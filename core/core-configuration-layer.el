@@ -25,10 +25,6 @@
 (defvar configuration-layer--refresh-package-timeout dotspacemacs-elpa-timeout
   "Timeout in seconds to reach a package archive page.")
 
-(defconst configuration-layer-template-directory
-  (expand-file-name (concat spacemacs-core-directory "templates/"))
-  "Configuration layer templates directory.")
-
 (defconst configuration-layer-directory
   (expand-file-name (concat spacemacs-start-directory "layers/"))
   "Spacemacs layers directory.")
@@ -609,49 +605,6 @@ To prevent package from being installed or uninstalled set the variable
       (spacemacs-buffer/message "Loading auto-layer file...")
       (load-file file))))
 
-(defun configuration-layer/create-layer ()
-  "Ask the user for a configuration layer name and the layer
-directory to use. Create a layer with this name in the selected
-layer directory."
-  (interactive)
-  (let* ((current-layer-paths (mapcar (lambda (dir) (expand-file-name dir))
-                                      (cl-pushnew
-                               configuration-layer-private-layer-directory
-                               dotspacemacs-configuration-layer-path)))
-         (other-choice "Another directory...")
-         (helm-lp-source
-          `((name . "Configuration Layer Paths")
-            (candidates . ,(append current-layer-paths
-                                   (list other-choice)))
-            (action . (lambda (c) c))))
-         (layer-path-sel (if (configuration-layer/layer-used-p 'ivy)
-                             (ivy-read "Configuration layer path: "
-                                       (append current-layer-paths
-                                               (list other-choice)))
-                           (helm :sources helm-lp-source
-                                 :prompt "Configuration layer path: ")))
-         (layer-path (cond
-                      ((string-equal layer-path-sel other-choice)
-                       (read-directory-name (concat "Other configuration "
-                                                    "layer path: ") "~/" ))
-                      ((member layer-path-sel current-layer-paths)
-                       layer-path-sel)
-                      (t
-                       (error "Please select an option from the list"))))
-         (name (read-from-minibuffer "Configuration layer name: " ))
-         (layer-dir (concat layer-path "/" name)))
-    (cond
-     ((string-equal "" name)
-      (message "Cannot create a configuration layer without a name."))
-     ((file-exists-p layer-dir)
-      (message (concat "Cannot create configuration layer \"%s\", "
-                       "this layer already exists.") name))
-     (t
-      (make-directory layer-dir t)
-      (configuration-layer//copy-template name "packages.el" layer-dir)
-      (when (y-or-n-p "Create readme?")
-        (configuration-layer//copy-template name "README.org" layer-dir))
-      (message "Configuration layer \"%s\" successfully created." name)))))
 
 (defun configuration-layer//select-packages (layer-specs packages)
   "Return the selected packages of LAYER-SPECS from given PACKAGES list."
@@ -1244,32 +1197,6 @@ PREDICATE is an additional expression that eval to a boolean."
   "Return an absolute path to the private configuration layer string NAME."
   (file-name-as-directory
    (concat configuration-layer-private-layer-directory name)))
-
-(defun configuration-layer//copy-template (name template &optional layer-dir)
-  "Copy and replace special values of TEMPLATE to layer string NAME.
-If LAYER_DIR is nil, the private directory is used."
-  (cl-flet ((substitute (old new) (let ((case-fold-search nil))
-                                    (save-excursion
-                                      (goto-char (point-min))
-                                      (while (search-forward old nil t)
-                                        (replace-match new t))))))
-    (let ((src (concat configuration-layer-template-directory
-                       (format "%s.template" template)))
-          (dest (if layer-dir
-                    (concat layer-dir "/" (format "%s" template))
-                  (concat (configuration-layer//get-private-layer-dir name)
-                          (format "%s" template)))))
-      (copy-file src dest)
-      (find-file dest)
-      (substitute "%LAYER_NAME%" name)
-      (cond
-       (user-full-name
-        (substitute "%USER_FULL_NAME%" user-full-name)
-        (substitute "%USER_MAIL_ADDRESS%" user-mail-address))
-       (t
-        (substitute "%USER_FULL_NAME%" "Sylvain Benner & Contributors")
-        (substitute "%USER_MAIL_ADDRESS%" "sylvain.benner@gmail.com")))
-      (save-buffer))))
 
 (defun configuration-layer//directory-type (path)
   "Return the type of directory pointed by PATH.
