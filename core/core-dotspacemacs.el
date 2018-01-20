@@ -88,20 +88,6 @@ as their unused dependencies. `used-but-keep-unused' installs only the used
 packages but won't delete unused ones. `all' installs *all*
 packages supported by Spacemacs and never uninstalls them.")
 
-(defvar dotspacemacs-enable-lazy-installation 'unused
-  "Lazy installation of layers (i.e. layers are installed only when a file
-with a supported type is opened). Possible values are `all', `unused' and `nil'.
-`unused' will lazy install only unused layers (i.e. layers not listed in
-variable `dotspacemacs-configuration-layers'), `all' will lazy install any layer
-that support lazy installation even the layers listed in
-`dotspacemacs-configuration-layers'. `nil' disable the lazy installation feature
-and you have to explicitly list a layer in the variable
-`dotspacemacs-configuration-layers' to install it.")
-
-(defvar dotspacemacs-ask-for-lazy-installation t
-  "If non-nil then Spacemacs will ask for confirmation before installing
-a layer lazily.")
-
 (defvar dotspacemacs-additional-packages '()
   "List of additional packages that will be installed wihout being
 wrapped in a layer. If you need some configuration for these

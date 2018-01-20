@@ -135,11 +135,6 @@ subdirectory of ROOT is used."
               :initform nil
               :type list
               :documentation "A list of variable-value pairs.")
-   (lazy-install :initarg :lazy-install
-                 :initform nil
-                 :type boolean
-                 :documentation
-                 "If non-nil then the layer needs to be installed")
    (disabled :initarg :disabled-for
              :initform nil
              :type list
@@ -246,11 +241,6 @@ If PROPS is non-nil then return packages as lists along with their properties."
          :initform nil
          :type (satisfies (lambda (x) (member x '(nil bootstrap pre))))
          :documentation "Initialization step.")
-   (lazy-install :initarg :lazy-install
-                 :initform nil
-                 :type boolean
-                 :documentation
-                 "If non-nil then the package needs to be installed")
    (protected :initarg :protected
               :initform nil
               :type boolean
@@ -359,9 +349,6 @@ file.")
 
 (defvar configuration-layer--protected-packages nil
   "A list of packages that will be protected from removal as orphans.")
-
-(defvar configuration-layer--lazy-mode-alist nil
-  "Association list where the key is a mode and the value a regexp.")
 
 (defvar configuration-layer--inhibit-errors nil
   "If non-nil then error messages emitted by the layer system are ignored.")
@@ -545,16 +532,13 @@ To prevent package from being installed or uninstalled set the variable
   (configuration-layer//load-layers-files configuration-layer--used-layers
                          '("funcs.el"))
   (configuration-layer//configure-layers configuration-layer--used-layers)
-  ;; load layers lazy settings
-  (configuration-layer/load-auto-layer-file)
   ;; install and/or uninstall packages
   (when spacemacs-sync-packages
     (let ((packages
            (append
             ;; install used packages
             (configuration-layer//filter-distant-packages
-             configuration-layer--used-packages t
-             '(not (oref pkg :lazy-install)))
+             configuration-layer--used-packages t)
             ;; also install all other packages if requested
             (when (eq 'all dotspacemacs-install-packages)
               (let (all-other-packages)
@@ -582,14 +566,6 @@ To prevent package from being installed or uninstalled set the variable
   (configuration-layer//load-layers-files configuration-layer--used-layers
                                           '("keybindings.el"))
   (run-hooks 'configuration-layer-post-load-hook))
-
-(defun configuration-layer/load-auto-layer-file ()
-  "Load `auto-layer.el' file"
-  (let ((file (concat configuration-layer-directory "auto-layer.el")))
-    (when (file-exists-p file)
-      (spacemacs-buffer/message "Loading auto-layer file...")
-      (load-file file))))
-
 
 (defun configuration-layer//select-packages (layer-specs packages)
   "Return the selected packages of LAYER-SPECS from given PACKAGES list."
@@ -885,19 +861,6 @@ a new object."
               (if (featurep pkg-symbol)
                   (princ "and loaded.\n")
                 (princ "but it has not been loaded yet.\n")))))
-        (when (configuration-layer/package-lazy-install-p pkg-symbol)
-          (princ
-           "\nThis package can be lazily installed using `auto-mode-alist'.\n")
-          (with-current-buffer standard-output
-            (save-excursion
-              (re-search-backward "`\\([^`']+\\)'" nil t)
-              (help-xref-button 1 'help-variable 'auto-mode-alist)))
-          (when (assq pkg-symbol configuration-layer--lazy-mode-alist)
-            (princ (concat "Actually it will be installed when one of the "
-                           "following files is opened: \n"))
-            (princ (cdr (assq pkg-symbol
-                              configuration-layer--lazy-mode-alist)))
-            (princ "\n")))
         ;; source location
         (let ((location (oref pkg :location)))
           (cond
@@ -1100,61 +1063,6 @@ USEDP if non-nil indicates that made packages are used packages."
         (setq obj (configuration-layer/make-package xpkg 'dotfile)))
       (configuration-layer//add-package obj usedp)
       (cfgl-package-set-property obj :excluded t))))
-
-(defun configuration-layer/lazy-install (layer-name &rest props)
-  "Configure auto-installation of layer with name LAYER-NAME."
-  (declare (indent 1))
-  (when (configuration-layer//lazy-install-p layer-name)
-    (let ((extensions (spacemacs/mplist-get props :extensions))
-          (interpreter (plist-get props :interpreter)))
-      (when (configuration-layer/layer-used-p layer-name)
-        (let* ((layer (configuration-layer/get-layer layer-name))
-               (package-names (when layer (cfgl-layer-owned-packages layer))))
-          ;; set lazy install flag for a layer if and only if its owned
-          ;; distant packages are all not already installed
-          (let ((lazy
-                 (or (eq 'all dotspacemacs-enable-lazy-installation)
-                     (cl-reduce
-                      (lambda (x y) (and x y))
-                      (mapcar
-                       (lambda (p)
-                         (let ((pkg (configuration-layer/get-package p)))
-                           (or (not (eq layer-name (car (oref pkg :owners))))
-                               (null (package-installed-p
-                                      (oref pkg :name))))))
-                       package-names)
-                      :initial-value t))))
-            (oset layer :lazy-install lazy)
-            (dolist (pkg-name package-names)
-              (let ((pkg (configuration-layer/get-package pkg-name)))
-                (cfgl-package-set-property pkg :lazy-install lazy))))))
-      ;; configure `auto-mode-alist'
-      (dolist (x extensions)
-        (let ((ext (car x))
-              (mode (cadr x)))
-          (add-to-list 'configuration-layer--lazy-mode-alist (cons mode ext))
-          (add-to-list
-           'auto-mode-alist
-           `(,ext . (lambda ()
-                      (configuration-layer//auto-mode
-                       ',layer-name ',mode))))
-          ))
-      ;; configure `interpreter-mode-alist'
-      (when interpreter
-        (let ((regex (car interpreter))
-              (mode (cadr interpreter)))
-          (add-to-list
-           'interpreter-mode-alist
-           `(,regex . (lambda () (configuration-layer//auto-mode
-                               ',layer-name ',mode)))))))))
-
-(defun configuration-layer//auto-mode (layer-name mode)
-  "Auto mode support of lazily installed layers."
-  (let ((layer (configuration-layer/get-layer layer-name)))
-    (when (or (oref layer :lazy-install)
-              (not (configuration-layer/layer-used-p layer-name)))
-      (configuration-layer//lazy-install-packages layer-name mode)))
-  (when (fboundp mode) (funcall mode)))
 
 (defun configuration-layer/filter-objects (objects ffunc)
   "Return a filtered OBJECTS list where each element satisfies FFUNC."
@@ -1437,11 +1345,6 @@ RNAME is the name symbol of another existing layer."
                   'configuration-layer/package-used-p
                   (oref pkg :requires)))))
 
-(defun  configuration-layer/package-lazy-install-p (name)
-  "Return non-nil if NAME is the name of a package to be lazily installed."
-  (let ((obj (configuration-layer/get-package name)))
-    (when obj (oref obj :lazy-install))))
-
 (defun configuration-layer//configure-layers (layer-names)
   "Configure layers with LAYER-NAMES."
   (let ((warning-minimum-level :error))
@@ -1516,11 +1419,9 @@ RNAME is the name symbol of another existing layer."
       (condition-case-unless-debug err
           (cond
            ((or (null pkg) (eq 'elpa location))
-            (configuration-layer//install-from-elpa pkg-name)
-            (when pkg (cfgl-package-set-property pkg :lazy-install nil)))
+            (configuration-layer//install-from-elpa pkg-name))
            ((and (listp location) (eq 'recipe (car location)))
-            (configuration-layer//install-from-recipe pkg)
-            (cfgl-package-set-property pkg :lazy-install nil))
+            (configuration-layer//install-from-recipe pkg))
            (t (configuration-layer//warning "Cannot install package %S."
                                         pkg-name)))
         ('error
@@ -1528,45 +1429,6 @@ RNAME is the name symbol of another existing layer."
           (concat "\nAn error occurred while installing %s "
                   "(error: %s)\n") pkg-name err)
          (spacemacs//redisplay))))))
-
-(defun configuration-layer//lazy-install-p (layer-name)
-  "Return non nil if the layer with LAYER-NAME should be lazy installed."
-  (or (eq 'all dotspacemacs-enable-lazy-installation)
-      (and (memq dotspacemacs-enable-lazy-installation '(unused t))
-           (not (configuration-layer/layer-used-p layer-name)))))
-
-(defun configuration-layer//lazy-install-packages (layer-name mode)
-  "Install layer with LAYER-NAME to support MODE."
-  (when (or (not dotspacemacs-ask-for-lazy-installation)
-            (and
-             (not noninteractive)
-             (yes-or-no-p (format
-                           (concat "Support for %s requires installation of "
-                                   "layer %s, do you want to install it?")
-                           mode layer-name))))
-    (when (dotspacemacs/add-layer layer-name)
-      (let (spacemacs-sync-packages)
-        (configuration-layer/load)))
-    (let* ((layer (configuration-layer/get-layer layer-name))
-           (inst-pkgs
-            (delq nil
-                  (mapcar
-                   (lambda (x)
-                     (let* ((pkg-name (if (listp x) (car x) x))
-                            (pkg (configuration-layer/get-package pkg-name)))
-                       (cfgl-package-set-property pkg :lazy-install nil)
-                       (when (cfgl-package-distant-p pkg)
-                         pkg-name)))
-                   (oref layer :packages)))))
-      (let ((last-buffer (current-buffer))
-            (sorted-pkg (configuration-layer//sort-packages inst-pkgs)))
-        (spacemacs-buffer/goto-buffer)
-        (goto-char (point-max))
-        (configuration-layer//install-packages sorted-pkg)
-        (configuration-layer//configure-packages sorted-pkg)
-        (configuration-layer//load-layer-files layer '("keybindings.el"))
-        (oset layer :lazy-install nil)
-        (switch-to-buffer last-buffer)))))
 
 (defun configuration-layer//install-packages (packages)
   "Install PACKAGES which are not lazy installed."
@@ -1733,9 +1595,6 @@ RNAME is the name symbol of another existing layer."
       (spacemacs-buffer/loading-animation)
       (let ((pkg (configuration-layer/get-package pkg-name)))
         (cond
-         ((oref pkg :lazy-install)
-          (spacemacs-buffer/message
-           (format "%S ignored since it can be lazily installed." pkg-name)))
          ((and (oref pkg :excluded)
                (not (oref pkg :protected)))
           (spacemacs-buffer/message
@@ -2154,13 +2013,8 @@ depends on it."
 
 (defun configuration-layer//package-delete (pkg-name)
   "Delete package with name PKG-NAME."
-  (cond
-   ((version<= "25.0.50" emacs-version)
-    (let ((p (cadr (assq pkg-name package-alist))))
-      ;; add force flag to ignore dependency checks in Emacs25
-      (when p (package-delete p t t))))
-   (t (let ((p (cadr (assq pkg-name package-alist))))
-        (when p (package-delete p))))))
+  (let ((p (cadr (assq pkg-name package-alist))))
+    (when p (package-delete p t t))))
 
 (defun configuration-layer/delete-orphan-packages (packages)
   "Delete PACKAGES if they are orphan."
@@ -2197,59 +2051,6 @@ depends on it."
             (spacemacs//redisplay))
           (spacemacs-buffer/append "\n"))
       (spacemacs-buffer/message "No orphan package to delete."))))
-
-(defun configuration-layer//gather-auto-mode-extensions (mode)
-  "Return a regular expression matching all the extensions associate to MODE."
-  (let (gather-extensions)
-    (dolist (x auto-mode-alist)
-      (let ((ext (car x))
-            (auto-mode (cdr x)))
-        (when (and (stringp ext)
-                   (symbolp auto-mode)
-                   (eq auto-mode mode))
-          (push (car x) gather-extensions))))
-    (when gather-extensions
-        (concat "\\("
-                (string-join gather-extensions "\\|")
-                "\\)"))))
-
-(defun configuration-layer//lazy-install-extensions-for-layer (layer-name)
-  "Return an alist of owned modes and extensions for the passed layer."
-  (let* ((layer (configuration-layer/get-layer layer-name))
-         (package-names (cfgl-layer-owned-packages layer))
-         result)
-    (dolist (pkg-name package-names)
-      (dolist (mode (list pkg-name (intern (format "%S-mode" pkg-name))))
-        (let ((ext (configuration-layer//gather-auto-mode-extensions mode)))
-          (when ext (push (cons mode ext) result)))))
-    result))
-
-(defun configuration-layer//insert-lazy-install-form (layer-name mode ext)
-  "Insert a configuration form for lazy installation of MODE."
-  (let ((str (concat "(configuration-layer/lazy-install '"
-                     (symbol-name layer-name)
-                     " :extensions '("
-                     (let ((print-quoted t)) (prin1-to-string ext))
-                     " "
-                     (symbol-name mode)
-                     "))\n")))
-    (insert str)))
-
-(defun configuration-layer/insert-lazy-install-configuration ()
-  "Prompt for a layer and insert the forms to configure lazy installation."
-  (interactive)
-  (let ((layer-name
-         (intern (completing-read
-                  "Choose a used layer"
-                  (sort configuration-layer--used-layers
-                        (lambda (x y)
-                          (string< (oref (cdr x) :name)
-                                   (oref (cdr y) :name))))))))
-    (let ((mode-exts (configuration-layer//lazy-install-extensions-for-layer
-                      layer-name)))
-      (dolist (x mode-exts)
-        (configuration-layer//insert-lazy-install-form
-         layer-name (car x) (cdr x))))))
 
 (defvar configuration-layer--spacemacs-startup-time nil
   "Spacemacs full startup duration.")
