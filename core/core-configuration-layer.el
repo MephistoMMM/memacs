@@ -29,21 +29,6 @@
   (expand-file-name (concat spacemacs-start-directory "layers/"))
   "Spacemacs layers directory.")
 
-(defconst configuration-layer-private-directory
-  (expand-file-name (concat spacemacs-start-directory "private/"))
-  "Spacemacs private layers base directory.")
-
-(defconst configuration-layer-private-layer-directory
-  (let ((dotspacemacs-layer-dir
-         (when dotspacemacs-directory
-           (expand-file-name
-            (concat dotspacemacs-directory "layers/")))))
-    (if (and dotspacemacs-directory
-             (file-exists-p dotspacemacs-layer-dir))
-        dotspacemacs-layer-dir
-      configuration-layer-private-directory))
-  "Spacemacs default directory for private layers.")
-
 (defconst configuration-layer-lock-file
   (concat spacemacs-start-directory ".lock")
   "Absolute path to the lock file.")
@@ -1193,11 +1178,6 @@ PREDICATE is an additional expression that eval to a boolean."
             (or (null predicate)
                 (eval predicate)))))))
 
-(defun configuration-layer//get-private-layer-dir (name)
-  "Return an absolute path to the private configuration layer string NAME."
-  (file-name-as-directory
-   (concat configuration-layer-private-layer-directory name)))
-
 (defun configuration-layer//directory-type (path)
   "Return the type of directory pointed by PATH.
 Possible return values:
@@ -1244,8 +1224,6 @@ discovery."
   (let ((search-paths (append
                        ;; layers shipped with spacemacs
                        (list configuration-layer-directory)
-                       ;; layers in private folder ~/.emacs.d/private
-                       (list configuration-layer-private-directory)
                        ;; layers in dotdirectory
                        ;; this path may not exist, so check if it does
                        (when dotspacemacs-directory
@@ -1815,7 +1793,7 @@ RNAME is the name symbol of another existing layer."
       nil))
    ((eq 'local location)
     (let ((dir (if (eq 'dotfile owner)
-                   configuration-layer-private-directory
+                   spacemacs-start-directory
                  (let* ((owner (configuration-layer/get-layer owner)))
                    (when owner (oref owner :dir))))))
       (if dir
