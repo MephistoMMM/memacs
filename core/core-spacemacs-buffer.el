@@ -112,12 +112,9 @@ FILE: the path to the file containing the banner."
      (buffer-string))))
 
 (defun spacemacs-buffer/insert-banner-and-buttons ()
-  "Choose a banner according to `dotspacemacs-startup-banner'and insert it.
+  "Load a banner according to `spacemacs-banner-official-png'and insert it.
 in spacemacs buffer along with quick buttons underneath.
-Easter egg:
-Doge special text banner can be reachable via `999', `doge' or `random*'.
-Cate special text banner can de reachable via `998', `cat' or `random*'.
-`random' ignore special banners whereas `random*' does not."
+"
   (let ((banner (spacemacs-buffer//choose-banner))
         (buffer-read-only nil))
     (progn
@@ -151,49 +148,16 @@ Cate special text banner can de reachable via `998', `cat' or `random*'.
 
 (defun spacemacs-buffer//choose-banner ()
   "Return the full path of a banner based on the dotfile value."
-  (when dotspacemacs-startup-banner
-    (cond ((eq 'official dotspacemacs-startup-banner)
-           (if (and (display-graphic-p) (image-type-available-p 'png))
-               spacemacs-banner-official-png
-             (spacemacs-buffer//get-banner-path 1)))
-          ((eq 'random dotspacemacs-startup-banner)
-           (spacemacs-buffer//choose-random-text-banner))
-          ((eq 'random* dotspacemacs-startup-banner)
-           (spacemacs-buffer//choose-random-text-banner t))
-          ((eq 'doge dotspacemacs-startup-banner)
-           (spacemacs-buffer//get-banner-path 999))
-          ((eq 'cat dotspacemacs-startup-banner)
-           (spacemacs-buffer//get-banner-path 998))
-          ((integerp dotspacemacs-startup-banner)
-           (spacemacs-buffer//get-banner-path dotspacemacs-startup-banner))
-          ((and dotspacemacs-startup-banner
-                (image-type-available-p (intern (file-name-extension
-                                                 dotspacemacs-startup-banner)))
-                (display-graphic-p))
-           (if (file-exists-p dotspacemacs-startup-banner)
-               dotspacemacs-startup-banner
-             (spacemacs-buffer/warning (format "could not find banner %s"
-                                               dotspacemacs-startup-banner))
-             (spacemacs-buffer//get-banner-path 1)))
-          (t (spacemacs-buffer//get-banner-path 1)))))
-
-(defvar spacemacs-buffer--random-banner nil
-  "The random banner chosen.")
-
-(defun spacemacs-buffer//choose-random-text-banner (&optional all)
-  "Return the full path of a banner chosen randomly.
-If ALL is non-nil then truly all banners can be selected."
-  (setq spacemacs-buffer--random-banner
-        (or spacemacs-buffer--random-banner
-            (let* ((files (directory-files spacemacs-banner-directory t ".*\.txt"))
-                   (count (length files))
-                   ;; -2 to remove the two last ones (easter eggs)
-                   (choice (random (- count (if all 0 2)))))
-              (nth choice files)))))
-
-(defun spacemacs-buffer//get-banner-path (index)
-  "Return the full path to banner with index INDEX."
-  (concat spacemacs-banner-directory (format "%03d-banner.txt" index)))
+  (cond ((and spacemacs-banner-official-png
+              (image-type-available-p (intern (file-name-extension
+                                               spacemacs-banner-official-png)))
+              (display-graphic-p))
+         (if (file-exists-p spacemacs-banner-official-png)
+             spacemacs-banner-official-png
+           (spacemacs-buffer/warning (format "could not find banner %s"
+                                             spacemacs-banner-official-png))
+           (concat spacemacs-banner-directory "default-banner.txt")))
+        (t (concat spacemacs-banner-directory "default-banner.txt"))))
 
 (defun spacemacs-buffer//insert-image-banner (banner)
   "Display an image banner.
@@ -232,30 +196,20 @@ Insert it in the first line of the buffer, right justified."
 (defun spacemacs-buffer//insert-footer ()
   "Insert the footer of the home buffer."
   (save-excursion
-    (let* ((badge-path spacemacs-badge-official-png)
-           (badge (when (and (display-graphic-p)
-                             (image-type-available-p
-                              (intern (file-name-extension badge-path))))
-                    (create-image badge-path)))
-           (badge-size (when badge (car (image-size badge))))
-           (heart-path spacemacs-purple-heart-png)
+    (let* ((heart-path spacemacs-purple-heart-png)
            (heart (when (and (display-graphic-p)
                              (image-type-available-p
-                              (intern (file-name-extension badge-path))))
+                              (intern (file-name-extension heart-path))))
                     (create-image heart-path)))
            (heart-size (when heart (car (image-size heart))))
            (build-lhs "Made with ")
-           (build-rhs " by the community")
+           (build-rhs " by the Mephis Pheies")
            (buffer-read-only nil))
-      (when (or badge heart)
+      (when heart
         (goto-char (point-max))
         (spacemacs-buffer/insert-page-break)
         (insert "\n")
-        (when badge
-          (insert-image badge)
-          (spacemacs-buffer//center-line badge-size))
         (when heart
-          (when badge (insert "\n\n"))
           (insert build-lhs)
           (insert-image heart)
           (insert build-rhs)

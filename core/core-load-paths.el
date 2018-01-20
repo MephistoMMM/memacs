@@ -32,12 +32,8 @@
   (expand-file-name (concat spacemacs-core-directory "banners/"))
   "Spacemacs banners directory.")
 (defconst spacemacs-banner-official-png
-  (expand-file-name (concat spacemacs-banner-directory "img/spacemacs.png"))
+  (expand-file-name (concat spacemacs-banner-directory "img/banner.png"))
   "Spacemacs official banner image.")
-(defconst spacemacs-badge-official-png
-  (expand-file-name (concat spacemacs-banner-directory
-                            "img/spacemacs-badge.png"))
-  "Spacemacs official badge image.")
 (defconst spacemacs-purple-heart-png
   (expand-file-name (concat spacemacs-banner-directory "img/heart.png"))
   "Purple heart emoji.")
@@ -56,9 +52,6 @@
 (defconst spacemacs-assets-directory
   (expand-file-name (concat spacemacs-start-directory "assets/"))
   "Spacemacs assets directory.")
-(defconst spacemacs-test-directory
-  (expand-file-name (concat spacemacs-start-directory "tests/"))
-  "Spacemacs tests directory.")
 
 (defconst user-home-directory
   (expand-file-name "~/")
