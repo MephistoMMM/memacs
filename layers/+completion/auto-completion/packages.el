@@ -222,22 +222,12 @@
                                           "snippets/"))
              (spacemacs-layer-snippets-dir (expand-file-name
                                       "snippets"
-                                      spacemacs--auto-completion-dir))
-             (dotspacemacs-directory-snippets-dir
-              (when dotspacemacs-directory
-                (let ((snippet-dir (expand-file-name
-                                    "snippets"
-                                    dotspacemacs-directory)))
-                  (when (file-accessible-directory-p snippet-dir)
-                    snippet-dir)))))
+                                      spacemacs--auto-completion-dir)))
         (setq yas-snippet-dirs nil)
         ;; ~/.emacs.d/layers/auto-completion/snippets
         (add-to-list 'yas-snippet-dirs spacemacs-layer-snippets-dir)
-        ;; ~/.emacs.d/private/snippets
+        ;; ~/.emacs.d/snippets
         (add-to-list 'yas-snippet-dirs emacs-directory-snippets-dir)
-        ;; ~/.spacemacs.d/snippets
-        (when dotspacemacs-directory-snippets-dir
-          (add-to-list 'yas-snippet-dirs dotspacemacs-directory-snippets-dir))
         ;; arbitrary directories in `auto-completion-private-snippets-directory'
         (when auto-completion-private-snippets-directory
           (if (listp auto-completion-private-snippets-directory)

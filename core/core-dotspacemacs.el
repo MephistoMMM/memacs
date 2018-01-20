@@ -8,49 +8,14 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; License: GPLv3
-(defconst dotspacemacs-template-directory
-  (expand-file-name (concat spacemacs-core-directory "templates/"))
-  "Templates directory.")
-
 (defconst dotspacemacs-test-results-buffer "*dotfile-test-results*"
   "Name of the buffer to display dotfile test results.")
 
-(let* ((env (getenv "SPACEMACSDIR"))
-       (env-dir (when env (expand-file-name (concat env "/"))))
-       (env-init (and env-dir (expand-file-name "init.el" env-dir)))
-       (no-env-dir-default (expand-file-name
-                            (concat user-home-directory
-                                    ".spacemacs.d/")))
-       (default-init (expand-file-name ".spacemacs" user-home-directory)))
-  (defconst dotspacemacs-directory
-    (cond
-     ((and env (file-exists-p env-dir))
-      env-dir)
-     ((file-exists-p no-env-dir-default)
-      no-env-dir-default)
-     (t
-      nil))
-    "Optional spacemacs directory, which defaults to
-~/.spacemacs.d. This setting can be overridden using the
-SPACEMACSDIR environment variable. If neither of these
-directories exist, this variable will be nil.")
+(let* ((default-init (expand-file-name "memacs" spacemacs-start-directory)))
+  (defvar dotspacemacs-filepath default-init)
+  "Filepath to the installed dotfile. ~/.spacemacs")
 
-  (defvar dotspacemacs-filepath
-    (let ((spacemacs-dir-init (when dotspacemacs-directory
-                                 (concat dotspacemacs-directory
-                                         "init.el"))))
-      (cond
-       (env-init)
-       ((file-exists-p default-init) default-init)
-       ((and dotspacemacs-directory (file-exists-p spacemacs-dir-init)) spacemacs-dir-init)
-       (t default-init)))
-    "Filepath to the installed dotfile. If SPACEMACSDIR is given
-then SPACEMACSDIR/init.el is used. Otherwise, if ~/.spacemacs
-exists, then this is used. If ~/.spacemacs does not exist, then
-check for init.el in dotspacemacs-directory and use this if it
-exists. Otherwise, fallback to ~/.spacemacs"))
-
-(defvar dotspacemacs-distribution 'spacemacs
+(defvar dotspacemacs-distribution 'spacemacs-base
   "Base distribution to use. This is a layer contained in the directory
 `+distributions'. For now available distributions are `spacemacs-base'
 or `spacemacs'.")
@@ -104,13 +69,6 @@ in `dotspacemacs-themes'.")
 `hybrid state' with `emacs' key bindings. The value can also be a list
  with `:variables' keyword (similar to layers). Check the editing styles
  section of the documentation for details on available variables.")
-
-(defvar dotspacemacs-startup-banner 'official
-   "Specify the startup banner. Default value is `official', it displays
-the official spacemacs logo. An integer value is the index of text
-banner, `random' chooses a random text banner in `core/banners'
-directory. A string value must be a path to a .PNG file.
-If the value is nil then no banner is displayed.")
 
 (defvar dotspacemacs-scratch-mode 'text-mode
   "Default major mode of the scratch buffer.")
@@ -517,19 +475,6 @@ If SYMBOL value is `display-graphic-p' then return the result of
   "Return the absolute path to the spacemacs dotfile."
   dotspacemacs-filepath)
 
-(defun dotspacemacs/copy-template ()
-  "Copy `.spacemacs.template' in home directory. Ask for confirmation
-before copying the file if the destination already exists."
-  (interactive)
-  (let* ((copy? (if (file-exists-p dotspacemacs-filepath)
-                    (y-or-n-p
-                     (format "%s already exists. Do you want to overwrite it ? "
-                             dotspacemacs-filepath)) t)))
-    (when copy?
-      (copy-file (concat dotspacemacs-template-directory
-                         ".spacemacs.template") dotspacemacs-filepath t)
-      (message "%s has been installed." dotspacemacs-filepath))))
-
 (defun dotspacemacs//ido-completing-read (prompt candidates)
   "Call `ido-completing-read' with a CANDIDATES alist where the key is
 a display strng and the value is the actual value to return."
@@ -537,69 +482,12 @@ a display strng and the value is the actual value to return."
     (cadr (assoc (ido-completing-read prompt (mapcar 'car candidates))
                  candidates))))
 
-(defun dotspacemacs/maybe-install-dotfile ()
-  "Install the dotfile if it does not exist."
-  (unless (file-exists-p dotspacemacs-filepath)
-    (spacemacs-buffer/set-mode-line "Dotfile wizard installer" t)
-    (when (dotspacemacs/install 'with-wizard)
-      (configuration-layer/load))))
-
-(defun dotspacemacs/install (arg)
-  "Install the dotfile, return non nil if the doftile has been installed.
-
-If ARG is non nil then Ask questions to the user before installing the dotfile."
-  (interactive "P")
-  ;; preferences is an alist where the key is the text to replace by
-  ;; the value in the dotfile
-  (let ((preferences
-         (when arg
-           ;; editing style
-           `(("dotspacemacs-editing-style 'vim"
-              ,(format
-                "dotspacemacs-editing-style '%S"
-                (dotspacemacs//ido-completing-read
-                 "What is your preferred editing style? "
-                 '(("Among the stars aboard the Evil flagship (vim)"
-                    vim)
-                   ("On the planet Emacs in the Holy control tower (emacs)"
-                    emacs)))))
-             ("dotspacemacs-distribution 'spacemacs"
-              ,(format
-                "dotspacemacs-distribution '%S"
-                (dotspacemacs//ido-completing-read
-                 "What distribution of spacemacs would you like to start with? "
-                 `(("The standard distribution, recommended (spacemacs)"
-                    spacemacs)
-                   (,(concat "A minimalist distribution that you can build on "
-                             "(spacemacs-base)")
-                    spacemacs-base)))))))))
-    (with-current-buffer (find-file-noselect
-                          (concat dotspacemacs-template-directory
-                                  ".spacemacs.template"))
-      (dolist (p preferences)
-        (goto-char (point-min))
-        (re-search-forward (car p))
-        (replace-match (cadr p)))
-      (let ((install
-             (if (file-exists-p dotspacemacs-filepath)
-                 (y-or-n-p
-                  (format "%s already exists. Do you want to overwrite it ? "
-                          dotspacemacs-filepath)) t)))
-        (when install
-          (write-file dotspacemacs-filepath)
-          (message "%s has been installed." dotspacemacs-filepath)
-          t))))
-  (dotspacemacs/load-file)
-  ;; force new wizard values to be applied
-  (dotspacemacs/init))
-
 (defun dotspacemacs/load-file ()
   "Load ~/.spacemacs if it exists."
   (let ((dotspacemacs (dotspacemacs/location)))
     (if (file-exists-p dotspacemacs)
         (unless (with-demoted-errors "Error loading .spacemacs: %S"
-                  (load dotspacemacs))
-          (dotspacemacs/safe-load)))))
+                  (load dotspacemacs))))))
 
 (defun spacemacs/title-prepare (title-format)
   "A string is printed verbatim except for %-constructs.
@@ -648,41 +536,6 @@ If ARG is non nil then Ask questions to the user before installing the dotfile."
               ?- "%-"
               )))
     (format-spec title-format fs)))
-
-(defun dotspacemacs/safe-load ()
-  "Error recovery from malformed .spacemacs.
-Loads default .spacemacs template and suspends pruning of orphan packages.
-Informs users of error and prompts for default editing style for use during
-error recovery."
-  (load (concat dotspacemacs-template-directory
-                ".spacemacs.template"))
-  (defadvice dotspacemacs/layers
-      (after error-recover-preserve-packages activate)
-    (progn
-      (setq-default dotspacemacs-install-packages 'used-but-keep-unused)
-      (ad-disable-advice 'dotspacemacs/layers 'after
-                         'error-recover-preserve-packages)
-      (ad-activate 'dotspacemacs/layers)))
-  (defadvice dotspacemacs/init
-      (after error-recover-prompt-for-style activate)
-    (progn
-      (setq-default dotspacemacs-editing-style
-                    (intern
-                     (ido-completing-read
-                      (format
-                       (concat
-                        "Spacemacs encountered an error while "
-                        "loading your `%s' file.\n"
-                        "Pick your editing style for recovery "
-                        "(use left and right arrows): ")
-                       dotspacemacs-filepath)
-                      '(("vim" vim)
-                        ("emacs" emacs)
-                        ("hybrid" hybrid))
-                      nil t nil nil 'vim)))
-      (ad-disable-advice 'dotspacemacs/init 'after
-                         'error-recover-prompt-for-style)
-      (ad-activate 'dotspacemacs/init))))
 
 (defun dotspacemacs//test-dotspacemacs/layers ()
   "Tests for `dotspacemacs/layers'"

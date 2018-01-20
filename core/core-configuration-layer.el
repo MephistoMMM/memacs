@@ -1125,19 +1125,12 @@ If REFRESH-INDEX is non-nil, the layer index is cleared before
 discovery."
   ;; load private layers at the end on purpose we asume that the user layers
   ;; must have the final word on configuration choices. Let
-  ;; `dotspacemacs-directory' override the private directory if it exists.
   (when refresh-index
     (setq configuration-layer--indexed-layers (make-hash-table :size 1024)))
   (spacemacs-buffer/set-mode-line "Indexing layers..." t)
   (let ((search-paths (append
                        ;; layers shipped with spacemacs
                        (list configuration-layer-directory)
-                       ;; layers in dotdirectory
-                       ;; this path may not exist, so check if it does
-                       (when dotspacemacs-directory
-                         (let ((dir (expand-file-name (concat dotspacemacs-directory
-                                                              "layers/"))))
-                           (when (file-exists-p dir) (list dir))))
                        ;; additional layer directories provided by the user
                        dotspacemacs-configuration-layer-path))
         (discovered '()))

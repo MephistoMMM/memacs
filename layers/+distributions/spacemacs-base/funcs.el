@@ -555,12 +555,6 @@ If the universal prefix argument is used then will the windows too."
   (interactive)
   (find-file-existing (dotspacemacs/location)))
 
-(defun spacemacs/ediff-dotfile-and-template ()
-  "ediff the current `dotfile' with the template"
-  (interactive)
-  (ediff-files (dotspacemacs/location)
-               (concat dotspacemacs-template-directory ".spacemacs.template")))
-
 (defun spacemacs/new-empty-buffer (&optional split)
   "Create a new buffer called untitled(<n>).
 A SPLIT argument with the value: `left',
