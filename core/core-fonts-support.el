@@ -40,21 +40,12 @@ The return value is nil if no font was found, truthy otherwise."
           ;; fallback font for unicode characters used in spacemacs
           (pcase system-type
             (`gnu/linux
-             (setq fallback-font-name "NanumGothic")
-             (setq fallback-font-name2 "NanumGothic"))
+             (setq fallback-font-name "NanumGothic"))
             (`darwin
-             (setq fallback-font-name "Arial Unicode MS")
-             (setq fallback-font-name2 "Arial Unicode MS"))
-            (`windows-nt
-             (setq fallback-font-name "MS Gothic")
-             (setq fallback-font-name2 "Lucida Sans Unicode"))
-            (`cygwin
-             (setq fallback-font-name "MS Gothic")
-             (setq fallback-font-name2 "Lucida Sans Unicode"))
+             (setq fallback-font-name "Arial Unicode MS"))
             (other
-             (setq fallback-font-name nil)
-             (setq fallback-font-name2 nil)))
-          (when (and fallback-font-name fallback-font-name2)
+             (setq fallback-font-name nil)))
+          (when (and fallback-font-name)
             ;; remove any size or height properties in order to be able to
             ;; scale the fallback fonts with the default one (for zoom-in/out
             ;; for instance)
@@ -63,10 +54,7 @@ The return value is nil if no font was found, truthy otherwise."
                                     :height))
                    (fallback-spec (apply 'font-spec
                                          :name fallback-font-name
-                                         fallback-props))
-                   (fallback-spec2 (apply 'font-spec
-                                          :name fallback-font-name2
-                                          fallback-props)))
+                                         fallback-props)))
               ;; window numbers
               (set-fontset-font "fontset-default"
                                 '(#x2776 . #x2793) fallback-spec nil 'prepend)
@@ -75,10 +63,7 @@ The return value is nil if no font was found, truthy otherwise."
                                 '(#x24b6 . #x24fe) fallback-spec nil 'prepend)
               ;; mode-line additional characters
               (set-fontset-font "fontset-default"
-                                '(#x2295 . #x22a1) fallback-spec nil 'prepend)
-              ;; new version lighter
-              (set-fontset-font "fontset-default"
-                                '(#x2190 . #x2200) fallback-spec2 nil 'prepend))))
+                                '(#x2295 . #x22a1) fallback-spec nil 'prepend))))
         (throw 'break t)))
     nil))
 

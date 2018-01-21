@@ -154,10 +154,7 @@ the final step of executing code in `emacs-startup-hook'.")
     (spacemacs-buffer/message (concat "No graphical support detected, "
                                       "you won't be able to launch a "
                                       "graphical instance of Emacs"
-                                      "with this build.")))
-  ;; check for new version
-  (if dotspacemacs-mode-line-unicode-symbols
-      (setq-default spacemacs-version-check-lighter "[⇪]")))
+                                      "with this build."))))
 
 (defun spacemacs//removes-gui-elements ()
   "Remove the menu bar, tool bar and scroll bars."
