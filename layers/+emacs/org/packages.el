@@ -26,8 +26,7 @@
         (org-expiry :location built-in)
         (org-journal :toggle org-enable-org-journal-support)
         org-download
-        ;; org-mime is installed by `org-plus-contrib'
-        (org-mime :location built-in)
+        org-mime
         org-pomodoro
         org-present
         (org-projectile :requires projectile)
@@ -55,7 +54,8 @@
     :init
     (progn
       (add-hook 'org-mode-hook 'spacemacs//evil-org-mode)
-      (setq evil-org-key-theme `(textobjects
+      (setq evil-org-use-additional-insert t
+            evil-org-key-theme `(textobjects
                                  navigation
                                  additional
                                  ,@(when org-want-todo-bindings '(todo)))))
@@ -493,6 +493,10 @@ Headline^^            Visit entry^^               Filter^^                    Da
       :bindings
       "j" 'org-agenda-next-line
       "k" 'org-agenda-previous-line
+      ;; C-h should not be rebound by evilification so we unshadow it manually
+      ;; TODO add the rule in auto-evilification to ignore C-h (like we do
+      ;; with C-g)
+      (kbd "C-h") nil
       (kbd "M-j") 'org-agenda-next-item
       (kbd "M-k") 'org-agenda-previous-item
       (kbd "M-h") 'org-agenda-earlier
