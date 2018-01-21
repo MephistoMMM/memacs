@@ -18,6 +18,8 @@
 - 删除 spacemacs 新版本确认
 - 删除所有冗余的主题申明
 - 删除默认微软字体定义，我不需要支持windows版emacs
+- 删除所有没用的持续集成配置文件
+- 删除github的issue和pull request文本文件
 
 ## License
 
