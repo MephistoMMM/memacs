@@ -18,7 +18,6 @@
 (require 'core-configuration-layer)
 (require 'core-dotspacemacs)
 (require 'core-custom-settings)
-(require 'core-release-management)
 (require 'core-jump)
 (require 'core-display-init)
 (require 'core-themes-support)
@@ -227,7 +226,6 @@ defer call using `spacemacs-post-user-config-hook'."
                              spacemacs--fallback-theme t))
      (configuration-layer/display-summary emacs-start-time)
      (spacemacs-buffer//startup-hook)
-     (spacemacs/check-for-new-version nil spacemacs-version-check-interval)
      (setq spacemacs-initialized t))))
 
 (provide 'core-spacemacs)

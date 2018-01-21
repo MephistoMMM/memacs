@@ -159,7 +159,6 @@ seconds to load")
            "- OS: %s\n"
            "- Emacs: %s\n"
            "- Spacemacs: %s\n"
-           "- Spacemacs branch: %s (rev. %s)\n"
            "- Graphic display: %s\n"
            "- Distribution: %s\n"
            "- Editing style: %s\n"
@@ -169,8 +168,6 @@ seconds to load")
    system-type
    emacs-version
    spacemacs-version
-   (spacemacs//git-get-current-branch)
-   (spacemacs/git-get-current-branch-rev)
    (display-graphic-p)
    dotspacemacs-distribution
    dotspacemacs-editing-style

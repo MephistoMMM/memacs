@@ -611,13 +611,6 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
                  :mouse-face 'highlight
                  :follow-link "\C-m"
                  "https://gitter.im/syl20bnr/spacemacs")
-  (insert " ")
-  (widget-create 'push-button
-                 :help-echo "Update Spacemacs core and layers."
-                 :action (lambda (&rest ignore) (spacemacs/switch-to-version))
-                 :mouse-face 'highlight
-                 :follow-link "\C-m"
-                 (propertize "Update Spacemacs" 'face 'font-lock-keyword-face))
   (let ((len (- (line-end-position)
                 (line-beginning-position))))
     (spacemacs-buffer//center-line)

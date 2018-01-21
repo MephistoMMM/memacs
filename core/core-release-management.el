@@ -17,7 +17,6 @@
 (defconst spacemacs-checkversion-branch "master"
   "Name of the branch used to check for new version.")
 
-(defvar dotspacemacs-check-for-update)
 (defvar spacemacs-version)
 ;; new version variables
 (defvar spacemacs-new-version nil
@@ -82,85 +81,6 @@ users on `develop' branch must manually pull last commits instead."
                (message "An error occurred while switching to version %s"
                         version))))
           (t (message "Update aborted.")))))
-
-(defun spacemacs/check-for-new-version (force &optional interval)
-  "Periodically check for new for new Spacemacs version.
-Update `spacemacs-new-version' variable if any new version has been
-found."
-  (interactive "P")
-  (cond
-   ((and (not force)
-         (not dotspacemacs-check-for-update))
-    (message "Skipping check for new version (reason: dotfile)"))
-   ((and (not force)
-         (string-equal "develop" (spacemacs//git-get-current-branch)))
-    (message "Skipping check for new version (reason: develop branch)"))
-   ((and (not force)
-         (not (spacemacs//can-check-for-new-version-at-startup)))
-    (message (concat "Skipping check for new version "
-                     "(reason: last check is too recent)")))
-   ((require 'async nil t)
-    (message "Start checking for new version...")
-    (async-start
-     `(lambda ()
-        ,(async-inject-variables "\\`spacemacs-start-directory\\'")
-        (load-file (concat spacemacs-start-directory
-                           "core/core-load-paths.el"))
-        (require 'core-spacemacs)
-        (spacemacs/get-last-version))
-     (lambda (result)
-       (if result
-           (if (or (version< result spacemacs-version)
-                   (string= result spacemacs-version)
-                   (if spacemacs-new-version
-                       (string= result spacemacs-new-version)))
-               (message "Spacemacs is up to date.")
-             (message "New version of Spacemacs available: %s" result)
-             (setq spacemacs-new-version result))
-         (message "Unable to check for new version."))))
-    (when interval
-      (setq spacemacs-version--check-timer
-            (run-at-time t (timer-duration interval)
-                         'spacemacs/check-for-new-version))))
-   (t (message "Skipping check for new version (reason: async not loaded)"))))
-
-(defun spacemacs/git-get-current-branch-rev ()
-  "Returns the hash of the head commit on the current branch.
-Returns nil if an error occurred."
-  (let ((proc-buffer "git-get-current-branch-head-hash")
-        (default-directory (file-truename spacemacs-start-directory)))
-    (when (eq 0 (process-file "git" nil proc-buffer nil
-                              "rev-parse" "--short" "HEAD"))
-      (with-current-buffer proc-buffer
-        (prog1
-            (when (buffer-string)
-              (goto-char (point-min))
-              (replace-regexp-in-string
-               "\n$" ""
-               (buffer-substring (line-beginning-position)
-                                 (line-end-position))))
-          (kill-buffer proc-buffer))))))
-
-(defun spacemacs/get-new-version-lighter-face (current new)
-  "Return the new version lighter face given the difference between the CURRENT
-version and the NEW version."
-  (let* ((lcur (version-to-list current))
-         (lnew (version-to-list new))
-         (scur (spacemacs//compute-version-score lcur))
-         (snew (spacemacs//compute-version-score lnew))
-         (diff (- snew scur)))
-    (cond
-     ((< diff 3000) 'spacemacs-mode-line-new-version-lighter-success-face)
-     ((< diff 5000) 'spacemacs-mode-line-new-version-lighter-warning-face)
-     (t 'spacemacs-mode-line-new-version-lighter-error-face))))
-
-(defun spacemacs/get-last-version ()
-  "Return the last tagged version."
-  (interactive)
-  (spacemacs//get-last-version spacemacs-repository
-                               spacemacs-repository-owner
-                               spacemacs-checkversion-remote
-                               spacemacs-checkversion-branch))
 
 (defun spacemacs//can-check-for-new-version-at-startup ()
   "Return non-nil if the version check at startup can be performed."

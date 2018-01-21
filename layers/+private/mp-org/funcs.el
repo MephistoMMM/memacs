@@ -24,6 +24,9 @@ user-config should be defined in this function!"
   ;; Count Words
   (spacemacs/set-leader-keys "xC" 'advance-words-count)
 
+  ;; Count page lines
+  (spacemacs/set-leader-keys "xll" 'count-lines-page)
+
   ;; Org Agenda Reload
   (spacemacs/set-leader-keys "or" 'mp-org/org-agenda-reload-files)
 
