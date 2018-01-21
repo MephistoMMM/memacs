@@ -728,40 +728,12 @@ dotspacemacs-persistent-server to be t"
      (make-frame-invisible nil 1))))
 
 (defun spacemacs/toggle-frame-fullscreen ()
-  "Respect the `dotspacemacs-fullscreen-use-non-native' variable when
-toggling fullscreen."
+  "Toggling fullscreen."
   (interactive)
-  (if dotspacemacs-fullscreen-use-non-native
-      (spacemacs/toggle-frame-fullscreen-non-native)
-    (toggle-frame-fullscreen)))
-
-(defun spacemacs/toggle-fullscreen ()
-  "Toggle full screen on X11 and Carbon"
-  (interactive)
-  (cond
-   ((eq window-system 'x)
-    (set-frame-parameter nil 'fullscreen
-                         (when (not (frame-parameter nil 'fullscreen))
-                           'fullboth)))
-   ((eq window-system 'mac)
-    (set-frame-parameter
-     nil 'fullscreen
-     (when (not (frame-parameter nil 'fullscreen)) 'fullscreen)))))
-
-(defun spacemacs/toggle-frame-fullscreen-non-native ()
-  "Toggle full screen non-natively. Uses the `fullboth' frame paramerter
-   rather than `fullscreen'. Useful to fullscreen on OSX w/o animations."
-  (interactive)
-  (modify-frame-parameters
-   nil
-   `((maximized
-      . ,(unless (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
-	   (frame-parameter nil 'fullscreen)))
-     (fullscreen
-      . ,(if (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
-	     (if (eq (frame-parameter nil 'maximized) 'maximized)
-		 'maximized)
-	   'fullboth)))))
+  (toggle-frame-fullscreen)
+  (spacemacs-buffer//resize-on-hook)
+  (goto-line 1)
+  )
 
 ;; taken from Prelude: https://github.com/bbatsov/prelude
 (defmacro spacemacs|advise-commands (advice-name commands class &rest body)

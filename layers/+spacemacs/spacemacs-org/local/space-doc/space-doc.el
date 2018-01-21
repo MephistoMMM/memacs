@@ -188,13 +188,13 @@ This functions is aimed to be used with `spacemacs-space-doc-modificators'."
                :btn-marker-face btn-marker-face
                :kbd-marker      kbd-marker)))))
 
+;; TODO: save local buffer line number status via spacemacs/toggle-line-numbers-status
 (defun spacemacs//space-doc-hide-line-numbers (&optional enable)
   "If ENABLE is non-nil then toggle off the line numbers.
 This functions is aimed to be used with `spacemacs-space-doc-modificators'."
   (if enable
       (spacemacs/toggle-line-numbers-off)
-    (when dotspacemacs-line-numbers
-      (spacemacs/toggle-line-numbers-on))))
+    (spacemacs/toggle-line-numbers-off)))
 
 (defun spacemacs//space-doc-org-do-emphasis-faces-advice (found)
   "If FOUND has non-nil value then modify emphasized regions

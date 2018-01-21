@@ -36,7 +36,7 @@ version of packages from MELPA.")
 (defvar dotspacemacs-verify-spacelpa-archives nil
   "If non-nil then verify the signature for downloaded Spacelpa archives.")
 
-(defvar dotspacemacs-elpa-subdirectory 'emacs-version
+(defvar dotspacemacs-elpa-subdirectory nil
   "If non-nil, a form that evaluates to a package directory. For
 example, to use different package directories for different Emacs
 versions, set this to `emacs-version'.")
@@ -63,7 +63,7 @@ configuration in `dotspacemacs/user-config'.")
   "Same as `dotspacemacs-additonal-packages' but reserved for themes declared
 in `dotspacemacs-themes'.")
 
-(defvar dotspacemacs-editing-style 'vim
+(defvar dotspacemacs-editing-style 'hybrid
   "One of `vim', `emacs' or `hybrid'.
 `hybrid' is like `vim' except that `insert state' is replaced by the
 `hybrid state' with `emacs' key bindings. The value can also be a list
@@ -168,7 +168,7 @@ if used there.")
 (defvar dotspacemacs-default-layout-name "Default"
   " Name of the default layout.")
 
-(defvar dotspacemacs-display-default-layout nil
+(defvar dotspacemacs-display-default-layout t
   "If non nil the default layout name is displayed in the mode-line.")
 
 (defvar dotspacemacs-auto-resume-layouts nil
@@ -182,7 +182,7 @@ Only has effect when using the \"jump to layout by number\" commands.")
 (defvar dotspacemacs-max-rollback-slots 5
   "Maximum number of rollback slots to keep in the cache.")
 
-(defvar dotspacemacs-large-file-size 1
+(defvar dotspacemacs-large-file-size 2
   "Size (in MB) above which spacemacs will prompt to open the large file
 literally to avoid performance issues. Opening a file literally means that
 no major mode or minor modes are active.")
@@ -211,25 +211,13 @@ key sequence. Setting this variable is equivalent to setting
 right, and right-then-bottom. The last one will display on the
 right if possible and fallback to bottom if not.")
 
-(defvar dotspacemacs-switch-to-buffer-prefers-purpose nil
-  "Control where `switch-to-buffer' displays the buffer.
-If nil, `switch-to-buffer' displays the buffer in the current
-window even if another same-purpose window is available. If non
-nil, `switch-to-buffer' displays the buffer in a same-purpose
-window even if the buffer can be displayed in the current
-window.")
-
 (defvar dotspacemacs-loading-progress-bar t
   "If non nil a progress bar is displayed when spacemacs is loading. This
 may increase the boot time on some systems and emacs builds, set it to nil
 to boost the loading time.")
 
-(defvar dotspacemacs-fullscreen-at-startup nil
+(defvar dotspacemacs-fullscreen-at-startup t
   "If non nil the frame is fullscreen when Emacs starts up (Emacs 24.4+ only).")
-
-(defvar dotspacemacs-fullscreen-use-non-native nil
-  "If non nil `spacemacs/toggle-fullscreen' will not use native fullscreen. Use
-to disable fullscreen animations in OSX.")
 
 (defvar dotspacemacs-maximized-at-startup nil
   "If non nil the frame is maximized when Emacs starts up (Emacs 24.4+ only).
@@ -291,12 +279,12 @@ This can be temporary disabled by pressing `C-q' before `)'.")
   "Either nil or a number of seconds. If non-nil zone out after the specified
 number of seconds.")
 
-(defvar dotspacemacs-highlight-delimiters 'all
+(defvar dotspacemacs-highlight-delimiters 'current
   "Select a scope to highlight delimiters. Possible values are `any',
 `current', `all' or `nil'. Default is `all' (highlight any scope and
 emphasize the current one.")
 
-(defvar dotspacemacs-whitespace-cleanup nil
+(defvar dotspacemacs-whitespace-cleanup 'changed
   "delete whitespace while saving buffer. possible values are `all'
 to aggressively delete empty lines and long sequences of whitespace, `trailing'
 to delete only the whitespace at end of lines, `changed' to delete only
@@ -311,8 +299,7 @@ tool of the list. Supported tools are `rg', `ag', `pt', `ack' and `grep'.")
 specified with an installed package.
 NOT USED FOR NOW :-)")
 
-(defvar dotspacemacs-startup-lists '((recents  . 5)
-                                    (projects . 7))
+(defvar dotspacemacs-startup-lists nil
   "Association list of items to show in the startup buffer of the form
 `(list-type . list-size)`. If nil it is disabled.
 Possible values for list-type are:
@@ -333,16 +320,6 @@ List sizes may be nil, in which case
 (defvar dotspacemacs-pretty-docs nil
   "Run `spacemacs/prettify-org-buffer' when
 visiting README.org files of Spacemacs.")
-
-(defun dotspacemacs//prettify-spacemacs-docs ()
-  "Run `spacemacs/prettify-org-buffer' if `buffer-file-name'
-has `spacemacs-start-directory'"
-  (when (and dotspacemacs-pretty-docs
-             spacemacs-start-directory
-             buffer-file-name
-             (string-prefix-p (expand-file-name spacemacs-start-directory)
-                              (expand-file-name buffer-file-name)))
-    (spacemacs/prettify-org-buffer)))
 
 ;; only for backward compatibility
 (defalias 'dotspacemacs-mode 'emacs-lisp-mode)
@@ -474,13 +451,6 @@ If SYMBOL value is `display-graphic-p' then return the result of
 (defun dotspacemacs/location ()
   "Return the absolute path to the spacemacs dotfile."
   dotspacemacs-filepath)
-
-(defun dotspacemacs//ido-completing-read (prompt candidates)
-  "Call `ido-completing-read' with a CANDIDATES alist where the key is
-a display strng and the value is the actual value to return."
-  (let ((ido-max-window-height (1+ (length candidates))))
-    (cadr (assoc (ido-completing-read prompt (mapcar 'car candidates))
-                 candidates))))
 
 (defun dotspacemacs/load-file ()
   "Load ~/.spacemacs if it exists."

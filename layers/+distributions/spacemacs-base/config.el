@@ -129,15 +129,8 @@ It runs `tabulated-list-revert-hook', then calls `tabulated-list-print'."
 ;; Tip taken from Xah Lee: http://ergoemacs.org/emacs/emacs_stop_cursor_enter_prompt.html
 (setq minibuffer-prompt-properties
       '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt))
-;; Fullscreen/maximize frame on startup
-(if dotspacemacs-fullscreen-at-startup
-    ;; spacemacs/toggle-fullscreen-frame-on is NOT available during the startup,
-    ;; but IS available during the subsequent config reloads
-    (if (fboundp 'spacemacs/toggle-fullscreen-frame-on)
-        (spacemacs/toggle-fullscreen-frame-on)
-      (spacemacs/toggle-frame-fullscreen)))
 
-(setq ns-use-native-fullscreen (not dotspacemacs-fullscreen-use-non-native))
+(setq ns-use-native-fullscreen t)
 
 ;; make `next-buffer', `other-buffer', etc. ignore useless buffers (see
 ;; `spacemacs/useless-buffer-p')
