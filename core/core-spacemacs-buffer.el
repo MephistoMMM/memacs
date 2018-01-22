@@ -19,7 +19,7 @@
 (defconst spacemacs-buffer-logo-title "[E M A C S]"
   "The title displayed beneath the logo.")
 
-(defconst spacemacs-buffer-buttons-startup-lists-offset 12
+(defconst spacemacs-buffer-buttons-startup-lists-offset 25
   "Relative position between the home buffer buttons and startup lists.")
 
 (defconst spacemacs-buffer--window-width 80
@@ -285,6 +285,13 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
                  :mouse-face 'highlight
                  :follow-link "\C-m"
                  "http://spacemacs.org/doc/DOCUMENTATION.html")
+  (insert " ")
+  (widget-create 'url-link
+                 :tag (propertize "Mephis Pheies" 'face 'font-lock-keyword-face)
+                 :help-echo "Open the blog of mephis pheies in your browser."
+                 :mouse-face 'highlight
+                 :follow-link "\C-m"
+                 "https://mephis.me")
   (let ((len (- (line-end-position)
                 (line-beginning-position))))
     (spacemacs-buffer//center-line)
@@ -298,7 +305,7 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
                            (configuration-layer/update-packages))
                  :mouse-face 'highlight
                  :follow-link "\C-m"
-                 (propertize "Update Packages" 'face 'font-lock-keyword-face))
+                 (propertize "Update Packages" 'face 'font-lock-preprocessor-face))
   (insert " ")
   (widget-create 'push-button
                  :help-echo
@@ -308,7 +315,7 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
                  :mouse-face 'highlight
                  :follow-link "\C-m"
                  (propertize "Rollback Package Update"
-                             'face 'font-lock-keyword-face))
+                             'face 'font-lock-function-name-face))
   (spacemacs-buffer//center-line)
   (insert "\n\n"))
 
