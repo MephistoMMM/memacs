@@ -30,7 +30,6 @@
   (spacemacs/init)
   (configuration-layer/stable-elpa-download-tarball)
   (configuration-layer/load)
-  (spacemacs-buffer/display-startup-note)
   (spacemacs/setup-startup-hook)
   (require 'server)
   (unless (server-running-p) (server-start)))

@@ -40,6 +40,7 @@
 
   ;; Frame
   (define-key evil-normal-state-map (kbd "C-w f") 'other-frame)
+  (define-key evil-motion-state-map (kbd "C-w f") 'other-frame)
 
   ;; Search
   ;; (define-key evil-normal-state-map (kbd "/") 'evil-search-forward)

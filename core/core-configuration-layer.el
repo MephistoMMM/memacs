@@ -1585,7 +1585,6 @@ RNAME is the name symbol of another existing layer."
   "Configure all passed PACKAGES."
   (let (packages-to-configure)
     (dolist (pkg-name packages)
-      (spacemacs-buffer/loading-animation)
       (let ((pkg (configuration-layer/get-package pkg-name)))
         (cond
          ((and (oref pkg :excluded)

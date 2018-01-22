@@ -13,7 +13,7 @@
 
 (let* ((default-init (expand-file-name "memacs" spacemacs-start-directory)))
   (defvar dotspacemacs-filepath default-init)
-  "Filepath to the installed dotfile. ~/.spacemacs")
+  "Filepath to the installed dotfile. ~/.emacs.d/memacs")
 
 (defvar dotspacemacs-distribution 'spacemacs-base
   "Base distribution to use. This is a layer contained in the directory

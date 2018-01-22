@@ -20,6 +20,8 @@
 - 删除默认微软字体定义，我不需要支持windows版emacs
 - 删除所有没用的持续集成配置文件
 - 删除github的issue和pull request文本文件
+- 删除启动进度条
+- 删除 quik help 和 release note 相关代码
 
 ## License
 
