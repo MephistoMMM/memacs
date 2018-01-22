@@ -19,7 +19,7 @@
 (defconst spacemacs-buffer-logo-title "[E M A C S]"
   "The title displayed beneath the logo.")
 
-(defconst spacemacs-buffer-buttons-startup-lists-offset 25
+(defconst spacemacs-buffer-buttons-startup-lists-offset 12
   "Relative position between the home buffer buttons and startup lists.")
 
 (defconst spacemacs-buffer--window-width 80

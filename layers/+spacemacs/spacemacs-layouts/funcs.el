@@ -417,7 +417,10 @@ perspectives does."
                 (cons (abbreviate-file-name (projectile-project-root))
                       (projectile-relevant-known-projects))
               projectile-known-projects)
-            :action counsel-projectile-switch-project-action
+            :action (lambda (project)
+                      (let ((persp-reset-windows-on-nil-window-conf t))
+                        (persp-switch project)
+                        (counsel-projectile-switch-project-action project)))
             :require-match t
             :caller 'spacemacs/ivy-persp-switch-project))
 
