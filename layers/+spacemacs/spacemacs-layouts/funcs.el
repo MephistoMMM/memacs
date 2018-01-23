@@ -421,7 +421,6 @@ perspectives does."
                       (let ((persp-reset-windows-on-nil-window-conf t))
                         (persp-switch project)
                         (counsel-projectile-switch-project-action project)))
-            :require-match t
             :caller 'spacemacs/ivy-persp-switch-project))
 
 
