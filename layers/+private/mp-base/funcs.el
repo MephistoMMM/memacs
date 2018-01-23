@@ -14,36 +14,41 @@
 (defun mp-base/spaceline-compile ()
   "Spaceline Compile Using Myself Theme"
   (spaceline-compile
-          `(((major-mode buffer-modified)
-                :fallback evil-state
-                :face highlight-face)
-              auto-compile
-              ((persp-name workspace-number window-number)
-                :separator "|")
-              (process :when active)
-              (minor-modes :when active)
-              (buffer-size  remote-host buffer-id)
-              (mu4e-alert-segment :when active)
-              (erc-track :when active)
-              (version-control :when active)
-              (org-pomodoro :when active)
-              (org-clock :when active))
-
-          `(which-function
-            (python-pyvenv :fallback python-pyenv)
-            (battery :when active)
-            anzu
-            selection-info
-            input-method
-            ((buffer-encoding-abbrev
-              point-position
-              line-column)
-              :separator " | ")
-            ((flycheck-error flycheck-warning flycheck-info)
-              :when active)
-            (global :when active)
-            buffer-position
-            hud))
+    `(
+      ((((persp-name workspace-number window-number) :separator "|")
+       buffer-modified)
+       :fallback evil-state
+       :face highlight-face
+       :priority 0)
+      ((buffer-size buffer-id remote-host)
+       :priority 5)
+      auto-comple
+      major-mode
+      (process :when active)
+      (minor-modes :when active)
+      (mu4e-alert-segment :when active)
+      (erc-track :when active)
+      (version-control :when active
+                       :priority 7)
+      (org-pomodoro :when active)
+      (org-clock :when active))
+    `(
+      which-function
+      (python-pyvenv :fallback python-pyenv)
+      (anzu :priority 4)
+      (selection-info :priority 2)
+      input-method
+      ((buffer-encoding-abbrev
+        point-position
+        line-column)
+       :separator " | "
+       :priority 3)
+      ((flycheck-error flycheck-warning flycheck-info)
+       :when active
+       :priority 3)
+      (global :when active)
+      (buffer-position :priority 0)
+      (hud :priority 0)))
     (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main))))
   )
 (defun spacemacs/get-mode-line-theme-name ()
