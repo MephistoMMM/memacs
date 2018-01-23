@@ -55,6 +55,7 @@
     )
   )
 
+;; TODO: let the color of text in mode line be the same as that of evil state
 (defun mp-base/init-spaceline ()
   (use-package spaceline-config
     :if (memq (spacemacs/get-mode-line-theme-name) '(spacemacs))
