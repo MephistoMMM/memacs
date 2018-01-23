@@ -31,7 +31,6 @@
         ;; Temporarily disabled, pending the resolution of
         ;; https://github.com/7696122/evil-terminal-cursor-changer/issues/8
         ;; evil-terminal-cursor-changer
-        evil-tutor
         (evil-unimpaired :location (recipe :fetcher local))
         evil-visual-mark-mode
         (hs-minor-mode :location built-in)
@@ -261,16 +260,6 @@
     :init (setq evil-visual-state-cursor 'box
                 evil-insert-state-cursor 'bar
                 evil-emacs-state-cursor 'hbar)))
-
-(defun spacemacs-evil/init-evil-tutor ()
-  (use-package evil-tutor
-    :commands (evil-tutor-start
-               evil-tutor-resume)
-    :init
-    (progn
-      (setq evil-tutor-working-directory
-            (concat spacemacs-cache-directory ".tutor/"))
-      (spacemacs/set-leader-keys "hT" 'evil-tutor-start))))
 
 (defun spacemacs-evil/init-evil-unimpaired ()
   ;; No laziness here, unimpaired bindings should be available right away.

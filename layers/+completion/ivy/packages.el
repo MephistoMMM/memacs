@@ -64,7 +64,6 @@
         "hdm" 'spacemacs/describe-mode
         "hdv" 'counsel-describe-variable
         "hi"  'counsel-info-lookup-symbol
-        "hR"  'spacemacs/counsel-search-docs
         ;; insert
         "iu"  'counsel-unicode-char
         ;; jump
@@ -230,18 +229,14 @@
   (use-package ivy-spacemacs-help
     :commands (ivy-spacemacs-help-dotspacemacs
                ivy-spacemacs-help
-               ivy-spacemacs-help-faq
                ivy-spacemacs-help-layers
                ivy-spacemacs-help-packages
-               ivy-spacemacs-help-docs
                ivy-spacemacs-help-toggles)
     :init (spacemacs/set-leader-keys
             "h ."   'ivy-spacemacs-help-dotspacemacs
             "h SPC" 'ivy-spacemacs-help
-            "h f"   'ivy-spacemacs-help-faq
             "h l"   'ivy-spacemacs-help-layers
             "h p"   'ivy-spacemacs-help-packages
-            "h r"   'ivy-spacemacs-help-docs
             "h t"   'ivy-spacemacs-help-toggles)))
 
 (defun ivy/post-init-org ()

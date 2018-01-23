@@ -242,12 +242,6 @@ that directory."
                  (thing-at-point 'symbol t))))
     (counsel-git-grep nil input)))
 
-(defun spacemacs/counsel-search-docs ()
-  "Search spacemacs docs using `spacemacs/counsel-search'"
-  (interactive)
-  (spacemacs/counsel-search dotspacemacs-search-tools
-                            nil spacemacs-docs-directory))
-
 (defun spacemacs//counsel-occur ()
   "Generate a custom occur buffer for `counsel-git-grep'."
   (ivy-occur-grep-mode)

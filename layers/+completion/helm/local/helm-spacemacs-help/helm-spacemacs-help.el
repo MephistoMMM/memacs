@@ -53,8 +53,7 @@
   (helm-spacemacs-help-mode)
   (helm-spacemacs-help//init arg)
   (helm :buffer "*helm: spacemacs*"
-        :sources `(,(helm-spacemacs-help//documentation-source)
-                   ,(helm-spacemacs-help//layer-source)
+        :sources `(,(helm-spacemacs-help//layer-source)
                    ,(helm-spacemacs-help//package-source)
                    ,(helm-spacemacs-help//dotspacemacs-source)
                    ,(helm-spacemacs-help//toggle-source))))
@@ -84,13 +83,6 @@
   (helm :buffer "*helm: spacemacs*"
         :sources `(,(helm-spacemacs-help//package-source))))
 
-;;;###autoload
-(defun helm-spacemacs-help-docs ()
-  "Helm session to search for documentation."
-  (interactive)
-  (helm-spacemacs-help-mode)
-  (helm :buffer "*helm: spacemacs*"
-        :sources `(,(helm-spacemacs-help//documentation-source))))
 
 ;;;###autoload
 (defun helm-spacemacs-help-toggles ()
@@ -99,75 +91,6 @@
   (helm-spacemacs-help-mode)
   (helm :buffer "*helm: spacemacs*"
         :sources `(,(helm-spacemacs-help//toggle-source))))
-
-(defun helm-spacemacs-help//documentation-source ()
-  "Construct the helm source for the documentation section."
-  (helm-build-sync-source "Spacemacs Documentation"
-    :candidates #'helm-spacemacs-help//documentation-candidates
-    :persistent-action #'helm-spacemacs-help//documentation-action-open-file
-    :keymap helm-map
-    :action (helm-make-actions
-             "Open Documentation" #'helm-spacemacs-help//documentation-action-open-file)))
-
-(defun helm-spacemacs-help//documentation-candidates ()
-  (let (result file-extension)
-    (dolist (filename (directory-files spacemacs-docs-directory))
-      (setq file-extension (file-name-extension filename))
-      (when (or (equal file-extension "md")
-                (equal file-extension "org"))
-        (push filename result)))
-
-    ;; CONTRIBUTING.org is a special case as it should be at the root of the
-    ;; repository to be linked as the contributing guide on Github.
-    (push "CONTRIBUTING.org" result)
-
-    ;; delete DOCUMENTATION.org to make it the first guide
-    (delete "DOCUMENTATION.org" result)
-    (push "DOCUMENTATION.org" result)
-
-    ;; give each document an appropriate title
-    (mapcar (lambda (r)
-              (cond
-               ((string-equal r "BEGINNERS_TUTORIAL.org")
-                `("Beginners tutorial" . ,r))
-               ((string-equal r "CONTRIBUTING.org")
-                `("How to contribute to Spacemacs" . ,r))
-               ((string-equal r "CONVENTIONS.org")
-                `("Spacemacs conventions" . ,r))
-               ((string-equal r "DOCUMENTATION.org")
-                `("Spacemacs documentation" . ,r))
-               ((string-equal r "FAQ.org")
-                `("Spacemacs FAQ" . ,r))
-               ((string-equal r "LAYERS.org")
-                `("Tips on writing layers for Spacemacs" . ,r))
-               ((string-equal r "QUICK_START.org")
-                `("Quick start guide for Spacemacs" . ,r))
-               ((string-equal r "VIMUSERS.org")
-                `("Vim users migration guide" . ,r))
-               (t
-                `(,r . ,r))))
-            result)))
-
-(defun helm-spacemacs-help//documentation-action-open-file (candidate)
-  "Open documentation FILE."
-  (let ((file (if (string= candidate "CONTRIBUTING.org")
-                  ;; CONTRIBUTING.org is a special case as it should be at the
-                  ;; root of the repository to be linked as the contributing
-                  ;; guide on Github.
-                  (concat spacemacs-start-directory candidate)
-                (concat spacemacs-docs-directory candidate))))
-    (cond ((and (equal (file-name-extension file) "md")
-                (not helm-current-prefix-arg))
-           (condition-case-unless-debug nil
-               (with-current-buffer (find-file-noselect file)
-                 (gh-md-render-buffer)
-                 (spacemacs/kill-this-buffer))
-             ;; if anything fails, fall back to simply open file
-             (find-file file)))
-          ((equal (file-name-extension file) "org")
-           (spacemacs/view-org-file file "^" 'all))
-          (t
-           (find-file file)))))
 
 (defun helm-spacemacs-help//layer-source ()
   "Construct the helm source for the layer section."
