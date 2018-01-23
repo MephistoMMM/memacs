@@ -1566,9 +1566,6 @@ RNAME is the name symbol of another existing layer."
 
 (defun configuration-layer//configure-packages (packages)
   "Configure all passed PACKAGES honoring the steps order."
-  (setq spacemacs-loading-dots-chunk-threshold
-        (/ (length configuration-layer--used-packages)
-           spacemacs-loading-dots-chunk-count))
   (spacemacs-buffer/message "+ Configuring bootstrap packages...")
   (configuration-layer//configure-packages-2
    (configuration-layer/filter-objects

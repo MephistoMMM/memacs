@@ -395,7 +395,6 @@ Called with `C-u C-u' skips `dotspacemacs/user-config' _and_ preleminary tests."
   (when (file-exists-p dotspacemacs-filepath)
     (with-current-buffer (find-file-noselect dotspacemacs-filepath)
       (let ((dotspacemacs-loading-progress-bar nil))
-        (setq spacemacs-loading-string "")
         (save-buffer)
         (let ((tests-ok (or (equal arg '(16)) (dotspacemacs/test-dotfile t))))
           (if tests-ok

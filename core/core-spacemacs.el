@@ -35,19 +35,6 @@
   :group 'starter-kit
   :prefix 'spacemacs-)
 
-;; loading progress bar variables
-(defvar spacemacs-loading-char ?█)
-(defvar spacemacs-loading-string "")
-(defvar spacemacs-loading-counter 0)
-(defvar spacemacs-loading-value 0)
-;; (defvar spacemacs-loading-text "Loading")
-;; (defvar spacemacs-loading-done-text "Ready!")
-(defvar spacemacs-loading-dots-chunk-count 3)
-(defvar spacemacs-loading-dots-count (window-total-size nil 'width))
-(defvar spacemacs-loading-dots-chunk-size
-  (/ spacemacs-loading-dots-count spacemacs-loading-dots-chunk-count))
-(defvar spacemacs-loading-dots-chunk-threshold 0)
-
 (defvar spacemacs-post-user-config-hook nil
   "Hook run after dotspacemacs/user-config")
 (defvar spacemacs-post-user-config-hook-run nil
@@ -138,16 +125,9 @@ the final step of executing code in `emacs-startup-hook'.")
   ;; spacemacs init
   (setq inhibit-startup-screen t)
   (spacemacs-buffer/goto-buffer)
-  (unless (display-graphic-p)
-    ;; explicitly recreate the home buffer for the first GUI client
-    ;; in order to correctly display the logo
-    (spacemacs|do-after-display-system-init
-     (kill-buffer (get-buffer spacemacs-buffer-name))
-     (spacemacs-buffer/goto-buffer)))
   ;; This is set to nil during startup to allow Spacemacs to show buffers opened
   ;; as command line arguments.
   (setq initial-buffer-choice nil)
-  (setq inhibit-startup-screen t)
   (require 'core-keybindings)
   ;; for convenience and user support
   (unless (fboundp 'tool-bar-mode)
