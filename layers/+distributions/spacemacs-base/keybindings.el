@@ -404,31 +404,12 @@
   "w TAB"  'spacemacs/alternate-window
   "w2"  'spacemacs/layout-double-columns
   "w3"  'spacemacs/layout-triple-columns
-  "wb"  'spacemacs/switch-to-minibuffer-window
   "wd"  'spacemacs/delete-window
   "wt"  'spacemacs/toggle-current-window-dedication
-  "wf"  'follow-mode
   "wF"  'make-frame
-  "wH"  'evil-window-move-far-left
-  "w <S-left>"  'evil-window-move-far-left
-  "wh"  'evil-window-left
-  "w <left>"  'evil-window-left
-  "wJ"  'evil-window-move-very-bottom
-  "w <S-down>"  'evil-window-move-very-bottom
-  "wj"  'evil-window-down
-  "w <down>"  'evil-window-down
-  "wK"  'evil-window-move-very-top
-  "w <S-up>"  'evil-window-move-very-top
-  "wk"  'evil-window-up
-  "w <up>"  'evil-window-up
-  "wL"  'evil-window-move-far-right
-  "w <S-right>"  'evil-window-move-far-right
-  "wl"  'evil-window-right
-  "w <right>"  'evil-window-right
-  "wm"  'spacemacs/toggle-maximize-buffer
+  "wM"  'spacemacs/toggle-maximize-buffer
   "wc"  'spacemacs/toggle-centered-buffer-mode
-  "wC"  'spacemacs/toggle-centered-buffer-mode-frame
-  "wo"  'other-frame
+  "wf"  'other-frame
   "wr"  'spacemacs/rotate-windows-forward
   "wR"  'spacemacs/rotate-windows-backward
   "ws"  'split-window-below
@@ -438,7 +419,6 @@
   "wu"  'winner-undo
   "wv"  'split-window-right
   "wV"  'split-window-right-and-focus
-  "ww"  'other-window
   "wx"  'kill-buffer-and-window
   "w/"  'split-window-right
   "w="  'balance-windows-area
@@ -587,8 +567,8 @@
  [_j_/_k_]  down/up       [_J_/_K_] down/up     [_s_] vertical        [_[_] shrink horiz   [_u_] restore prev layout
  [_h_/_l_]  left/right    [_H_/_L_] left/right  [_S_] verti & follow  [_]_] enlarge horiz  [_U_] restore next layout
  [_0_.._9_] window 0..9   [_r_]^^   rotate fwd  [_v_] horizontal      [_{_] shrink verti   [_d_] close current
- [_w_]^^    other window  [_R_]^^   rotate bwd  [_V_] horiz & follow  [_}_] enlarge verti  [_D_] close other
- [_o_]^^    other frame   ^^^^                  ^^                    ^^                   "
+ [_w_]^^    ace window  [_R_]^^   rotate bwd  [_V_] horiz & follow  [_}_] enlarge verti  [_D_] close other
+ [_f_]^^    other frame   ^^^^                  ^^                    ^^                   "
                (if (configuration-layer/package-used-p 'golden-ratio)
                    "[_g_] golden-ratio %`golden-ratio-mode"
                  "")
@@ -629,7 +609,7 @@
   ("<S-up>" evil-window-move-very-top)
   ("L" evil-window-move-far-right)
   ("<S-right>" evil-window-move-far-right)
-  ("o" other-frame)
+  ("f" other-frame)
   ("r" spacemacs/rotate-windows-forward)
   ("R" spacemacs/rotate-windows-backward)
   ("s" split-window-below)
@@ -638,7 +618,7 @@
   ("U" winner-redo)
   ("v" split-window-right)
   ("V" split-window-right-and-focus)
-  ("w" other-window))
+  ("w" 'ace-window))
 (spacemacs/set-leader-keys "w."
   'spacemacs/window-manipulation-transient-state/body)
 

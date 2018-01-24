@@ -38,8 +38,8 @@ user-config should be defined in this function!"
 
   ;; Wraper
   (spacemacs/declare-prefix "ow" "wrapper")
-  (spacemacs/set-leader-keys "wi" 'mp-org/wrap-math-inline-formula)
-  (spacemacs/set-leader-keys "wb" 'mp-org/wrap-math-block-formula)
+  (spacemacs/set-leader-keys "owi" 'mp-org/wrap-math-inline-formula)
+  (spacemacs/set-leader-keys "owb" 'mp-org/wrap-math-block-formula)
 
   ;; (spacemacs/set-leader-keys "xf" 'fill-region)
   ;; This function is the same as 'gq' in evil(vim)

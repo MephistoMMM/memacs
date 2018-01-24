@@ -140,31 +140,6 @@ automatically applied to."
   (when (require 'centered-buffer-mode nil t)
     (call-interactively 'spacemacs-centered-buffer-mode)))
 
-(defun spacemacs/toggle-centered-buffer-mode-frame ()
-  "Open current buffer in the new frame centered and without mode-line."
-  (interactive)
-  (when (require 'centered-buffer-mode nil t)
-    (switch-to-buffer-other-frame (current-buffer) t)
-    (toggle-frame-fullscreen)
-    (run-with-idle-timer
-     ;; FIXME: We need this delay to make sure that the
-     ;; `toggle-frame-fullscreen' fully "finished"
-     ;; it will be better to use something more reliable
-     ;; instead :)
-     1
-     nil
-     (lambda ()
-       (call-interactively 'spacemacs-centered-buffer-mode)
-       (setq mode-line-format nil)))))
-
-(defun spacemacs/centered-buffer-mode-full-width ()
-  "Center buffer in the frame."
-  ;; FIXME Needs new key-binding.
-  (interactive)
-  (when (require 'centered-buffer-mode nil t)
-    (spacemacs/maximize-horizontally)
-    (call-interactively 'spacemacs-centered-buffer-mode)))
-
 (defun spacemacs/useful-buffer-p (buffer)
   "Determines if a buffer is useful."
   (let ((buf-name (buffer-name buffer)))
@@ -793,12 +768,6 @@ containing the current file by the default explorer."
       (if file-path
           (spacemacs//open-in-external-app file-path)
         (message "No file associated to this buffer.")))))
-
-(defun spacemacs/switch-to-minibuffer-window ()
-  "switch to minibuffer window (if active)"
-  (interactive)
-  (when (active-minibuffer-window)
-    (select-window (active-minibuffer-window))))
 
 ;; http://stackoverflow.com/a/10216338/4869
 (defun spacemacs/copy-whole-buffer-to-clipboard ()
