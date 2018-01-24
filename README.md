@@ -24,6 +24,9 @@
 - 删除 quik help 和 release note 相关代码
 - 删除 docs 和 faq 的查看，我比较喜欢直接去官网或github页面上看
 - 删除 evil tutorial 
+- 删除 golden-ratio mode , 它 bug 太多
+- 修改许多 windows 相关绑定
+- 删除 winum mode , 我从来都是用 ace-window 和 evil-window 的
 
 ## License
 

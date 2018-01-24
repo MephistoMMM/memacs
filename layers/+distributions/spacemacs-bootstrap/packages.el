@@ -350,43 +350,6 @@
           ("\\1C-M-0..9" . "digit-argument"))
         which-key-replacement-alist)
 
-  ;; Rename the entry for M-0 in the SPC h k Top-level bindings,
-  ;; and for 0 in the SPC- Spacemacs root
-  (push '(("\\(.*\\)0" . "winum-select-window-0-or-10") .
-          ("\\10" . "select window 0 or 10"))
-        which-key-replacement-alist)
-
-  ;; Rename the entry for M-1 in the SPC h k Top-level bindings,
-  ;; and for 1 in the SPC- Spacemacs root, to 1..9
-  (push '(("\\(.*\\)1" . "winum-select-window-1") .
-          ("\\11..9" . "select window 1..9"))
-        which-key-replacement-alist)
-
-  ;; Hide the entries for M-[2-9] in the SPC h k Top-level bindings,
-  ;; and for [2-9] in the SPC- Spacemacs root
-  (push '((nil . "winum-select-window-[2-9]") . t)
-        which-key-replacement-alist)
-
-  ;; SPC- Spacemacs root
-  ;; Combine the ` (backtick) and ² (superscript 2) key entries
-  (push '(("\\(.*\\)`" . "winum-select-window-by-number") .
-          ("\\1`,²" . "select window by number"))
-        which-key-replacement-alist)
-
-  ;; hide the "² -> winum-select-window-by-number" entry
-  (push '(("\\(.*\\)²" . nil) . t)
-        which-key-replacement-alist)
-
-  ;; SPC b- buffers
-  ;; rename the buffer-to-window-1 entry, to 1..9
-  (push '(("\\(.*\\)1" . "buffer-to-window-1") .
-          ("\\11..9" . "buffer to window 1..9"))
-        which-key-replacement-alist)
-
-  ;; hide the "[2-9] -> buffer-to-window-[2-9]" entries
-  (push '((nil . "buffer-to-window-[2-9]") . t)
-        which-key-replacement-alist)
-
   ;; SPC k- lisp
   ;; rename "1 .. 9 -> digit-argument" to "1..9 -> digit-argument"
   (push '(("\\(.*\\)1 .. 9" . "evil-lisp-state-digit-argument") .

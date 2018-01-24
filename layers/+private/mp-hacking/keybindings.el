@@ -25,12 +25,6 @@
   ;; Buffer
   (spacemacs/set-leader-keys "bt" 'evil-buffer-new) ; new buffer
 
-  ;; Window
-  (define-key evil-normal-state-map (kbd "C-w w") 'ace-window)
-  (define-key evil-motion-state-map (kbd "C-w w") 'ace-window)
-  (define-key evil-normal-state-map (kbd "C-w m") 'ace-swap-window)
-  (define-key evil-motion-state-map (kbd "C-w m") 'ace-swap-window)
-
   ;; Frame
   (define-key evil-normal-state-map (kbd "C-w f") 'other-frame)
   (define-key evil-motion-state-map (kbd "C-w f") 'other-frame)

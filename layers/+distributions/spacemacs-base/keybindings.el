@@ -145,10 +145,7 @@
   "bx"    'kill-buffer-and-window
   "bY"    'spacemacs/copy-whole-buffer-to-clipboard
   "bw"    'read-only-mode)
-(dotimes (i 9)
-  (let ((n (+ i 1)))
-    (spacemacs/set-leader-keys (format "b%i" n)
-      (intern (format "buffer-to-window-%s" n)))))
+
 ;; Cycling settings -----------------------------------------------------------
 (spacemacs|define-transient-state theme
   :title "Themes Transient State"
@@ -491,9 +488,9 @@
 (spacemacs|define-transient-state buffer
   :title "Buffer Selection Transient State"
   :doc (concat "
- [_C-1_.._C-9_] goto nth window            [_n_/_<right>_]^^  next buffer       [_b_]   buffer list
- [_1_.._9_]     move buffer to nth window  [_N_/_p_/_<left>_] previous buffer   [_C-d_] bury buffer
- [_M-1_.._M-9_] swap buffer w/ nth window  [_d_]^^^^          kill buffer       [_o_]   other window
+ [_n_/_<right>_]^^  next buffer       [_b_]   buffer list
+ [_N_/_p_/_<left>_] previous buffer   [_C-d_] bury buffer
+ [_d_]^^^^          kill buffer       [_o_]   other window
  ^^^^                                      [_q_]^^^^          quit")
   :bindings
   ("n" next-buffer)
@@ -506,33 +503,7 @@
   ("d" spacemacs/kill-this-buffer)
   ("C-d" bury-buffer)
   ("q" nil :exit t)
-  ("1" move-buffer-window-no-follow-1)
-  ("2" move-buffer-window-no-follow-2)
-  ("3" move-buffer-window-no-follow-3)
-  ("4" move-buffer-window-no-follow-4)
-  ("5" move-buffer-window-no-follow-5)
-  ("6" move-buffer-window-no-follow-6)
-  ("7" move-buffer-window-no-follow-7)
-  ("8" move-buffer-window-no-follow-8)
-  ("9" move-buffer-window-no-follow-9)
-  ("M-1" swap-buffer-window-no-follow-1)
-  ("M-2" swap-buffer-window-no-follow-2)
-  ("M-3" swap-buffer-window-no-follow-3)
-  ("M-4" swap-buffer-window-no-follow-4)
-  ("M-5" swap-buffer-window-no-follow-5)
-  ("M-6" swap-buffer-window-no-follow-6)
-  ("M-7" swap-buffer-window-no-follow-7)
-  ("M-8" swap-buffer-window-no-follow-8)
-  ("M-9" swap-buffer-window-no-follow-9)
-  ("C-1" winum-select-window-1)
-  ("C-2" winum-select-window-2)
-  ("C-3" winum-select-window-3)
-  ("C-4" winum-select-window-4)
-  ("C-5" winum-select-window-5)
-  ("C-6" winum-select-window-6)
-  ("C-7" winum-select-window-7)
-  ("C-8" winum-select-window-8)
-  ("C-9" winum-select-window-9))
+  )
 (spacemacs/set-leader-keys "b." 'spacemacs/buffer-transient-state/body)
 
 ;; end of Buffer transient state
@@ -566,8 +537,8 @@
  ──────^^^^─────────────  ────^^^^────────────  ─────^^─────────────  ──────^^───────────  ─────^^──────────────────
  [_j_/_k_]  down/up       [_J_/_K_] down/up     [_s_] vertical        [_[_] shrink horiz   [_u_] restore prev layout
  [_h_/_l_]  left/right    [_H_/_L_] left/right  [_S_] verti & follow  [_]_] enlarge horiz  [_U_] restore next layout
- [_0_.._9_] window 0..9   [_r_]^^   rotate fwd  [_v_] horizontal      [_{_] shrink verti   [_d_] close current
- [_w_]^^    ace window  [_R_]^^   rotate bwd  [_V_] horiz & follow  [_}_] enlarge verti  [_D_] close other
+                      [_r_]^^   rotate fwd  [_v_] horizontal      [_{_] shrink verti   [_d_] close current
+ [_w_]^^    ace window    [_R_]^^   rotate bwd  [_V_] horiz & follow  [_}_] enlarge verti  [_D_] close other
  [_f_]^^    other frame   ^^^^                  ^^                    ^^                   "
                (if (configuration-layer/package-used-p 'golden-ratio)
                    "[_g_] golden-ratio %`golden-ratio-mode"
@@ -575,16 +546,6 @@
                "\n ^^^^                     ^^^^                  ^^                    ^^                   [_q_] quit")
   :bindings
   ("q" nil :exit t)
-  ("0" winum-select-window-0)
-  ("1" winum-select-window-1)
-  ("2" winum-select-window-2)
-  ("3" winum-select-window-3)
-  ("4" winum-select-window-4)
-  ("5" winum-select-window-5)
-  ("6" winum-select-window-6)
-  ("7" winum-select-window-7)
-  ("8" winum-select-window-8)
-  ("9" winum-select-window-9)
   ("-" split-window-below-and-focus)
   ("/" split-window-right-and-focus)
   ("[" spacemacs/shrink-window-horizontally)

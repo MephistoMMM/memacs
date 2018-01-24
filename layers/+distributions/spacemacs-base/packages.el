@@ -76,6 +76,10 @@
         "wD" 'spacemacs/ace-delete-window
         "wm" 'ace-swap-window
         "ww" 'ace-window)
+      (define-key evil-normal-state-map (kbd "C-w w") 'ace-window)
+      (define-key evil-motion-state-map (kbd "C-w w") 'ace-window)
+      (define-key evil-normal-state-map (kbd "C-w m") 'ace-swap-window)
+      (define-key evil-motion-state-map (kbd "C-w m") 'ace-swap-window)
       ;; set ace-window keys to home-row
       (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))))
 
