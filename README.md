@@ -28,6 +28,7 @@
 - 修改许多 windows 相关绑定
 - 删除 winum mode , 我从来都是用 ace-window 和 evil-window 的
 - 删除 centered-buffer-mode , 这个东西只能用来装逼，而且效果还很差
+- 删除 zone-mode , 这个mode莫名其妙，有屏保就够了
 
 ## License
 

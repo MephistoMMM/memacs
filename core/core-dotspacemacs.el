@@ -269,10 +269,6 @@ restricts line-number to the specified list of major-mode.")
 over any automatically added closing parenthesis, bracket, quote, etc…
 This can be temporary disabled by pressing `C-q' before `)'.")
 
-(defvar dotspacemacs-zone-out-when-idle nil
-  "Either nil or a number of seconds. If non-nil zone out after the specified
-number of seconds.")
-
 (defvar dotspacemacs-highlight-delimiters 'current
   "Select a scope to highlight delimiters. Possible values are `any',
 `current', `all' or `nil'. Default is `all' (highlight any scope and

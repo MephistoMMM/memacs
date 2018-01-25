@@ -14,6 +14,13 @@
 Some configurations should be written at here which be unable to config
 in 'with-eval-after-load.")
 
+(defun mp-hacking/insert-form-feed ()
+  "Insert a FORM FEED(^L)"
+  (interactive)
+  (beginning-of-line)
+  (insert "\n")
+  )
+
 (defun mp-hacking/format-haskell-buffer ()
   "format haskell buffer by hindent-reformat-buffer and haskell-mode-stylish-buffer"
   (interactive)

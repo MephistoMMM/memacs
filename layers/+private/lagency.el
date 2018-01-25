@@ -13,6 +13,7 @@
 
 ;;; Code:
 
+
 ;; buffer swap
 ;; ace window is better: SPC w M
 ;; (spacemacs/declare-prefix "bS" "Swap")
@@ -26,6 +27,19 @@
 ;; (spacemacs/set-leader-keys "bS8" 'swap-buffer-window-no-follow-8) ; swap buffer with window8
 ;; (spacemacs/set-leader-keys "bS9" 'swap-buffer-window-no-follow-9) ; swap buffer with window9
 
+
+;; relative line number
+
+(defun mp-ui/post-init-linum-relative ()
+  "Change line format if not in gui"
+  (with-eval-after-load 'linum-relative
+    (unless (display-graphic-p)
+      (setq linum-relative-format "%3s "))
+    )
+  )
+
+
+;; Evil Play Mode And mp-hacking/init-string-inflection
 
 (define-minor-mode self-evil-play-mode
   "Buffer-local minor mode to define self evil keyboard."

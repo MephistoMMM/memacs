@@ -56,6 +56,9 @@
     (global-set-key (kbd "<mouse-5>") 'evil-next-line))
   (setq smooth-scroll-margin 10)
 
+  ;; insert FF
+  (spacemacs/set-leader-keys "if" 'mp-hacking/insert-form-feed)
+
   ;; Yasnippet
   ;; Use C-k to start complete snips and use TAB to go arround the points
   ;; How to write yasnippet: https://joaotavora.github.io/yasnippet/snippet-development.html or http://d.pr/n/1bHuv
