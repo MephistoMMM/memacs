@@ -10,7 +10,6 @@
 ;;; Code:
 (configuration-layer/declare-layers '(
                                       ivy
-                                      spacemacs-completion
                                       spacemacs-layouts
                                       spacemacs-editing
                                       spacemacs-editing-visual
