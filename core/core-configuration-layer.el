@@ -33,6 +33,9 @@
   (concat spacemacs-start-directory ".lock")
   "Absolute path to the lock file.")
 
+(defvar configuration-layer-completing-read-func nil
+  "Completing function used in core.")
+
 (defvar configuration-layer-stable-elpa-version spacemacs-version
   "Version of ELPA stable repository. This value is aimed to be overwritten by
 the .lock file at the root of the repository.")
@@ -1830,7 +1833,7 @@ to update."
       (spacemacs-buffer/append "--> All packages are up to date.\n")
       (spacemacs//redisplay))))
 
-(defun configuration-layer//ido-candidate-rollback-slot ()
+(defun configuration-layer//completing-candidate-rollback-slot ()
   "Return a list of candidates to select a rollback slot."
   (let ((rolldir configuration-layer-rollback-directory))
     (when (file-exists-p rolldir)
@@ -1847,15 +1850,20 @@ to update."
 
 (defun configuration-layer/rollback (slot)
   "Rollback all the packages in the given SLOT.
-If called interactively and SLOT is nil then an ido buffers appears
+If called interactively and SLOT is nil then an completing buffers appears
 to select one."
   (interactive
    (list
     (if (boundp 'slot) slot
-      (let ((candidates (configuration-layer//ido-candidate-rollback-slot)))
-        (when candidates
-          (ido-completing-read "Rollback slots (most recent are first): "
-                               candidates))))))
+      (if configuration-layer-completing-read-func
+          (let ((candidates (configuration-layer//completing-candidate-rollback-slot)))
+            (when candidates
+              (funcall configuration-layer-completing-read-func "Rollback slots (most recent are first): "
+                       candidates)))
+        (spacemacs-buffer/error
+         "`configuration-layer-completing-read-func' is nil.")
+        nil)
+      )))
   (spacemacs-buffer/insert-page-break)
   (if (not slot)
       (message "No rollback slot available.")

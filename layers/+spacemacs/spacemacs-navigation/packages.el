@@ -15,7 +15,6 @@
         (centered-cursor :location local)
         (compile :location built-in)
         (doc-view :location built-in)
-        flx-ido
         (grep :location built-in)
         info+
         open-junk-file
@@ -184,10 +183,6 @@
               (text-mode)
               (doc-view-minor-mode))
           ad-do-it)))))
-
-(defun spacemacs-navigation/init-flx-ido ()
-  (use-package flx-ido
-    :init (flx-ido-mode 1)))
 
 (defun spacemacs-navigation/init-grep ()
   (use-package grep

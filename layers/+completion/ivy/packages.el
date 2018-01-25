@@ -135,6 +135,7 @@
 (defun ivy/init-ivy ()
   (use-package ivy
     :init
+    (setq configuration-layer-completing-read-func 'ivy-completing-read)
     (progn
       ;; Key bindings
       (spacemacs/set-leader-keys
@@ -163,8 +164,6 @@
                      'spacemacs//counsel-occur)
       (spacemacs/set-leader-keys-for-major-mode 'ivy-occur-grep-mode
         "w" 'ivy-wgrep-change-to-wgrep-mode)
-      ;; Why do we do this ?
-      (ido-mode -1)
 
       ;; allow to select prompt in some ivy functions
       (setq ivy-use-selectable-prompt t))))

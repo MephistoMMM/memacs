@@ -28,7 +28,7 @@
   (require 'browse-url)
   (require 'simple)
   (require 'cl)
-  (require 'ido))
+  (require 'ivy))
 
 ;;=================================================================
 ;; user options
@@ -75,9 +75,8 @@
 
 (put 'pylookup-mode 'mode-class 'special)
 
-(defvar pylookup-completing-read
-  (if (null ido-mode) 'completing-read 'ido-completing-read)
-  "Ido support with convenience")
+(defvar pylookup-completing-read 'ivy-completing-read
+  "ivy support with convenience")
 
 ;;=================================================================
 ;; pylookup mode specific interactive functions

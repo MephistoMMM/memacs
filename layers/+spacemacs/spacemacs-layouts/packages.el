@@ -118,8 +118,7 @@
             persp-nil-name dotspacemacs-default-layout-name
             persp-reset-windows-on-nil-window-conf nil
             persp-set-last-persp-for-new-frames nil
-            persp-save-dir spacemacs-layouts-directory
-            persp-set-ido-hooks t)
+            persp-save-dir spacemacs-layouts-directory)
 
       (defun spacemacs//activate-persp-mode ()
         "Always activate persp-mode, unless it is already active.
@@ -140,7 +139,7 @@
  [_<tab>_]^^^^    last layout                 [_d_]^^   close current layout
  [_b_]^^^^        buffer in layout            [_D_]^^   close other layout
  [_h_]^^^^        default layout              [_L_]^^   load layouts from file
- [_l_]^^^^        layout w/ivy           [_r_]^^   remove current buffer
+ [_l_]^^^^        layout w/ivy                [_r_]^^   remove current buffer
  [_n_/_C-l_]^^    next layout                 [_R_]^^   rename current layout
  [_N_/_p_/_C-h_]  prev layout                 [_s_/_S_] save all layouts/save by names
  [_o_]^^^^        custom layout               [_t_]^^   show a buffer without adding it to current layout

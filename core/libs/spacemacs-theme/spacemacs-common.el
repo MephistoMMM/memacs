@@ -424,12 +424,6 @@ to 'auto, tags may not be properly aligned. "
      `(hydra-face-blue ((,class (:foreground ,blue))))
      `(hydra-face-red ((,class (:foreground ,red))))
 
-;;;;; ido
-     `(ido-first-match ((,class (:foreground ,comp :inherit bold))))
-     `(ido-only-match ((,class (:foreground ,mat :inherit bold))))
-     `(ido-subdir ((,class (:foreground ,keyword))))
-     `(ido-vertical-match-face ((,class (:foreground ,comp :underline nil))))
-
 ;;;;; info
      `(info-header-xref ((,class (:foreground ,func :underline t))))
      `(info-menu ((,class (:foreground ,suc))))
