@@ -20,7 +20,6 @@
         git-link
         git-messenger
         git-timemachine
-        (helm-gitignore :requires helm)
         magit
         magit-gitflow
         ;; not compatible with magit 2.1 at the time of release
@@ -45,11 +44,6 @@
 
 (defun git/post-init-fill-column-indicator ()
   (add-hook 'git-commit-mode-hook 'fci-mode))
-
-(defun git/init-helm-gitignore ()
-  (use-package helm-gitignore
-    :defer t
-    :init (spacemacs/set-leader-keys "gI" 'helm-gitignore)))
 
 (defun git/init-git-commit ()
   (use-package git-commit

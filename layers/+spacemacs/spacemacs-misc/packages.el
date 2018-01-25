@@ -26,12 +26,7 @@
 
       (spacemacs/set-leader-keys "jq" #'dumb-jump-quick-look)
 
-      ;; Use Helm or Ivy as the selector for dumb-jump.
-      (cond
-       ((configuration-layer/layer-used-p 'ivy)
-        (setq dumb-jump-selector 'ivy))
-       ((configuration-layer/layer-used-p 'helm)
-        (setq dumb-jump-selector 'helm)))
+      (setq dumb-jump-selector 'ivy)
 
       ;; Since it's dumb, we add it to the end of the default jump handlers. At
       ;; the time of writing it is the only default jump handler. (gtags remains

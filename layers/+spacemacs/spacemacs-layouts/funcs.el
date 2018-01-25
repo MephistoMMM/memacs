@@ -46,11 +46,6 @@ Cancels autosave on exiting perspectives mode."
                        *persp-hash* 'non-existent))
     (persp-switch spacemacs--last-selected-layout)))
 
-(defun spacemacs-layouts/non-restricted-buffer-list-helm ()
-  (interactive)
-  (let ((ido-make-buffer-list-hook (remove #'persp-restrict-ido-buffers ido-make-buffer-list-hook)))
-    (helm-mini)))
-
 (defun spacemacs-layouts/non-restricted-buffer-list-ivy ()
   (interactive)
   (let ((ivy-ignore-buffers (remove #'spacemacs//layout-not-contains-buffer-p ivy-ignore-buffers)))
@@ -175,7 +170,7 @@ ask the user if a new layout should be created."
 
 (defun spacemacs/layouts-ts-close-other ()
   (interactive)
-  (call-interactively 'spacemacs/helm-persp-close)
+  (call-interactively 'spacemacs/ivy-spacemacs-layout-close-other)
   (spacemacs/layouts-transient-state/body))
 
 (defun spacemacs/layouts-ts-kill ()
@@ -185,7 +180,7 @@ ask the user if a new layout should be created."
 
 (defun spacemacs/layouts-ts-kill-other ()
   (interactive)
-  (call-interactively 'spacemacs/helm-persp-kill)
+  (call-interactively 'spacemacs/ivy-spacemacs-layout-kill-other)
   (spacemacs/layouts-transient-state/body))
 
 (defun spacemacs/move-element-left (element list)
@@ -302,109 +297,6 @@ format so they are supported by the
              :doc (concat (spacemacs//custom-layouts-ms-documentation))
              :bindings
              ,@bindings))))
-
-
-;; Helm integration
-
-(defun spacemacs/persp-helm-mini ()
-  "As `helm-mini' but restricts visible buffers by perspective."
-  (interactive)
-  (with-persp-buffer-list ()
-                          (helm-mini)))
-
-(defun spacemacs//helm-perspectives-source ()
-  (helm-build-in-buffer-source
-      (concat "Current Perspective: " (spacemacs//current-layout-name))
-    :data (persp-names)
-    :fuzzy-match t
-    :action
-    '(("Switch to perspective" . persp-switch)
-      ("Close perspective(s)" . (lambda (candidate)
-                                  (mapcar
-                                   'persp-kill-without-buffers
-                                   (helm-marked-candidates))))
-      ("Kill perspective(s)" . (lambda (candidate)
-                                 (mapcar 'persp-kill
-                                         (helm-marked-candidates)))))))
-(defun spacemacs/helm-perspectives ()
-  "Control Panel for perspectives. Has many actions.
-If match is found
-f1: (default) Select perspective
-f2: Close Perspective(s) <- mark with C-SPC to close more than one-window
-f3: Kill Perspective(s)
-
-If match is not found
-<enter> Creates perspective
-
-Closing doesn't kill buffers inside the perspective while killing
-perspectives does."
-  (interactive)
-  (helm
-   :buffer "*Helm Perspectives*"
-   :sources
-   `(,(spacemacs//helm-perspectives-source)
-     ,(helm-build-dummy-source "Create new perspective"
-        :requires-pattern t
-        :action
-        '(("Create new perspective" .
-           (lambda (name)
-             (let ((persp-reset-windows-on-nil-window-conf t))
-               (persp-switch name)
-               (unless (member name (persp-names-current-frame-fast-ordered))
-                 (spacemacs/home))))))))))
-
-;; ability to use helm find files but also adds to current perspective
-(defun spacemacs/helm-persp-close ()
-  "Kills perspectives without killing the buffers"
-  (interactive)
-  (helm
-   :buffer "*Helm Kill Perspectives (without killing buffers)*"
-   :sources
-   (helm-build-in-buffer-source
-       (concat "Current Perspective: " (spacemacs//current-layout-name))
-     :data (persp-names)
-     :fuzzy-match t
-     :action
-     '(("Close perspective(s)" . (lambda (candidate)
-                                   (mapcar
-                                    'persp-kill-without-buffers
-                                    (helm-marked-candidates))))))))
-
-(defun spacemacs/helm-persp-kill ()
-  "Kills perspectives with all their buffers"
-  (interactive)
-  (helm
-   :buffer "*Helm Kill Perspectives with all their buffers*"
-   :sources (helm-build-in-buffer-source
-                (s-concat "Current Perspective: "
-                          (spacemacs//current-layout-name))
-              :data (persp-names)
-              :fuzzy-match t
-              :action
-              '(("Kill perspective(s)" .
-                 (lambda (candidate)
-                   (mapcar 'persp-kill
-                           (helm-marked-candidates))))))))
-
-(defun spacemacs/helm-persp-switch-project (arg)
-  (interactive "P")
-  (helm
-   :sources
-   (helm-build-in-buffer-source "*Helm Switch Project Layout*"
-     :data (lambda ()
-             (if (projectile-project-p)
-                 (cons (abbreviate-file-name (projectile-project-root))
-                       (projectile-relevant-known-projects))
-               projectile-known-projects))
-     :fuzzy-match helm-projectile-fuzzy-match
-     :mode-line helm-read-file-name-mode-line-string
-     :action '(("Switch to Project Perspective" .
-                (lambda (project)
-                  (let ((persp-reset-windows-on-nil-window-conf t))
-                    (persp-switch project)
-                    (let ((projectile-completion-system 'helm))
-                      (projectile-switch-project-by-name project)))))))
-   :buffer "*Helm Projectile Layouts*"))
 
 
 ;; Ivy integration

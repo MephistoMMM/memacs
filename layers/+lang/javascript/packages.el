@@ -19,7 +19,6 @@
         flycheck
         ggtags
         counsel-gtags
-        helm-gtags
         impatient-mode
         js-doc
         js2-mode
@@ -85,9 +84,6 @@
 
 (defun javascript/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'js2-mode))
-
-(defun javascript/post-init-helm-gtags ()
-  (spacemacs/helm-gtags-define-keys-for-mode 'js2-mode))
 
 (defun javascript/post-init-impatient-mode ()
   (spacemacs/set-leader-keys-for-major-mode 'js2-mode "i" 'spacemacs/impatient-mode))

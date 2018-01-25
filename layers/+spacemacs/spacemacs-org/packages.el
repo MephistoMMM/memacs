@@ -49,8 +49,6 @@
       ;;     "Try removing org code from user initialization and private layers.") t))
       (setq org-startup-with-inline-images t
             org-src-fontify-natively t
-            ;; this is consistent with the value of
-            ;; `helm-org-headings-max-depth'.
             org-imenu-depth 8)
     :config
     (progn

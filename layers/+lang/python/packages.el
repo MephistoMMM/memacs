@@ -19,10 +19,7 @@
     evil-matchit
     flycheck
     ggtags
-    helm-cscope
     counsel-gtags
-    helm-gtags
-    (helm-pydoc :requires helm)
     hy-mode
     importmagic
     live-py-mode
@@ -111,25 +108,11 @@
 (defun python/post-init-flycheck ()
   (spacemacs/enable-flycheck 'python-mode))
 
-(defun python/pre-init-helm-cscope ()
-  (spacemacs|use-package-add-hook xcscope
-    :post-init
-    (spacemacs/setup-helm-cscope 'python-mode)))
-
 (defun python/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'python-mode))
 
-(defun python/post-init-helm-gtags ()
-  (spacemacs/helm-gtags-define-keys-for-mode 'python-mode))
-
 (defun python/post-init-ggtags ()
   (add-hook 'python-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
-
-(defun python/init-helm-pydoc ()
-  (use-package helm-pydoc
-    :defer t
-    :init
-    (spacemacs/set-leader-keys-for-major-mode 'python-mode "hd" 'helm-pydoc)))
 
 (defun python/init-hy-mode ()
   (use-package hy-mode

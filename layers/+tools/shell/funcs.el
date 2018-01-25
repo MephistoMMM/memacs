@@ -139,29 +139,6 @@ is achieved by adding the relevant text properties."
   (define-key eshell-mode-map (kbd "C-l") 'spacemacs/eshell-clear-keystroke)
   (define-key eshell-mode-map (kbd "C-d") 'eshell-delchar-or-maybe-eof))
 
-
-
-(defun spacemacs/helm-eshell-history ()
-  "Correctly revert to insert state after selection."
-  (interactive)
-  (helm-eshell-history)
-  (evil-insert-state))
-
-(defun spacemacs/helm-shell-history ()
-  "Correctly revert to insert state after selection."
-  (interactive)
-  (helm-comint-input-ring)
-  (evil-insert-state))
-
-(defun spacemacs/init-helm-eshell ()
-  "Initialize helm-eshell."
-  ;; this is buggy for now
-  ;; (define-key eshell-mode-map (kbd "<tab>") 'helm-esh-pcomplete)
-  (spacemacs/set-leader-keys-for-major-mode 'eshell-mode
-    "H" 'spacemacs/helm-eshell-history)
-  (define-key eshell-mode-map
-    (kbd "M-l") 'spacemacs/helm-eshell-history))
-
 (defun multiterm (_)
   "Wrapper to be able to call multi-term from shell-pop"
   (interactive)

@@ -171,11 +171,7 @@ seconds to load")
    (display-graphic-p)
    dotspacemacs-distribution
    dotspacemacs-editing-style
-   (cond ((configuration-layer/layer-used-p 'helm)
-          'helm)
-         ((configuration-layer/layer-used-p 'ivy)
-          'ivy)
-         (t 'helm))
+   'ivy
    (pp-to-string dotspacemacs--configuration-layers-saved)
    (bound-and-true-p system-configuration-features)))
 

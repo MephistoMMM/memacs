@@ -18,8 +18,6 @@
         (company-quickhelp :toggle auto-completion-enable-help-tooltip)
         company-statistics
         fuzzy
-        (helm-company :requires helm)
-        (helm-c-yasnippet :requires helm)
         hippie-exp
         smartparens
         yasnippet
@@ -142,22 +140,6 @@
        (unless (eq auto-completion-enable-help-tooltip 'manual)
          (company-quickhelp-mode))))))
 
-(defun auto-completion/init-helm-c-yasnippet ()
-  (use-package helm-c-yasnippet
-    :defer t
-    :init
-    (progn
-      (spacemacs/set-leader-keys "is" 'spacemacs/helm-yas)
-      (setq helm-c-yas-space-match-any-greedy t))))
-
-(defun auto-completion/init-helm-company ()
-  (use-package helm-company
-    :if (configuration-layer/package-used-p 'company)
-    :defer t
-    :init
-    (with-eval-after-load 'company
-      (define-key company-active-map (kbd "C-/") 'helm-company))))
-
 (defun auto-completion/init-hippie-exp ()
   ;; replace dabbrev-expand
   (global-set-key (kbd "M-/") 'hippie-expand)
@@ -204,10 +186,7 @@
       ;; We don't want undefined variable errors
       (defvar yas-global-mode nil)
       (setq yas-triggers-in-field t
-            yas-wrap-around-region t
-            helm-yas-display-key-on-candidate t)
-      ;; on multiple keys, fall back to completing read
-      ;; typically this means helm
+            yas-wrap-around-region t)
       (setq yas-prompt-functions '(yas-completing-prompt))
       ;; disable yas minor mode map
       ;; use hippie-expand instead

@@ -530,8 +530,6 @@ SEQ, START and END are the same arguments as for `cl-subseq'"
                   (spacemacs-buffer||add-shortcut "c" "Agenda:")
                   (insert list-separator)))
                ((eq el 'bookmarks)
-                (when (configuration-layer/layer-used-p 'spacemacs-helm)
-                  (helm-mode))
                 (require 'bookmark)
                 (when (spacemacs-buffer//insert-bookmark-list
                        "Bookmarks:"

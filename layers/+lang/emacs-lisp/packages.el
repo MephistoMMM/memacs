@@ -23,7 +23,6 @@
         flycheck
         ggtags
         counsel-gtags
-        helm-gtags
         (ielm :location built-in)
         macrostep
         nameless
@@ -245,9 +244,6 @@
 
 (defun emacs-lisp/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'emacs-lisp-mode))
-
-(defun emacs-lisp/post-init-helm-gtags ()
-  (spacemacs/helm-gtags-define-keys-for-mode 'emacs-lisp-mode))
 
 (defun emacs-lisp/post-init-ggtags ()
   (add-hook 'emacs-lisp-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))

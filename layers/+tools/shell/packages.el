@@ -17,7 +17,6 @@
         (eshell :location built-in)
         eshell-prompt-extras
         eshell-z
-        helm
         magit
         multi-term
         org
@@ -143,16 +142,6 @@
     :init
     (with-eval-after-load 'eshell
       (require 'eshell-z))))
-
-(defun shell/pre-init-helm ()
-  (spacemacs|use-package-add-hook helm
-    :post-init
-    (progn
-      ;; eshell
-      (add-hook 'eshell-mode-hook 'spacemacs/init-helm-eshell)
-      ;;shell
-      (spacemacs/set-leader-keys-for-major-mode 'shell-mode
-        "H" 'spacemacs/helm-shell-history))))
 
 (defun shell/pre-init-magit ()
   (spacemacs|use-package-add-hook magit

@@ -24,34 +24,33 @@
     :config
     (progn
       (setq
-            ;; should not set this to anything else than nil
-            ;; the focus of SQLi is handled by spacemacs conventions
-            sql-pop-to-buffer-after-send-region nil)
+       ;; should not set this to anything else than nil
+       ;; the focus of SQLi is handled by spacemacs conventions
+       sql-pop-to-buffer-after-send-region nil)
       (advice-add 'sql-add-product :after #'spacemacs/sql-populate-products-list)
       (advice-add 'sql-del-product :after #'spacemacs/sql-populate-products-list)
       (spacemacs/sql-populate-products-list)
 
       (defun spacemacs//sql-source (products)
-        "return a source for helm selection"
         `((name . "SQL Products")
           (candidates . ,(mapcar (lambda (product)
                                    (cons (sql-get-product-feature (car product) :name)
                                          (car product)))
                                  products))
-          (action . (lambda (candidate) (helm-marked-candidates)))))
+          (action . (ivy-completing-read candidates))))
 
       (defun spacemacs/sql-highlight ()
         "set SQL dialect-specific highlighting"
         (interactive)
-        (let ((product (car (helm
-                             :sources (list (spacemacs//sql-source spacemacs-sql-highlightable))))))
+        (let ((product (car (ivy-completing-read
+                             (list (spacemacs//sql-source spacemacs-sql-highlightable))))))
           (sql-set-product product)))
 
       (defun spacemacs/sql-start ()
         "set SQL dialect-specific highlighting and start inferior SQLi process"
         (interactive)
-        (let ((product (car (helm
-                             :sources (list (spacemacs//sql-source spacemacs-sql-startable))))))
+        (let ((product (car (ivy-completing-read
+                             (list (spacemacs//sql-source spacemacs-sql-startable))))))
           (sql-set-product product)
           (sql-product-interactive product)))
 

@@ -24,9 +24,6 @@
     ggtags
     counsel-gtags
     google-c-style
-    helm-cscope
-    helm-gtags
-    (helm-rtags :requires helm rtags)
     (ivy-rtags :requires ivy rtags)
     rtags
     realgud
@@ -138,16 +135,6 @@
 (defun c-c++/post-init-counsel-gtags ()
   (dolist (mode c-c++-modes)
     (spacemacs/counsel-gtags-define-keys-for-mode mode)))
-
-(defun c-c++/post-init-helm-gtags ()
-  (dolist (mode c-c++-modes)
-    (spacemacs/helm-gtags-define-keys-for-mode mode)))
-
-;; TODO lazy load this package
-(defun c-c++/init-helm-rtags ()
-  (use-package helm-rtags
-    :if c-c++-enable-rtags-support
-    :init (setq rtags-display-result-backend 'helm)))
 
 ;; TODO lazy load this package
 (defun c-c++/init-ivy-rtags ()
@@ -264,9 +251,3 @@
     :post-init
     (dolist (mode c-c++-modes)
       (spacemacs/set-leader-keys-for-major-mode mode "gi" 'cscope-index-files))))
-
-(defun c-c++/pre-init-helm-cscope ()
-  (spacemacs|use-package-add-hook xcscope
-    :post-init
-    (dolist (mode c-c++-modes)
-      (spacemacs/setup-helm-cscope mode))))

@@ -101,6 +101,7 @@
   (add-hook 'conf-mode-hook 'spacemacs/run-text-mode-hooks))
 
 (defun spacemacs-base/init-dired ()
+  (setq dired-isearch-filenames t)
   (spacemacs/set-leader-keys
     "ad" 'dired
     "fj" 'dired-jump

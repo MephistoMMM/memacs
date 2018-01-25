@@ -18,7 +18,6 @@
                                              'flycheck)))
         ggtags
         counsel-gtags
-        helm-gtags
         exec-path-from-shell
         go-eldoc
         go-mode
@@ -144,6 +143,3 @@
 
 (defun go/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'go-mode))
-
-(defun go/post-init-helm-gtags ()
-  (spacemacs/helm-gtags-define-keys-for-mode 'go-mode))

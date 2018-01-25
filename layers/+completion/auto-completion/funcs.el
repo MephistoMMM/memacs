@@ -308,16 +308,6 @@ MODE parameter must match the :modes values used in the call to
   (when company-fci-mode-on-p (fci-mode 1)))
 
 
-;; helm-yas
-
-(defun spacemacs/helm-yas ()
-  "Properly lazy load helm-c-yasnipper."
-  (interactive)
-  (spacemacs/load-yasnippet)
-  (require 'helm-c-yasnippet)
-  (call-interactively 'helm-yas-complete))
-
-
 ;; Yasnippet
 
 (defun spacemacs/load-yasnippet ()

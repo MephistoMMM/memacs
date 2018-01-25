@@ -243,11 +243,9 @@
   ;; turn off evil in corelv buffers
   (push '("\\*LV\\*") evil-buffer-regexps)
 
-  ;; replace `dired-goto-file' with `helm-find-files', since `helm-find-files'
-  ;; can do the same thing and with fuzzy matching and other features.
   (with-eval-after-load 'dired
-    (evil-define-key 'normal dired-mode-map "J" 'spacemacs/helm-find-files)
-    (define-key dired-mode-map "j" 'spacemacs/helm-find-files)
+    (evil-define-key 'normal dired-mode-map "J" 'counsel-find-file)
+    (define-key dired-mode-map "j" 'counsel-find-file)
     (evil-define-key 'normal dired-mode-map (kbd dotspacemacs-leader-key)
       spacemacs-default-map))
 
@@ -308,23 +306,19 @@
            ("avy-goto-word-or-subword-1" . "avy word")
            ("shell-command" . "shell cmd")
            ("spacemacs/default-pop-shell" . "open shell")
-           ("spacemacs/helm-project-smart-do-search-region-or-symbol" . "smart search w/input")
-           ("spacemacs/helm-project-smart-do-search" . "smart search")
            ("spacemacs/search-project-auto-region-or-symbol" . "search project w/input")
            ("spacemacs/search-project-auto" . "search project")
-           ("helm-descbinds" . "show keybindings")
            ("sp-split-sexp" . "split sexp")
            ("avy-goto-line" . "avy line")
            ("universal-argument" . "universal arg")
            ("er/expand-region" . "expand region")
-           ("helm-apropos" . "apropos")
            ("spacemacs/toggle-hybrid-mode" . "hybrid (hybrid-mode)")
            ("spacemacs/toggle-holy-mode" . "emacs (holy-mode)")
            ("evil-lisp-state-\\(.+\\)" . "\\1")
            ("spacemacs/\\(.+\\)-transient-state/\\(.+\\)" . "\\2")
            ("spacemacs/\\(.+\\)-transient-state/body" . "\\1-transient-state")
-           ("helm-mini\\|ivy-switch-buffer" . "list-buffers")
-           ("spacemacs-layouts/non-restricted-buffer-list-\\(helm\\|ivy\\)" . "global-list-buffers"))))
+           ("ivy-switch-buffer" . "list-buffers")
+           ("spacemacs-layouts/non-restricted-buffer-list-ivy" . "global-list-buffers"))))
     (dolist (nd new-descriptions)
       ;; ensure the target matches the whole string
       (push (cons (cons nil (concat "\\`" (car nd) "\\'")) (cons nil (cdr nd)))

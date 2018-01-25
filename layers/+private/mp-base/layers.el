@@ -9,7 +9,7 @@
 
 ;;; Code:
 (configuration-layer/declare-layers '(
-                                      ;; helm
+                                      ivy
                                       spacemacs-completion
                                       spacemacs-layouts
                                       spacemacs-editing

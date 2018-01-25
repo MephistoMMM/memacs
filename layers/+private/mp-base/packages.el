@@ -98,9 +98,6 @@
         (setq spaceline-window-numbers-unicode unicodep
               spaceline-workspace-numbers-unicode unicodep))
       (add-hook 'spaceline-pre-hook 'spacemacs//prepare-diminish)
-      ;; Additional spacelines
-      (when (package-installed-p 'helm)
-        (spaceline-helm-mode t))
       (when (configuration-layer/package-used-p 'info+)
         (spaceline-info-mode t))
       ;; Enable spaceline for buffers created before the configuration of

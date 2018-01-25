@@ -286,7 +286,7 @@
 ;; junk-file
 
 (defun spacemacs/open-junk-file (&optional arg)
-  "Open junk file using helm or ivy.
+  "Open junk file using ivy.
 
 Interface choice depends on whether the `ivy' layer is used or
 not.
@@ -302,14 +302,7 @@ When ARG is non-nil search in junk files."
           ((configuration-layer/layer-used-p 'ivy)
            (require 'counsel)
            (counsel-find-file rel-fname))
-          (arg
-           (require 'helm)
-           (let (helm-ff-newfile-prompt-p)
-             (spacemacs/helm-files-smart-do-search)))
-          (t
-           (require 'helm)
-           (let (helm-ff-newfile-prompt-p)
-             (helm-find-files-1 fname))))))
+          )))
 
 
 ;; paradox

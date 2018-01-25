@@ -150,12 +150,12 @@
 ;; Cycling settings -----------------------------------------------------------
 (spacemacs|define-transient-state theme
   :title "Themes Transient State"
-  :doc "\n[_n_/_<right>_] next  [_p_/_<left>_] previous  [_t_/_<up>_] helm-themes"
+  :doc "\n[_n_/_<right>_] next  [_p_/_<left>_] previous  [_t_/_<up>_] ivy-themes"
   :bindings
   ("n" spacemacs/cycle-spacemacs-theme)
   ("p" (spacemacs/cycle-spacemacs-theme 'backward))
-  ("t" helm-themes)
-  ("<up>" helm-themes)
+  ("t" counsel-load-theme)
+  ("<up>" counsel-load-theme)
   ("<right>" spacemacs/cycle-spacemacs-theme)
   ("<left>" (spacemacs/cycle-spacemacs-theme 'backward)))
 (spacemacs/set-leader-keys "Tn"
@@ -499,7 +499,7 @@
   ("N" previous-buffer)
   ("o" other-window)
   ("<left>" previous-buffer)
-  ("b" helm-buffers-list)
+  ("b" ivy-switch-buffer)
   ("d" spacemacs/kill-this-buffer)
   ("C-d" bury-buffer)
   ("q" nil :exit t)

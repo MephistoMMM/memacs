@@ -12,7 +12,6 @@
       '(
         cmake-mode
         cmake-ide
-        (helm-ctest :requires helm)
         ))
 
 (defun cmake/init-cmake-ide ()
@@ -33,10 +32,3 @@
 (defun cmake/init-cmake-mode ()
   (use-package cmake-mode
     :mode (("CMakeLists\\.txt\\'" . cmake-mode) ("\\.cmake\\'" . cmake-mode))))
-
-(defun cmake/init-helm-ctest ()
-  (use-package helm-ctest
-    :config
-    (dolist (mode cmake-modes)
-      (spacemacs/set-leader-keys-for-major-mode mode
-        "pt" 'helm-ctest))))

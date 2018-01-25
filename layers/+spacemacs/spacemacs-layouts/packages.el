@@ -11,7 +11,6 @@
 
 (setq spacemacs-layouts-packages
       '(eyebrowse
-        helm
         ivy
         persp-mode
         spaceline
@@ -38,7 +37,7 @@
  [_l_]^^^^        layouts
  [_n_/_C-l_]^^    next workspace
  [_N_/_p_/_C-h_]  prev workspace\n
- [_w_]^^^^       workspace w/helm/ivy\n")
+ [_w_]^^^^       workspace w/ivy\n")
 
       (spacemacs|define-transient-state workspaces
         :title "Workspaces Transient State"
@@ -102,13 +101,6 @@
 
 
 
-(defun spacemacs-layouts/post-init-helm ()
-  (spacemacs/set-leader-keys
-    "bB" 'spacemacs-layouts/non-restricted-buffer-list-helm
-    "pl" 'spacemacs/helm-persp-switch-project))
-
-
-
 (defun spacemacs-layouts/post-init-ivy ()
   (spacemacs/set-leader-keys
     "bB" 'spacemacs-layouts/non-restricted-buffer-list-ivy))
@@ -148,7 +140,7 @@
  [_<tab>_]^^^^    last layout                 [_d_]^^   close current layout
  [_b_]^^^^        buffer in layout            [_D_]^^   close other layout
  [_h_]^^^^        default layout              [_L_]^^   load layouts from file
- [_l_]^^^^        layout w/helm/ivy           [_r_]^^   remove current buffer
+ [_l_]^^^^        layout w/ivy           [_r_]^^   remove current buffer
  [_n_/_C-l_]^^    next layout                 [_R_]^^   rename current layout
  [_N_/_p_/_C-h_]  prev layout                 [_s_/_S_] save all layouts/save by names
  [_o_]^^^^        custom layout               [_t_]^^   show a buffer without adding it to current layout
