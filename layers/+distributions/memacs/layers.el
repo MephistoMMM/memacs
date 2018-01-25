@@ -23,7 +23,6 @@
                                       spacemacs-misc
                                       spacemacs-navigation
                                       spacemacs-org
-                                      ;; spacemacs-purpose
                                       spacemacs-visual
                                       ))
 ;;; packages.el ends here

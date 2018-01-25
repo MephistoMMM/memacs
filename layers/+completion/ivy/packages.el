@@ -159,7 +159,6 @@
 
       (ivy-mode 1)
       (global-set-key (kbd "C-c C-r") 'ivy-resume)
-      (global-set-key (kbd "<f6>") 'ivy-resume)
       ;; Occur
       (evil-make-overriding-map ivy-occur-mode-map 'normal)
       (ivy-set-occur 'spacemacs/counsel-search

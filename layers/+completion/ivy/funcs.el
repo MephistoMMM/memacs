@@ -117,7 +117,6 @@
 
 (defvar spacemacs--counsel-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "<f3>") 'spacemacs//counsel-save-in-buffer)
     (define-key map (kbd "C-c C-e") 'spacemacs//counsel-edit)
     map))
 
