@@ -32,6 +32,7 @@
 - 删除 helm 
 - 瘦身搜索工具与函数
 - 删除 ido, ido 只在 core 的 rollback package 中被使用，而我将它抽象为 completing-read-func 
+- 将 spacemacs-completion 层与 ivy 层合并
 
 ## License
 
