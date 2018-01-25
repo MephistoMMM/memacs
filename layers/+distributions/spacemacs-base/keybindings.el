@@ -40,6 +40,7 @@
                                        ("k`"  "hybrid")
                                        ("n"   "narrow/numbers")
                                        ("N"   "navigation")
+                                       ("o"   "owner")
                                        ("p"   "projects")
                                        ("p$"  "projects/shell")
                                        ("q"   "quit")
@@ -405,7 +406,6 @@
   "wt"  'spacemacs/toggle-current-window-dedication
   "wF"  'make-frame
   "wM"  'spacemacs/toggle-maximize-buffer
-  "wc"  'spacemacs/toggle-centered-buffer-mode
   "wf"  'other-frame
   "wr"  'spacemacs/rotate-windows-forward
   "wR"  'spacemacs/rotate-windows-backward

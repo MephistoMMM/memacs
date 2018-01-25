@@ -134,12 +134,6 @@ automatically applied to."
     (while (condition-case nil (windmove-down) (error nil))
       (delete-window))))
 
-(defun spacemacs/toggle-centered-buffer-mode ()
-  "Toggle `spacemacs-centered-buffer-mode'."
-  (interactive)
-  (when (require 'centered-buffer-mode nil t)
-    (call-interactively 'spacemacs-centered-buffer-mode)))
-
 (defun spacemacs/useful-buffer-p (buffer)
   "Determines if a buffer is useful."
   (let ((buf-name (buffer-name buffer)))

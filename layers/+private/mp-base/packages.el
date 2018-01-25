@@ -28,8 +28,6 @@
                 (lambda (&rest args) (unless (outline-on-heading-p t)
                                        (outline-previous-visible-heading 1))))
 
-    ;; declare onwer prifix
-    (spacemacs/declare-prefix "o" "owner")
     (spacemacs/declare-prefix "oo" "outshine")
     ;; Keybinding
     (spacemacs/set-leader-keys

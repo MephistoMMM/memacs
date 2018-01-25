@@ -15,7 +15,6 @@
         ace-window
         (archive-mode :location built-in)
         (bookmark :location built-in)
-        (centered-buffer-mode :location local)
         (conf-mode :location built-in)
         (dired :location built-in)
         (dired-x :location built-in)
@@ -596,5 +595,3 @@
                        ;; zone-pgm-random-life
                        ])
   (spacemacs/set-leader-keys "TZ" 'zone))
-
-(defun spacemacs-base/init-centered-buffer-mode ())

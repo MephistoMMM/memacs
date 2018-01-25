@@ -15,7 +15,7 @@
   "Spaceline Compile Using Myself Theme"
   (spaceline-compile
     `(
-      ((((persp-name workspace-number window-number) :separator "|")
+      ((((persp-name workspace-number) :separator "|")
        buffer-modified)
        :fallback evil-state
        :face highlight-face
