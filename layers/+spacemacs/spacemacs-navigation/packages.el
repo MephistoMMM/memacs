@@ -16,7 +16,7 @@
         (compile :location built-in)
         (doc-view :location built-in)
         (grep :location built-in)
-        info+
+        (info+ :location local)
         open-junk-file
         paradox
         restart-emacs

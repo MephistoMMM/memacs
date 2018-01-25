@@ -1082,11 +1082,14 @@ PREDICATE is an additional expression that eval to a boolean."
    packages
    (lambda (x)
      (let ((pkg (configuration-layer/get-package x)))
-       (and (cfgl-package-distant-p pkg)
-            (or (null usedp)
-                (cfgl-package-used-p pkg))
-            (or (null predicate)
-                (eval predicate)))))))
+       (if pkg
+           (and (cfgl-package-distant-p pkg)
+                (or (null usedp)
+                    (cfgl-package-used-p pkg))
+                (or (null predicate)
+                    (eval predicate)))
+         (spacemacs-buffer/warning "Cannot find package for %s" x)
+         nil)))))
 
 (defun configuration-layer//directory-type (path)
   "Return the type of directory pointed by PATH.
