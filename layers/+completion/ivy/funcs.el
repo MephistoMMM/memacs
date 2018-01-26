@@ -60,6 +60,39 @@
             (ivy--insert-prompt))))
       (setq counsel--async-time (current-time))))
 
+;; projectile action
+(defun memacs/projectile-find-file-vsplit (file)
+  "find file in vertical split"
+  (interactive "PFind file (vsplit): ")
+  (let ((buffer (find-file-noselect (projectile-expand-root file))))
+    (pop-to-buffer buffer '(spacemacs//display-in-split (split-side . right))))
+    (run-hooks 'projectile-find-file-hook))
+
+(defun memacs/projectile-find-file-split (file)
+  "find file in vertical split"
+  (interactive "PFind file (split): ")
+  (let ((buffer (find-file-noselect (projectile-expand-root file))))
+    (pop-to-buffer buffer '(spacemacs//display-in-split (split-side . below))))
+  (run-hooks 'projectile-find-file-hook))
+
+(defun memacs/projectile-delete-file-confirm (filename)
+  "Remove specified file or directory after users approval.
+
+FILENAME is deleted using `spacemacs/delete-file' function.."
+  (interactive "f")
+  (funcall-interactively #'spacemacs/delete-file (projectile-expand-root filename) t))
+
+(defun memacs/projectile-rename-file (filename &optional new-filename)
+  "Rename FILENAME to NEW-FILENAME.
+
+FILENAME is renamed using `spacemacs/delete-file' function.."
+  (interactive "f")
+  (funcall-interactively #'spacemacs/rename-file (projectile-expand-root filename) new-filename))
+
+(defun memacs/projectile-find-file-literally (filename)
+  (interactive "f")
+  (funcall-interactively #'find-file-literally (projectile-expand-root filename)))
+
 ;; search
 
 (defvar spacemacs--counsel-search-cmd)

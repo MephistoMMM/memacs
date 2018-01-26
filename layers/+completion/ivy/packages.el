@@ -55,7 +55,6 @@
         ;; files
         "ff"  'counsel-find-file
         "fel" 'counsel-find-library
-        "fL"  'counsel-locate
         ;; help
         "?"   'counsel-descbinds
         "hdf" 'counsel-describe-function
@@ -80,15 +79,13 @@
         "sD"  'spacemacs/search-dir-auto-region-or-symbol
         "sf"  'spacemacs/search-auto
         "sF"  'spacemacs/search-auto-region-or-symbol
-        "sp"  'spacemacs/search-project-auto
-        "sP"  'spacemacs/search-project-auto-region-or-symbol
         ))
     :config
     (progn
       ;; set additional ivy actions
       (ivy-set-actions
        'counsel-find-file
-       spacemacs--ivy-file-actions)
+       memacs--ivy-file-actions)
 
       (define-key counsel-find-file-map (kbd "C-h") 'counsel-up-directory)
       ;; remaps built-in commands that have a counsel replacement
@@ -108,13 +105,14 @@
 
       (ivy-set-actions
        'counsel-projectile-find-file
-       (append spacemacs--ivy-file-actions
-               '(("R" (lambda (arg)
-                        (interactive)
-                        (call-interactively
-                         #'projectile-invalidate-cache)
-                        (ivy-resume)) "refresh list")
-                 )))
+       memacs--ivy-projectile-actions)
+      ;; (append spacemacs--ivy-file-actions
+      ;;         '(("R" (lambda (arg)
+      ;;                  (interactive)
+      ;;                  (call-interactively
+      ;;                   #'projectile-invalidate-cache)
+      ;;                  (ivy-resume)) "refresh list")
+      ;;           ))
 
       (spacemacs/set-leader-keys
         "p SPC" 'counsel-projectile
@@ -151,7 +149,7 @@
       ;; custom actions for recentf
       (ivy-set-actions
        'counsel-recentf
-       spacemacs--ivy-file-actions)
+       memacs--ivy-file-actions)
 
       ;; mappings to quit minibuffer or enter transient state
       (define-key ivy-minibuffer-map [escape] 'minibuffer-keyboard-quit)
@@ -308,7 +306,7 @@ Current Action: %s(ivy-action-name)
   ;; custom actions for recentf
   (ivy-set-actions
    'counsel-recentf
-   (append spacemacs--ivy-file-actions
+   (append memacs--ivy-file-actions
            '(("R" (lambda (arg)
                     (interactive)
                     (recentf-cleanup)

@@ -34,18 +34,24 @@ than this amount.")
 
 (defvar spacemacs--counsel-initial-number-cand 100)
 
-(defvar spacemacs--ivy-file-actions
-  '(("f" find-file-other-frame "other frame")
-    ("j" find-file-other-window "other window")
-    ("v" spacemacs/find-file-vsplit "in vertical split")
+(defvar memacs--ivy-file-actions
+  '(("v" spacemacs/find-file-vsplit "in vertical split")
     ("s" spacemacs/find-file-split "in horizontal split")
     ("l" find-file-literally "literally")
     ("d" spacemacs/delete-file-confirm "delete file")
-    ("r" spacemacs/rename-file "rename file"))
+    ("R" spacemacs/rename-file "rename file"))
   "Default ivy actions for files.")
 
-(defvar spacemacs--ivy-grep-actions
-  (cl-loop for j in spacemacs--ivy-file-actions
+(defvar memacs--ivy-projectile-actions
+  '(("v" memacs/projectile-find-file-vsplit "in vertical split")
+    ("s" memacs/projectile-find-file-split "in horizontal split")
+    ("l" memacs/projectile-find-file-literally "literally")
+    ("d" memacs/projectile-delete-file-confirm "delete file")
+    ("R" memacs/projectile-rename-file "rename file"))
+  "Default ivy actions for projectile.")
+
+(defvar memacs--ivy-grep-actions
+  (cl-loop for j in memacs--ivy-file-actions
         for key = (nth 0 j)
         for func = (nth 1 j)
         for desc = (nth 2 j)
