@@ -15,7 +15,8 @@
         bookmark
         counsel
         counsel-projectile
-        evil
+        smex
+        (hybrid-mode :location local)
         flx
         ivy
         ivy-hydra
@@ -66,7 +67,6 @@
         "iu"  'counsel-unicode-char
         ;; jump
         ;; register/ring
-        "ry"  'counsel-yank-pop
         "rm"  'counsel-mark-ring
         ;; themes
         "Ts"  'counsel-load-theme
@@ -122,9 +122,14 @@
         "pp"    'counsel-projectile-switch-project
         "pf"    'counsel-projectile-find-file))))
 
-(defun ivy/post-init-evil ()
-  (spacemacs/set-leader-keys
-    "re" 'spacemacs/ivy-evil-registers))
+(defun ivy/post-init-hybrid-mode ()
+  ;; registers
+  (with-eval-after-load 'counsel
+    (memacs/define-evil-keybinding
+     (list evil-normal-state-map evil-hybrid-state-map)
+     "C-e" 'spacemacs/ivy-evil-registers
+     "C-y" 'counsel-yank-pop))
+  )
 
 (defun ivy/init-flx ()
   (use-package flx))
@@ -142,8 +147,8 @@
       (spacemacs/set-leader-keys
         "a'" 'spacemacs/ivy-available-repls
         "fr" 'counsel-recentf
-        "rr" 'ivy-resume
-        "bb" 'ivy-switch-buffer))
+        "bb" 'ivy-switch-buffer)
+      (memacs/define-evil-normal-keybinding "C-i" 'ivy-resume))
 
     :config
     (progn
@@ -155,7 +160,6 @@
       ;; mappings to quit minibuffer or enter transient state
       (define-key ivy-minibuffer-map [escape] 'minibuffer-keyboard-quit)
       (define-key ivy-minibuffer-map (kbd "M-SPC") 'hydra-ivy/body)
-      (define-key ivy-minibuffer-map (kbd "C-i")   'ivy-avy)
 
       (ivy-mode 1)
       ;; Occur
@@ -329,6 +333,13 @@ Current Action: %s(ivy-action-name)
         "b" 'swiper-all
         "B" 'spacemacs/swiper-all-region-or-symbol)
       )))
+
+(defun ivy/init-smex ()
+  (use-package smex
+    :defer t
+    :init (setq-default smex-history-length 32
+                        smex-save-file (concat spacemacs-cache-directory
+                                               ".smex-items"))))
 
 (defun ivy/init-wgrep ()
   (evil-define-key 'normal wgrep-mode-map ",," 'wgrep-finish-edit)

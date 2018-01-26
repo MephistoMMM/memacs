@@ -39,7 +39,7 @@
                                        ("kD"  "delete-backward")
                                        ("k`"  "hybrid")
                                        ("n"   "narrow/numbers")
-                                       ("N"   "navigation")
+                                       ("P"   "Page navigation")
                                        ("o"   "owner")
                                        ("p"   "projects")
                                        ("p$"  "projects/shell")
@@ -113,6 +113,7 @@
 ;; buffers --------------------------------------------------------------------
 (spacemacs/set-leader-keys
   "TAB"   'spacemacs/alternate-buffer
+  "bt"    'spacemacs/new-empty-buffer
   "bd"    'spacemacs/kill-this-buffer
   "be"    'spacemacs/safe-erase-buffer
   "bh"    'spacemacs/home
@@ -394,7 +395,6 @@
   "C-w 3"   'spacemacs/layout-triple-columns
   "C-w f"   'other-frame
   "C-w F"   'make-frame
-  "C-w M"   'spacemacs/toggle-maximize-buffer
   "C-w S"   'split-window-below-and-focus
   "C-w U"   'winner-redo
   "C-w u"   'winner-undo

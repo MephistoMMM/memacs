@@ -70,20 +70,11 @@
   ;; evil-want-Y-yank-to-eol must be set via customize to have an effect
   (customize-set-variable 'evil-want-Y-yank-to-eol dotspacemacs-remap-Y-to-y$)
 
-  ;; bind evil-jump-forward for GUI only.
-  (define-key evil-motion-state-map [C-i] 'evil-jump-forward)
-
   ;; Make the current definition and/or comment visible.
   (define-key evil-normal-state-map "zf" 'reposition-window)
   ;; toggle maximize buffer
   (define-key evil-window-map (kbd "o") 'spacemacs/toggle-maximize-buffer)
-  (define-key evil-window-map (kbd "C-o") 'spacemacs/toggle-maximize-buffer)
-  ;; make cursor keys work
-  (define-key evil-window-map (kbd "<left>") 'evil-window-left)
-  (define-key evil-window-map (kbd "<right>") 'evil-window-right)
-  (define-key evil-window-map (kbd "<up>") 'evil-window-up)
-  (define-key evil-window-map (kbd "<down>") 'evil-window-down)
-  (spacemacs/set-leader-keys "re" 'evil-show-registers)
+
   ;; motions keys for help buffers
   (evil-define-key 'motion help-mode-map (kbd "<escape>") 'quit-window)
   (evil-define-key 'motion help-mode-map (kbd "<tab>") 'forward-button)
@@ -103,13 +94,6 @@
   (when dotspacemacs-retain-visual-state-on-shift
     (evil-map visual "<" "<gv")
     (evil-map visual ">" ">gv"))
-
-  ;; move selection up and down
-  (when dotspacemacs-visual-line-move-text
-    (define-key evil-visual-state-map "J" (concat ":m '>+1" (kbd "RET") "gv=gv"))
-    (define-key evil-visual-state-map "K" (concat ":m '<-2" (kbd "RET") "gv=gv")))
-
-  (evil-ex-define-cmd "enew" 'spacemacs/new-empty-buffer)
 
   (define-key evil-normal-state-map (kbd "K") 'spacemacs/evil-smart-doc-lookup)
   (define-key evil-normal-state-map (kbd "gd") 'spacemacs/jump-to-definition)
@@ -143,56 +127,8 @@
     ("k" evil-scroll-line-up)
     ("h" evil-scroll-column-left)
     ("l" evil-scroll-column-right))
-  (spacemacs/set-leader-keys
-    ;; buffer
-    "N<" 'spacemacs/scroll-transient-state/evil-goto-first-line
-    "N>" 'spacemacs/scroll-transient-state/evil-goto-line
-    ;; full page
-    "Nf" 'spacemacs/scroll-transient-state/evil-scroll-page-down
-    "Nb" 'spacemacs/scroll-transient-state/evil-scroll-page-up
-    ;; half page
-    "Nd" 'spacemacs/scroll-transient-state/evil-scroll-down
-    "Nu" 'spacemacs/scroll-transient-state/evil-scroll-up
-    "NJ" 'spacemacs/scroll-transient-state/evil-scroll-down
-    "NK" 'spacemacs/scroll-transient-state/evil-scroll-up
-    "NH" 'spacemacs/scroll-transient-state/evil-scroll-left
-    "NL" 'spacemacs/scroll-transient-state/evil-scroll-right
-    ;; lines and columns
-    "Nj" 'spacemacs/scroll-transient-state/evil-scroll-line-down
-    "Nk" 'spacemacs/scroll-transient-state/evil-scroll-line-up
-    "Nh" 'spacemacs/scroll-transient-state/evil-scroll-column-left
-    "Nl" 'spacemacs/scroll-transient-state/evil-scroll-column-right)
+  (spacemacs/set-leader-keys "P" 'spacemacs/scroll-transient-state/body)
 
-  ;; pasting transient-state
-  (evil-define-command spacemacs//transient-state-0 ()
-    :keep-visual t
-    :repeat nil
-    (interactive)
-    (if current-prefix-arg
-        (progn
-          (setq this-command #'digit-argument)
-          (call-interactively #'digit-argument))
-      (setq this-command #'evil-beginning-of-line
-            hydra-deactivate t)
-      (call-interactively #'evil-beginning-of-line)))
-
-  (spacemacs|define-transient-state paste
-    :title "Pasting Transient State"
-    :doc "\n[%s(length kill-ring-yank-pointer)/%s(length kill-ring)] \
- [_C-j_/_C-k_] cycles through yanked text, [_p_/_P_] pastes the same text \
- above or below. Anything else exits."
-    :bindings
-    ("C-j" evil-paste-pop)
-    ("C-k" evil-paste-pop-next)
-    ("p" evil-paste-after)
-    ("P" evil-paste-before)
-    ("0" spacemacs//transient-state-0))
-
-  (when dotspacemacs-enable-paste-transient-state
-    (define-key evil-normal-state-map
-      "p" 'spacemacs/paste-transient-state/evil-paste-after)
-    (define-key evil-normal-state-map
-      "P" 'spacemacs/paste-transient-state/evil-paste-before))
   ;; fold transient state
   (when (eq 'evil dotspacemacs-folding-method)
     (spacemacs|define-transient-state fold
@@ -214,7 +150,7 @@
       ("q" nil :exit t)
       ("C-g" nil :exit t)
       ("<SPC>" nil :exit t)))
-  (spacemacs/set-leader-keys "z." 'spacemacs/fold-transient-state/body)
+  (memacs/define-evil-normal-keybinding "z." 'spacemacs/fold-transient-state/body)
 
   ;; define text objects
   (spacemacs|define-text-object "$" "dollar" "$" "$")

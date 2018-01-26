@@ -128,14 +128,6 @@ pressing `<leader> m`. Set it to `nil` to disable it.")
 (defvaralias 'dotspacemacs-emacs-command-key 'dotspacemacs-command-key
   "New official name for `dotspacemacs-command-key'")
 
-(defvar dotspacemacs-distinguish-gui-tab nil
-  "If non nil, distinguish C-i and tab in the GUI version of
-emacs.")
-
-;; (defvar dotspacemacs-distinguish-gui-ret nil
-;;   "If non nil, distinguish C-m and return in the GUI version of
-;; emacs.")
-
 (defvar dotspacemacs-default-font '("Source Code Pro"
                                     :size 13
                                     :weight normal
@@ -149,9 +141,6 @@ running Emacs in terminal.")
 (defvar dotspacemacs-retain-visual-state-on-shift t
   "If non-nil, the shift mappings `<' and `>' retain visual state
 if used there.")
-
-(defvar dotspacemacs-visual-line-move-text nil
-  "If non-nil, J and K move lines up and down when in visual mode.")
 
 (defvar dotspacemacs-ex-substitute-global nil
   "If non nil, inverse the meaning of `g' in `:substitute' Evil ex-command.")
@@ -185,14 +174,6 @@ no major mode or minor modes are active.")
   "Location where to auto-save files. Possible values are `original' to
 auto-save the file in-place, `cache' to auto-save the file to another
 file stored in the cache directory and `nil' to disable auto-saving.")
-
-(defvar dotspacemacs-enable-paste-transient-state nil
-  "If non-nil, the paste transient-state is enabled. While enabled, pressing
-`p' several times cycles through the elements in the `kill-ring'.")
-(defvaralias
-  'dotspacemacs-enable-paste-micro-state
-  'dotspacemacs-enable-paste-transient-state
-  "Old name of `dotspacemacs-enable-paste-transient-state'.")
 
 (defvar dotspacemacs-which-key-delay 0.4
   "Delay in seconds starting from the last keystroke after which

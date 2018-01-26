@@ -85,9 +85,7 @@
         (define-key evil-motion-state-map (kbd "#")
           'spacemacs/enter-ahs-backward))
 
-      (spacemacs/set-leader-keys
-        "sh" 'spacemacs/symbol-highlight
-        "sH" 'spacemacs/goto-last-searched-ahs-symbol)
+      (define-key evil-normal-state-map (kbd "gH") 'spacemacs/goto-last-searched-ahs-symbol)
 
       ;; micro-state to easily jump from a highlighted symbol to the others
       (dolist (sym '(ahs-forward

@@ -19,12 +19,6 @@
   ;; ds <aim>              delete surround
   ;; <visual> s <aim>      create surround
 
-  ;; Comment
-  (spacemacs/set-leader-keys "ci" 'spacemacs/comment-or-uncomment-lines) ; comment toggle
-
-  ;; Buffer
-  (spacemacs/set-leader-keys "bt" 'evil-buffer-new) ; new buffer
-
   ;; Expand
   (define-key evil-normal-state-map (kbd "e") 'er/expand-region)
   (define-key evil-visual-state-map (kbd "e") 'er/expand-region)
