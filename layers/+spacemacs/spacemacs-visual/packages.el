@@ -64,8 +64,8 @@
     :config
     (progn
       (popwin-mode 1)
-      (spacemacs/set-leader-keys "wpm" 'popwin:messages)
-      (spacemacs/set-leader-keys "wpp" 'popwin:close-popup-window)
+      (spacemacs/set-leader-keys "em" 'popwin:messages)
+      (spacemacs/set-leader-keys "ed" 'popwin:close-popup-window)
 
       ;; don't use default value but manage it ourselves
       (setq popwin:special-display-config nil)

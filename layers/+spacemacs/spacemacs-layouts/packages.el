@@ -82,7 +82,9 @@
         ("w" eyebrowse-switch-to-window-config :exit t))
       ;; note: we don't need to declare the `SPC l w' binding, it is
       ;; declare in the layout transient state
-      (spacemacs/set-leader-keys "bW" 'spacemacs/goto-buffer-workspace)
+      (spacemacs/set-leader-keys
+        "w"  'spacemacs/workspaces-transient-state/body
+        "bW" 'spacemacs/goto-buffer-workspace)
       ;; hooks
       (when (configuration-layer/package-used-p 'persp-mode)
         (add-hook 'persp-before-switch-functions

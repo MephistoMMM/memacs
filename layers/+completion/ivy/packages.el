@@ -69,7 +69,7 @@
         "ry"  'counsel-yank-pop
         "rm"  'counsel-mark-ring
         ;; jumping
-        "sj"  'counsel-imenu
+        "si"  'counsel-imenu
         ;; themes
         "Ts"  'counsel-load-theme
         ;; search
@@ -129,7 +129,7 @@
   (use-package flx))
 
 (defun ivy/post-init-imenu ()
-  (spacemacs/set-leader-keys "ji" 'counsel-imenu))
+  (spacemacs/set-leader-keys "bi" 'counsel-imenu))
 
 (defun ivy/init-ivy ()
   (use-package ivy
@@ -141,7 +141,7 @@
       (spacemacs/set-leader-keys
         "a'" 'spacemacs/ivy-available-repls
         "fr" 'counsel-recentf
-        "rl" 'ivy-resume
+        "rr" 'ivy-resume
         "bb" 'ivy-switch-buffer))
 
     :config
@@ -154,9 +154,9 @@
       ;; mappings to quit minibuffer or enter transient state
       (define-key ivy-minibuffer-map [escape] 'minibuffer-keyboard-quit)
       (define-key ivy-minibuffer-map (kbd "M-SPC") 'hydra-ivy/body)
+      (define-key ivy-minibuffer-map (kbd "C-i")   'ivy-avy)
 
       (ivy-mode 1)
-      (global-set-key (kbd "C-c C-r") 'ivy-resume)
       ;; Occur
       (evil-make-overriding-map ivy-occur-mode-map 'normal)
       (ivy-set-occur 'spacemacs/counsel-search
@@ -307,7 +307,7 @@ Current Action: %s(ivy-action-name)
   (ivy-set-actions
    'counsel-recentf
    (append memacs--ivy-file-actions
-           '(("R" (lambda (arg)
+           '(("F" (lambda (arg)
                     (interactive)
                     (recentf-cleanup)
                     (ivy-recentf)) "refresh list")

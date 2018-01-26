@@ -24,7 +24,6 @@
         js2-mode
         go-mode
         yaml-mode
-        avy
         outshine
         ))
 
@@ -63,25 +62,6 @@
       "ooL" 'outline-demote
       )
     )
-  )
-
-(defun mp-hacking/post-init-avy ()
-  "Bind keybindings for avy."
-  (define-key evil-normal-state-map (kbd "C-j j") 'evil-avy-goto-char)
-  (define-key evil-motion-state-map (kbd "C-j j") 'evil-avy-goto-char)
-  (define-key evil-normal-state-map (kbd "C-j J") 'evil-avy-goto-char-2)
-  (define-key evil-motion-state-map (kbd "C-j J") 'evil-avy-goto-char-2)
-  (define-key evil-normal-state-map (kbd "C-j l") 'evil-avy-goto-line)
-  (define-key evil-motion-state-map (kbd "C-j l") 'evil-avy-goto-line)
-  (define-key evil-normal-state-map (kbd "C-j w") 'evil-avy-goto-word-or-subword-1)
-  (define-key evil-motion-state-map (kbd "C-j w") 'evil-avy-goto-word-or-subword-1)
-  (define-key evil-normal-state-map (kbd "C-j W") 'evil-avy-goto-word-0)
-  (define-key evil-motion-state-map (kbd "C-j W") 'evil-avy-goto-word-0)
-  (define-key evil-normal-state-map (kbd "C-j t") 'evil-avy-goto-char-timer)
-  (define-key evil-motion-state-map (kbd "C-j t") 'evil-avy-goto-char-timer)
-
-  ;; there is a bug with evil-search module
-  ;; (define-key evil-normal-state-map (kbd "C-j i") 'avy-isearch)
   )
 
 (defun mp-hacking/post-init-yaml-mode ()

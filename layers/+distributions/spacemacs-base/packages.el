@@ -66,17 +66,14 @@
     :defer t
     :init
     (progn
-      (spacemacs/set-leader-keys
-        "bD" 'spacemacs/ace-kill-this-buffer
-        ;; FIXME: Needs new binding.
-        ;; "wC" 'spacemacs/ace-center-window
-        "wD" 'spacemacs/ace-delete-window
-        "wm" 'ace-swap-window
-        "ww" 'ace-window)
-      (define-key evil-normal-state-map (kbd "C-w w") 'ace-window)
-      (define-key evil-motion-state-map (kbd "C-w w") 'ace-window)
-      (define-key evil-normal-state-map (kbd "C-w m") 'ace-swap-window)
-      (define-key evil-motion-state-map (kbd "C-w m") 'ace-swap-window)
+      (spacemacs/set-leader-keys "bD" 'spacemacs/ace-kill-this-buffer)
+      (memacs/define-evil-normal-keybinding
+        "C-w w" 'ace-window
+        "C-w a" 'ace-window
+        "C-w m" 'ace-swap-window
+        "C-w D" 'spacemacs/ace-delete-window
+       )
+
       ;; set ace-window keys to home-row
       (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))))
 
@@ -386,8 +383,7 @@
         "pp" 'projectile-switch-project
         "pr" 'projectile-recentf
         "pR" 'projectile-replace
-        "pT" 'projectile-test-project
-        "pv" 'projectile-vc))
+        "pT" 'projectile-test-project))
     :config
     (progn
       (projectile-global-mode)

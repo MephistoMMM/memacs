@@ -58,13 +58,23 @@
     (progn
       (setq avy-all-windows 'all-frames)
       (setq avy-background t)
-      (spacemacs/set-leader-keys
-        "jb" 'avy-pop-mark
-        "jj" 'evil-avy-goto-char-timer
-        "jl" 'evil-avy-goto-line
-        "ju" 'spacemacs/avy-goto-url
-        "jw" 'evil-avy-goto-word-or-subword-1
-        "xo" 'spacemacs/avy-open-url))
+      (memacs/define-evil-keybinding
+       (list
+        evil-normal-state-map
+        evil-motion-state-map
+        evil-hybrid-state-map
+        evil-visual-state-map)
+       "C-j r"   'avy-resume
+       "C-j b"   'avy-pop-mark
+       "C-j c"   'evil-avy-goto-char
+       "C-j C"   'evil-avy-goto-char-2
+       "C-j l"   'evil-avy-goto-line
+       "C-l"     'evil-avy-goto-line
+       "C-j u"   'spacemacs/avy-goto-url
+       "C-j C-u" 'spacemacs/avy-open-url
+       "C-j w"   'evil-avy-goto-word-or-subword-1
+       "C-j W"   'evil-avy-goto-word-0
+       "C-j j"   'evil-avy-goto-char-timer))
     :config
     (progn
       (defun spacemacs/avy-goto-url()

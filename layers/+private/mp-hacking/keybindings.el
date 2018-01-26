@@ -25,15 +25,6 @@
   ;; Buffer
   (spacemacs/set-leader-keys "bt" 'evil-buffer-new) ; new buffer
 
-  ;; Frame
-  (define-key evil-normal-state-map (kbd "C-w f") 'other-frame)
-  (define-key evil-motion-state-map (kbd "C-w f") 'other-frame)
-
-  ;; Search
-  ;; (define-key evil-normal-state-map (kbd "/") 'evil-search-forward)
-  ;; (define-key evil-normal-state-map (kbd "n") 'evil-search-next)
-  ;; (define-key evil-normal-state-map (kbd "N") 'evil-search-previous)
-
   ;; Expand
   (define-key evil-normal-state-map (kbd "e") 'er/expand-region)
   (define-key evil-visual-state-map (kbd "e") 'er/expand-region)
@@ -62,7 +53,6 @@
   ;; Yasnippet
   ;; Use C-k to start complete snips and use TAB to go arround the points
   ;; How to write yasnippet: https://joaotavora.github.io/yasnippet/snippet-development.html or http://d.pr/n/1bHuv
-  (define-key evil-hybrid-state-map (kbd "C-l") 'hippie-expand)
   (spacemacs/declare-prefix "oy" "yasnippet")
   (spacemacs/set-leader-keys "oyn" 'yas-new-snippet)                      ;;owner yasnippet new
   (spacemacs/set-leader-keys "oyl" 'yas-load-snippet-buffer)              ;;owner yasnippet load

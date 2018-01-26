@@ -61,8 +61,6 @@
                                        ("tm"  "modeline")
                                        ("T"   "UI toggles/themes")
                                        ("C-t" "other toggles")
-                                       ("w"   "windows")
-                                       ("wp"  "popup")
                                        ("x"   "text")
                                        ("xa"  "align")
                                        ("xd"  "delete")
@@ -398,30 +396,24 @@
              (symbol-value golden-ratio-mode))
     (golden-ratio)))
 
-(spacemacs/set-leader-keys
-  "w TAB"  'spacemacs/alternate-window
-  "w2"  'spacemacs/layout-double-columns
-  "w3"  'spacemacs/layout-triple-columns
-  "wd"  'spacemacs/delete-window
-  "wt"  'spacemacs/toggle-current-window-dedication
-  "wF"  'make-frame
-  "wM"  'spacemacs/toggle-maximize-buffer
-  "wf"  'other-frame
-  "wr"  'spacemacs/rotate-windows-forward
-  "wR"  'spacemacs/rotate-windows-backward
-  "ws"  'split-window-below
-  "wS"  'split-window-below-and-focus
-  "w-"  'split-window-below
-  "wU"  'winner-redo
-  "wu"  'winner-undo
-  "wv"  'split-window-right
-  "wV"  'split-window-right-and-focus
-  "wx"  'kill-buffer-and-window
-  "w/"  'split-window-right
-  "w="  'balance-windows-area
-  "w+"  'spacemacs/window-layout-toggle
-  "w_"  'spacemacs/maximize-horizontally
-  "w|"  'spacemacs/maximize-vertically)
+(memacs/define-evil-normal-keybinding
+  "C-w d"   'spacemacs/delete-window
+  "C-w T"   'spacemacs/toggle-current-window-dedication
+  "C-w TAB" 'spacemacs/alternate-window
+  "C-w 2"   'spacemacs/layout-double-columns
+  "C-w 3"   'spacemacs/layout-triple-columns
+  "C-w f"   'other-frame
+  "C-w F"   'make-frame
+  "C-w M"   'spacemacs/toggle-maximize-buffer
+  "C-w S"   'split-window-below-and-focus
+  "C-w U"   'winner-redo
+  "C-w u"   'winner-undo
+  "C-w V"   'split-window-right-and-focus
+  "C-w x"   'kill-buffer-and-window
+  "C-w _"   'spacemacs/maximize-horizontally
+  "C-w |"   'spacemacs/maximize-vertically
+  )
+
 ;; text -----------------------------------------------------------------------
 (defalias 'count-region 'count-words-region)
 
@@ -580,7 +572,7 @@
   ("v" split-window-right)
   ("V" split-window-right-and-focus)
   ("w" 'ace-window))
-(spacemacs/set-leader-keys "w."
+(memacs/define-evil-normal-keybinding "C-w ."
   'spacemacs/window-manipulation-transient-state/body)
 
 ;; end of Window Manipulation Transient State
