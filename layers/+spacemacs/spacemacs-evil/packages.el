@@ -103,7 +103,7 @@
       (setq iedit-current-symbol-default t
             iedit-only-at-symbol-boundaries t
             iedit-toggle-key-default nil)
-      (spacemacs/set-leader-keys "se" 'evil-iedit-state/iedit-mode))
+      (define-key evil-normal-state-map "gI" 'evil-iedit-state/iedit-mode))
     :config
     ;; activate leader in iedit and iedit-insert states
     (define-key evil-iedit-state-map
@@ -235,10 +235,7 @@
     :init
     (progn
       (global-evil-search-highlight-persist)
-      ;; (set-face-attribute )
-      (define-key evil-search-highlight-persist-map
-        (kbd "C-x SPC") 'rectangle-mark-mode)
-      (spacemacs/set-leader-keys "sc" 'spacemacs/evil-search-clear-highlight)
+      (memacs/define-evil-normal-keybinding "gs" 'spacemacs/evil-search-clear-highlight)
       (evil-ex-define-cmd "nohlsearch" 'spacemacs/evil-search-clear-highlight)
       (spacemacs//adaptive-evil-highlight-persist-face)
       (add-hook 'spacemacs-post-theme-change-hook

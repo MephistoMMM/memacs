@@ -68,18 +68,19 @@
         ;; register/ring
         "ry"  'counsel-yank-pop
         "rm"  'counsel-mark-ring
-        ;; jumping
-        "si"  'counsel-imenu
         ;; themes
         "Ts"  'counsel-load-theme
-        ;; search
-        "/"   'spacemacs/search-project-auto
-        "*"   'spacemacs/search-project-auto-region-or-symbol
-        "sd"  'spacemacs/search-dir-auto
-        "sD"  'spacemacs/search-dir-auto-region-or-symbol
-        "sf"  'spacemacs/search-auto
-        "sF"  'spacemacs/search-auto-region-or-symbol
-        ))
+        )
+      ;; search
+      (memacs/define-search-keybinding
+       "/" 'spacemacs/search-project-auto
+       "?" 'spacemacs/search-project-auto-region-or-symbol
+       "d" 'spacemacs/search-dir-auto
+       "D" 'spacemacs/search-dir-auto-region-or-symbol
+       "f" 'spacemacs/search-auto
+       "F" 'spacemacs/search-auto-region-or-symbol
+       )
+      )
     :config
     (progn
       ;; set additional ivy actions
@@ -322,12 +323,12 @@ Current Action: %s(ivy-action-name)
   (use-package swiper
     :config
     (progn
-      (spacemacs/set-leader-keys
-        "ss" 'swiper
-        "sS" 'spacemacs/swiper-region-or-symbol
-        "sb" 'swiper-all
-        "sB" 'spacemacs/swiper-all-region-or-symbol)
-      (global-set-key "\C-s" 'swiper))))
+      (memacs/define-search-keybinding
+        "s" 'swiper
+        "S" 'spacemacs/swiper-region-or-symbol
+        "b" 'swiper-all
+        "B" 'spacemacs/swiper-all-region-or-symbol)
+      )))
 
 (defun ivy/init-wgrep ()
   (evil-define-key 'normal wgrep-mode-map ",," 'wgrep-finish-edit)

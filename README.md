@@ -33,6 +33,8 @@
 - 瘦身搜索工具与函数
 - 删除 ido, ido 只在 core 的 rollback package 中被使用，而我将它抽象为 completing-read-func 
 - 将 spacemacs-completion 层与 ivy 层合并
+- 将 window 相关指令绑定在 C-w 之下
+- 将文本内容相关执行绑定在 C-s 之下， 将 clear-highlight 改为 gs ，将 iedit-mode 改为 gI
 
 ## License
 

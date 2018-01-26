@@ -79,16 +79,6 @@
 ;; auto-indent on RET
 (define-key global-map (kbd "RET") 'newline-and-indent)
 
-;; improve delete-other-windows
-(define-key global-map (kbd "C-x 1") 'spacemacs/toggle-maximize-buffer)
-
-;; alternate binding to search next occurrence with isearch without
-;; exiting isearch
-(define-key isearch-mode-map (kbd "S-<return>") 'isearch-repeat-forward)
-(define-key isearch-mode-map (kbd "M-S-<return>") 'isearch-repeat-backward)
-;; Escape from isearch-mode("/" and "?" in evil-mode) like vim
-(define-key isearch-mode-map (kbd "<escape>") 'isearch-cancel)
-
 ;; Make <escape> quit as much as possible
 (define-key minibuffer-local-map (kbd "<escape>") 'keyboard-escape-quit)
 (define-key minibuffer-local-ns-map (kbd "<escape>") 'keyboard-escape-quit)

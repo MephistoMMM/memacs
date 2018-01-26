@@ -17,6 +17,19 @@
 (defvar spacemacs-default-map (make-sparse-keymap)
   "Base keymap for all spacemacs leader key commands.")
 
+(defvar memacs-search-map (make-sparse-keymap)
+  "Search keymap for all text content search commands.")
+
+(global-set-key (kbd "C-s") memacs-search-map)
+
+(defun memacs/define-search-keybinding (key def &rest bindings)
+  "Binding funcs to search map."
+  (while key
+    (define-key memacs-search-map (kbd key) def)
+    (define-key memacs-search-map (kbd key) def)
+    (setq key (pop bindings) def (pop bindings)))
+  )
+
 (defun spacemacs/translate-C-i (_)
   "If `dotspacemacs-distinguish-gui-tab' is non nil, the raw key
 sequence does not include <tab> or <kp-tab>, and we are in the
