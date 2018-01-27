@@ -23,6 +23,7 @@
                                        ("bN"  "new empty buffer")
                                        ("c"   "compile/comments")
                                        ("C"   "capture/colors")
+                                       ("d"   "diff")
                                        ("e"   "errors")
                                        ("f"   "files")
                                        ("fC"  "files/convert")
@@ -90,6 +91,11 @@
 ;; spacemacs leader key bindings
 ;; ---------------------------------------------------------------------------
 
+;; Diff
+(spacemacs/set-leader-keys
+  "dd" 'ediff
+  "dm" 'ediff3)
+
 ;; Universal argument ---------------------------------------------------------
 (spacemacs/set-leader-keys "u" 'universal-argument)
 (when (memq dotspacemacs-editing-style '(vim hybrid))
@@ -114,7 +120,6 @@
   "bH"    'spacemacs/switch-to-help-buffer
   "b C-d" 'spacemacs/kill-other-buffers
   "b C-S-d" 'spacemacs/kill-matching-buffers-rudely
-  "bn"    'next-buffer
   "bm"    'spacemacs/switch-to-messages-buffer
   "b N h" 'spacemacs/new-empty-buffer-left
   "b N j" 'spacemacs/new-empty-buffer-below
@@ -122,7 +127,6 @@
   "b N l" 'spacemacs/new-empty-buffer-right
   "b N n" 'spacemacs/new-empty-buffer
   "bP"    'spacemacs/copy-clipboard-to-whole-buffer
-  "bp"    'previous-buffer
   "bR"    'spacemacs/safe-revert-buffer
   "bs"    'spacemacs/switch-to-scratch-buffer
   "bu"    'spacemacs/reopen-killed-buffer

@@ -1,6 +1,10 @@
-# Memacs
+<hr/>
 
-![wing cat](./core/banners/img/banner.png)
+<p align="center">
+<a href="./core/banners/img/banner.png"><img src="./core/banners/img/banner.png" alt="wing cat"></a>
+</p>
+
+# Memacs
 
 ## Spacemacs 配置缩减计划进度
 - 删除无用的 banner 和其他杂乱的图片，只留下我自己的 banner -- 羽川翼
@@ -35,6 +39,15 @@
 - 将 spacemacs-completion 层与 ivy 层合并
 - 将 window 相关指令绑定在 C-w 之下
 - 将文本内容相关执行绑定在 C-s 之下， 将 clear-highlight 改为 gs ，将 iedit-mode 改为 gI
+- 删除 gui-tab 相关的配置，这个用不到
+- 删除 paste transient state， 有 counsel-yand 和 evil-register 了，这个多此一举
+- 将 ivy-evil-regeisters 绑定到 C-e , 将 counsel-yank-pop 绑定到 C-y
+- 将 navigation transient state 修改为 Page navigation transient state (SPC P)
+- 将 goto-last-searched-ahs-symbol 修改为 gH
+- 将 dracula-theme 作为内置主题
+- 删除所有在 dotspacemacs-excluding-packages 中的包的相关配置
+- 删除 auto-completion , 大家用的都是 company
+- 整和我的键位绑定到相应的地方
 
 ## License
 

@@ -86,7 +86,11 @@
 (defun spacemacs-editing/init-expand-region ()
   (use-package expand-region
     :defer t
-    :init (spacemacs/set-leader-keys "v" 'er/expand-region)
+    :init
+    (memacs/define-evil-keybinding
+     (list evil-normal-state-map evil-visual-state-map)
+     "e" 'er/expand-region
+     "E" 'er/contract-region)
     :config
     (progn
       ;; add search capability to expand-region
