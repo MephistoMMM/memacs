@@ -42,15 +42,6 @@
   ;; insert FF
   (spacemacs/set-leader-keys "if" 'mp-hacking/insert-form-feed)
 
-  ;; Yasnippet
-  ;; Use C-k to start complete snips and use TAB to go arround the points
-  ;; How to write yasnippet: https://joaotavora.github.io/yasnippet/snippet-development.html or http://d.pr/n/1bHuv
-  (spacemacs/declare-prefix "oy" "yasnippet")
-  (spacemacs/set-leader-keys "oyn" 'yas-new-snippet)                      ;;owner yasnippet new
-  (spacemacs/set-leader-keys "oyl" 'yas-load-snippet-buffer)              ;;owner yasnippet load
-  (spacemacs/set-leader-keys "oyc" 'yas-load-snippet-buffer-and-close)    ;;owner yasnippet load and close
-  (spacemacs/set-leader-keys "oyv" 'yas-visit-snippet-file)               ;;owner yasnippet visit file
-
   ;; Diff
   (spacemacs/declare-prefix "d" "diff")
   (spacemacs/set-leader-keys "dd" 'ediff)

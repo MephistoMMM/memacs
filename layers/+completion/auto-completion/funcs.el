@@ -12,22 +12,14 @@
 
 
 (spacemacs|add-toggle auto-completion
-  :status
-  (if (eq 'company auto-completion-front-end)
-      (bound-and-true-p company-mode)
-    (bound-and-true-p auto-complete-mode))
+  :status (bound-and-true-p company-mode)
   :on
   (progn
-    (if (eq 'company auto-completion-front-end)
-        (company-mode)
-      (auto-complete-mode))
+    (company-mode)
     (message "Enabled auto-completion (using %S)."
              auto-completion-front-end))
   :off
-  (progn
-    (if (eq 'company auto-completion-front-end)
-        (company-mode -1)
-      (auto-complete-mode -1))
+  (progn (company-mode -1)
     (message "Disabled auto-completion."))
   :documentation "Enable auto-completion."
   :evil-leader "ta")
@@ -138,6 +130,7 @@ MODE parameter must match the :modes values used in the call to
 
 
 ;; auto-completion key bindings functions
+;; TODO: use company only
 
 (defun spacemacs//auto-completion-set-RET-key-behavior (package)
   "Bind RET key appropriately for the given PACKAGE and value of
@@ -179,105 +172,6 @@ MODE parameter must match the :modes values used in the call to
         (define-key map (kbd "<tab>") nil)))))
    (t (message "Not yet implemented for package %S" package))))
 
-(defun spacemacs//auto-completion-setup-key-sequence (package)
-  "Setup the key sequence to complete current selection."
-  (when auto-completion-complete-with-key-sequence
-    (let ((first-key (elt auto-completion-complete-with-key-sequence 0)))
-      (cond ((eq 'company package)
-             (define-key company-active-map (kbd (char-to-string first-key))
-               'spacemacs//auto-completion-key-sequence-start))
-            (t (message "Not yet implemented for package %S" package))))))
-
-
-;; key sequence to complete selection
-
-(defvar spacemacs--auto-completion-time nil)
-(defvar spacemacs--auto-completion-complete-last-candidate nil)
-(defvar spacemacs--auto-completion-shadowed-insert-binding nil)
-(defvar spacemacs--auto-completion-shadowed-emacs-binding nil)
-(defvar spacemacs--auto-completion-shadowed-hybrid-binding nil)
-
-(defun spacemacs//auto-completion-key-sequence-start ()
-  "Initiate auto-completion sequence."
-  (interactive)
-  (self-insert-command 1)
-  (setq spacemacs--auto-completion-complete-last-candidate
-        (cond
-         ((bound-and-true-p company-mode)
-          (nth company-selection company-candidates))))
-  ;; enable second key of the sequence
-  (let ((second-key (kbd (char-to-string
-                          (elt auto-completion-complete-with-key-sequence 1)))))
-    (setq spacemacs--auto-completion-shadowed-insert-binding
-          (lookup-key evil-insert-state-map second-key))
-    (setq spacemacs--auto-completion-shadowed-emacs-binding
-          (lookup-key evil-emacs-state-map second-key))
-    (setq spacemacs--auto-completion-shadowed-hybrid-binding
-          (lookup-key evil-hybrid-state-map second-key))
-    (define-key
-      evil-insert-state-map
-      second-key
-      'spacemacs//auto-completion-key-sequence-end)
-    (define-key
-      evil-emacs-state-map
-      second-key
-      'spacemacs//auto-completion-key-sequence-end)
-    (define-key
-      evil-hybrid-state-map
-      second-key
-      'spacemacs//auto-completion-key-sequence-end))
-  ;; set a timer to restore the old bindings
-  (run-at-time auto-completion-complete-with-key-sequence-delay
-               nil
-               'spacemacs//auto-completion-key-sequence-restore)
-  (when spacemacs--auto-completion-complete-last-candidate
-    (setq spacemacs--auto-completion-time (current-time))))
-
-(defun spacemacs//auto-completion-key-sequence-end ()
-  "Check if the auto-completion key sequence has been entered."
-  (interactive)
-  (if (or (null spacemacs--auto-completion-time)
-          (< auto-completion-complete-with-key-sequence-delay
-             (float-time (time-since spacemacs--auto-completion-time))))
-      (self-insert-command 1)
-    (cond
-     ((bound-and-true-p company-mode)
-      (unless company-candidates
-        ;; if the auto-completion menu is still active then we don't need to
-        ;; delete the last inserted first key of the sequence
-        (delete-char -1))
-      (let ((company-idle-delay))
-        (company-auto-begin)
-        (company-finish spacemacs--auto-completion-complete-last-candidate)))))
-  (spacemacs//auto-completion-key-sequence-restore)
-  (setq spacemacs--auto-completion-time nil))
-
-(defun spacemacs//auto-completion-key-sequence-restore ()
-  "Restore the shadowed key bindings used to auto-complete."
-  (let ((second-key (kbd (char-to-string
-                          (elt auto-completion-complete-with-key-sequence 1)))))
-    (define-key
-      evil-insert-state-map
-      second-key
-      spacemacs--auto-completion-shadowed-insert-binding)
-    (define-key
-      evil-emacs-state-map
-      second-key
-      spacemacs--auto-completion-shadowed-emacs-binding)
-    (define-key
-      evil-hybrid-state-map
-      second-key
-      spacemacs--auto-completion-shadowed-hybrid-binding)))
-
-
-;; Transformers
-
-(defun spacemacs//company-transformer-cancel (candidates)
-  "Cancel completion if prefix is in the list
-`company-mode-completion-cancel-keywords'"
-  (unless (member company-prefix company-mode-completion-cancel-keywords)
-    candidates))
-
 
 
 (defvar-local company-fci-mode-on-p nil)
@@ -300,6 +194,13 @@ MODE parameter must match the :modes values used in the call to
 (defun spacemacs/force-yasnippet-off ()
   (yas-minor-mode -1)
   (setq yas-dont-activate t))
+
+(defun memacs/describe-yasnippets ()
+  "Show yasnippets' descriptions in a read-only window.
+
+Press 'q' to quit."
+  (interactive)
+  (select-window (yas-describe-tables)))
 
 
 ;; Auto-Yasnippet

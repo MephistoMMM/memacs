@@ -12,56 +12,13 @@
 (setq auto-completion-packages
       '(
         auto-yasnippet
-        auto-complete
-        ac-ispell
         company
-        (company-quickhelp :toggle auto-completion-enable-help-tooltip)
         company-statistics
         fuzzy
         hippie-exp
         yasnippet
         yasnippet-snippets
         ))
-
-;; TODO replace by company-ispell which comes with company
-;; to be moved to spell-checking layer as well
-(defun auto-completion/init-ac-ispell ()
-  (use-package ac-ispell
-    :defer t
-    :init
-    (progn
-      (setq ac-ispell-requires 4)
-      (with-eval-after-load 'auto-complete
-        (ac-ispell-setup))
-      ;; (add-hook 'markdown-mode-hook 'ac-ispell-ac-setup)
-      )))
-
-(defun auto-completion/init-auto-complete ()
-  (use-package auto-complete
-    :defer t
-    :init
-    (setq ac-auto-start 0
-          ac-delay auto-completion-idle-delay
-          ac-quick-help-delay 1.
-          ac-use-fuzzy t
-          ac-fuzzy-enable t
-          ac-comphist-file (concat spacemacs-cache-directory "ac-comphist.dat")
-          ;; use 'complete when auto-complete is disabled
-          tab-always-indent 'complete
-          ac-dwim t)
-    :config
-    (progn
-      (require 'auto-complete-config)
-      (setq-default ac-sources '(ac-source-abbrev
-                                 ac-source-dictionary
-                                 ac-source-words-in-same-mode-buffers))
-      (when (configuration-layer/package-used-p 'yasnippet)
-        (add-to-list 'ac-sources 'ac-source-yasnippet))
-      (add-to-list 'completion-styles 'initials t)
-      (define-key ac-completing-map (kbd "C-j") 'ac-next)
-      (define-key ac-completing-map (kbd "C-k") 'ac-previous)
-      (define-key ac-completing-map (kbd "<S-tab>") 'ac-previous)
-      (spacemacs|diminish auto-complete-mode " ⓐ" " a"))))
 
 (defun auto-completion/init-auto-yasnippet ()
   (use-package auto-yasnippet
@@ -72,7 +29,7 @@
             (or auto-completion-private-snippets-directory
                 (concat spacemacs-start-directory "snippets/")))
       (spacemacs/set-leader-keys
-        "sc" 'aya-create
+        "sa" 'aya-create
         "se" 'spacemacs/auto-yasnippet-expand
         "sp" 'aya-persist-snippet))))
 
@@ -101,7 +58,6 @@
         (company-complete-common-or-cycle -1))
       (spacemacs//auto-completion-set-RET-key-behavior 'company)
       (spacemacs//auto-completion-set-TAB-key-behavior 'company)
-      (spacemacs//auto-completion-setup-key-sequence 'company)
 
       (let ((map company-active-map))
         (define-key map (kbd "C-j") 'company-select-next)
@@ -113,11 +69,6 @@
         (define-key map (kbd "C-j") 'company-select-next)
         (define-key map (kbd "C-k") 'company-select-previous)
         (define-key map (kbd "C-l") 'memacs/company-complete-selection))
-      (when (require 'company-quickhelp nil 'noerror)
-        (evil-define-key 'insert company-quickhelp-mode-map (kbd "C-k") 'company-select-previous))
-
-      (setq company-transformers '(spacemacs//company-transformer-cancel
-                                   company-sort-by-occurrence))
 
       )))
 
@@ -133,17 +84,6 @@
 
 (defun auto-completion/init-fuzzy ()
   (use-package fuzzy :defer t))
-
-(defun auto-completion/init-company-quickhelp ()
-  (use-package company-quickhelp
-    :commands company-quickhelp-manual-begin
-    :init
-    (spacemacs|do-after-display-system-init
-     (with-eval-after-load 'company
-       (setq company-frontends (delq 'company-echo-metadata-frontend company-frontends))
-       (define-key company-active-map (kbd "M-h") #'company-quickhelp-manual-begin)
-       (unless (eq auto-completion-enable-help-tooltip 'manual)
-         (company-quickhelp-mode))))))
 
 (defun auto-completion/init-hippie-exp ()
   ;; replace dabbrev-expand
@@ -170,9 +110,11 @@
           ;; unique.
           try-complete-lisp-symbol-partially
           ;; Try to complete word as an Emacs Lisp symbol.
-          try-complete-lisp-symbol))
-    ;; Try to expand yasnippet snippets based on prefix
-    (add-to-list 'hippie-expand-try-functions-list 'yas-hippie-try-expand))
+          try-complete-lisp-symbol
+          ;; Yasnippet
+          ;; Try to expand yasnippet snippets based on prefix
+          yas-hippie-try-expand
+          )))
 
 (defun auto-completion/init-yasnippet ()
   (use-package yasnippet
@@ -219,6 +161,19 @@
        'spacemacs/force-yasnippet-off '(term-mode-hook
                                         shell-mode-hook
                                         eshell-mode-hook)))
-    :config (spacemacs|diminish yas-minor-mode " ⓨ" " y")))
+    :config
+    (progn
+      (spacemacs|diminish yas-minor-mode " ⓨ" " y")
+
+      ;; Use C-h to start complete snips and use TAB to go arround the points
+      ;; How to write yasnippet: https://joaotavora.github.io/yasnippet/snippet-development.html or http://d.pr/n/1bHuv
+      (spacemacs/set-leader-keys
+        "sn" 'yas-new-snippet
+        "sl" 'yas-load-snippet-buffer
+        "sc" 'yas-load-snippet-buffer-and-close
+        "sv" 'yas-visit-snippet-file
+        "sd" 'memacs/describe-yasnippets)
+      )
+    ))
 
 (defun auto-completion/init-yasnippet-snippets ())
