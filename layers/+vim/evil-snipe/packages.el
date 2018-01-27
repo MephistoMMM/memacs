@@ -17,7 +17,6 @@
     :config
     (progn
       (spacemacs|hide-lighter evil-snipe-local-mode)
-      (custom-set-faces `(evil-snipe-matches-face ((t :foreground "#ff5555" :weight bold))))
       (evil-snipe-mode 1)
       (when  evil-snipe-enable-alternate-f-and-t-behaviors
         (setq evil-snipe-repeat-scope 'whole-buffer)

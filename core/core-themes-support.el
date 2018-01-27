@@ -9,7 +9,7 @@
 ;;
 ;;; License: GPLv3
 
-(defvar spacemacs--fallback-theme 'spacemacs-light
+(defvar spacemacs--fallback-theme 'dracula
   "Fallback theme if user theme cannot be applied.")
 
 (defvar spacemacs--delayed-user-theme nil
@@ -26,8 +26,9 @@
 
 (defconst spacemacs-theme-name-to-package
   '(
+    (dracula         . spacemacs-theme)
+    (spacemacs-dark  . spacemacs-theme)
     (spacemacs-light . spacemacs-theme)
-    (dracula         . dracula-theme)
     )
   "alist matching a theme name with its package name, required when
 package name does not match theme name + `-theme' suffix.")

@@ -72,11 +72,10 @@
       (setq aya-persist-snippets-dir
             (or auto-completion-private-snippets-directory
                 (concat spacemacs-start-directory "snippets/")))
-      (spacemacs/declare-prefix "iS" "auto-yasnippet")
       (spacemacs/set-leader-keys
-        "iSc" 'aya-create
-        "iSe" 'spacemacs/auto-yasnippet-expand
-        "iSw" 'aya-persist-snippet))))
+        "sc" 'aya-create
+        "se" 'spacemacs/auto-yasnippet-expand
+        "sp" 'aya-persist-snippet))))
 
 (defun auto-completion/init-company ()
   (use-package company
@@ -86,7 +85,7 @@
       (setq company-idle-delay auto-completion-idle-delay
             company-minimum-prefix-length 2
             company-require-match nil
-            company-dabbrev-ignore-case nil
+            company-dabbrev-ignore-case t
             company-dabbrev-downcase nil)
 
       (add-hook 'company-completion-started-hook 'company-turn-off-fci)
@@ -105,16 +104,24 @@
       (spacemacs//auto-completion-set-TAB-key-behavior 'company)
       (spacemacs//auto-completion-setup-key-sequence 'company)
 
+      (define-key evil-hybrid-state-map (kbd "C-h")   'hippie-expand)
       (let ((map company-active-map))
-        (define-key map (kbd "C-/")   'company-search-candidates)
-        (define-key map (kbd "C-M-/") 'company-filter-candidates)
-        (define-key map (kbd "C-d")   'company-show-doc-buffer))
-      (add-hook 'spacemacs-editing-style-hook 'spacemacs//company-active-navigation)
-      ;; ensure that the correct bindings are set at startup
-      (spacemacs//company-active-navigation dotspacemacs-editing-style)
+        (define-key map (kbd "C-j") 'company-select-next)
+        (define-key map (kbd "C-k") 'company-select-previous)
+        (define-key map (kbd "C-l") 'memacs/company-complete-selection)
+        (define-key map (kbd "C-s") 'company-filter-candidates)
+        (define-key map (kbd "C-d") 'company-show-doc-buffer))
+      (let ((map company-search-map))
+        (define-key map (kbd "C-j") 'company-select-next)
+        (define-key map (kbd "C-k") 'company-select-previous)
+        (define-key map (kbd "C-l") 'memacs/company-complete-selection))
+      (when (require 'company-quickhelp nil 'noerror)
+        (evil-define-key 'insert company-quickhelp-mode-map (kbd "C-k") 'company-select-previous))
 
       (setq company-transformers '(spacemacs//company-transformer-cancel
-                                   company-sort-by-occurrence)))))
+                                   company-sort-by-occurrence))
+
+      )))
 
 (defun auto-completion/init-company-statistics ()
   (use-package company-statistics

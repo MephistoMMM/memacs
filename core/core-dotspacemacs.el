@@ -82,7 +82,7 @@ in `dotspacemacs-themes'.")
 (defvar dotspacemacs--configuration-layers-saved nil
   "Saved value of `dotspacemacs-configuration-layers' after sync.")
 
-(defvar dotspacemacs-themes '(spacemacs-dark
+(defvar dotspacemacs-themes '(dracula
                               spacemacs-light)
   "List of themes, the first of the list is loaded when spacemacs starts.
 Press `SPC T n' to cycle to the next theme in the list (works great

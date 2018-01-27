@@ -149,6 +149,9 @@ MODE parameter must match the :modes values used in the call to
        ((eq 'complete auto-completion-return-key-behavior)
         (define-key map [return] 'company-complete-selection)
         (define-key map (kbd "RET") 'company-complete-selection))
+       ((eq 'insert auto-completion-return-key-behavior)
+        (define-key map [return] 'memacs/company-complete-selection)
+        (define-key map (kbd "RET") 'memacs/company-complete-selection))
        (t
         (define-key map [return] 'nil)
         (define-key map (kbd "RET") 'nil)))))
@@ -267,26 +270,6 @@ MODE parameter must match the :modes values used in the call to
       spacemacs--auto-completion-shadowed-hybrid-binding)))
 
 
-;; Editing style
-
-(defun spacemacs//company-active-navigation (style)
-  "Set navigation for the given editing STYLE."
-  (cond
-   ((or (eq 'vim style)
-        (and (eq 'hybrid style)
-             hybrid-mode-enable-hjkl-bindings))
-    (let ((map company-active-map))
-      (define-key map (kbd "C-j") 'company-select-next)
-      (define-key map (kbd "C-k") 'company-select-previous)
-      (define-key map (kbd "C-l") 'company-complete-selection))
-    (when (require 'company-quickhelp nil 'noerror)
-      (evil-define-key 'insert company-quickhelp-mode-map (kbd "C-k") 'company-select-previous)))
-   (t
-    (let ((map company-active-map))
-      (define-key map (kbd "C-n") 'company-select-next)
-      (define-key map (kbd "C-p") 'company-select-previous)))))
-
-
 ;; Transformers
 
 (defun spacemacs//company-transformer-cancel (candidates)
@@ -362,3 +345,15 @@ Disable smartparens and remember its initial state."
   (setq spacemacs--yasnippet-expanding nil)
   (when spacemacs--smartparens-enabled-initially
     (smartparens-mode 1)))
+
+
+;; complete selection function
+(defun memacs/company-complete-selection ()
+  "Insert the selected candidate."
+  (interactive)
+  (when (company-manual-begin)
+    (let ((result (nth company-selection company-candidates)))
+      (company--insert-candidate result)
+      (company-abort)
+      ))
+  )
