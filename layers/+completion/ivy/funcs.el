@@ -201,7 +201,8 @@ that directory."
 
 ;; Define search functions for each tool
 (cl-loop
-   for (tools tool-name) in '((dotspacemacs-search-tools "auto"))
+ for (tools tool-name) in '((dotspacemacs-search-tools "auto")
+                            ((list "ag") "ag"))
    do
    (eval
     `(progn

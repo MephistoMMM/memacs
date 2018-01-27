@@ -80,6 +80,17 @@
        "f" 'spacemacs/search-auto
        "F" 'spacemacs/search-auto-region-or-symbol
        )
+      ;; ag search
+      (which-key-add-key-based-replacements
+        "C-s a" '("ag" . "Search By Ag"))
+      (memacs/define-search-keybinding
+       "a/" 'spacemacs/search-project-ag
+       "a?" 'spacemacs/search-project-auto-region-or-ag
+       "ad" 'spacemacs/search-dir-ag
+       "aD" 'spacemacs/search-dir-ag-region-or-symbol
+       "af" 'spacemacs/search-ag
+       "aF" 'spacemacs/search-ag-region-or-symbol
+       )
       )
     :config
     (progn

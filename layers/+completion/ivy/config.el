@@ -24,6 +24,7 @@
     ;; no --vimgrep because it adds column numbers that wgrep can't handle
     ;; see https://github.com/syl20bnr/spacemacs/pull/8065
     ("rg" . "rg --smart-case --no-heading --color never --line-number --max-columns 150 %s %S .")
+    ("ag" . "ag --nocolor --nogroup %s %S .")
     ("grep" . "grep -nrP %s %S ."))
   "An alist of search commands and their corresponding commands
 with options to run in the shell.")
