@@ -10,20 +10,17 @@
 ;;; License: GPLv3
 
 (setq spacemacs-editing-packages
-      '(aggressive-indent
-        avy
+      '(avy
         clean-aindent-mode
         editorconfig
         eval-sexp-fu
         expand-region
         (hexl :location built-in)
-        hungry-delete
         link-hint
         lorem-ipsum
         move-text
         (origami :toggle (eq 'origami dotspacemacs-folding-method))
         password-generator
-        smartparens
         (spacemacs-whitespace-cleanup :location local)
         string-inflection
         undo-tree
@@ -31,24 +28,6 @@
         ws-butler))
 
 ;; Initialization of packages
-
-(defun spacemacs-editing/init-aggressive-indent ()
-  (use-package aggressive-indent
-    :defer t
-    :init
-    (progn
-      (spacemacs|add-toggle aggressive-indent
-        :mode aggressive-indent-mode
-        :documentation "Always keep code indented."
-        :evil-leader "tI")
-      (spacemacs|add-toggle aggressive-indent-globally
-        :mode aggressive-indent-mode
-        :documentation "Always keep code indented globally."
-        :evil-leader "t C-I"))
-    :config
-    (progn
-      (add-hook 'diff-auto-refine-mode-hook 'spacemacs/toggle-aggressive-indent-off)
-      (spacemacs|diminish aggressive-indent-mode " Ⓘ" " I"))))
 
 (defun spacemacs-editing/init-avy ()
   (use-package avy
@@ -136,20 +115,6 @@
         "$" 'hexl-end-of-line
         "^" 'hexl-beginning-of-line
         "0" 'hexl-beginning-of-line))))
-
-(defun spacemacs-editing/init-hungry-delete ()
-  (use-package hungry-delete
-    :defer t
-    :init
-    (spacemacs|add-toggle hungry-delete
-      :mode hungry-delete-mode
-      :documentation "Delete consecutive horizontal whitespace with a single key."
-      :evil-leader "td")
-    :config
-    (progn
-      (setq-default hungry-delete-chars-to-skip " \t\f\v") ; only horizontal whitespace
-      (define-key hungry-delete-mode-map (kbd "DEL") 'hungry-delete-backward)
-      (define-key hungry-delete-mode-map (kbd "S-DEL") 'delete-backward-char))))
 
 (defun spacemacs-editing/init-link-hint ()
   (use-package link-hint
@@ -249,60 +214,6 @@
         "ip3" 'password-generator-paranoid
         "ipp" 'password-generator-phonetic
         "ipn" 'password-generator-numeric))))
-
-(defun spacemacs-editing/init-smartparens ()
-  (use-package smartparens
-    :defer t
-    :commands (sp-split-sexp sp-newline sp-up-sexp)
-    :init
-    (progn
-      ;; settings
-      (setq sp-show-pair-delay
-            ;; Use this form to allow users to override this setting from
-            ;; dotspacemacs/user-init
-            (or (bound-and-true-p sp-show-pair-delay) 0.2)
-            ;; fix paren highlighting in normal mode
-            sp-show-pair-from-inside t
-            sp-cancel-autoskip-on-backward-movement nil
-            sp-highlight-pair-overlay nil
-            sp-highlight-wrap-overlay nil
-            sp-highlight-wrap-tag-overlay nil)
-      (spacemacs/add-to-hooks (if dotspacemacs-smartparens-strict-mode
-                                  'smartparens-strict-mode
-                                'smartparens-mode)
-                              '(prog-mode-hook comint-mode-hook))
-      ;; enable smartparens-mode in `eval-expression'
-      (add-hook 'minibuffer-setup-hook 'spacemacs//conditionally-enable-smartparens-mode)
-      ;; toggles
-      (spacemacs|add-toggle smartparens
-        :mode smartparens-mode
-        :documentation "Enable smartparens."
-        :evil-leader "tp")
-      (spacemacs|add-toggle smartparens-globally
-        :mode smartparens-mode
-        :documentation "Enable smartparens globally."
-        :evil-leader "t C-p")
-      ;; key bindings
-      (spacemacs/set-leader-keys
-        "js" 'sp-split-sexp
-        "jn" 'sp-newline))
-    :config
-    (progn
-      (require 'smartparens-config)
-      (spacemacs|diminish smartparens-mode " ⓟ" " p")
-      (spacemacs//adaptive-smartparent-pair-overlay-face)
-      (add-hook 'spacemacs-post-theme-change-hook
-                'spacemacs//adaptive-smartparent-pair-overlay-face)
-      (show-smartparens-global-mode +1)
-      ;; don't create a pair with single quote in minibuffer
-      (sp-local-pair 'minibuffer-inactive-mode "'" nil :actions nil)
-      (sp-pair "{" nil :post-handlers
-               '(:add (spacemacs/smartparens-pair-newline-and-indent "RET")))
-      (sp-pair "[" nil :post-handlers
-               '(:add (spacemacs/smartparens-pair-newline-and-indent "RET")))
-      (when dotspacemacs-smart-closing-parenthesis
-        (define-key evil-insert-state-map ")"
-          'spacemacs/smart-closing-parenthesis)))))
 
 (defun spacemacs-editing/init-spacemacs-whitespace-cleanup ()
   (use-package spacemacs-whitespace-cleanup

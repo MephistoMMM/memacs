@@ -44,19 +44,6 @@ back to the previous non-whitespace character."
     )
   )
 
-(defun mp-hacking/hungry-delete-current-line ()
-  "Delete all spaces before current point in current line"
-  (interactive)
-  (let ((here (point)))
-    (while (progn
-             (skip-syntax-backward " \t\r\f\v")
-             (eq (char-before) ?\\))
-      (backward-char))
-    (if (< (point) here)
-        (delete-region (point) here))
-   )
- )
-
 (defun mp-hacking/hide-js2-checks-if-flycheck-active ()
   "This function hide the result of js2-mode checking when there is a checker for flycheck."
   (message "fuck")

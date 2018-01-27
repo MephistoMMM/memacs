@@ -12,11 +12,9 @@
 (setq org-packages
       '(
         company
-        company-emoji
         emoji-cheat-sheet-plus
         evil-org
         evil-surround
-        gnuplot
         htmlize
         ;; ob, org and org-agenda are installed by `org-plus-contrib'
         (ob :location built-in)
@@ -26,7 +24,6 @@
         (org-expiry :location built-in)
         (org-journal :toggle org-enable-org-journal-support)
         org-download
-        org-mime
         org-pomodoro
         org-present
         (org-projectile :requires projectile)
@@ -41,9 +38,6 @@
 
 (defun org/post-init-company ()
   (spacemacs|add-company-backends :backends company-capf :modes org-mode))
-
-(defun org/post-init-company-emoji ()
-  (spacemacs|add-company-backends :backends company-emoji :modes org-mode))
 
 (defun org/post-init-emoji-cheat-sheet-plus ()
   (add-hook 'org-mode-hook 'spacemacs/delay-emoji-cheat-sheet-hook))
@@ -67,12 +61,6 @@
     (push '(?: . spacemacs//surround-drawer) evil-surround-pairs-alist)
     (push '(?# . spacemacs//surround-code) evil-surround-pairs-alist))
   (add-hook 'org-mode-hook 'spacemacs/add-org-surrounds))
-
-(defun org/init-gnuplot ()
-  (use-package gnuplot
-    :defer t
-    :init (spacemacs/set-leader-keys-for-major-mode 'org-mode
-            "tp" 'org-plot/gnuplot)))
 
 (defun org/init-htmlize ()
   (use-package htmlize
@@ -537,16 +525,6 @@ Headline^^            Visit entry^^               Filter^^                    Da
       (spacemacs/set-leader-keys-for-major-mode 'org-mode
         "iDy" 'org-download-yank
         "iDs" 'org-download-screenshot))))
-
-(defun org/init-org-mime ()
-  (use-package org-mime
-    :defer t
-    :init
-    (progn
-      (spacemacs/set-leader-keys-for-major-mode 'message-mode
-        "em" 'org-mime-htmlize)
-      (spacemacs/set-leader-keys-for-major-mode 'org-mode
-        "em" 'org-mime-org-buffer-htmlize))))
 
 (defun org/init-org-pomodoro ()
   (use-package org-pomodoro

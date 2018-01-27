@@ -242,9 +242,6 @@ restricts line-number to the specified list of major-mode.")
 (defvar dotspacemacs-persistent-server nil
   "If non nil advises quit functions to keep server open when quitting.")
 
-(defvar dotspacemacs-smartparens-strict-mode nil
-  "If non-nil smartparens-strict-mode will be enabled in programming modes.")
-
 (defvar dotspacemacs-smart-closing-parenthesis nil
   "If non-nil pressing the closing parenthesis `)' key in insert mode passes
 over any automatically added closing parenthesis, bracket, quote, etc…

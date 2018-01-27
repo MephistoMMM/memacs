@@ -29,7 +29,6 @@
         overseer
         parinfer
         semantic
-        smartparens
         srefactor))
 
 (defun emacs-lisp/init-ielm ()
@@ -271,9 +270,3 @@
         "=d" 'srefactor-lisp-format-defun
         "=o" 'srefactor-lisp-one-line
         "=s" 'srefactor-lisp-format-sexp))))
-
-(defun emacs-lisp/post-init-smartparens ()
-  (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-    (spacemacs/set-leader-keys-for-major-mode mode
-      "ec" 'spacemacs/eval-current-form-sp
-      "es" 'spacemacs/eval-current-symbol-sp)))

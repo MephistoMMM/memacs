@@ -14,7 +14,6 @@
 - [[#structuraly-safe-editing][Structuraly safe editing]]
 - [[#key-bindings][Key bindings]]
   - [[#additional-testing-functions-with-overseer][Additional testing functions with overseer]]
-  - [[#additional-evaluation-functions][Additional evaluation functions]]
   - [[#format-code][Format code]]
   - [[#debugging][Debugging]]
 
@@ -189,14 +188,6 @@ Function related to test are present under the ~SPC m t~ prefix:
 | ~SPC m t p~ | test prompt   |
 | ~SPC m t q~ | test quiet    |
 | ~SPC m t h~ | test help     |
-
-** Additional evaluation functions
-If =smartparens= is used the following additional key bindings are available:
-
-| Key Binding | Description                  |
-|-------------+------------------------------|
-| ~SPC m e c~ | evaluate sexp around point   |
-| ~SPC m e s~ | evaluate symbol around point |
 
 ** Format code
 The [[https://github.com/syl20bnr/spacemacs/blob/develop/layers/%2Bemacs/semantic/README.org][semantic]] layer should be installed for these key bindings to become active.

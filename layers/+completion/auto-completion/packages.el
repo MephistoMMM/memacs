@@ -19,7 +19,6 @@
         company-statistics
         fuzzy
         hippie-exp
-        smartparens
         yasnippet
         yasnippet-snippets
         ))
@@ -104,7 +103,6 @@
       (spacemacs//auto-completion-set-TAB-key-behavior 'company)
       (spacemacs//auto-completion-setup-key-sequence 'company)
 
-      (define-key evil-hybrid-state-map (kbd "C-h")   'hippie-expand)
       (let ((map company-active-map))
         (define-key map (kbd "C-j") 'company-select-next)
         (define-key map (kbd "C-k") 'company-select-previous)
@@ -149,8 +147,7 @@
 
 (defun auto-completion/init-hippie-exp ()
   ;; replace dabbrev-expand
-  (global-set-key (kbd "M-/") 'hippie-expand)
-  (define-key evil-insert-state-map [remap evil-complete-previous] 'hippie-expand)
+  (define-key evil-hybrid-state-map (kbd "C-h")   'hippie-expand)
   (setq hippie-expand-try-functions-list
         '(
           ;; Try to expand word "dynamically", searching the current buffer.
@@ -174,16 +171,8 @@
           try-complete-lisp-symbol-partially
           ;; Try to complete word as an Emacs Lisp symbol.
           try-complete-lisp-symbol))
-  (when (configuration-layer/package-used-p 'yasnippet)
     ;; Try to expand yasnippet snippets based on prefix
-    (add-to-list 'hippie-expand-try-functions-list 'yas-hippie-try-expand)))
-
-(defun auto-completion/post-init-smartparens ()
-  (with-eval-after-load 'smartparens
-    (add-hook 'yas-before-expand-snippet-hook
-              #'spacemacs//smartparens-disable-before-expand-snippet)
-    (add-hook 'yas-after-exit-snippet-hook
-              #'spacemacs//smartparens-restore-after-exit-snippet)))
+    (add-to-list 'hippie-expand-try-functions-list 'yas-hippie-try-expand))
 
 (defun auto-completion/init-yasnippet ()
   (use-package yasnippet
@@ -198,8 +187,6 @@
       ;; disable yas minor mode map
       ;; use hippie-expand instead
       (setq yas-minor-mode-map (make-sparse-keymap))
-      ;; this makes it easy to get out of a nested expansion
-      (define-key yas-minor-mode-map (kbd "M-s-/") 'yas-next-field)
       ;; configure snippet directories
       (let* ((spacemacs--auto-completion-dir
               (configuration-layer/get-layer-local-dir 'auto-completion))

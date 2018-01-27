@@ -573,12 +573,6 @@ to 'auto, tags may not be properly aligned. "
      `(notmuch-tag-face ((,class (:foreground ,keyword))))
      `(notmuch-tag-flagged ((,class (:foreground ,war))))
 
-;;;;; neotree
-     `(neo-dir-link-face ((,class (:foreground ,keyword :inherit bold))))
-     `(neo-expand-btn-face ((,class (:foreground ,base))))
-     `(neo-file-link-face ((,class (:foreground ,base))))
-     `(neo-root-dir-face ((,class (:foreground ,func :inherit bold))))
-
 ;;;;; org
      `(org-agenda-clocking ((,class (:background ,highlight :foreground ,comp))))
      `(org-agenda-date ((,class (:foreground ,var :height ,(if spacemacs-theme-org-agenda-height 1.1 1.0)))))
@@ -673,10 +667,6 @@ to 'auto, tags may not be properly aligned. "
 ;;;;; show-paren
      `(show-paren-match ((,class (:background ,green-bg-s))))
      `(show-paren-mismatch ((,class (:background ,red-bg-s))))
-
-;;;;; smartparens
-     `(sp-pair-overlay-face ((,class (:background ,highlight :foreground nil))))
-     `(sp-show-pair-match-face ((,class (:foreground ,mat :inherit bold :underline t))))
 
 ;;;;; smerge
      `(smerge-base ((,class (:background ,yellow-bg))))

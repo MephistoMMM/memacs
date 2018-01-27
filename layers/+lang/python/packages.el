@@ -14,7 +14,6 @@
     anaconda-mode
     company
     (company-anaconda :requires company)
-    cython-mode
     eldoc
     evil-matchit
     flycheck
@@ -34,7 +33,6 @@
     (python :location built-in)
     pyvenv
     semantic
-    smartparens
     stickyfunc-enhance
     xcscope
     yapfify
@@ -89,15 +87,6 @@
     :init (spacemacs|add-company-backends
             :backends company-anaconda
             :modes python-mode)))
-
-(defun python/init-cython-mode ()
-  (use-package cython-mode
-    :defer t
-    :init
-    (progn
-      (spacemacs/set-leader-keys-for-major-mode 'cython-mode
-        "hh" 'anaconda-mode-show-doc
-        "gu" 'anaconda-mode-find-references))))
 
 (defun python/post-init-eldoc ()
   (add-hook 'python-mode-hook 'spacemacs//init-eldoc-python-mode))
@@ -340,17 +329,6 @@ fix this issue."
     (condition-case-unless-debug nil
         ad-do-it
       (error nil))))
-
-(defun python/post-init-smartparens ()
-  (spacemacs/add-to-hooks 'smartparens-mode '(inferior-python-mode-hook
-                                              hy-mode-hook))
-  (defadvice python-indent-dedent-line-backspace
-      (around python/sp-backward-delete-char activate)
-    (let ((pythonp (or (not smartparens-strict-mode)
-                       (char-equal (char-before) ?\s))))
-      (if pythonp
-          ad-do-it
-        (call-interactively 'sp-backward-delete-char)))))
 
 (defun python/post-init-stickyfunc-enhance ()
   (add-hook 'python-mode-hook 'spacemacs/load-stickyfunc-enhance))

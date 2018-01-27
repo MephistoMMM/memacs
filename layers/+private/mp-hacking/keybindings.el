@@ -26,8 +26,6 @@
   (define-key evil-visual-state-map (kbd "E") 'er/contract-region)
 
   ;; Hungry Delete Backwards
-  ;; C-h :: hungry delete all chars in line
-  (define-key evil-hybrid-state-map (kbd "C-h") 'mp-hacking/hungry-delete-current-line)
   (define-key evil-hybrid-state-map (kbd "<C-backspace>") 'mp-hacking/hungry-delete)
 
   ;; Jump out from pairs

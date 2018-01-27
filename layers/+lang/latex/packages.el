@@ -21,7 +21,6 @@
         ggtags
         counsel-gtags
         (magic-latex-buffer :toggle latex-enable-magic)
-        smartparens
         typo
         yasnippet
         which-key
@@ -184,9 +183,6 @@
 
 (defun latex/post-init-ggtags ()
   (add-hook 'latex-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
-
-(defun latex/post-init-smartparens ()
-  (add-hook 'LaTeX-mode-hook 'smartparens-mode))
 
 (defun latex/post-init-typo ()
   ;; Typo mode isn't useful for LaTeX.

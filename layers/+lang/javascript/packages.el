@@ -12,9 +12,6 @@
 (setq javascript-packages
       '(
         add-node-modules-path
-        coffee-mode
-        company
-        (company-tern :requires company)
         evil-matchit
         flycheck
         ggtags
@@ -33,50 +30,11 @@
 
 (defun javascript/post-init-add-node-modules-path ()
   (add-hook 'css-mode-hook #'add-node-modules-path)
-  (add-hook 'coffee-mode-hook #'add-node-modules-path)
   (add-hook 'js2-mode-hook #'add-node-modules-path)
   (add-hook 'json-mode-hook #'add-node-modules-path))
 
-(defun javascript/init-coffee-mode ()
-  (use-package coffee-mode
-    :defer t
-    :init
-    (progn
-      (spacemacs/register-repl 'coffee-mode 'coffee-repl "coffeescript")
-      ;; keybindings
-      (spacemacs/declare-prefix-for-mode 'coffee-mode "mc" "compile")
-      (spacemacs/declare-prefix-for-mode 'coffee-mode "ms" "REPL")
-      (spacemacs/set-leader-keys-for-major-mode 'coffee-mode
-        "'"  'coffee-repl
-        "cc" 'coffee-compile-buffer
-        "cr" 'coffee-compile-region
-        "sb" 'coffee-send-buffer
-        "sl" 'coffee-send-line
-        "si" 'coffee-repl
-        "sr" 'coffee-send-region
-        "Tc" 'coffee-cos-mode)
-      ;; indent to right position after `evil-open-below' and `evil-open-above'
-      (add-hook 'coffee-mode-hook
-                '(lambda ()
-                   (setq indent-line-function 'javascript/coffee-indent
-                         evil-shift-width coffee-tab-width))))))
-
-(defun javascript/init-company-tern ()
-  (use-package company-tern
-    :if (and (configuration-layer/package-used-p 'company)
-             (configuration-layer/package-used-p 'tern))
-    :defer t
-    :init (spacemacs|add-company-backends
-            :backends company-tern
-            :modes js2-mode)))
-
-(defun javascript/post-init-company ()
-  (spacemacs|add-company-backends
-    :backends company-capf
-    :modes coffee-mode))
-
 (defun javascript/post-init-flycheck ()
-  (dolist (mode '(coffee-mode js2-mode json-mode))
+  (dolist (mode '(js2-mode json-mode))
     (spacemacs/enable-flycheck mode)))
 
 (defun javascript/post-init-ggtags ()

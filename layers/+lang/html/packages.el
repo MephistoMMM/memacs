@@ -27,7 +27,6 @@
         sass-mode
         scss-mode
         slim-mode
-        smartparens
         tagedit
         web-mode
         yasnippet
@@ -174,15 +173,6 @@
 (defun html/init-slim-mode ()
   (use-package slim-mode
     :defer t))
-
-(defun html/post-init-smartparens ()
-  (spacemacs/add-to-hooks
-   (if dotspacemacs-smartparens-strict-mode
-       'smartparens-strict-mode
-     'smartparens-mode)
-   '(css-mode-hook scss-mode-hook sass-mode-hook less-css-mode-hook))
-
-  (add-hook 'web-mode-hook 'spacemacs/toggle-smartparens-off))
 
 (defun html/init-tagedit ()
   (use-package tagedit

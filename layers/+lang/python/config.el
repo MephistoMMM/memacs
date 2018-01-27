@@ -12,7 +12,7 @@
 ;; variables
 
 (spacemacs|define-jump-handlers python-mode)
-(spacemacs|define-jump-handlers cython-mode anaconda-mode-goto)
+(spacemacs|define-jump-handlers anaconda-mode-goto)
 
 (defvar python-enable-yapf-format-on-save nil
   "If non-nil, automatically format code with YAPF on save.")

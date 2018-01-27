@@ -12,13 +12,10 @@
 (setq markdown-packages
   '(
     company
-    company-emoji
     emoji-cheat-sheet-plus
     gh-md
     markdown-mode
     markdown-toc
-    mmm-mode
-    smartparens
     (vmd-mode :toggle (eq 'vmd markdown-live-preview-engine))
     ))
 
@@ -26,12 +23,6 @@
   (dolist (mode markdown--key-bindings-modes)
     (eval `(spacemacs|add-company-backends
              :backends company-capf
-             :modes ,mode))))
-
-(defun markdown/post-init-company-emoji ()
-  (dolist (mode markdown--key-bindings-modes)
-    (eval `(spacemacs|add-company-backends
-             :backends company-emoji
              :modes ,mode))))
 
 (defun markdown/post-init-emoji-cheat-sheet-plus ()
@@ -44,9 +35,6 @@
     (dolist (mode markdown--key-bindings-modes)
       (spacemacs/set-leader-keys-for-major-mode mode
         "cr" 'gh-md-render-buffer))))
-
-(defun markdown/post-init-smartparens ()
-  (add-hook 'markdown-mode-hook 'smartparens-mode))
 
 (defun markdown/init-markdown-mode ()
   (use-package markdown-mode
@@ -155,13 +143,6 @@
     (dolist (mode markdown--key-bindings-modes)
       (spacemacs/set-leader-keys-for-major-mode mode
         "it" 'markdown-toc-generate-toc))))
-
-(defun markdown/init-mmm-mode ()
-  (use-package mmm-mode
-    :commands mmm-mode
-    :init (add-hook 'markdown-mode-hook 'spacemacs/activate-mmm-mode)
-    ;; Automatically add mmm class for languages
-    :config (mapc 'markdown/mmm-auto-class markdown-mmm-auto-modes)))
 
 (defun markdown/init-vmd-mode ()
   (use-package vmd-mode

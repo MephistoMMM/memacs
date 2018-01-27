@@ -17,7 +17,6 @@
     (groovy-mode . groovy-indent-offset)
     (python-mode . python-indent-offset)
     (cmake-mode . cmake-tab-width)
-    (coffee-mode . coffee-tab-width)
     (cperl-mode . cperl-indent-level)
     (css-mode . css-indent-offset)
     (elixir-mode . elixir-smie-indent-basic)
