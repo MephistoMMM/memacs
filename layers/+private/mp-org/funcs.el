@@ -18,7 +18,6 @@
   "Better default for mp-org, something done in
 user-config should be defined in this function!"
   ;; (run-with-idle-timer 300 t 'mp-org/auto-org-agenda-task)
-
   )
 
 

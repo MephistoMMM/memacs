@@ -33,11 +33,40 @@
 (setq smooth-scroll-margin 10)
 
 ;; insert FF
-(spacemacs/set-leader-keys "if" 'mp-hacking/insert-form-feed)
+(memacs/define-insert-keybinding "f" 'mp-hacking/insert-form-feed)
 
 ;; Buffer
 (memacs/define-evil-normal-keybinding
  "C-n" 'next-buffer
  "C-p" 'previous-buffer)
+
+;; Outshine
+(spacemacs/set-leader-keys-for-minor-mode outline-minor-mode
+  "M-RET"     'outshine-insert-heading
+  "<backtab>" 'outshine-cycle-buffer)
+(spacemacs/declare-prefix "o" "outshine")
+(spacemacs/set-leader-keys
+  ;; Insert
+  "oi" 'outshine-insert-heading
+  "ob" 'outshine-cycle-buffer
+
+  ;; Narrowing
+  "on" 'outshine-narrow-to-subtree
+  "ow" 'widen
+
+  ;; Structural edits and moves
+  "oj" 'outline-forward-same-level
+  "ok" 'outline-backward-same-level
+  "oh" 'outline-up-heading
+  "ol" 'outline-next-visible-heading
+  "ou" 'outline-previous-visible-heading
+  "oJ" 'outline-move-subtree-down
+  "oK" 'outline-move-subtree-up
+  "oH" 'outline-promote
+  "oL" 'outline-demote
+  )
+
+;; Outline Ivy
+(spacemacs/set-leader-keys "jo" 'oi-jump)
 
 ;;; keybindings.el ends here

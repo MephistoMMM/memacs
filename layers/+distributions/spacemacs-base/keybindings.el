@@ -33,15 +33,12 @@
                                        ("g"   "git/versions-control")
                                        ("h"   "help")
                                        ("hd"  "help-describe")
-                                       ("i"   "insertion")
                                        ("j"   "jump/join/split")
                                        ("k"   "lisp")
                                        ("kd"  "delete")
                                        ("kD"  "delete-backward")
                                        ("k`"  "hybrid")
                                        ("n"   "narrow/numbers")
-                                       ("P"   "Page navigation")
-                                       ("o"   "owner")
                                        ("p"   "projects")
                                        ("p$"  "projects/shell")
                                        ("q"   "quit")
@@ -113,7 +110,6 @@
 ;; buffers --------------------------------------------------------------------
 (spacemacs/set-leader-keys
   "TAB"   'spacemacs/alternate-buffer
-  "bt"    'spacemacs/new-empty-buffer
   "bd"    'spacemacs/kill-this-buffer
   "be"    'spacemacs/safe-erase-buffer
   "bh"    'spacemacs/home
@@ -226,11 +222,11 @@
   "hdv" 'describe-variable
   "hn"  'view-emacs-news)
 ;; insert stuff ---------------------------------------------------------------
-(spacemacs/set-leader-keys
-  "iJ" 'spacemacs/insert-line-below-no-indent
-  "iK" 'spacemacs/insert-line-above-no-indent
-  "ik" 'spacemacs/evil-insert-line-above
-  "ij" 'spacemacs/evil-insert-line-below)
+(memacs/define-insert-keybinding
+  "J" 'spacemacs/insert-line-below-no-indent
+  "K" 'spacemacs/insert-line-above-no-indent
+  "k" 'spacemacs/evil-insert-line-above
+  "j" 'spacemacs/evil-insert-line-below)
 ;; format ---------------------------------------------------------------------
 (spacemacs/set-leader-keys
   "jo" 'open-line

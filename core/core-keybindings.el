@@ -20,13 +20,23 @@
 (defvar memacs-search-map (make-sparse-keymap)
   "Search keymap for all text content search commands.")
 
+(defvar memacs-insert-map (make-sparse-keymap)
+  "Search keymap for all text content search commands.")
+
 (global-set-key (kbd "C-s") memacs-search-map)
+(global-set-key (kbd "M-i") memacs-insert-map)
 
 (defun memacs/define-search-keybinding (key def &rest bindings)
   "Binding funcs to search map."
   (while key
     (define-key memacs-search-map (kbd key) def)
-    (define-key memacs-search-map (kbd key) def)
+    (setq key (pop bindings) def (pop bindings)))
+  )
+
+(defun memacs/define-insert-keybinding (key def &rest bindings)
+  "Binding funcs to search map."
+  (while key
+    (define-key memacs-insert-map (kbd key) def)
     (setq key (pop bindings) def (pop bindings)))
   )
 

@@ -135,11 +135,12 @@
                lorem-ipsum-insert-sentences)
     :init
     (progn
-      (spacemacs/declare-prefix "il" "lorem ipsum")
-      (spacemacs/set-leader-keys
-        "ill" 'lorem-ipsum-insert-list
-        "ilp" 'lorem-ipsum-insert-paragraphs
-        "ils" 'lorem-ipsum-insert-sentences))))
+      (which-key-add-key-based-replacements
+        "M-i l" '("lorem ipsum" . "Insert lorem ipsum"))
+      (memacs/define-insert-keybinding
+        "ll" 'lorem-ipsum-insert-list
+        "lp" 'lorem-ipsum-insert-paragraphs
+        "ls" 'lorem-ipsum-insert-sentences))))
 
 (defun spacemacs-editing/init-move-text ()
   (use-package move-text
@@ -211,13 +212,14 @@
     :defer t
     :init
     (progn
-      (spacemacs/declare-prefix "ip" "passwords")
-      (evil-leader/set-key
-        "ip1" 'password-generator-simple
-        "ip2" 'password-generator-strong
-        "ip3" 'password-generator-paranoid
-        "ipp" 'password-generator-phonetic
-        "ipn" 'password-generator-numeric))))
+      (which-key-add-key-based-replacements
+        "M-i p" '("passwords" . "Insert Passwords"))
+      (memacs/define-insert-keybinding
+        "p1" 'password-generator-simple
+        "p2" 'password-generator-strong
+        "p3" 'password-generator-paranoid
+        "pp" 'password-generator-phonetic
+        "pn" 'password-generator-numeric))))
 
 (defun spacemacs-editing/init-spacemacs-whitespace-cleanup ()
   (use-package spacemacs-whitespace-cleanup
@@ -296,11 +298,12 @@
     :commands (uuidgen-1 uuidgen-4)
     :init
     (progn
-      (spacemacs/declare-prefix "iU" "uuid")
-      (spacemacs/set-leader-keys
-        "iU1" 'spacemacs/uuidgen-1
-        "iU4" 'spacemacs/uuidgen-4
-        "iUU" 'spacemacs/uuidgen-4))))
+      (which-key-add-key-based-replacements
+        "M-i u" '("uuid" . "Insert UUID"))
+      (memacs/define-insert-keybinding
+        "u1" 'spacemacs/uuidgen-1
+        "u4" 'spacemacs/uuidgen-4
+        "uu" 'spacemacs/uuidgen-4))))
 
 (defun spacemacs-editing/init-ws-butler ()
   ;; not deferred on purpose, init-spacemacs-whitespace-cleanup need

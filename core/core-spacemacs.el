@@ -63,7 +63,7 @@ the final step of executing code in `emacs-startup-hook'.")
                 ;; `evil-want-C-i-jump' is set to nil to avoid `TAB' being
                 ;; overlapped in terminal mode. The GUI specific `<C-i>' is used
                 ;; instead.
-                evil-want-C-i-jump t)
+                evil-want-C-i-jump nil)
   (dotspacemacs/load-file)
   (dotspacemacs|call-func dotspacemacs/init "Calling dotfile init...")
   (when dotspacemacs-maximized-at-startup

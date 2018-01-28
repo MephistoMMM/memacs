@@ -63,8 +63,6 @@
         "hdm" 'spacemacs/describe-mode
         "hdv" 'counsel-describe-variable
         "hi"  'counsel-info-lookup-symbol
-        ;; insert
-        "iu"  'counsel-unicode-char
         ;; jump
         ;; register/ring
         "rm"  'counsel-mark-ring
@@ -91,6 +89,9 @@
        "af" 'spacemacs/search-ag
        "aF" 'spacemacs/search-ag-region-or-symbol
        )
+      ;; insert
+      (memacs/define-insert-keybinding
+       "c"  'counsel-unicode-char)
       )
     :config
     (progn
@@ -159,7 +160,7 @@
         "a'" 'spacemacs/ivy-available-repls
         "fr" 'counsel-recentf
         "bb" 'ivy-switch-buffer)
-      (memacs/define-evil-normal-keybinding "M-i" 'ivy-resume))
+      (memacs/define-evil-normal-keybinding "M-u" 'ivy-resume))
 
     :config
     (progn

@@ -9,10 +9,8 @@
 
 ;;; Code:
 
-(defun mp-hacking/better-default ()
-  "This function set many default config to more better!
-Some configurations should be written at here which be unable to config
-in 'with-eval-after-load.")
+
+;;;; common
 
 (defun mp-hacking/insert-form-feed ()
   "Insert a FORM FEED(^L)"
@@ -20,6 +18,9 @@ in 'with-eval-after-load.")
   (beginning-of-line)
   (insert "\n")
   )
+
+
+;;;; haskell
 
 (defun mp-hacking/format-haskell-buffer ()
   "format haskell buffer by hindent-reformat-buffer and haskell-mode-stylish-buffer"
@@ -43,5 +44,12 @@ back to the previous non-whitespace character."
           (delete-region (point) here)))
     )
   )
+
+
+;;;; outline-ivy
+
+(defun mp-hacking//advise-outshine-narrow-start-pos ()
+  (unless (outline-on-heading-p t)
+    (outline-previous-visible-heading 1)))
 
 ;;; funcs.el ends here

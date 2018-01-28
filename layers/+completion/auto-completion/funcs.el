@@ -141,10 +141,8 @@ MODE parameter must match the :modes values used in the call to
       (cond
        ((eq 'complete auto-completion-return-key-behavior)
         (define-key map [return] 'company-complete-selection)
-        (define-key map (kbd "RET") 'company-complete-selection))
-       ((eq 'insert auto-completion-return-key-behavior)
-        (define-key map [return] 'memacs/company-complete-selection)
-        (define-key map (kbd "RET") 'memacs/company-complete-selection))
+        (define-key map (kbd "RET") 'company-complete-selection)
+        (define-key map (kbd "<C-return>") 'memacs/company-complete-selection))
        (t
         (define-key map [return] 'nil)
         (define-key map (kbd "RET") 'nil)))))
@@ -222,3 +220,10 @@ Press 'q' to quit."
       (company-abort)
       ))
   )
+
+;; quit to normal state
+(defun memacs/company-escape ()
+  "Quit company toolit to evil normal state"
+  (interactive)
+  (company-abort)
+  (evil-normal-state))

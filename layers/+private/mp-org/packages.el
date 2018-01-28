@@ -31,10 +31,7 @@
 (defun mp-org/init-pangu-spacing()
   "Insert White Spece Automatically."
   (use-package pangu-spacing
-    :defer t
-    :init
-    (spacemacs/set-leader-keys "op" 'pangu-spacing-space-current-buffer)
-    )
+    :defer t)
   )
 
 (defun mp-org/post-init-auctex ()

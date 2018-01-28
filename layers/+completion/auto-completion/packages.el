@@ -60,12 +60,16 @@
       (spacemacs//auto-completion-set-TAB-key-behavior 'company)
 
       (let ((map company-active-map))
+        (define-key map [escape] 'memacs/company-escape)
+        (define-key map (kbd "C-[") 'memacs/company-escape)
         (define-key map (kbd "C-j") 'company-select-next)
         (define-key map (kbd "C-k") 'company-select-previous)
         (define-key map (kbd "C-l") 'memacs/company-complete-selection)
         (define-key map (kbd "C-s") 'company-filter-candidates)
         (define-key map (kbd "C-d") 'company-show-doc-buffer))
       (let ((map company-search-map))
+        (define-key map [escape] 'memacs/company-escape)
+        (define-key map (kbd "C-[") 'memacs/company-escape)
         (define-key map (kbd "C-j") 'company-select-next)
         (define-key map (kbd "C-k") 'company-select-previous)
         (define-key map (kbd "C-l") 'memacs/company-complete-selection))
@@ -129,6 +133,7 @@
       ;; disable yas minor mode map
       ;; use hippie-expand instead
       (setq yas-minor-mode-map (make-sparse-keymap))
+      (define-key yas-minor-mode-map (kbd "C-[") 'evil-normal-state)
       ;; configure snippet directories
       (let* ((spacemacs--auto-completion-dir
               (configuration-layer/get-layer-local-dir 'auto-completion))

@@ -107,7 +107,7 @@
  ──────^^^^───────────── ─────────^^^^──── ─────────^^^^─────── ───────────^^^^─────
  [_<_/_>_] beginning/end [_f_/_b_] down/up [_J_/_K_] down/up    [_j_/_k_] down/up
   ^ ^ ^ ^                 ^ ^ ^ ^          [_H_/_L_] left/right [_h_/_l_] left/right
-  ^ ^ ^ ^                 ^ ^ ^ ^          [_d_/_u_] down/up     ^ ^ ^ ^"
+ [_q_]^ ^  quit           ^ ^ ^ ^          [_d_/_u_] down/up     ^ ^ ^ ^"
     :bindings
     ;; buffer
     ("<" evil-goto-first-line)
@@ -126,7 +126,8 @@
     ("j" evil-scroll-line-down)
     ("k" evil-scroll-line-up)
     ("h" evil-scroll-column-left)
-    ("l" evil-scroll-column-right))
+    ("l" evil-scroll-column-right)
+    ("q" nil :exit t))
   (spacemacs/set-leader-keys "P" 'spacemacs/scroll-transient-state/body)
 
   ;; fold transient state

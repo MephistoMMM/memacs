@@ -104,6 +104,6 @@
       ;; groovy but also in the major mode menu with shell specific inserts
       (spacemacs/set-leader-keys-for-major-mode 'sh-mode
         "i!" 'spacemacs/insert-shebang)
-      (spacemacs/set-leader-keys "i!" 'spacemacs/insert-shebang)
+      (memacs/define-insert-keybinding "!" 'spacemacs/insert-shebang)
       ;; we don't want to insert shebang lines automatically
       (remove-hook 'find-file-hook 'insert-shebang))))

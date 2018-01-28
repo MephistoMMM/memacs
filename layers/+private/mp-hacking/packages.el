@@ -19,44 +19,27 @@
                           :repo "MephistoMMM/goenv"))
         ;; haskell-mode
         outshine
+        (outline-ivy :location local)
         ))
 
+
 (defun mp-hacking/init-outshine ()
-  "Bind outshine to SPE o o"
+  "Init outshine to manager code contents."
   (use-package outshine
     :defer t
     :init
-    (spacemacs|diminish outline-minor-mode " ♗" " @")
-    (add-hook 'outline-minor-mode-hook 'outshine-hook-function)
-    (add-hook 'prog-mode-hook 'outline-minor-mode)
-    (advice-add 'outshine-narrow-to-subtree :before
-                (lambda (&rest args) (unless (outline-on-heading-p t)
-                                       (outline-previous-visible-heading 1))))
+    (progn
+      (spacemacs|diminish outline-minor-mode " ♗" " @")
+      ;; Narrowing works within the headline rather than requiring to be on it
+      (advice-add 'outshine-narrow-to-subtree :before
+                  'mp-hacking//advise-outshine-narrow-start-pos)
 
-    (spacemacs/declare-prefix "oo" "outshine")
-    ;; Keybinding
-    (spacemacs/set-leader-keys
-      ;; Insert
-      "ooi" 'outshine-insert-heading
-      "oob" 'outshine-cycle-buffer
+      (add-hook 'outline-minor-mode-hook 'outshine-hook-function)
+      (add-hook 'prog-mode-hook 'outline-minor-mode))))
 
-      ;; Narrowing
-      "oon" 'outshine-narrow-to-subtree
-      "oow" 'widen
-
-      ;; Structural edits and moves
-      "ooj" 'outline-forward-same-level
-      "ook" 'outline-backward-same-level
-      "ooh" 'outline-up-heading
-      "ool" 'outline-next-visible-heading
-      "oou" 'outline-previous-visible-heading
-      "ooJ" 'outline-move-subtree-down
-      "ooK" 'outline-move-subtree-up
-      "ooH" 'outline-promote
-      "ooL" 'outline-demote
-      )
-    )
-  )
+(defun mp-hacking/init-outline-ivy ()
+  (use-package outline-ivy
+    :after ivy outshine))
 
 (defun mp-hacking/init-goenv ()
   "Add Goenv."
