@@ -11,38 +11,14 @@
 
 ;;; Code:
 
+
 ;;;; Better Default
 
 (defun mp-org/better-default ()
   "Better default for mp-org, something done in
 user-config should be defined in this function!"
-  (run-with-idle-timer 300 t 'mp-org/auto-org-agenda-task)
+  ;; (run-with-idle-timer 300 t 'mp-org/auto-org-agenda-task)
 
-  ;; Switch auto org agenda task
-  (spacemacs/set-leader-keys "oa" 'mp-org/switch-auto-org-agenda-task)
-
-  ;; Count Words
-  (spacemacs/set-leader-keys "xC" 'advance-words-count)
-
-  ;; Count page lines
-  (spacemacs/set-leader-keys "xll" 'count-lines-page)
-
-  ;; Org Agenda Reload
-  (spacemacs/set-leader-keys "or" 'mp-org/org-agenda-reload-files)
-
-  ;; Org new file in Dropbox
-  (spacemacs/set-leader-keys "on" 'mp-org/new-org-buffer-in-dropdire)
-
-  ;; Uploat img link file
-  (spacemacs/set-leader-keys "om" 'mp-org/mequ-upload-img-link-file)
-
-  ;; Wraper
-  (spacemacs/declare-prefix "ow" "wrapper")
-  (spacemacs/set-leader-keys "owi" 'mp-org/wrap-math-inline-formula)
-  (spacemacs/set-leader-keys "owb" 'mp-org/wrap-math-block-formula)
-
-  ;; (spacemacs/set-leader-keys "xf" 'fill-region)
-  ;; This function is the same as 'gq' in evil(vim)
   )
 
 
@@ -55,6 +31,7 @@ user-config should be defined in this function!"
   (setq default-directory notes-org-directory-path)
   )
 
+
 ;;;; Source Code
 
 (setq mp-org/src-code-types
@@ -110,6 +87,7 @@ Go files should disable fly-check."
     )
   )
 
+
 ;;;; Mequ And Custom Link
 
 (defun mp-org/get-filepath-at-org-img-link ()
@@ -161,6 +139,7 @@ Go files should disable fly-check."
     )
   )
 
+
 ;;;; Auto Org Agenda
 
 (defun mp-org/org-agenda-reload-files ()
@@ -187,6 +166,7 @@ Switch to @org -> reload org agenda file -> show agenda list"
       (message "Opened auto org agenda task."))
   )
 
+
 ;;;; Toggle Inline Image
 
 ;; Codes is modified from 'org.el'

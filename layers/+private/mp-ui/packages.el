@@ -26,7 +26,6 @@
   (spacemacs|diminish hindent-mode " \u24bd" " (h) ")
   )
 
-;; TODO: it should change golden-ratio-previous-enable to nil while toggle the golden-ratio
 (defun mp-ui/post-init-ranger ()
   "Configuations for ranger!"
   (setq ranger-ignored-extensions '("mkv" "iso" "mp4"))

@@ -36,7 +36,9 @@ than this amount.")
 (defvar spacemacs--counsel-initial-number-cand 100)
 
 (defvar memacs--ivy-file-actions
-  '(("v" spacemacs/find-file-vsplit "in vertical split")
+  '(("x" find-file-other-frame "other frame")
+    ("j" find-file-other-window "other window")
+    ("v" spacemacs/find-file-vsplit "in vertical split")
     ("s" spacemacs/find-file-split "in horizontal split")
     ("l" find-file-literally "literally")
     ("d" spacemacs/delete-file-confirm "delete file")

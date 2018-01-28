@@ -159,7 +159,7 @@
         "a'" 'spacemacs/ivy-available-repls
         "fr" 'counsel-recentf
         "bb" 'ivy-switch-buffer)
-      (memacs/define-evil-normal-keybinding "C-i" 'ivy-resume))
+      (memacs/define-evil-normal-keybinding "M-i" 'ivy-resume))
 
     :config
     (progn

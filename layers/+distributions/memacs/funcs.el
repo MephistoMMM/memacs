@@ -9,74 +9,15 @@
 
 ;;; Code:
 
-;;;; Better-Default
+
+;;;; Spaceline
 
 (defun memacs/spaceline-compile ()
   "Spaceline Compile Using Myself Theme"
   (spaceline-compile
-    `(
-      ((((persp-name workspace-number) :separator "|")
-       buffer-modified)
-       :fallback evil-state
-       :face highlight-face
-       :priority 0)
-      ((buffer-size buffer-id remote-host)
-       :priority 5)
-      auto-comple
-      major-mode
-      (process :when active)
-      (minor-modes :when active)
-      (mu4e-alert-segment :when active)
-      (erc-track :when active)
-      (version-control :when active
-                       :priority 7)
-      (org-pomodoro :when active)
-      (org-clock :when active))
-    `(
-      which-function
-      (python-pyvenv :fallback python-pyenv)
-      (anzu :priority 4)
-      (selection-info :priority 2)
-      input-method
-      ((buffer-encoding-abbrev
-        point-position
-        line-column)
-       :separator " | "
-       :priority 3)
-      ((flycheck-error flycheck-warning flycheck-info)
-       :when active
-       :priority 3)
-      (global :when active)
-      (buffer-position :priority 0)
-      (hud :priority 0)))
-    (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main))))
-  )
-(defun spacemacs/get-mode-line-theme-name ()
-  "Return the mode-line theme name."
-  (if (listp dotspacemacs-mode-line-theme)
-      (car dotspacemacs-mode-line-theme)
-    dotspacemacs-mode-line-theme))
-
-(defun spacemacs/mode-line-separator ()
-  "Return the separator type for the mode-line.
-Return nil if no separator is defined."
-  (when (listp dotspacemacs-mode-line-theme)
-    (plist-get (cdr dotspacemacs-mode-line-theme) :separator)))
-
-(defun spacemacs/mode-line-separator-scale ()
-  "Return the separator scale for the mode-line.
-Return nil if no scale is defined."
-  (when (listp dotspacemacs-mode-line-theme)
-    (plist-get (cdr dotspacemacs-mode-line-theme) :separator-scale)))
-
-
-;; spaceline
-
-(defun spacemacs/customize-powerline-faces ()
-  "Alter powerline face to make them work with more themes."
-  (when (boundp 'powerline-inactive2)
-    (set-face-attribute 'powerline-inactive2 nil
-                        :inherit 'font-lock-comment-face)))
+    memacs-spaceline-left-segments
+    memacs-spaceline-right-segments)
+  (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
 
 (defun spacemacs//evil-state-face ()
   (let ((state (if (eq 'operator evil-state) evil-previous-state evil-state)))
@@ -92,9 +33,7 @@ Return nil if no scale is defined."
 (defun spacemacs//set-powerline-for-startup-buffers ()
   "Set the powerline for buffers created when Emacs starts."
   (dolist (buffer '("*Messages*" "*spacemacs*" "*Compile-Log*"))
-    (when (and (get-buffer buffer)
-               (configuration-layer/package-used-p 'spaceline))
-      (spacemacs//restore-powerline buffer))))
+    (when (get-buffer buffer) (spacemacs//restore-powerline buffer))))
 
 (defun spacemacs//prepare-diminish ()
   (when spaceline-minor-modes-p
