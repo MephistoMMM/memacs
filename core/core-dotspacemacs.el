@@ -88,7 +88,7 @@ in `dotspacemacs-themes'.")
 Press `SPC T n' to cycle to the next theme in the list (works great
 with 2 themes variants, one dark and one light")
 
-(defvar dotspacemacs-mode-line-theme '(spacemacs :separator wave :separator-scale 1.5)
+(defvar dotspacemacs-mode-line-theme '(memacs :separator wave :separator-scale 1.5)
   "Set the theme for the Spaceline. Supported themes are `spacemacs',
 `all-the-icons', `custom', `vim-powerline' and `vanilla'. The first three
 are spaceline themes. `vanilla' is default Emacs mode-line. `custom' is a
@@ -555,6 +555,7 @@ Return nil if no scale is defined."
     (lambda (x)
       (let ((themes '(spacemacs
                       all-the-icons
+                      memacs
                       custom
                       vim-powerline
                       vanilla)))

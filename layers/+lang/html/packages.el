@@ -188,6 +188,10 @@
     :defer t
     :config
     (progn
+      ;; Init web mode for indent offset, 'auto-mode-alist and so. http://web-mode.org
+      (setq web-mode-code-indent-offset 2
+            web-mode-markup-indent-offset 2
+            web-mode-css-indent-offset 2)
       (spacemacs/declare-prefix-for-mode 'web-mode "me" "errors")
       (spacemacs/declare-prefix-for-mode 'web-mode "mg" "goto")
       (spacemacs/declare-prefix-for-mode 'web-mode "mh" "dom")

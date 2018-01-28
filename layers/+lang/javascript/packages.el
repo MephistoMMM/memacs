@@ -58,9 +58,35 @@
     (progn
       (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
       ;; Required to make imenu functions work correctly
-      (add-hook 'js2-mode-hook 'js2-imenu-extras-mode))
+      (add-hook 'js2-mode-hook  (lambda ()
+                                  (js2-imenu-extras-mode)
+                                  (modify-syntax-entry ?_ "w")
+                                  (setq mode-name "JS2"))))
     :config
     (progn
+      ;; these mode related variables must be in eval-after-load
+      ;; https://github.com/magnars/.emacs.d/blob/master/settings/setup-js2-mode.el
+      (setq-default
+       js2-global-externs '("module"
+                            "require"
+                            "assert"
+                            "setTimeout"
+                            "clearTimeout"
+                            "setInterval"
+                            "clearInterval"
+                            "__dirname"
+                            "console"
+                            "JSON")
+       js2-idle-timer-delay 0.2
+       js-indent-level 2
+       js2-basic-offset 2
+
+       ;; Let flycheck handle parse errors
+       js2-mode-show-parse-errors nil
+       js2-mode-show-strict-warnings nil
+       js2-highlight-external-variables t
+       js2-strict-trailing-comma-warning nil)
+
       ;; prefixes
       (spacemacs/declare-prefix-for-mode 'js2-mode "mh" "documentation")
       (spacemacs/declare-prefix-for-mode 'js2-mode "mg" "goto")

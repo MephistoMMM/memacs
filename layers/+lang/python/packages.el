@@ -258,6 +258,10 @@
       (add-hook 'inferior-python-mode-hook
                 #'spacemacs//inferior-python-setup-hook)
       (add-hook 'python-mode-hook #'spacemacs//python-default)
+      ;; Toggle the indent guide
+      (add-hook 'python-mode-hook (lambda ()
+                                    (indent-guide-mode)
+                                    (modify-syntax-entry ?_ "w")))
       ;; call `spacemacs//python-setup-shell' once, don't put it in a hook
       ;; (see issue #5988)
       (spacemacs//python-setup-shell))

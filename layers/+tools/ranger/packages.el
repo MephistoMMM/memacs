@@ -37,6 +37,10 @@
 
       ;; set up image-dired to allow picture resize
       (setq image-dired-dir (concat spacemacs-cache-directory "image-dir"))
+
+      (setq ranger-ignored-extensions
+            '("mkv" "iso" "mp4" "flv" "jpg" "png")
+            ranger-max-preview-size 2)
       (unless (file-directory-p image-dired-dir)
         (make-directory image-dired-dir)))
     :config

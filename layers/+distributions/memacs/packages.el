@@ -32,7 +32,8 @@
       (spacemacs|do-after-display-system-init
        ;; seems to be needed to avoid weird graphical artefacts with the
        ;; first graphical client
-       (require 'spaceline)))
+       (require 'spaceline)
+       (memacs/spaceline-compile)))
     :config
     (progn
       (setq spaceline-org-clock-p nil
