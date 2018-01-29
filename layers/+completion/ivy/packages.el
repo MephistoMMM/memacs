@@ -247,9 +247,13 @@ Current Action: %s(ivy-action-name)
     (define-key ivy-minibuffer-map "\C-o" 'spacemacs/ivy-transient-state/body)
     (define-key ivy-minibuffer-map (kbd "M-SPC")
       'spacemacs/ivy-transient-state/body)
-    (define-key ivy-minibuffer-map (kbd "s-M-SPC")
-      'spacemacs/ivy-transient-state/body)
-    ))
+    )
+
+  ;; binding yank pop and evil-registers
+  (with-eval-after-load 'counsel
+    (define-key ivy-minibuffer-map (kbd "C-e") 'spacemacs/ivy-evil-registers)
+    (define-key ivy-minibuffer-map (kbd "C-y") 'counsel-yank-pop))
+  )
 
 (defun ivy/init-ivy-hydra ()
   (use-package ivy-hydra)

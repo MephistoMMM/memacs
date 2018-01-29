@@ -57,17 +57,14 @@
     :defer t
     :init
     (progn
-      (defun spacemacs//go-set-tab-width ()
-        "Set the tab width."
-        (setq-local tab-width go-tab-width))
-      (add-hook 'go-mode-hook 'spacemacs//go-set-tab-width))
+      (add-hook 'go-mode-hook 'spacemacs//go-set-tab-width)
       ;; Change flycheck-disabled-checkers
       (with-eval-after-load 'flycheck
         (add-hook 'flycheck-mode-hook (lambda ()
                                         (add-to-list 'flycheck-disabled-checkers 'go-vet)
                                         (add-to-list 'flycheck-disabled-checkers 'go-gofmt)
                                         (add-to-list 'flycheck-disabled-checkers 'go-errcheck)
-                                        )))
+                                        ))))
     :config
     (progn
       (add-hook 'before-save-hook 'gofmt-before-save)

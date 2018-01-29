@@ -71,3 +71,7 @@
    (format "go run %s"
            (shell-quote-argument (or (file-remote-p (buffer-file-name (buffer-base-buffer)) 'localname)
                                      (buffer-file-name (buffer-base-buffer)))))))
+
+(defun spacemacs//go-set-tab-width ()
+  "Set the tab width."
+  (setq-local tab-width go-tab-width))

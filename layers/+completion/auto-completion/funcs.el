@@ -130,7 +130,10 @@ MODE parameter must match the :modes values used in the call to
 
 
 ;; auto-completion key bindings functions
-;; TODO: use company only
+(defun spacemacs//company-complete-common-or-cycle-backward ()
+  "Complete common prefix or cycle backward."
+  (interactive)
+  (company-complete-common-or-cycle -1))
 
 (defun spacemacs//auto-completion-set-RET-key-behavior (package)
   "Bind RET key appropriately for the given PACKAGE and value of
