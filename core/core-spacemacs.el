@@ -186,6 +186,8 @@ defer call using `spacemacs-post-user-config-hook'."
                              spacemacs--fallback-theme t))
      (configuration-layer/display-summary emacs-start-time)
      (spacemacs-buffer//startup-hook)
-     (setq spacemacs-initialized t))))
+     (setq spacemacs-initialized t)
+     (setq gc-cons-threshold (car dotspacemacs-gc-cons)
+           gc-cons-percentage (cadr dotspacemacs-gc-cons)))))
 
 (provide 'core-spacemacs)
