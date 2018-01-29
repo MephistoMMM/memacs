@@ -29,7 +29,7 @@
     :defer t
     :init
     (progn
-      (spacemacs|diminish outline-minor-mode " ♗" " @")
+      (spacemacs|diminish outline-minor-mode " ☰" " os")
       ;; Narrowing works within the headline rather than requiring to be on it
       (advice-add 'outshine-narrow-to-subtree :before
                   'mp-hacking//advise-outshine-narrow-start-pos)
