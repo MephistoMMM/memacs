@@ -9,6 +9,9 @@
 
 ;;; Code:
 
+
+;;;; Base
+
 ;; Surround
 ;; the same as the vim surround
 ;; cs <from> <to>        change surround
@@ -32,7 +35,7 @@
   (global-set-key (kbd "<mouse-5>") 'evil-next-line))
 (setq smooth-scroll-margin 10)
 
-;; insert FF
+;; Insert FF
 (memacs/define-insert-keybinding "f" 'mp-hacking/insert-form-feed)
 
 ;; Buffer
@@ -40,7 +43,8 @@
  "C-n" 'next-buffer
  "C-p" 'previous-buffer)
 
-;; Outshine
+
+;;;; Outshine
 (spacemacs/set-leader-keys-for-minor-mode outline-minor-mode
   "M-RET"     'outshine-insert-heading
   "<backtab>" 'outshine-cycle-buffer)
@@ -49,10 +53,6 @@
   ;; Insert
   "oi" 'outshine-insert-heading
   "ob" 'outshine-cycle-buffer
-
-  ;; Narrowing
-  "on" 'outshine-narrow-to-subtree
-  "ow" 'widen
 
   ;; Structural edits and moves
   "oj" 'outline-forward-same-level
@@ -66,7 +66,11 @@
   "oL" 'outline-demote
   )
 
-;; Outline Ivy
+;; Narrowing
+(spacemacs/set-leader-keys "no" 'outshine-narrow-to-subtree)
+
+
+;;;; Outline Ivy
 (spacemacs/set-leader-keys "jo" 'oi-jump)
 
 ;;; keybindings.el ends here

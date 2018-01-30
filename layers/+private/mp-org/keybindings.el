@@ -8,7 +8,7 @@
 (spacemacs/set-leader-keys
 
   ;; Switch auto org agenda task
-  "oa" 'mp-org/switch-auto-org-agenda-task
+  "aoT" 'mp-org/switch-auto-org-agenda-task
 
   ;; Count Words
   "xC" 'advance-words-count

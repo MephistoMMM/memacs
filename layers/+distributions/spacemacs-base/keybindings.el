@@ -38,7 +38,7 @@
                                        ("kd"  "delete")
                                        ("kD"  "delete-backward")
                                        ("k`"  "hybrid")
-                                       ("n"   "narrow/numbers")
+                                       ("n"   "narrow")
                                        ("p"   "projects")
                                        ("p$"  "projects/shell")
                                        ("q"   "quit")

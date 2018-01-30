@@ -223,9 +223,9 @@
         ("-" evil-numbers/dec-at-pt)
         ("q" nil :exit t))
       (spacemacs/set-leader-keys
-        "n+" 'spacemacs/evil-numbers-transient-state/evil-numbers/inc-at-pt
-        "n=" 'spacemacs/evil-numbers-transient-state/evil-numbers/inc-at-pt
-        "n-" 'spacemacs/evil-numbers-transient-state/evil-numbers/dec-at-pt))))
+        "+" 'spacemacs/evil-numbers-transient-state/evil-numbers/inc-at-pt
+        "=" 'spacemacs/evil-numbers-transient-state/evil-numbers/inc-at-pt
+        "-" 'spacemacs/evil-numbers-transient-state/evil-numbers/dec-at-pt))))
 
 (defun spacemacs-evil/init-evil-search-highlight-persist ()
   (use-package evil-search-highlight-persist
