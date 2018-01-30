@@ -138,7 +138,11 @@
   ;; registers
   (with-eval-after-load 'counsel
     (memacs/define-evil-keybinding
-     (list evil-normal-state-map evil-hybrid-state-map)
+     (list
+      evil-ex-completion-map  ;; TODO: replace command lack action after C-e or C-y
+      evil-ex-search-keymap
+      evil-normal-state-map
+      evil-hybrid-state-map)
      "C-e" 'spacemacs/ivy-evil-registers
      "C-y" 'counsel-yank-pop))
   )
