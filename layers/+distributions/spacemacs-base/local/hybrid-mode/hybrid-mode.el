@@ -36,7 +36,7 @@
   :group 'spacemacs
   :type 'symbol)
 
-(defcustom hybrid-mode-enable-hjkl-bindings nil
+(defcustom hybrid-mode-enable-hjkl-bindings t
   "If non-nil then packages configuration should enable hjkl navigation."
   :group 'spacemacs
   :type 'boolean)
@@ -46,7 +46,7 @@
   :group 'spacemacs
   :type 'boolean)
 
-(defcustom hybrid-mode-use-evil-search-module nil
+(defcustom hybrid-mode-use-evil-search-module t
   "If non-nil then use evil own search module which is closer to Vim search
 behavior (for instance it support C-r pasting)."
   :group 'spacemacs
@@ -90,8 +90,6 @@ behavior (for instance it support C-r pasting)."
                     'around 'hybrid-evilified-to-hybrid-state)
   (ad-activate 'evil-insert-state)
   (ad-activate 'evil-evilified-state)
-  ;; key bindings hooks for dynamic switching of editing styles
-  (run-hook-with-args 'spacemacs-editing-style-hook 'hybrid)
   ;; initiate `hybrid state'
   (hybrid-mode//update-states-for-current-buffers 'hybrid))
 
@@ -105,8 +103,6 @@ behavior (for instance it support C-r pasting)."
                      'around 'hybrid-evilified-to-hybrid-state)
   (ad-activate 'evil-insert-state)
   (ad-activate 'evil-evilified-state)
-  ;; restore key bindings
-  (run-hook-with-args 'spacemacs-editing-style-hook 'vim)
   ;; restore the states
   (hybrid-mode//update-states-for-current-buffers 'vim))
 

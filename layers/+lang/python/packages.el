@@ -293,26 +293,6 @@
         "sR" 'spacemacs/python-shell-send-region-switch
         "sr" 'python-shell-send-region)
 
-      ;; Emacs users won't need these key bindings
-      ;; TODO: make these key bindings dynamic given the current style
-      ;; Doing it only at init time won't update it if the user switches style
-      ;; Also find a way to generalize these bindings.
-      (when (eq dotspacemacs-editing-style 'vim)
-        ;; the default in Emacs is M-n
-        (define-key inferior-python-mode-map (kbd "C-j") 'comint-next-input)
-        ;; the default in Emacs is M-p and this key binding overrides
-        ;; default C-k which prevents Emacs users to kill line
-        (define-key inferior-python-mode-map (kbd "C-k") 'comint-previous-input)
-        ;; the default in Emacs is M-r; C-r to search backward old output
-        ;; and should not be changed
-        (define-key inferior-python-mode-map
-          (kbd "C-r") 'comint-history-isearch-backward)
-        ;; this key binding is for recentering buffer in Emacs
-        ;; it would be troublesome if Emacs user
-        ;; Vim users can use this key since they have other key
-        (define-key inferior-python-mode-map
-          (kbd "C-l") 'spacemacs/comint-clear-buffer))
-
       ;; add this optional key binding for Emacs user, since it is unbound
       (define-key inferior-python-mode-map
         (kbd "C-c M-l") 'spacemacs/comint-clear-buffer))))

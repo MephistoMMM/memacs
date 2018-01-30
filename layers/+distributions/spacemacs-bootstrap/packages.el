@@ -43,8 +43,7 @@
 (defun spacemacs-bootstrap/init-evil ()
   ;; ensure that the search module is set at startup
   ;; must be called before evil is required to really take effect.
-  (spacemacs/set-evil-search-module dotspacemacs-editing-style)
-  (add-hook 'spacemacs-editing-style-hook 'spacemacs/set-evil-search-module)
+  (setq-default evil-search-module 'evil-search)
 
   ;; evil-mode is mandatory for Spacemacs to work properly
   ;; evil must be require explicitly, the autoload seems to not
@@ -187,10 +186,6 @@
       spacemacs-default-map))
 
   ;; Define history commands for comint
-  (when (eq dotspacemacs-editing-style 'vim)
-    (evil-define-key 'insert comint-mode-map
-      (kbd "C-k") 'comint-previous-input
-      (kbd "C-j") 'comint-next-input))
   (evil-define-key 'normal comint-mode-map
     (kbd "C-k") 'comint-previous-input
     (kbd "C-j") 'comint-next-input)
@@ -241,8 +236,6 @@
            ("avy-goto-line" . "avy line")
            ("universal-argument" . "universal arg")
            ("er/expand-region" . "expand region")
-           ("spacemacs/toggle-hybrid-mode" . "hybrid (hybrid-mode)")
-           ("spacemacs/toggle-holy-mode" . "emacs (holy-mode)")
            ("evil-lisp-state-\\(.+\\)" . "\\1")
            ("spacemacs/\\(.+\\)-transient-state/\\(.+\\)" . "\\2")
            ("spacemacs/\\(.+\\)-transient-state/body" . "\\1-transient-state")

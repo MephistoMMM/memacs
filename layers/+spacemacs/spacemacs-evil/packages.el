@@ -78,7 +78,6 @@
     (progn
       (setq evil-cleverparens-use-regular-insert t)
       (eval `(spacemacs|add-toggle evil-safe-lisp-structural-editing
-               :if (memq dotspacemacs-editing-style '(vim hybrid))
                :mode evil-cleverparens-mode
                :documentation "Enable evil-cleverparens."
                :evil-leader-for-mode
@@ -88,8 +87,7 @@
 
 (defun spacemacs-evil/init-evil-ediff ()
   (use-package evil-ediff
-    :after (ediff)
-    :if (memq dotspacemacs-editing-style '(hybrid vim))))
+    :after (ediff)))
 
 (defun spacemacs-evil/init-evil-exchange ()
   (use-package evil-exchange
@@ -97,6 +95,7 @@
 
 (defun spacemacs-evil/init-evil-iedit-state ()
   (use-package evil-iedit-state
+    :defer t
     :commands (evil-iedit-state evil-iedit-state/iedit-mode)
     :init
     (progn
@@ -108,9 +107,7 @@
     ;; activate leader in iedit and iedit-insert states
     (define-key evil-iedit-state-map
       (kbd dotspacemacs-leader-key) spacemacs-default-map)
-    (spacemacs//iedit-insert-state-hybrid dotspacemacs-editing-style)
-    (add-hook 'spacemacs-editing-style-hook
-              #'spacemacs//iedit-insert-state-hybrid)))
+    (spacemacs//iedit-insert-state-hybrid 'hybrid)))
 
 (defun spacemacs-evil/init-evil-indent-plus ()
   (use-package evil-indent-plus

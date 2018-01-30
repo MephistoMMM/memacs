@@ -189,11 +189,15 @@
     (setq ivy-height 15
           ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
     (spacemacs|hide-lighter ivy-mode)
-    ;; setup hooks
-    (add-hook 'spacemacs-editing-style-hook 'spacemacs//ivy-hjkl-navigation)
     ;; key bindings
     ;; ensure that the correct bindings are set at startup
-    (spacemacs//ivy-hjkl-navigation dotspacemacs-editing-style)
+    (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
+    (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
+    (define-key ivy-minibuffer-map (kbd "C-h") (kbd "DEL"))
+    ;; Move C-h to C-S-h
+    (define-key ivy-minibuffer-map (kbd "C-S-h") help-map)
+    (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-alt-done)
+    (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
     ;; Transient state
     ;; ivy-hydra disabled for now, waiting to see how the dependency management
     ;; evolves upstream

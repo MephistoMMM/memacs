@@ -68,13 +68,6 @@ configuration in `dotspacemacs/user-config'.")
   "Same as `dotspacemacs-additonal-packages' but reserved for themes declared
 in `dotspacemacs-themes'.")
 
-(defvar dotspacemacs-editing-style 'hybrid
-  "One of `vim', `emacs' or `hybrid'.
-`hybrid' is like `vim' except that `insert state' is replaced by the
-`hybrid state' with `emacs' key bindings. The value can also be a list
- with `:variables' keyword (similar to layers). Check the editing styles
- section of the documentation for details on available variables.")
-
 (defvar dotspacemacs-scratch-mode 'text-mode
   "Default major mode of the scratch buffer.")
 
@@ -324,30 +317,6 @@ changed, and issue a warning if it did."
 (add-hook 'spacemacs-post-user-config-hook
           'dotspacemacs//check-layers-changed)
 
-(defun dotspacemacs//read-editing-style-config (config)
-  "Read editing style CONFIG: apply variables and return the editing style.
-CONFIG can be the symbol of an editing style or a list where the car is
-the symbol of an editing style and the cdr is a list of keyword arguments like
-`:variables'."
-  (cond
-   ((symbolp config) config)
-   ((listp config)
-    (let ((variables (spacemacs/mplist-get config :variables)))
-      (while variables
-        (let ((var (pop variables)))
-          (if (consp variables)
-              (condition-case-unless-debug err
-                  (set-default var (eval (pop variables)))
-                ('error
-                 (spacemacs-buffer/append
-                  (format (concat "\nAn error occurred while reading the "
-                                  "editing style variable %s "
-                                  "(error: %s). Be sure to quote the value "
-                                  "if needed.\n") var err))))
-            (spacemacs-buffer/warning "Missing value for variable %s !"
-                                      var)))))
-    (car config))))
-
 (defun dotspacemacs/add-layer (layer-name)
   "Add LAYER_NAME to dotfile and reload the it.
 Returns non nil if the layer has been effectively inserted."
@@ -384,9 +353,6 @@ Called with `C-u C-u' skips `dotspacemacs/user-config' _and_ preleminary tests."
                                         "Calling dotfile init...")
                 (dotspacemacs|call-func dotspacemacs/user-init
                                         "Calling dotfile user init...")
-                (setq dotspacemacs-editing-style
-                      (dotspacemacs//read-editing-style-config
-                       dotspacemacs-editing-style))
                 (configuration-layer/load)
                 (if (member arg '((4) (16)))
                     (message (concat "Done (`dotspacemacs/user-config' "
@@ -547,16 +513,6 @@ Return nil if no scale is defined."
            dotspacemacs-filepath))
   (dotspacemacs||let-init-test
    (dotspacemacs/init)
-   (spacemacs//test-var
-    (lambda (x)
-      (or (member x '(vim
-                      emacs
-                      hybrid))
-          (and (listp x)
-               (eq 'hybrid (car x))
-               (spacemacs/mplist-get x :variables))))
-    'dotspacemacs-editing-style
-    "is \'vim, \'emacs or \'hybrid or and list with `:variable' keyword")
    (spacemacs//test-var
     (lambda (x)
       (let ((themes '(spacemacs

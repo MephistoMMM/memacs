@@ -48,7 +48,6 @@
                                        ("s"   "snippets")
                                        ("t"   "toggles")
                                        ("tC"  "colors")
-                                       ("tE"  "editing-styles")
                                        ("th"  "highlight")
                                        ("tm"  "modeline")
                                        ("T"   "UI toggles/themes")
@@ -95,10 +94,9 @@
 
 ;; Universal argument ---------------------------------------------------------
 (spacemacs/set-leader-keys "u" 'universal-argument)
-(when (memq dotspacemacs-editing-style '(vim hybrid))
-  (define-key universal-argument-map
-    (kbd (concat dotspacemacs-leader-key " u"))
-    'universal-argument-more))
+(define-key universal-argument-map
+  (kbd (concat dotspacemacs-leader-key " u"))
+  'universal-argument-more)
 ;; shell command  -------------------------------------------------------------
 (spacemacs/set-leader-keys "!" 'shell-command)
 ;; applications ---------------------------------------------------------------

@@ -90,8 +90,6 @@ the final step of executing code in `emacs-startup-hook'.")
   ;; related issue: https://github.com/syl20bnr/spacemacs/issues/9736
   ;; (dotspacemacs|call-func dotspacemacs/emacs-custom-settings
   ;;                         "Calling dotfile Emacs custom settings...")
-  (setq dotspacemacs-editing-style (dotspacemacs//read-editing-style-config
-                                    dotspacemacs-editing-style))
   (configuration-layer/initialize)
   ;; frame title init
   (when (and (display-graphic-p) dotspacemacs-frame-title-format)

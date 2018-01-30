@@ -72,23 +72,6 @@ For evil states that also need an entry to `spacemacs-evil-cursors' use
 (defun evil-insert-state-cursor-hide ()
   (setq evil-insert-state-cursor '((hbar . 0))))
 
-(defun spacemacs/set-evil-search-module (style)
-  "Set the evil search module depending on STYLE."
-  (cond
-   ((or (eq 'vim style)
-        (and (eq 'hybrid style)
-             (bound-and-true-p hybrid-mode-use-evil-search-module)))
-    ;; if Evil is loaded already, just setting `evil-search-module' isn't
-    ;; enough, we need to call `evil-select-search-module' as well (this is done
-    ;; automatically when `evil-search-module' is changed via customize)
-    (if (featurep 'evil-search)
-        (evil-select-search-module 'evil-search-module 'evil-search)
-      (setq-default evil-search-module 'evil-search)))
-   (t
-    (if (featurep 'evil-search)
-        (evil-select-search-module 'evil-search-module 'isearch)
-      (setq-default evil-search-module 'isearch)))))
-
 (defun spacemacs/evil-smart-doc-lookup ()
   "Run documentation lookup command specific to the major mode.
 Use command bound to `SPC m h h` if defined, otherwise fall back

@@ -32,7 +32,6 @@
                                           (eq window-system 'x)))
         (help-fns+ :location local)
         (hi-lock :location built-in)
-        (holy-mode :location local :step pre)
         (hybrid-mode :location local :step pre)
         (image-mode :location built-in)
         (imenu :location built-in)
@@ -175,6 +174,7 @@
 
 (defun spacemacs-base/init-evil-visualstar ()
   (use-package evil-visualstar
+    :defer t
     :commands (evil-visualstar/begin-search-forward
                evil-visualstar/begin-search-backward)
     :init
@@ -198,37 +198,12 @@
   (with-eval-after-load 'hi-lock
     (spacemacs|hide-lighter hi-lock-mode)))
 
-(defun spacemacs-base/init-holy-mode ()
-  (use-package holy-mode
-    :commands holy-mode
-    :init
-    (progn
-      (when (eq 'emacs dotspacemacs-editing-style)
-        (holy-mode))
-      (spacemacs|add-toggle holy-mode
-        :status holy-mode
-        :on (progn (when (bound-and-true-p hybrid-mode)
-                     (hybrid-mode -1))
-                   (holy-mode))
-        :off (holy-mode -1)
-        :documentation "Globally toggle holy mode."
-        :evil-leader "tEe")
-      (spacemacs|diminish holy-mode " Ⓔe" " Ee"))))
-
 (defun spacemacs-base/init-hybrid-mode ()
   (use-package hybrid-mode
     :config
     (progn
-      (when (eq 'hybrid dotspacemacs-editing-style) (hybrid-mode))
-      (spacemacs|add-toggle hybrid-mode
-        :status hybrid-mode
-        :on (progn (when (bound-and-true-p holy-mode)
-                     (holy-mode -1))
-                   (hybrid-mode))
-        :off (hybrid-mode -1)
-        :documentation "Globally toggle hybrid mode."
-        :evil-leader "tEh")
-      (spacemacs|diminish hybrid-mode " Ⓔh" " Eh"))))
+      (hybrid-mode)
+      (spacemacs|diminish hybrid-mode))))
 
 (defun spacemacs-base/init-image-mode ()
   (use-package image-mode
@@ -329,6 +304,7 @@
 
 (defun spacemacs-base/init-projectile ()
   (use-package projectile
+    :defer t
     :commands (projectile-ack
                projectile-ag
                projectile-compile-project
@@ -369,18 +345,14 @@
         "p&" 'projectile-run-async-shell-command-in-root
         "p%" 'projectile-replace-regexp
         "pa" 'projectile-toggle-between-implementation-and-test
-        "pb" 'projectile-switch-to-buffer
         "pc" 'projectile-compile-project
-        "pd" 'projectile-find-dir
         "pD" 'projectile-dired
         "pe" 'projectile-edit-dir-locals
-        "pf" 'projectile-find-file
         "pF" 'projectile-find-file-dwim
         "pg" 'projectile-find-tag
         "pG" 'projectile-regenerate-tags
         "pI" 'projectile-invalidate-cache
         "pk" 'projectile-kill-buffers
-        "pp" 'projectile-switch-project
         "pr" 'projectile-recentf
         "pR" 'projectile-replace
         "pT" 'projectile-test-project))

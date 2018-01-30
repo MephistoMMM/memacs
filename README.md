@@ -51,6 +51,9 @@
 - 将 spacemacs-editing 中的函数定义从 package 初始化中分离到 funcs.el
 - 删除 link-hint 包，我只使用 spacemacs/avy-goto-url 和 spacemacs/avy-open-url
 - 让 spacemacs-editing 中的 package 尽量 autoload
+- 删除 holy-mode 和 dotspacemacs-editing-style ，我只使用 hybrid 
+- 为 evil-iedit-state-mode 添加退出绑定，在取消高亮的 ‘gs’ 中
+- 删除 spacemacs-buffer 页面的 mouse-1 绑定，它有bug
 
 ## License
 

@@ -31,16 +31,13 @@
 (defun git/pre-init-evil-magit ()
   (spacemacs|use-package-add-hook magit
     :post-config
-    (when (spacemacs//support-evilified-buffer-p dotspacemacs-editing-style)
-      (evil-magit-init))
+    (evil-magit-init)
     (evil-define-key 'motion magit-mode-map
       (kbd dotspacemacs-leader-key) spacemacs-default-map)))
 
 (defun git/init-evil-magit ()
   (use-package evil-magit
-    :defer t
-    :init (add-hook 'spacemacs-editing-style-hook
-                    'spacemacs//magit-evil-magit-bindings)))
+    :defer t))
 
 (defun git/post-init-fill-column-indicator ()
   (add-hook 'git-commit-mode-hook 'fci-mode))

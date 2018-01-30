@@ -40,7 +40,6 @@ Internal use, do not set this variable.")
 
 (defvar spacemacs-buffer-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map [down-mouse-1] 'widget-button-click)
     (define-key map (kbd "RET") 'widget-button-press)
 
     (define-key map [tab] 'widget-forward)

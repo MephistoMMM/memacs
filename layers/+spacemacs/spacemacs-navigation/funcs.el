@@ -149,18 +149,12 @@
 (defun spacemacs/ahs-to-iedit ()
   "Trigger iedit from ahs."
   (interactive)
-  (cond
-   ((and (not (eq dotspacemacs-editing-style 'emacs))
-         (configuration-layer/package-used-p 'evil-iedit-state))
-    (evil-iedit-state/iedit-mode)
-    (iedit-restrict-region (ahs-current-plugin-prop 'start)
-                           (ahs-current-plugin-prop 'end)))
-   ((and (eq dotspacemacs-editing-style 'emacs)
-         (configuration-layer/package-used-p 'iedit))
-    (iedit-mode)
-    (iedit-restrict-region (ahs-current-plugin-prop 'start)
-                           (ahs-current-plugin-prop 'end)))
-   (t (ahs-edit-mode t))))
+  (if (configuration-layer/package-used-p 'evil-iedit-state)
+      (progn
+        (evil-iedit-state/iedit-mode)
+        (iedit-restrict-region (ahs-current-plugin-prop 'start)
+                               (ahs-current-plugin-prop 'end)))
+    (ahs-edit-mode t)))
 
 (defun spacemacs//symbol-highlight-ts-doc ()
   (spacemacs//transient-state-make-doc
