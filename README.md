@@ -54,6 +54,11 @@
 - 删除 holy-mode 和 dotspacemacs-editing-style ，我只使用 hybrid 
 - 为 evil-iedit-state-mode 添加退出绑定，在取消高亮的 ‘gs’ 中
 - 删除 spacemacs-buffer 页面的 mouse-1 绑定，它有bug
+- 删除 hl-anything ， 3年前的issue到现在都没解决。。。。
+- 删除 indent-guide ，它造成我的buffer抖动
+- 删除 highlight-indentation-current-column ，太难看了
+- 删除 rainbow-delimiters ，太慢
+- 修改 highlight-paren 的颜色列表，太单调
 
 ## License
 

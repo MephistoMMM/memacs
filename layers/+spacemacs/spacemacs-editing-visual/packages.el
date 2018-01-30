@@ -18,11 +18,6 @@
         highlight-indentation
         highlight-numbers
         highlight-parentheses
-        ;; waiting for an overlay bug to be fixed
-        ;; see https://github.com/syl20bnr/spacemacs/issues/2529
-        (hl-anything :excluded t)
-        indent-guide
-        rainbow-delimiters
         volatile-highlights
         ))
 
@@ -30,12 +25,12 @@
 
 (defun spacemacs-editing-visual/init-adaptive-wrap ()
   (use-package adaptive-wrap
-    :config
-    (progn
-      (add-hook 'visual-line-mode-hook 'adaptive-wrap-prefix-mode))))
+    :defer t
+    :init (add-hook 'visual-line-mode-hook 'adaptive-wrap-prefix-mode)))
 
 (defun spacemacs-editing-visual/init-column-enforce-mode ()
   (use-package column-enforce-mode
+    :defer t
     :commands (column-enforce-mode global-column-enforce-mode)
     :init
     (progn
@@ -66,15 +61,10 @@
       (spacemacs|add-toggle highlight-indentation
         :mode highlight-indentation-mode
         :documentation "Highlight indentation levels."
-        :evil-leader "thi")
-      (spacemacs|add-toggle highlight-indentation-current-column
-        :mode highlight-indentation-current-column-mode
-        :documentation "Highlight indentation level at point."
-        :evil-leader "thc"))
+        :evil-leader "thi"))
     :config
     (progn
-      (spacemacs|diminish highlight-indentation-mode " ⓗi" " hi")
-      (spacemacs|diminish highlight-indentation-current-column-mode " ⓗc" " hc"))))
+      (spacemacs|diminish highlight-indentation-mode " ⓘ" " i"))))
 
 (defun spacemacs-editing-visual/init-highlight-numbers ()
   (use-package highlight-numbers
@@ -93,59 +83,16 @@
         (add-hook 'prog-mode-hook #'highlight-parentheses-mode))
       (setq hl-paren-delay 0.2)
       (spacemacs/set-leader-keys "thp" 'highlight-parentheses-mode)
-      (setq hl-paren-colors '("Springgreen3"
-                              "IndianRed1"
+      (setq hl-paren-colors '("#50fa7b"
+                              "#0189cc"
+                              "#bd93f9"
+                              "#ff79c6"
+                              "#ff5555"
                               "IndianRed3"
                               "IndianRed4")))
     :config
     (spacemacs|hide-lighter highlight-parentheses-mode)
     (set-face-attribute 'hl-paren-face nil :weight 'ultra-bold)))
-
-(defun spacemacs-editing-visual/init-hl-anything ()
-  (use-package hl-anything
-    :init
-    (progn
-      (hl-highlight-mode)
-      (setq-default hl-highlight-save-file
-                    (concat spacemacs-cache-directory ".hl-save"))
-      (spacemacs/set-leader-keys
-        "hc"  'hl-unhighlight-all-local
-        "hC"  'hl-unhighlight-all-global
-        "hh"  'hl-highlight-thingatpt-local
-        "hH"  'hl-highlight-thingatpt-global
-        "hn"  'hl-find-next-thing
-        "hN"  'hl-find-prev-thing
-        "hr"  'hl-restore-highlights
-        "hs"  'hl-save-highlights))
-    :config (spacemacs|hide-lighter hl-highlight-mode)))
-
-(defun spacemacs-editing-visual/init-indent-guide ()
-  (use-package indent-guide
-    :defer t
-    :init
-    (progn
-      (setq indent-guide-delay 0.3)
-      (spacemacs|add-toggle indent-guide
-        :mode indent-guide-mode
-        :documentation
-        "Highlight indentation level at point. (alternative to highlight-indentation)."
-        :evil-leader "ti")
-      (spacemacs|add-toggle indent-guide-globally
-        :mode indent-guide-global-mode
-        :documentation
-        "Highlight indentation level at point globally. (alternative to highlight-indentation)."
-        :evil-leader "t TAB"))
-    :config
-    (spacemacs|diminish indent-guide-mode " ⓘ" " i")))
-
-(defun spacemacs-editing-visual/init-rainbow-delimiters ()
-  (use-package rainbow-delimiters
-    :defer t
-    :init
-    (progn
-      (spacemacs/set-leader-keys "tCd" 'rainbow-delimiters-mode)
-      (when (member dotspacemacs-highlight-delimiters '(any all))
-        (spacemacs/add-to-hooks 'rainbow-delimiters-mode '(prog-mode-hook))))))
 
 (defun spacemacs-editing-visual/init-volatile-highlights ()
   (use-package volatile-highlights

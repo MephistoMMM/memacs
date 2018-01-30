@@ -54,6 +54,13 @@ Cancels autosave on exiting perspectives mode."
 
 ;; Persp transient-state
 
+(defun spacemacs//activate-persp-mode ()
+  "Always activate persp-mode, unless it is already active.
+ (e.g. don't re-activate during `dotspacemacs/sync-configuration-layers' -
+ see issues #5925 and #3875)"
+  (unless (bound-and-true-p persp-mode)
+    (persp-mode)))
+
 (defvar spacemacs--persp-display-buffers-func 'ignore
   "Function to display buffers in the perspective.")
 (defun spacemacs/persp-buffers ()
