@@ -12,7 +12,6 @@
 (setq spacemacs-evil-packages
       '(evil-anzu
         evil-args
-        evil-cleverparens
         evil-ediff
         evil-exchange
         evil-iedit-state
@@ -28,9 +27,6 @@
         evil-numbers
         evil-search-highlight-persist
         evil-surround
-        ;; Temporarily disabled, pending the resolution of
-        ;; https://github.com/7696122/evil-terminal-cursor-changer/issues/8
-        ;; evil-terminal-cursor-changer
         (evil-unimpaired :location (recipe :fetcher local))
         evil-visual-mark-mode
         (hs-minor-mode :location built-in)
@@ -65,25 +61,12 @@
 
 (defun spacemacs-evil/init-evil-args ()
   (use-package evil-args
+    :defer t
     :init
     (progn
       ;; bind evil-args text objects
       (define-key evil-inner-text-objects-map "a" 'evil-inner-arg)
       (define-key evil-outer-text-objects-map "a" 'evil-outer-arg))))
-
-(defun spacemacs-evil/init-evil-cleverparens ()
-  (use-package evil-cleverparens
-    :defer t
-    :init
-    (progn
-      (setq evil-cleverparens-use-regular-insert t)
-      (eval `(spacemacs|add-toggle evil-safe-lisp-structural-editing
-               :mode evil-cleverparens-mode
-               :documentation "Enable evil-cleverparens."
-               :evil-leader-for-mode
-               ,@(mapcar (lambda (x) (cons x "Ts"))
-                         evil-lisp-safe-structural-editing-modes)))
-      (spacemacs|diminish evil-cleverparens-mode " 🆂" " [s]"))))
 
 (defun spacemacs-evil/init-evil-ediff ()
   (use-package evil-ediff
@@ -101,8 +84,7 @@
     (progn
       (setq iedit-current-symbol-default t
             iedit-only-at-symbol-boundaries t
-            iedit-toggle-key-default nil)
-      (define-key evil-normal-state-map "gI" 'evil-iedit-state/iedit-mode))
+            iedit-toggle-key-default nil))
     :config
     ;; activate leader in iedit and iedit-insert states
     (define-key evil-iedit-state-map
@@ -120,15 +102,11 @@
       ;; Override the default keys, as they collide
       (setq evil-lion-left-align-key nil
             evil-lion-right-align-key nil)
-      (spacemacs/set-leader-keys
-        "xal" 'evil-lion-left
-        "xaL" 'evil-lion-right)
       (evil-lion-mode))))
 
 (defun spacemacs-evil/init-evil-lisp-state ()
   (use-package evil-lisp-state
-    :init (setq evil-lisp-state-global t)
-    :config (spacemacs/set-leader-keys "k" evil-lisp-state-map)))
+    :init (setq evil-lisp-state-global t)))
 
 (defun spacemacs-evil/init-evil-mc ()
   (use-package evil-mc
@@ -136,8 +114,6 @@
     :init
     (progn
       ;; evil-mc is not compatible with the paste transient state
-      (define-key evil-normal-state-map "p" 'spacemacs/evil-mc-paste-after)
-      (define-key evil-normal-state-map "P" 'spacemacs/evil-mc-paste-before)
       (setq evil-mc-one-cursor-show-mode-line-text nil)
       (when (or (spacemacs/system-is-mac) (spacemacs/system-is-mswindows))
         (setq evil-mc-enable-bar-cursor nil)))))
@@ -145,65 +121,11 @@
 ;; other commenting functions in funcs.el with keybinds in keybindings.el
 (defun spacemacs-evil/init-evil-nerd-commenter ()
   (use-package evil-nerd-commenter
-    :commands evilnc-comment-operator
-    :init
-    (progn
-      ;; double all the commenting functions so that the inverse operations
-      ;; can be called without setting a flag
-      (defun spacemacs/comment-or-uncomment-lines-inverse (&optional arg)
-        (interactive "p")
-        (let ((evilnc-invert-comment-line-by-line t))
-          (evilnc-comment-or-uncomment-lines arg)))
-
-      (defun spacemacs/comment-or-uncomment-lines (&optional arg)
-        (interactive "p")
-        (let ((evilnc-invert-comment-line-by-line nil))
-          (evilnc-comment-or-uncomment-lines arg)))
-
-      (defun spacemacs/copy-and-comment-lines-inverse (&optional arg)
-        (interactive "p")
-        (let ((evilnc-invert-comment-line-by-line t))
-          (evilnc-copy-and-comment-lines arg)))
-
-      (defun spacemacs/copy-and-comment-lines (&optional arg)
-        (interactive "p")
-        (let ((evilnc-invert-comment-line-by-line nil))
-          (evilnc-copy-and-comment-lines arg)))
-
-      (defun spacemacs/quick-comment-or-uncomment-to-the-line-inverse
-          (&optional arg)
-        (interactive "p")
-        (let ((evilnc-invert-comment-line-by-line t))
-          (evilnc-comment-or-uncomment-to-the-line arg)))
-
-      (defun spacemacs/quick-comment-or-uncomment-to-the-line (&optional arg)
-        (interactive "p")
-        (let ((evilnc-invert-comment-line-by-line nil))
-          (evilnc-comment-or-uncomment-to-the-line arg)))
-
-      (defun spacemacs/comment-or-uncomment-paragraphs-inverse (&optional arg)
-        (interactive "p")
-        (let ((evilnc-invert-comment-line-by-line t))
-          (evilnc-comment-or-uncomment-paragraphs arg)))
-
-      (defun spacemacs/comment-or-uncomment-paragraphs (&optional arg)
-        (interactive "p")
-        (let ((evilnc-invert-comment-line-by-line nil))
-          (evilnc-comment-or-uncomment-paragraphs arg)))
-
-      (define-key evil-normal-state-map "gc" 'evilnc-comment-operator)
-      (define-key evil-normal-state-map "gy" 'spacemacs/copy-and-comment-lines)
-
-      (spacemacs/set-leader-keys
-        ";"  'evilnc-comment-operator
-        "cl" 'spacemacs/comment-or-uncomment-lines
-        "cL" 'spacemacs/comment-or-uncomment-lines-inverse
-        "cp" 'spacemacs/comment-or-uncomment-paragraphs
-        "cP" 'spacemacs/comment-or-uncomment-paragraphs-inverse
-        "ct" 'spacemacs/quick-comment-or-uncomment-to-the-line
-        "cT" 'spacemacs/quick-comment-or-uncomment-to-the-line-inverse
-        "cy" 'spacemacs/copy-and-comment-lines
-        "cY" 'spacemacs/copy-and-comment-lines-inverse))))
+    :defer t
+    :commands (evilnc-comment-operator
+               evilnc-copy-and-comment-lines
+               evilnc-comment-or-uncomment-paragraphs)
+    ))
 
 (defun spacemacs-evil/init-evil-matchit ()
   (use-package evil-matchit
@@ -211,28 +133,13 @@
 
 (defun spacemacs-evil/init-evil-numbers ()
   (use-package evil-numbers
-    :config
-    (progn
-      (spacemacs|define-transient-state evil-numbers
-        :title "Evil Numbers Transient State"
-        :doc
-        "\n[_+_/_=_] increase number  [_-_] decrease  [0..9] prefix  [_q_] quit"
-        :bindings
-        ("+" evil-numbers/inc-at-pt)
-        ("=" evil-numbers/inc-at-pt)
-        ("-" evil-numbers/dec-at-pt)
-        ("q" nil :exit t))
-      (spacemacs/set-leader-keys
-        "+" 'spacemacs/evil-numbers-transient-state/evil-numbers/inc-at-pt
-        "=" 'spacemacs/evil-numbers-transient-state/evil-numbers/inc-at-pt
-        "-" 'spacemacs/evil-numbers-transient-state/evil-numbers/dec-at-pt))))
+    :defer t))
 
 (defun spacemacs-evil/init-evil-search-highlight-persist ()
   (use-package evil-search-highlight-persist
     :init
     (progn
       (global-evil-search-highlight-persist)
-      (memacs/define-evil-normal-keybinding "gs" 'spacemacs/evil-search-clear-highlight)
       (evil-ex-define-cmd "nohlsearch" 'spacemacs/evil-search-clear-highlight)
       (spacemacs//adaptive-evil-highlight-persist-face)
       (add-hook 'spacemacs-post-theme-change-hook
@@ -241,19 +148,7 @@
 (defun spacemacs-evil/init-evil-surround ()
   (use-package evil-surround
     :init
-    (progn
-      (global-evil-surround-mode 1)
-      ;; `s' for surround instead of `substitute'
-      ;; see motivation for this change in the documentation
-      (evil-define-key 'visual evil-surround-mode-map "s" 'evil-surround-region)
-      (evil-define-key 'visual evil-surround-mode-map "S" 'evil-substitute))))
-
-(defun spacemacs-evil/init-evil-terminal-cursor-changer ()
-  (use-package evil-terminal-cursor-changer
-    :if (not (display-graphic-p))
-    :init (setq evil-visual-state-cursor 'box
-                evil-insert-state-cursor 'bar
-                evil-emacs-state-cursor 'hbar)))
+    (global-evil-surround-mode 1)))
 
 (defun spacemacs-evil/init-evil-unimpaired ()
   ;; No laziness here, unimpaired bindings should be available right away.
@@ -261,12 +156,7 @@
 
 (defun spacemacs-evil/init-evil-visual-mark-mode ()
   (use-package evil-visual-mark-mode
-    :defer t
-    :init
-    (spacemacs|add-toggle evil-visual-mark-mode
-      :mode evil-visual-mark-mode
-      :documentation "Enable evil visual marks mode."
-      :evil-leader "t`")))
+    :defer t))
 
 (defun spacemacs-evil/init-hs-minor-mode ()
   (add-hook 'prog-mode-hook 'spacemacs//enable-hs-minor-mode))
@@ -275,13 +165,11 @@
   (use-package linum-relative
     :commands (linum-relative-toggle linum-relative-on)
     :init
-    (progn
-      (when (or (eq dotspacemacs-line-numbers 'relative)
-                (and (listp dotspacemacs-line-numbers)
-                     (car (spacemacs/mplist-get dotspacemacs-line-numbers
-                                                :relative))))
-        (add-hook 'spacemacs-post-user-config-hook 'linum-relative-on))
-      (spacemacs/set-leader-keys "tr" 'spacemacs/linum-relative-toggle))
+    (when (or (eq dotspacemacs-line-numbers 'relative)
+              (and (listp dotspacemacs-line-numbers)
+                    (car (spacemacs/mplist-get dotspacemacs-line-numbers
+                                              :relative))))
+      (add-hook 'spacemacs-post-user-config-hook 'linum-relative-on))
     :config
     (setq linum-relative-current-symbol "")))
 
@@ -291,11 +179,6 @@
      :init
      (progn
        (global-vi-tilde-fringe-mode)
-       (spacemacs|add-toggle vi-tilde-fringe
-         :mode global-vi-tilde-fringe-mode
-         :documentation
-         "Globally display a ~ on empty lines in the fringe."
-         :evil-leader "T~")
        ;; don't enable it on some special buffers
        (with-current-buffer spacemacs-buffer-name
          (spacemacs/disable-vi-tilde-fringe))
@@ -305,7 +188,8 @@
        (add-hook 'after-change-major-mode-hook
                  'spacemacs/disable-vi-tilde-fringe-read-only)
        ;; TODO move this hook if/when we have a layer for eww
-       (spacemacs/add-to-hooks 'spacemacs/disable-vi-tilde-fringe
-                               '(eww-mode-hook)))
+       ;; (spacemacs/add-to-hooks 'spacemacs/disable-vi-tilde-fringe
+       ;;                         '(eww-mode-hook))
+       )
      :config
      (spacemacs|hide-lighter vi-tilde-fringe-mode))))

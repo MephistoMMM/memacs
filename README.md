@@ -59,6 +59,9 @@
 - 删除 highlight-indentation-current-column ，太难看了
 - 删除 rainbow-delimiters ，太慢
 - 修改 highlight-paren 的颜色列表，太单调
+- 删除 evil-clearparens 
+- 分离 spacemacs-evil 的键位绑定到 keybindings.el
+- 使 evil-numbers 和 evil-commenter autoload
 
 ## License
 

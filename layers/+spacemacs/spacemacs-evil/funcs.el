@@ -42,15 +42,31 @@ Otherwise, revert to the default behavior (i.e. enable `evil-insert-state')."
                        :enable states)))
 
 
+;; evil-nerd-commenter
+
+;; double all the commenting functions so that the inverse operations
+;; can be called without setting a flag
+(defun spacemacs/copy-and-comment-lines (&optional arg)
+  (interactive "p")
+  (let ((evilnc-invert-comment-line-by-line nil))
+    (evilnc-copy-and-comment-lines arg)))
+
+(defun spacemacs/comment-or-uncomment-paragraphs (&optional arg)
+  (interactive "p")
+  (let ((evilnc-invert-comment-line-by-line nil))
+    (evilnc-comment-or-uncomment-paragraphs arg)))
+
+
 ;; evil-search-highlight-persist
 
 (defun spacemacs/evil-search-clear-highlight ()
   "Clear evil-search or evil-ex-search persistent highlights."
   (interactive)
-  (evil-search-highlight-persist-remove-all)        ; `C-s' highlights
+  (evil-search-highlight-persist-remove-all)        ; `C-s s' highlights
   (evil-ex-nohighlight)                             ; `/' highlights
   (when (fboundp 'evil-iedit-state/quit-iedit-mode) ; `gI' evil-iedit-state-mode
       (evil-iedit-state/quit-iedit-mode))
+  (evil-exchange-cancel)                            ; `gx' evil-exchange
   )
 
 (defun spacemacs//adaptive-evil-highlight-persist-face ()

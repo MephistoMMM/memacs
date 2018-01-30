@@ -51,7 +51,8 @@
 (defun spacemacs-editing-visual/init-hide-comnt ()
   (use-package hide-comnt
     :commands hide/show-comments-toggle
-    :init (spacemacs/set-leader-keys "ch" 'hide/show-comments-toggle)))
+    :init (define-key evil-normal-state-map (kbd "g C-h") 'hide/show-comments-toggle)
+    ))
 
 (defun spacemacs-editing-visual/init-highlight-indentation ()
   (use-package highlight-indentation
