@@ -16,7 +16,6 @@
         eval-sexp-fu
         expand-region
         (hexl :location built-in)
-        link-hint
         lorem-ipsum
         move-text
         (origami :toggle (eq 'origami dotspacemacs-folding-method))
@@ -32,7 +31,8 @@
 (defun spacemacs-editing/init-avy ()
   (use-package avy
     :defer t
-    :commands (spacemacs/avy-open-url spacemacs/avy-goto-url avy-pop-mark)
+    ;; avy--generic-jump is used by spacemacs/avy-goto-url
+    :commands (avy--generic-jump avy-pop-mark avy-resume)
     :init
     (progn
       (setq avy-all-windows 'all-frames)
@@ -54,18 +54,7 @@
        "C-j w"   'evil-avy-goto-word-or-subword-1
        "C-j W"   'evil-avy-goto-word-0
        "C-j j"   'evil-avy-goto-char-timer))
-    :config
-    (progn
-      (defun spacemacs/avy-goto-url()
-        "Use avy to go to an URL in the buffer."
-        (interactive)
-        (avy--generic-jump "https?://" nil 'pre))
-      (defun spacemacs/avy-open-url ()
-        "Use avy to select an URL in the buffer and open it."
-        (interactive)
-        (save-excursion
-          (spacemacs/avy-goto-url)
-          (browse-url-at-point))))))
+    ))
 
 (defun spacemacs-editing/init-clean-aindent-mode ()
   (use-package clean-aindent-mode
@@ -89,12 +78,11 @@
     :init
     (memacs/define-evil-keybinding
      (list evil-normal-state-map evil-visual-state-map)
-     "e" 'er/expand-region
-     "E" 'er/contract-region)
+     "e" 'er/expand-region)
     :config
     (progn
       ;; add search capability to expand-region
-      (setq expand-region-contract-fast-key "V"
+      (setq expand-region-contract-fast-key "E"
             expand-region-reset-fast-key "r"))))
 
 (defun spacemacs-editing/init-hexl ()
@@ -108,28 +96,11 @@
         "c" 'hexl-insert-octal-char
         "x" 'hexl-insert-hex-char
         "X" 'hexl-insert-hex-string
-        "g" 'hexl-goto-address)
-      (evil-define-key 'motion hexl-mode-map
-        "]]" 'hexl-end-of-1k-page
-        "[[" 'hexl-beginning-of-1k-page
-        "h" 'hexl-backward-char
-        "l" 'hexl-forward-char
-        "j" 'hexl-next-line
-        "k" 'hexl-previous-line
-        "$" 'hexl-end-of-line
-        "^" 'hexl-beginning-of-line
-        "0" 'hexl-beginning-of-line))))
-
-(defun spacemacs-editing/init-link-hint ()
-  (use-package link-hint
-    :defer t
-    :init
-    (spacemacs/set-leader-keys
-      "xo" 'link-hint-open-link
-      "xO" 'link-hint-open-multiple-links)))
+        "g" 'hexl-goto-address))))
 
 (defun spacemacs-editing/init-lorem-ipsum ()
   (use-package lorem-ipsum
+    :defer t
     :commands (lorem-ipsum-insert-list
                lorem-ipsum-insert-paragraphs
                lorem-ipsum-insert-sentences)
@@ -149,11 +120,10 @@
     (spacemacs|define-transient-state move-text
       :title "Move Text Transient State"
       :bindings
-      ("J" move-text-down "move down")
-      ("K" move-text-up "move up"))
-    (spacemacs/set-leader-keys
-      "xJ" 'spacemacs/move-text-transient-state/move-text-down
-      "xK" 'spacemacs/move-text-transient-state/move-text-up)))
+      ("j" move-text-down "move down")
+      ("k" move-text-up "move up")
+      ("q" nil "quit" :exit t))
+    (spacemacs/set-leader-keys "xm" 'spacemacs/move-text-transient-state/body)))
 
 (defun spacemacs-editing/init-origami ()
   (use-package origami
@@ -257,9 +227,10 @@
     (progn
       (spacemacs|define-transient-state string-inflection
         :title "String Inflection Transient State"
-        :doc "\n [_i_] cycle"
+        :doc "\n [_i_] cycle  [_q_] quit"
         :bindings
-        ("i" string-inflection-all-cycle))
+        ("i" string-inflection-all-cycle)
+        ("q" nil :exit t))
       (spacemacs/declare-prefix "xi" "inflection")
       (spacemacs/set-leader-keys
         "xic" 'string-inflection-lower-camelcase
@@ -280,9 +251,6 @@
             undo-tree-visualizer-diff t))
     :config
     (progn
-      ;; restore diff window after quit.  TODO fix upstream
-      (defun spacemacs/undo-tree-restore-default ()
-        (setq undo-tree-visualizer-diff t))
       (advice-add 'undo-tree-visualizer-quit :after #'spacemacs/undo-tree-restore-default)
       (spacemacs|hide-lighter undo-tree-mode)
       (evilified-state-evilify-map undo-tree-visualizer-mode-map
@@ -295,6 +263,7 @@
 
 (defun spacemacs-editing/init-uuidgen ()
   (use-package uuidgen
+    :defer t
     :commands (uuidgen-1 uuidgen-4)
     :init
     (progn

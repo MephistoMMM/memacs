@@ -10,6 +10,21 @@
 ;;; License: GPLv3
 
 
+;; avy
+
+(defun spacemacs/avy-goto-url()
+  "Use avy to go to an URL in the buffer."
+  (interactive)
+  (avy--generic-jump "https?://" nil 'pre))
+
+(defun spacemacs/avy-open-url ()
+  "Use avy to select an URL in the buffer and open it."
+  (interactive)
+  (save-excursion
+    (spacemacs/avy-goto-url)
+    (browse-url-at-point)))
+
+
 ;; uuidgen
 ;; TODO spacemacs/uuidgen-3 and spacemacs/uuidgen-5
 
@@ -30,3 +45,10 @@
     (if arg
         (insert-uuid-cid uuid)
       (insert uuid))))
+
+
+;; undo-tree
+
+;; restore diff window after quit.  TODO fix upstream
+(defun spacemacs/undo-tree-restore-default ()
+  (setq undo-tree-visualizer-diff t))

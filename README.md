@@ -48,6 +48,9 @@
 - 删除所有在 dotspacemacs-excluding-packages 中的包的相关配置
 - 删除 auto-completion , 大家用的都是 company
 - 整和我的键位绑定到相应的地方
+- 将 spacemacs-editing 中的函数定义从 package 初始化中分离到 funcs.el
+- 删除 link-hint 包，我只使用 spacemacs/avy-goto-url 和 spacemacs/avy-open-url
+- 让 spacemacs-editing 中的 package 尽量 autoload
 
 ## License
 
