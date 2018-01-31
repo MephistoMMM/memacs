@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: import_base_react
+# key: i_react
+# --
+import React, { Component } from "react"
+$0

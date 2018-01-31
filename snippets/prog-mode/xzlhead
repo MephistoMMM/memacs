@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: xzlhead
+# key: i_xzl
+# --
+/**
+ * @file ${1:FileName}
+ * @brief ${2:SimpleDescription}
+ * @author Mephis Pheies
+ * @email shendonghao@zailingtech.com
+ * @version ${3:1.0}
+ * @date `(format-time-string "%Y-%m-%d")`
+ */
+ $0

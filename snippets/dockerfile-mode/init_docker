@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: init_docker
+# key: i_docker
+# --
+FROM ${1:ubuntu}
+MAINTAINER Mephis Pheies <mephistommm@gmail.com>
+
+# if you don't want use cache layers, change this data
+ENV REBUILD_DATA ${2:day-month-year}
+
+$0

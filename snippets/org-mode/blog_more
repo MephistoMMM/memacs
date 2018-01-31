@@ -1,0 +1,6 @@
+# key: blog_more
+# name: blog_more
+# --
+#+BEGIN_EXPORT html
+<!--more-->
+#+END_EXPORT

@@ -1,0 +1,25 @@
+# -*- mode: snippet -*-
+# name: react_component
+# key: component
+# --
+class ${1:cpntName} extends Component {
+
+  constructor(props){
+    super(props)
+    ${3:this.state = {${2:"state":1}}}
+    $0
+  }
+
+  render() {
+
+    return (
+      ${4:<p>Hello World</p>}
+    )
+  }
+}
+$1.propTypes = {
+  style: React.PropTypes.object
+}
+$1.defaultProps = {
+  style: {}
+}

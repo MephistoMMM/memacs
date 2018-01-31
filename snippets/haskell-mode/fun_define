@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: fun_define
+# key: func
+# --
+${1:fn} :: ${2:Type a} => ${3:a -> a}
+$0

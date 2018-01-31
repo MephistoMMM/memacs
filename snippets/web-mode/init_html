@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: init_html
+# key: i_html
+# --
+<!DOCTYPE html>
+<html>
+<head>
+  <title>${1:title name}</title>
+  <script src="js/main.js" type="application/javascript"></script>
+  <link rel="stylesheet" type="application/css" href="css/main.css">
+</head>
+<body>
+  $0
+</body>
+</html>

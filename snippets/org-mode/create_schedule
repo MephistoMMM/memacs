@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: create_schedule
+# key: sched_
+# --
+SCHEDULED: ${1:time-stamp}
+$0

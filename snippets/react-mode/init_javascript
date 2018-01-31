@@ -1,0 +1,19 @@
+# -*- mode: snippet -*-
+# name: init_javascript
+# key: i_js
+# --
+/* ${1:File Name} --- ${2:introduction}
+ *
+ * Maintainer: Mephis Pheies ( MephistoMMM )
+ * Email: mephistommm@gmail.com
+ *
+ * License:
+ * ${3:MIT License}
+ *
+ * Description:
+ * ${4:details Description}
+ */
+
+$0
+
+/* $1 ends here */

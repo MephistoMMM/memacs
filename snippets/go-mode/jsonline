@@ -1,0 +1,5 @@
+# key: jsonline
+# name: jsonline
+# --
+${1:Field} ${2:int} \`json:"$1" ${4:binding:"required"}\`
+$0
