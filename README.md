@@ -62,6 +62,8 @@
 - 删除 evil-clearparens 
 - 分离 spacemacs-evil 的键位绑定到 keybindings.el
 - 使 evil-numbers 和 evil-commenter autoload
+- 删除 request 包，完全不知道这个包有什么用
+- 删除 zoom-frm ，有bug
 
 ## License
 

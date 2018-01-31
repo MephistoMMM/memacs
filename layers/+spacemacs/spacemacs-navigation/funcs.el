@@ -257,7 +257,6 @@
 
 
 ;; doc-view
-
 (defun spacemacs/doc-view-search-new-query ()
   "Initiate a new query."
   (interactive)
@@ -276,6 +275,14 @@
       (doc-view-last-page)
     (doc-view-goto-page count)))
 
+(defadvice doc-view-toggle-display
+    (around spacemacs/doc-view-toggle-display activate)
+  (if (eq major-mode 'doc-view-mode)
+      (progn
+        ad-do-it
+        (text-mode)
+        (doc-view-minor-mode))
+    ad-do-it))
 
 ;; junk-file
 

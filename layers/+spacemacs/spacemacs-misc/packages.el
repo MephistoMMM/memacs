@@ -10,10 +10,7 @@
 ;;; License: GPLv3
 
 (setq spacemacs-misc-packages
-      '(
-        dumb-jump
-        request
-        ))
+      '(dumb-jump))
 
 (defun spacemacs-misc/init-dumb-jump ()
   (use-package dumb-jump
@@ -32,7 +29,3 @@
       ;; the time of writing it is the only default jump handler. (gtags remains
       ;; mode-local)
       (add-to-list 'spacemacs-default-jump-handlers 'dumb-jump-go 'append))))
-
-(defun spacemacs-misc/init-request ()
-  (setq request-storage-directory
-        (concat spacemacs-cache-directory "request/")))

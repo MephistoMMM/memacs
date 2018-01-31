@@ -60,8 +60,7 @@
                                        ("xl"  "lines")
                                        ("xm"  "move")
                                        ("xt"  "transpose")
-                                       ("xw"  "words")
-                                       ("z"   "zoom")))
+                                       ("xw"  "words")))
 (mapc (lambda (x) (apply #'spacemacs/declare-prefix x))
       spacemacs/key-binding-prefixes)
 
@@ -596,7 +595,7 @@ otherwise it is scaled down."
   ("-" spacemacs/scale-down-font)
   ("0" spacemacs/reset-font-size)
   ("q" nil :exit t))
-(spacemacs/set-leader-keys "zx" 'spacemacs/scale-font-transient-state/body)
+(spacemacs/set-leader-keys "bz" 'spacemacs/scale-font-transient-state/body)
 
 ;; end of Text Manipulation Transient State
 

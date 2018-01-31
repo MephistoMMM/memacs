@@ -24,6 +24,7 @@
 
 (defun spacemacs-navigation/init-ace-link ()
   (use-package ace-link
+    :defer t
     :commands spacemacs/ace-buffer-links
     :init
     (progn
@@ -31,10 +32,7 @@
       (with-eval-after-load 'info
         (define-key Info-mode-map "o" 'ace-link-info))
       (with-eval-after-load 'help-mode
-        (define-key help-mode-map "o" 'ace-link-help))
-      (with-eval-after-load 'eww
-        (define-key eww-link-keymap "o" 'ace-link-eww)
-        (define-key eww-mode-map "o" 'ace-link-eww)))))
+        (define-key help-mode-map "o" 'ace-link-help)))))
 
 (defun spacemacs-navigation/init-auto-highlight-symbol ()
   (use-package auto-highlight-symbol
@@ -119,6 +117,7 @@
 
 (defun spacemacs-navigation/init-centered-cursor-mode ()
   (use-package centered-cursor-mode
+    :defer t
     :commands (centered-cursor-mode
                global-centered-cursor-mode)
     :init
@@ -169,18 +168,7 @@
       (kbd "C-d") 'doc-view-scroll-up-or-next-page
       (kbd "C-k") 'doc-view-kill-proc
       (kbd "C-u") 'doc-view-scroll-down-or-previous-page)
-    :config
-    (progn
-      ;; fixed a weird issue where toggling display does not
-      ;; swtich to text mode
-      (defadvice doc-view-toggle-display
-          (around spacemacs/doc-view-toggle-display activate)
-        (if (eq major-mode 'doc-view-mode)
-            (progn
-              ad-do-it
-              (text-mode)
-              (doc-view-minor-mode))
-          ad-do-it)))))
+    ))
 
 (defun spacemacs-navigation/init-grep ()
   (use-package grep
@@ -208,6 +196,7 @@
 
 (defun spacemacs-navigation/init-paradox ()
   (use-package paradox
+    :defer t
     :commands paradox-list-packages
     :init
     (progn

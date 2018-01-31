@@ -10,14 +10,12 @@
 ;;; License: GPLv3
 
 (setq spacemacs-visual-packages
-      '(
-        (ansi-colors :location built-in)
+      '((ansi-colors :location built-in)
         desktop
         fill-column-indicator
         hl-todo
         popup
         popwin
-        (zoom-frm :location local)
         ))
 
 (defun spacemacs-visual/init-ansi-colors ()
@@ -83,25 +81,4 @@
       (push '("^\*WoMan.+\*$" :regexp t             :position bottom                                   ) popwin:special-display-config)
       (push '("*Google Translate*"     :dedicated t :position bottom :stick t :noselect t   :height 0.4) popwin:special-display-config))))
 
-(defun spacemacs-visual/init-zoom-frm ()
-  (use-package zoom-frm
-    :commands (zoom-frm-unzoom
-               zoom-frm-out
-               zoom-frm-in)
-    :init
-    (progn
-      (spacemacs|define-transient-state zoom-frm
-        :title "Zoom Frame Transient State"
-        :doc "
-[_+_/_=_] zoom frame in [_-_] zoom frame out [_0_] reset zoom [_q_] quit"
-        :bindings
-        ("+" spacemacs/zoom-frm-in)
-        ("=" spacemacs/zoom-frm-in)
-        ("-" spacemacs/zoom-frm-out)
-        ("0" spacemacs/zoom-frm-unzoom)
-        ("q" nil :exit t))
-      (spacemacs/set-leader-keys "zf" 'spacemacs/zoom-frm-transient-state/body)
-
-      ;; Font size, either with ctrl + mouse wheel
-      (global-set-key (kbd "<C-wheel-up>") 'spacemacs/zoom-frm-in)
-      (global-set-key (kbd "<C-wheel-down>") 'spacemacs/zoom-frm-out))))
+;; TODO: Create a magnifier like skim magnifier
