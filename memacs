@@ -23,7 +23,7 @@ This function should only modify configuration layer settings."
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------------
 
-     ;; Ready: brew install ripgrep the_silver_searcher
+     ;; READY : brew install ripgrep the_silver_searcher
 
      ;; Catalogue: tools
      ;; imenu-list
@@ -40,26 +40,27 @@ This function should only modify configuration layer settings."
      ;; Catalogue: language
      emacs-lisp
      html
-     ;; Ready: install MacTeX https://www.latex-project.org/get/
-     ;;        ln -s /usr/local/texlive/2017/bin/x86_64-darwin/xelatex /usr/local/bin/xelatex
-     ;;        ln -s /usr/local/texlive/2017/bin/x86_64-darwin/latexmk /usr/local/bin/latexmk
+     ;; READY : 1. install MacTeX https://www.latex-project.org/get/
+     ;;         2. ln -s /usr/local/texlive/2017/bin/x86_64-darwin/xelatex /usr/local/bin/xelatex
+     ;;         3. ln -s /usr/local/texlive/2017/bin/x86_64-darwin/latexmk /usr/local/bin/latexmk
      (latex :variables
             latex-build-command "LatexMk" ;; latexmk -pdf --synctex=1 -interaction=nonstopmode  -file-line-error  filename.tex
             latex-enable-folding t)
      shell-scripts
-     ;; Ready: pip install pylint pytest yapf jedi anaconda-mode json-rpc service_factory
+     ;; READY : pip install pylint pytest yapf jedi anaconda-mode json-rpc service_factory
      (python :variables
              python-enable-yapf-format-on-save t
              python-test-runner 'pytest)
-     ;; Ready: npm install eslint tern
+     ;; READY : npm install eslint tern
      javascript
      c-c++
-     ;; Ready: stack install stylish-haskell hlint apply-refact hindent hasktags intero
+     ;; READY : stack install stylish-haskell hlint apply-refact hindent hasktags intero
      ;; (haskell :variables
      ;;          haskell-completion-backend 'intero
      ;;          haskell-enable-hindent-style "gibiansky")
      sql
      yaml
+     ;; READY :
      ;; go get -u -v github.com/nsf/gocode
      ;; go get -u -v golang.org/x/tools/cmd/guru
      ;; go get -u -v github.com/rogpeppe/godef
@@ -70,7 +71,7 @@ This function should only modify configuration layer settings."
          gofmt-command "goimports")
 
      ;; Catalogue: self layers
-     ;; npm install -g hexo
+     ;; READY : npm install -g hexo
      mp-org
      mp-hacking
      )
@@ -334,16 +335,10 @@ before packages are loaded. If you are unsure, you should try in setting them in
            ("org-cn"   . "https://elpa.zilongshanren.com/org/")
            ("gnu-cn"   . "https://elpa.zilongshanren.com/gnu/")))
 
-  ;; add local for exec path
-  (push "/usr/local/bin" exec-path)
-
   ;; clean env error while starting
   (if (and (eq system-type 'darwin) (display-graphic-p))
       (when (string-match-p "/zsh$" (getenv "SHELL"))
         (setq exec-path-from-shell-arguments '("-l"))))
-
-  ;; change search module to evil-search
-  (setq-default evil-search-module 'evil-search)
   )
 
 (defun dotspacemacs/user-config ()
