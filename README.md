@@ -64,6 +64,9 @@
 - 使 evil-numbers 和 evil-commenter autoload
 - 删除 request 包，完全不知道这个包有什么用
 - 删除 zoom-frm ，有bug
+- 添加 lsp layer , 修改主题以支持 lsp
+- 修改并精简 python layer 以支持 lsp
+- 修改并精简 c-c++ layer 以支持 lsp
 
 ## License
 

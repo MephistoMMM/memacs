@@ -50,11 +50,6 @@ as the pyenv version then also return nil. This works around https://github.com/
       (setq python-shell-interpreter-args "-i")
       (setq python-shell-interpreter "python"))))
 
-(defun spacemacs//python-setup-hy (&rest args)
-  (setq hy-mode-inferior-lisp-command
-        (concat (or (spacemacs/pyenv-executable-find "hy") "hy")
-                " --spy")))
-
 (defun spacemacs//python-setup-checkers (&rest args)
   (when (fboundp 'flycheck-set-checker-executable)
     (let ((pylint (spacemacs/pyenv-executable-find "pylint"))
@@ -66,7 +61,6 @@ as the pyenv version then also return nil. This works around https://github.com/
 
 (defun spacemacs/python-setup-everything (&rest args)
   (apply 'spacemacs//python-setup-shell args)
-  (apply 'spacemacs//python-setup-hy args)
   (apply 'spacemacs//python-setup-checkers args))
 
 (defun spacemacs/python-toggle-breakpoint ()
@@ -133,16 +127,6 @@ as the pyenv version then also return nil. This works around https://github.com/
 
 
 ;; Tests
-
-(defun spacemacs//disable-semantic-idle-summary-mode ()
-  "Disable semantic-idle-summary in Python mode.
-Anaconda provides more useful information but can not do it properly
-when this mode is enabled since the minibuffer is cleared all the time."
-  (semantic-idle-summary-mode 0))
-
-(defun spacemacs//python-imenu-create-index-use-semantic-maybe ()
-  "Use semantic if the layer is enabled."
-  (setq imenu-create-index-function 'spacemacs/python-imenu-create-index))
 
 ;; fix for issue #2569 (https://github.com/syl20bnr/spacemacs/issues/2569) and
 ;; Emacs 24.5 and older. use `semantic-create-imenu-index' only when
@@ -225,20 +209,6 @@ to be called for each testrunner. "
   (spacemacs//python-call-correct-test-function arg '((pytest . pytest-pdb-one)
                                            (nose . nosetests-pdb-one))))
 
-(defun spacemacs//bind-python-testing-keys ()
-  "Bind the keys for testing in Python."
-  (spacemacs/declare-prefix-for-mode 'python-mode "mt" "test")
-  (spacemacs/set-leader-keys-for-major-mode 'python-mode
-    "tA" 'spacemacs/python-test-pdb-all
-    "ta" 'spacemacs/python-test-all
-    "tB" 'spacemacs/python-test-pdb-module
-    "tb" 'spacemacs/python-test-module
-    "tT" 'spacemacs/python-test-pdb-one
-    "tt" 'spacemacs/python-test-one
-    "tM" 'spacemacs/python-test-pdb-module
-    "tm" 'spacemacs/python-test-module
-    "tS" 'spacemacs/python-test-pdb-suite
-    "ts" 'spacemacs/python-test-suite))
 
 (defun spacemacs//python-sort-imports ()
   ;; py-isort-before-save checks the major mode as well, however we can prevent
@@ -246,14 +216,6 @@ to be called for each testrunner. "
   (when (and python-sort-imports-on-save
              (derived-mode-p 'python-mode))
     (py-isort-before-save)))
-
-
-;;* Anaconda
-(defun spacemacs/anaconda-view-forward-and-push ()
-  "Find next button and hit RET"
-  (interactive)
-  (forward-button 1)
-  (call-interactively #'push-button))
 
 
 ;; REPL
@@ -332,6 +294,10 @@ to be called for each testrunner. "
 
 (defun spacemacs//init-eldoc-python-mode ()
   "Initialize elddoc for python buffers"
-  (eldoc-mode)
-  (when (configuration-layer/package-used-p 'anaconda-mode)
-    (anaconda-eldoc-mode)))
+  (eldoc-mode))
+
+
+;; Lsp
+
+(defun spacemacs//add-python-format-on-save ()
+  (add-hook 'before-save-hook 'lsp-format-buffer))

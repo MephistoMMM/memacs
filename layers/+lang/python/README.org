@@ -16,6 +16,7 @@
   - [[#autoflake][autoflake]]
   - [[#pylookup][pylookup]]
   - [[#hy-mode][Hy-mode]]
+  - [[#lsp][Lsp]]
 - [[#configuration][Configuration]]
   - [[#fill-column][Fill column]]
   - [[#sort-imports][Sort imports]]
@@ -150,6 +151,17 @@ that hy is installed.
 
 #+BEGIN_SRC sh
   pip install hy
+#+END_SRC
+
+** Lsp
+For the layer to function, you have to install python languange server.
+#+BEGIN_SRC shell
+# mandatory
+pip install python-language-server
+# for import sorting
+pip install pyls-isort
+# for mypy checking
+pip install pyls-mypy
 #+END_SRC
 
 * Configuration

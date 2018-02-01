@@ -108,6 +108,13 @@
    `(company-tooltip-selection ((,class (:background ,bg5 :foreground ,fg1))))
    `(company-tooltip-search ((,class (:foreground ,aim :weight bold))))
    `(company-tooltip-search-selection ((,class (:foreground ,aim :weight bold))))
+   ;; lsp ui
+   `(lsp-ui-sideline-symbol ((,class (:foreground ,comment :box (:line-width -1 :color ,comment) :height 0.99))))
+   `(lsp-ui-sideline-current-symbol ((,class (:foreground ,const :weight ultra-bold :box (:line-width -1 :color ,const) :height 0.99))))
+   `(lsp-ui-sideline-code-action ((,class (:foreground ,str))))
+   `(lsp-ui-sideline-symbol-info ((,class  (:slant italic :height 0.99))))
+   `(lsp-ui-doc-header ((,class  (:foreground ,fg3 :background ,bg1))))
+   `(lsp-ui-doc-url ((,class  (:inherit link))))
    ;; diff-hl
    `(diff-hl-change ((,class (:foreground ,rainbow-5 :background ,rainbow-5))))
    `(diff-hl-delete ((,class (:foreground ,rainbow-9 :background ,rainbow-9))))

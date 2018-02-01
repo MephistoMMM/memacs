@@ -14,9 +14,6 @@
 (spacemacs|define-jump-handlers python-mode)
 (spacemacs|define-jump-handlers anaconda-mode-goto)
 
-(defvar python-enable-yapf-format-on-save nil
-  "If non-nil, automatically format code with YAPF on save.")
-
 (defvar python-test-runner 'nose
   "Test runner to use. Possible values are `nose' or `pytest'.")
 
@@ -41,3 +38,8 @@ Possible values are `on-visit', `on-project-switch' or `nil'.")
 
 (defvar python-sort-imports-on-save nil
   "If non-nil, automatically sort imports on save.")
+
+(defvar python-enable-lsp-format-on-save nil
+  "If non-nil, format by yapf on save")
+
+(defvar default-python-interpreter "python3")

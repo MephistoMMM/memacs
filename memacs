@@ -22,17 +22,8 @@ This function should only modify configuration layer settings."
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     ;; Catalogue: base
+
      ;; Ready: brew install ripgrep the_silver_searcher
-     (auto-completion :variables
-                      auto-completion-enable-sort-by-usage t
-                      auto-completion-return-key-behavior 'complete
-                      auto-completion-tab-key-behavior 'complete
-                      auto-completion-enable-snippets-in-popup t
-                      auto-completion-idle-delay 0.6
-                      auto-completion-private-snippets-directory "~/.emacs.d/snippets/")
-     git
-     (syntax-checking :variables syntax-checking-enable-by-default nil)
 
      ;; Catalogue: tools
      ;; imenu-list
@@ -45,9 +36,6 @@ This function should only modify configuration layer settings."
      ;;        shell-protect-eshell-prompt t
      ;;        shell-default-height 30
      ;;        shell-default-position 'top)
-     (org :variables
-          org-startup-indented t
-          org-enable-github-support t)
 
      ;; Catalogue: language
      emacs-lisp
@@ -65,7 +53,7 @@ This function should only modify configuration layer settings."
              python-test-runner 'pytest)
      ;; Ready: npm install eslint tern
      javascript
-     (c-c++ :variables c-c++-enable-clang-support t)
+     c-c++
      ;; Ready: stack install stylish-haskell hlint apply-refact hindent hasktags intero
      ;; (haskell :variables
      ;;          haskell-completion-backend 'intero
@@ -103,7 +91,7 @@ This function should only modify configuration layer settings."
    ;; `used-but-keep-unused' installs only the used packages but won't uninstall
    ;; them if they become unused. `all' installs *all* packages supported by
    ;; Spacemacs and never uninstall them. (default is `used-only')
-   dotspacemacs-install-packages 'used-only))
+   dotspacemacs-install-packages 'used-but-keep-unused))
 
 (defun dotspacemacs/init ()
   "Initialization:
@@ -229,19 +217,6 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-auto-save-file-location 'cache
    ;; Maximum number of rollback slots to keep in the cache. (default 5)
    dotspacemacs-max-rollback-slots 5
-   ;; If non-nil, `helm' will try to minimize the space it uses. (default nil)
-   dotspacemacs-helm-resize nil
-   ;; if non-nil, the helm header is hidden when there is only one source.
-   ;; (default nil)
-   dotspacemacs-helm-no-header nil
-   ;; define the position to display `helm', options are `bottom', `top',
-   ;; `left', or `right'. (default 'bottom)
-   dotspacemacs-helm-position 'bottom
-   ;; Controls fuzzy matching in helm. If set to `always', force fuzzy matching
-   ;; in all non-asynchronous sources. If set to `source', preserve individual
-   ;; source settings. Else, disable fuzzy matching in all sources.
-   ;; (default 'always)
-   dotspacemacs-helm-use-fuzzy 'always
    ;; Which-key delay in seconds. The which-key buffer is the popup listing
    ;; the commands bound to the current keystroke sequence. (default 0.4)
    dotspacemacs-which-key-delay 0.4

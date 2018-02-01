@@ -1,0 +1,26 @@
+#+SETUPFILE: ~/Dropbox/dotconf/export_setup.org
+#+TITLE: LSP layer
+
+* Table of Contents                      :TOC_4_gh:noexport:
+- [[#description][Description]]
+  - [[#features][Features:]]
+- [[#configuration][Configuration]]
+
+* Description
+This layer adds support for basic language server protocol packages speaking [[https://microsoft.github.io/language-server-protocol/specification][language server protocol]].
+
+** Features:
+- Cross references (definitions, references, document symbol, workspace symbol search and others)
+- Workspace-wide symbol rename
+- Symbol highlighting
+- Flycheck
+- Completion with =company-lsp=
+- Signature help with eldoc
+- Symbol documentation in a child frame (=lsp-ui-doc=)
+- Each language server may support a subset of these features and may have their extension, check =M-x lsp-capabilities= in a LSP buffer and the language server's website for details.
+
+* Configuration
+The LSP ecosystem is based on two packages: [[https://github.com/emacs-lsp/lsp-mode][lsp-mode]] and [[https://github.com/emacs-lsp/lsp-mode][lsp-ui]].
+Please check out their documentation.
+
+If you add `lsp-*-enable` to major mode hooks for auto initialization of language clients, customize =lsp-project-whitelist= =lsp-project-blacklist= to disable projects you don't want to enable LSP.

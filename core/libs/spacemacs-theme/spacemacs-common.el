@@ -259,6 +259,15 @@ to 'auto, tags may not be properly aligned. "
      `(company-tooltip-search ((,class (:inherit match))))
      `(company-tooltip-selection ((,class (:background ,ttip-sl :foreground ,base))))
 
+
+;;;;; lsp ui
+     `(lsp-ui-sideline-symbol ((,class (:foreground ,(if spacemacs-theme-comment-italic comment-light comment) :box (:line-width -1 :color ,(if spacemacs-theme-comment-italic comment-light comment)) :height 0.99))))
+     `(lsp-ui-sideline-current-symbol ((,class (:foreground ,const :weight ultra-bold :box (:line-width -1 :color ,const) :height 0.99))))
+     `(lsp-ui-sideline-code-action ((,class (:foreground ,str))))
+     `(lsp-ui-sideline-symbol-info ((,class  (:slant italic :height 0.99))))
+     `(lsp-ui-doc-header ((,class  (:foreground ,func :background ,bg1))))
+     `(lsp-ui-doc-url ((,class  (:inherit link))))
+
 ;;;;; diff
      `(diff-added             ((,class :background nil :foreground ,green)))
      `(diff-changed           ((,class :background nil :foreground ,keyword)))

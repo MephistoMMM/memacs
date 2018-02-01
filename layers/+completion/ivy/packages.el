@@ -29,6 +29,7 @@
         recentf
         swiper
         wgrep
+        ivy-xref
         ))
 
 (defun ivy/pre-init-auto-highlight-symbol ()
@@ -370,3 +371,17 @@ Current Action: %s(ivy-action-name)
   (evil-define-key 'normal wgrep-mode-map ",c" 'wgrep-finish-edit)
   (evil-define-key 'normal wgrep-mode-map ",a" 'wgrep-abort-changes)
   (evil-define-key 'normal wgrep-mode-map ",k" 'wgrep-abort-changes))
+
+
+;; used for lsp
+(defun ivy/init-ivy-xref ()
+  (use-package ivy-xref
+    :defer t
+    :init
+    (progn
+      (setq xref-prompt-for-identifier
+            '(not xref-find-definitions xref-find-definitions-other-window xref-find-definitions-other-frame xref-find-references spacemacs/jump-to-definition))
+
+      ;; Use ivy-xref to display xref.el results.
+      (setq xref-show-xrefs-function #'ivy-xref-show-xrefs)
+      )))
