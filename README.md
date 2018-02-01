@@ -6,6 +6,42 @@
 
 # Memacs
 
+## Usage
+
+### 1. Clone From Github
+
+```shell
+git clone https://github.com/MephistoMMM/memacs.git --single-branch --depth=1
+```
+
+### 2. Backup Your Origin Emacs Config
+
+```shell
+mv ~/.emacs.d ~/.bak.emacs.d
+# if you have latexmkrc file under your home
+mv ~/.latexmkrc ~/.bak.latexmkrc
+```
+
+### 2.5. Install Emacs
+
+MacOS :
+
+```shell
+./scripts/install_emacs_mac.sh
+```
+
+Ubuntu:
+
+```shell
+./scripts/install_emacs_ubuntu.sh
+```
+
+### 3. Run Link Script
+
+```shell
+./scripts/link_memacs.sh
+```
+
 ## Spacemacs 配置缩减计划进度
 - 删除无用的 banner 和其他杂乱的图片，只留下我自己的 banner -- 羽川翼
 - 删除无用的愚人节配置, 这个配置真无聊

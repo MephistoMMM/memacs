@@ -26,7 +26,6 @@ This function should only modify configuration layer settings."
      ;; READY : brew install ripgrep the_silver_searcher
 
      ;; Catalogue: tools
-     ;; imenu-list
      markdown
      protobuf
      docker
@@ -334,6 +333,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
          '(("melpa-cn" . "https://elpa.zilongshanren.com/melpa/")
            ("org-cn"   . "https://elpa.zilongshanren.com/org/")
            ("gnu-cn"   . "https://elpa.zilongshanren.com/gnu/")))
+
+  ;; add local/bin to exec-path for fixing not found tern
+  (push "/usr/local/bin" exec-path)
 
   ;; clean env error while starting
   (if (and (eq system-type 'darwin) (display-graphic-p))
