@@ -90,5 +90,4 @@
 
 ;;;; xref
 (spacemacs/set-leader-keys-for-major-mode 'python-mode
-  (kbd "gr") #'xref-find-references
-  (kbd "gd") #'xref-find-definitions)
+  (kbd "gr") #'xref-find-references)

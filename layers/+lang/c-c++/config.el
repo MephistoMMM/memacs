@@ -25,8 +25,8 @@
   "If non-nil `google-make-newline-indent' will be added as as
   `c-mode-common-hook'.")
 
-(spacemacs|define-jump-handlers c++-mode)
-(spacemacs|define-jump-handlers c-mode)
+(spacemacs|define-jump-handlers c++-mode xref-find-definitions)
+(spacemacs|define-jump-handlers c-mode   xref-find-definitions)
 
 (defvar c-c++-default-mode-for-headers 'c-mode
   "Default mode to open header files. Can be `c-mode' or `c++-mode'.")

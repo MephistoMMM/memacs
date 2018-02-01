@@ -11,8 +11,7 @@
 
 ;; variables
 
-(spacemacs|define-jump-handlers python-mode)
-(spacemacs|define-jump-handlers anaconda-mode-goto)
+(spacemacs|define-jump-handlers python-mode xref-find-definitions)
 
 (defvar python-test-runner 'nose
   "Test runner to use. Possible values are `nose' or `pytest'.")

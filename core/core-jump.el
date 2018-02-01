@@ -36,8 +36,8 @@ sets `spacemacs-jump-handlers' in buffers of that mode."
        (add-hook ',mode-hook ',func)
        (with-eval-after-load 'bind-map
          (spacemacs/set-leader-keys-for-major-mode ',mode
-           "gg" 'spacemacs/jump-to-definition
-           "gG" 'spacemacs/jump-to-definition-other-window)))))
+           "gd" 'spacemacs/jump-to-definition
+           "gD" 'spacemacs/jump-to-definition-other-window)))))
 
 (defun spacemacs/jump-to-definition ()
   "Jump to definition around point using the best tool for this action."

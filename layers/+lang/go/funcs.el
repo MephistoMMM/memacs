@@ -21,16 +21,6 @@
           (setq found t)
           finally return found)))
 
-(defun spacemacs//go-enable-gometalinter ()
-   "Enable `flycheck-gometalinter' and disable overlapping `flycheck' linters."
-   (setq flycheck-disabled-checkers '(go-gofmt
-                                      go-golint
-                                      go-vet
-                                      go-build
-                                      go-test
-                                      go-errcheck))
-   (flycheck-gometalinter-setup))
-
 (defun spacemacs/go-run-tests (args)
   (interactive)
   (compilation-start (concat "go test " args " " go-use-test-args)
