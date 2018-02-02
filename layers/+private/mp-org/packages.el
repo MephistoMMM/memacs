@@ -98,7 +98,7 @@
       org-startup-with-inline-images nil
       org-bullets-bullet-list '("❁" "✾" "❀" "❖" "✧")
       org-agenda-files (find-lisp-find-files org-directory "\.org$")
-      org-default-notes-file (concat org-directory "/Temp.org")
+      org-default-notes-file (concat org-directory "/TODOs.org")
 
       ;; org-log-done 'note
 

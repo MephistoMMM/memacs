@@ -178,7 +178,7 @@ Will work on both org-mode and any mode that accepts plain html."
         "Tl" 'org-toggle-link-display
         "Tt" 'org-show-todo-tree
         "TT" 'org-todo
-        "TV" 'space-doc-mode
+        "Ts" 'memacs/read-org-doc-mode
         "Tx" 'org-toggle-latex-fragment
 
         ;; More cycling options (timestamps, headlines, items, properties)

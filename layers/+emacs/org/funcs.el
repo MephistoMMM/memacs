@@ -44,3 +44,12 @@
 (defun spacemacs//evil-org-mode ()
   (evil-org-mode)
   (evil-normalize-keymaps))
+
+
+;; space-doc-mode
+
+(defun memacs/read-org-doc-mode ()
+  "Change status to read org document."
+  (interactive)
+  (evil-open-folds)
+  (space-doc-mode))
