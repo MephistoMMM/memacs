@@ -34,7 +34,7 @@
       (add-hook 'lsp-after-open-hook #'lsp-enable-imenu))
 
       ;; Disable lsp-flycheck.el in favor of lsp-ui-flycheck.el
-      (setq lsp-enable-flycheck nil)
+      (setq lsp-enable-flycheck t)
 
       (spacemacs|diminish lsp-mode " Ⓛ" " L"))
 

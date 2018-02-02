@@ -102,7 +102,6 @@
     :init
     (progn
       (setq cquery-executable "/usr/local/bin/cquery")
-      (setq cquery-extra-args '("--language-server" "--log-file=/tmp/cq.log"))
       ;; Customize `lsp-project-whitelist' `lsp-project-blacklist' to disable auto initialization.
       (add-hook 'c-mode-common-hook #'memacs//c-c++-cquery-enable)
 

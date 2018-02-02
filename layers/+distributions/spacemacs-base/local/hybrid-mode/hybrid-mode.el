@@ -36,19 +36,8 @@
   :group 'spacemacs
   :type 'symbol)
 
-(defcustom hybrid-mode-enable-hjkl-bindings t
-  "If non-nil then packages configuration should enable hjkl navigation."
-  :group 'spacemacs
-  :type 'boolean)
-
 (defcustom hybrid-mode-enable-evilified-state t
   "If non-nil then evilified states is enabled in buffer supporting it."
-  :group 'spacemacs
-  :type 'boolean)
-
-(defcustom hybrid-mode-use-evil-search-module t
-  "If non-nil then use evil own search module which is closer to Vim search
-behavior (for instance it support C-r pasting)."
   :group 'spacemacs
   :type 'boolean)
 

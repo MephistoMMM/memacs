@@ -196,12 +196,11 @@
     (spacemacs|hide-lighter ivy-mode)
     ;; key bindings
     ;; ensure that the correct bindings are set at startup
-    (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
-    (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
-    (define-key ivy-minibuffer-map (kbd "C-h") (kbd "DEL"))
-    ;; Move C-h to C-S-h
-    (define-key ivy-minibuffer-map (kbd "C-S-h") help-map)
-    (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-alt-done)
+    ;; (define-key ivy-minibuffer-map (kbd "C-n") 'ivy-next-line)
+    ;; (define-key ivy-minibuffer-map (kbd "C-p") 'ivy-previous-line)
+    ;; (define-key ivy-minibuffer-map (kbd "C-h") (kbd "DEL"))
+    (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-kill-line)
+    (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-avy)
     (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
     ;; Transient state
     ;; ivy-hydra disabled for now, waiting to see how the dependency management
@@ -238,8 +237,6 @@ Current Action: %s(ivy-action-name)
       ("C-o" nil)
       ("M-SPC" nil)
       ("TAB" ivy-alt-done :exit nil)
-      ;; ("C-j" ivy-alt-done :exit nil)
-      ;; ("d" ivy-done :exit t)
       ("RET" ivy-done :exit t)
       ("c" ivy-call)
       ("C-m" ivy-done :exit t)
@@ -254,8 +251,7 @@ Current Action: %s(ivy-action-name)
       ("f" ivy-toggle-case-fold)
       ("o" ivy-occur :exit t))
     (define-key ivy-minibuffer-map "\C-o" 'spacemacs/ivy-transient-state/body)
-    (define-key ivy-minibuffer-map (kbd "M-SPC")
-      'spacemacs/ivy-transient-state/body)
+    (define-key ivy-minibuffer-map (kbd "M-SPC") 'spacemacs/ivy-transient-state/body)
     )
 
   ;; binding yank pop and evil-registers

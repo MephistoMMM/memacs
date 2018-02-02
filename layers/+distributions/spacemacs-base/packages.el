@@ -203,6 +203,8 @@
     :config
     (progn
       (hybrid-mode)
+      (setq hybrid-mode-default-state 'normal
+            hybrid-mode-enable-evilified-state t)
       (spacemacs|diminish hybrid-mode))))
 
 (defun spacemacs-base/init-image-mode ()

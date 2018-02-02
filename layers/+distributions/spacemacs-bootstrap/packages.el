@@ -187,8 +187,8 @@
 
   ;; Define history commands for comint
   (evil-define-key 'normal comint-mode-map
-    (kbd "C-k") 'comint-previous-input
-    (kbd "C-j") 'comint-next-input)
+    (kbd "C-p") 'comint-previous-input
+    (kbd "C-n") 'comint-next-input)
 
   ;; ignore repeat
   (evil-declare-ignore-repeat 'spacemacs/next-error)
