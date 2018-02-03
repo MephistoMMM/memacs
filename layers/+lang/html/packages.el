@@ -192,10 +192,10 @@
       (setq web-mode-code-indent-offset 2
             web-mode-markup-indent-offset 2
             web-mode-css-indent-offset 2)
-      (spacemacs/declare-prefix-for-mode 'web-mode "me" "errors")
-      (spacemacs/declare-prefix-for-mode 'web-mode "mg" "goto")
-      (spacemacs/declare-prefix-for-mode 'web-mode "mh" "dom")
-      (spacemacs/declare-prefix-for-mode 'web-mode "mr" "refactor")
+      (spacemacs/declare-prefix-for-mode 'web-mode "e" "errors")
+      (spacemacs/declare-prefix-for-mode 'web-mode "g" "goto")
+      (spacemacs/declare-prefix-for-mode 'web-mode "h" "dom")
+      (spacemacs/declare-prefix-for-mode 'web-mode "r" "refactor")
       (spacemacs/set-leader-keys-for-major-mode 'web-mode
         "eh" 'web-mode-dom-errors-show
         "gb" 'web-mode-element-beginning

@@ -88,10 +88,10 @@
        js2-strict-trailing-comma-warning nil)
 
       ;; prefixes
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mh" "documentation")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mg" "goto")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mr" "refactor")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mz" "folding")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "h" "documentation")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "g" "goto")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "r" "refactor")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "z" "folding")
       ;; key bindings
       (spacemacs/set-leader-keys-for-major-mode 'js2-mode
         "w" 'js2-mode-toggle-warnings-and-errors
@@ -112,21 +112,21 @@
     (progn
       (add-hook 'js2-mode-hook 'spacemacs/js2-refactor-require)
       ;; prefixes
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mr3" "ternary")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mra" "add/args")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mrb" "barf")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mrc" "contract")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mre" "expand/extract")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mri" "inline/inject/introduct")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mrl" "localize/log")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mrr" "rename")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mrs" "split/slurp")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mrt" "toggle")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mru" "unwrap")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mrv" "var")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mrw" "wrap")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mx" "text")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "mxm" "move")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "r3" "ternary")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "ra" "add/args")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "rb" "barf")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "rc" "contract")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "re" "expand/extract")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "ri" "inline/inject/introduct")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "rl" "localize/log")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "rr" "rename")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "rs" "split/slurp")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "rt" "toggle")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "ru" "unwrap")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "rv" "var")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "rw" "wrap")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "x" "text")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "xm" "move")
       ;; key bindings
       (spacemacs/set-leader-keys-for-major-mode 'js2-mode
         "r3i" 'js2r-ternary-to-if
@@ -208,8 +208,8 @@
     :config
     (progn
       (spacemacs|hide-lighter skewer-mode)
-      (spacemacs/declare-prefix-for-mode 'js2-mode "ms" "skewer")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "me" "eval")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "s" "skewer")
+      (spacemacs/declare-prefix-for-mode 'js2-mode "e" "eval")
       (spacemacs/set-leader-keys-for-major-mode 'js2-mode
         "'" 'spacemacs/skewer-start-repl
         "ee" 'skewer-eval-last-expression

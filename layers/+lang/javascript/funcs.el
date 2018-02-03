@@ -19,7 +19,7 @@
 
 (defun spacemacs/js-doc-set-key-bindings (mode)
   "Setup the key bindings for `js2-doc' for the given MODE."
-  (spacemacs/declare-prefix-for-mode mode "mrd" "documentation")
+  (spacemacs/declare-prefix-for-mode mode "rd" "documentation")
   (spacemacs/set-leader-keys-for-major-mode mode
     "rdb" 'js-doc-insert-file-doc
     "rdf" (if (configuration-layer/package-used-p 'yasnippet)

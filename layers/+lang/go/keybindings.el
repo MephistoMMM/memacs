@@ -11,13 +11,13 @@
 
 
 ;;; go-mode
-(spacemacs/declare-prefix-for-mode 'go-mode "me" "playground")
-(spacemacs/declare-prefix-for-mode 'go-mode "mg" "goto")
-(spacemacs/declare-prefix-for-mode 'go-mode "mh" "help")
-(spacemacs/declare-prefix-for-mode 'go-mode "mi" "imports")
-(spacemacs/declare-prefix-for-mode 'go-mode "mr" "refactoring")
-(spacemacs/declare-prefix-for-mode 'go-mode "mt" "test")
-(spacemacs/declare-prefix-for-mode 'go-mode "mx" "execute")
+(spacemacs/declare-prefix-for-mode 'go-mode "e" "playground")
+(spacemacs/declare-prefix-for-mode 'go-mode "g" "goto")
+(spacemacs/declare-prefix-for-mode 'go-mode "h" "help")
+(spacemacs/declare-prefix-for-mode 'go-mode "i" "imports")
+(spacemacs/declare-prefix-for-mode 'go-mode "r" "refactoring")
+(spacemacs/declare-prefix-for-mode 'go-mode "t" "test")
+(spacemacs/declare-prefix-for-mode 'go-mode "x" "execute")
 (spacemacs/set-leader-keys-for-major-mode 'go-mode
   "hh" 'godoc-at-point
   "ig" 'go-goto-imports
@@ -35,7 +35,7 @@
   "tP" 'spacemacs/go-run-package-tests-nested)
 
 ;;;; go guru
-(spacemacs/declare-prefix-for-mode 'go-mode "mf" "guru")
+(spacemacs/declare-prefix-for-mode 'go-mode "f" "guru")
 (spacemacs/set-leader-keys-for-major-mode 'go-mode
   "fd" 'go-guru-describe
   "ff" 'go-guru-freevars

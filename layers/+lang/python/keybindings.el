@@ -12,14 +12,14 @@
 
 ;;; python-mode
 
-(spacemacs/declare-prefix-for-mode 'python-mode "mc" "execute")
-(spacemacs/declare-prefix-for-mode 'python-mode "md" "debug")
-(spacemacs/declare-prefix-for-mode 'python-mode "mh" "help")
-(spacemacs/declare-prefix-for-mode 'python-mode "mg" "goto")
-(spacemacs/declare-prefix-for-mode 'python-mode "ms" "REPL")
-(spacemacs/declare-prefix-for-mode 'python-mode "mr" "refactor")
-(spacemacs/declare-prefix-for-mode 'python-mode "mv" "pyenv")
-(spacemacs/declare-prefix-for-mode 'python-mode "mV" "pyvenv")
+(spacemacs/declare-prefix-for-mode 'python-mode "c" "execute")
+(spacemacs/declare-prefix-for-mode 'python-mode "d" "debug")
+(spacemacs/declare-prefix-for-mode 'python-mode "h" "help")
+(spacemacs/declare-prefix-for-mode 'python-mode "g" "goto")
+(spacemacs/declare-prefix-for-mode 'python-mode "s" "REPL")
+(spacemacs/declare-prefix-for-mode 'python-mode "r" "refactor")
+(spacemacs/declare-prefix-for-mode 'python-mode "v" "pyenv")
+(spacemacs/declare-prefix-for-mode 'python-mode "V" "pyvenv")
 
 (spacemacs/set-leader-keys-for-major-mode 'python-mode
   "'"  'spacemacs/python-start-or-switch-repl
@@ -44,7 +44,7 @@
   "l" 'live-py-mode)
 
 ;;;; nose
-(spacemacs/declare-prefix-for-mode 'python-mode "mt" "test")
+(spacemacs/declare-prefix-for-mode 'python-mode "t" "test")
 (spacemacs/set-leader-keys-for-major-mode 'python-mode
   "tA" 'spacemacs/python-test-pdb-all
   "ta" 'spacemacs/python-test-all

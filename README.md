@@ -103,6 +103,7 @@ Ubuntu:
 - 添加 lsp layer , 修改主题以支持 lsp
 - 修改并精简 python layer 以支持 lsp
 - 修改并精简 c-c++ layer 以支持 lsp
+- 删除 `SPC m` , 两个 leader 开头的 key sequence 足够用了
 
 ## License
 

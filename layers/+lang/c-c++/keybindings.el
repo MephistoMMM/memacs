@@ -14,9 +14,9 @@
 
 ;;;; cc-mode
 (dolist (mode c-c++-modes)
-  (spacemacs/declare-prefix-for-mode mode "mc" "compile")
-  (spacemacs/declare-prefix-for-mode mode "mg" "goto")
-  (spacemacs/declare-prefix-for-mode mode "mp" "project")
+  (spacemacs/declare-prefix-for-mode mode "c" "compile")
+  (spacemacs/declare-prefix-for-mode mode "g" "goto")
+  (spacemacs/declare-prefix-for-mode mode "p" "project")
   (spacemacs/set-leader-keys-for-major-mode mode
     "ga" 'projectile-find-other-file
     "gA" 'projectile-find-other-file-other-window))

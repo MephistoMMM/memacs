@@ -212,9 +212,9 @@
     :init
     (progn
       (setq image-animate-loop t)
-      (spacemacs/declare-prefix-for-mode 'image-mode "ma" "animate")
-      (spacemacs/declare-prefix-for-mode 'image-mode "mg" "goto file")
-      (spacemacs/declare-prefix-for-mode 'image-mode "mt" "transform/resize")
+      (spacemacs/declare-prefix-for-mode 'image-mode "a" "animate")
+      (spacemacs/declare-prefix-for-mode 'image-mode "g" "goto file")
+      (spacemacs/declare-prefix-for-mode 'image-mode "t" "transform/resize")
       (spacemacs/set-leader-keys-for-major-mode 'image-mode
         "aa" 'image-toggle-animation
         "a+" 'image-increase-speed

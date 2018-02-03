@@ -21,8 +21,8 @@
     (progn
       (cmake-ide-setup)
       (dolist (mode cmake-modes)
-        (spacemacs/declare-prefix-for-mode mode "mc" "compile")
-        (spacemacs/declare-prefix-for-mode mode "mp" "project")
+        (spacemacs/declare-prefix-for-mode mode "c" "compile")
+        (spacemacs/declare-prefix-for-mode mode "p" "project")
         (spacemacs/set-leader-keys-for-major-mode mode
           "cc" 'cmake-ide-compile
           "pc" 'cmake-ide-run-cmake

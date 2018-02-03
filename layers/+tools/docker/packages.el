@@ -52,6 +52,6 @@
     :config
     (progn
       (spacemacs/declare-prefix-for-mode 'dockerfile-mode
-        "mc" "compile")
+        "c" "compile")
       (spacemacs/set-leader-keys-for-major-mode 'dockerfile-mode
         "cb" 'dockerfile-build-buffer))))

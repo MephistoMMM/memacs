@@ -74,7 +74,7 @@
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "C-o" 'mp-org/toggle-inline-images)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "it" 'org-insert-todo-heading)
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "ic" 'mp-org/org-insert-src-code-block)
-    (spacemacs/declare-prefix-for-mode 'org-mode "mw" "wrapper")
+    (spacemacs/declare-prefix-for-mode 'org-mode "w" "wrapper")
     (spacemacs/set-leader-keys-for-major-mode 'org-mode "ws" 'mp-org/wrap-source-code)
 
 

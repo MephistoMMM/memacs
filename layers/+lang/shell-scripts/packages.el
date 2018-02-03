@@ -52,8 +52,8 @@
     :init
     (progn
       ;; Add meaningful names for prefix categories
-      (spacemacs/declare-prefix-for-mode 'sh-mode "mi" "insert")
-      (spacemacs/declare-prefix-for-mode 'sh-mode "mg" "goto")
+      (spacemacs/declare-prefix-for-mode 'sh-mode "i" "insert")
+      (spacemacs/declare-prefix-for-mode 'sh-mode "g" "goto")
 
       ;; Add standard key bindings for insert commands
       (spacemacs/set-leader-keys-for-major-mode 'sh-mode

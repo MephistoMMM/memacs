@@ -94,9 +94,9 @@
             "zr" 'TeX-fold-region
             "zR" 'TeX-fold-clearout-region
             "zz" 'TeX-fold-dwim))
-        (spacemacs/declare-prefix-for-mode mode "mh" "help")
-        (spacemacs/declare-prefix-for-mode mode "mx" "text/fonts")
-        (spacemacs/declare-prefix-for-mode mode "mz" "fold"))
+        (spacemacs/declare-prefix-for-mode mode "h" "help")
+        (spacemacs/declare-prefix-for-mode mode "x" "text/fonts")
+        (spacemacs/declare-prefix-for-mode mode "z" "fold"))
 
       ;; Key bindings specific to LaTeX
       (spacemacs/set-leader-keys-for-major-mode 'latex-mode
@@ -123,9 +123,9 @@
         "xfa" 'latex/font-calligraphic
         "xfn" 'latex/font-normal
         "xfu" 'latex/font-upright)
-      (spacemacs/declare-prefix-for-mode 'latex-mode "mi" "insert")
-      (spacemacs/declare-prefix-for-mode 'latex-mode "mp" "preview")
-      (spacemacs/declare-prefix-for-mode 'latex-mode "mf" "fill"))))
+      (spacemacs/declare-prefix-for-mode 'latex-mode "i" "insert")
+      (spacemacs/declare-prefix-for-mode 'latex-mode "p" "preview")
+      (spacemacs/declare-prefix-for-mode 'latex-mode "f" "fill"))))
 
 (defun latex/pre-init-auctex-latexmk ()
   (spacemacs|use-package-add-hook tex
@@ -162,7 +162,7 @@
   (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
   (setq reftex-plug-into-AUCTeX '(nil nil t t t)
         reftex-use-fonts t)
-  (spacemacs/declare-prefix-for-mode 'latex-mode "mr" "reftex")
+  (spacemacs/declare-prefix-for-mode 'latex-mode "r" "reftex")
   (spacemacs/set-leader-keys-for-major-mode 'latex-mode
     "rc"    'reftex-citation
     "rg"    'reftex-grep-document

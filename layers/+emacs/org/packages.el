@@ -142,20 +142,20 @@ Will work on both org-mode and any mode that accepts plain html."
             (forward-char -8))))
 
       (dolist (prefix '(
-                        ("mC" . "clocks")
-                        ("md" . "dates")
-                        ("me" . "export")
-                        ("mh" . "headings")
-                        ("mi" . "insert")
-                        ("miD" . "download")
-                        ("ms" . "trees/subtrees")
-                        ("mT" . "toggles")
-                        ("mt" . "tables")
-                        ("mtd" . "delete")
-                        ("mti" . "insert")
-                        ("mtt" . "toggle")
-                        ("mx" . "text")
-                        ("mb" . "src-blocks/babel")
+                        ("C" . "clocks")
+                        ("d" . "dates")
+                        ("e" . "export")
+                        ("h" . "headings")
+                        ("i" . "insert")
+                        ("iD" . "download")
+                        ("s" . "trees/subtrees")
+                        ("T" . "toggles")
+                        ("t" . "tables")
+                        ("td" . "delete")
+                        ("ti" . "insert")
+                        ("tt" . "toggle")
+                        ("x" . "text")
+                        ("b" . "src-blocks/babel")
                         ))
         (spacemacs/declare-prefix-for-mode 'org-mode (car prefix) (cdr prefix)))
       (spacemacs/set-leader-keys-for-major-mode 'org-mode
@@ -371,10 +371,10 @@ Will work on both org-mode and any mode that accepts plain html."
     :init
     (progn
       (setq org-agenda-restore-windows-after-quit t)
-      (dolist (prefix '(("mC" . "clocks")
-                        ("md" . "dates")
-                        ("mi" . "insert")
-                        ("ms" . "trees/subtrees")))
+      (dolist (prefix '(("C" . "clocks")
+                        ("d" . "dates")
+                        ("i" . "insert")
+                        ("s" . "trees/subtrees")))
         (spacemacs/declare-prefix-for-mode 'org-agenda-mode
           (car prefix) (cdr prefix)))
       (spacemacs/set-leader-keys-for-major-mode 'org-agenda-mode
@@ -519,7 +519,7 @@ Headline^^            Visit entry^^               Filter^^                    Da
     :init
     (progn
       (add-hook 'org-mode-hook 'org-download-enable)
-      (spacemacs/declare-prefix-for-mode 'org-mode "miD" "download")
+      (spacemacs/declare-prefix-for-mode 'org-mode "iD" "download")
       (spacemacs/set-leader-keys-for-major-mode 'org-mode
         "iDy" 'org-download-yank
         "iDs" 'org-download-screenshot))))

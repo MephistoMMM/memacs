@@ -37,7 +37,7 @@
     (progn
       (spacemacs/register-repl 'ielm 'ielm)
       (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-        (spacemacs/declare-prefix-for-mode mode "ms" "ielm")
+        (spacemacs/declare-prefix-for-mode mode "s" "ielm")
         (spacemacs/set-leader-keys-for-major-mode mode
           "'" 'ielm
           "si" 'ielm)))
@@ -59,7 +59,7 @@
   (use-package debug
     :defer t
     :init (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-            (spacemacs/declare-prefix-for-mode mode "md" "debug")
+            (spacemacs/declare-prefix-for-mode mode "d" "debug")
             (spacemacs/set-leader-keys-for-major-mode mode
               "dt" 'spacemacs/elisp-toggle-debug-expr-and-eval-func))
     :config (evilified-state-evilify-map debugger-mode-map
@@ -127,8 +127,8 @@
     (progn
       (add-hook 'emacs-lisp-mode-hook 'elisp-slime-nav-mode)
       (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-        (spacemacs/declare-prefix-for-mode mode "mg" "find-symbol")
-        (spacemacs/declare-prefix-for-mode mode "mh" "help")
+        (spacemacs/declare-prefix-for-mode mode "g" "find-symbol")
+        (spacemacs/declare-prefix-for-mode mode "h" "help")
         (spacemacs/set-leader-keys-for-major-mode mode
           "hh" 'elisp-slime-nav-describe-elisp-thing-at-point)
         (let ((jumpl (intern (format "spacemacs-jump-handlers-%S" mode))))
@@ -139,9 +139,9 @@
 
 (defun emacs-lisp/init-emacs-lisp ()
   (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-    (spacemacs/declare-prefix-for-mode mode "mc" "compile")
-    (spacemacs/declare-prefix-for-mode mode "me" "eval")
-    (spacemacs/declare-prefix-for-mode mode "mt" "tests")
+    (spacemacs/declare-prefix-for-mode mode "c" "compile")
+    (spacemacs/declare-prefix-for-mode mode "e" "eval")
+    (spacemacs/declare-prefix-for-mode mode "t" "tests")
     (spacemacs/set-leader-keys-for-major-mode mode
       "cc" 'emacs-lisp-byte-compile
       "e$" 'lisp-state-eval-sexp-end-of-line
@@ -258,7 +258,7 @@
                srefactor-lisp-one-line)
     :init
     (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-      (spacemacs/declare-prefix-for-mode mode "m=" "srefactor")
+      (spacemacs/declare-prefix-for-mode mode "=" "srefactor")
       (spacemacs/set-leader-keys-for-major-mode mode
         "=b" 'srefactor-lisp-format-buffer
         "=d" 'srefactor-lisp-format-defun

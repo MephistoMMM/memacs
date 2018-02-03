@@ -48,11 +48,11 @@
       (spacemacs|diminish orgtbl-mode)
       (add-hook 'markdown-mode-hook 'spacemacs//cleanup-org-tables-on-save)
       ;; Declare prefixes and bind keys
-      (dolist (prefix '(("mc" . "markdown/command")
-                        ("mh" . "markdown/header")
-                        ("mi" . "markdown/insert")
-                        ("ml" . "markdown/lists")
-                        ("mx" . "markdown/text")))
+      (dolist (prefix '(("c" . "markdown/command")
+                        ("h" . "markdown/header")
+                        ("i" . "markdown/insert")
+                        ("l" . "markdown/lists")
+                        ("x" . "markdown/text")))
         (dolist (mode markdown--key-bindings-modes)
           (spacemacs/declare-prefix-for-mode
             mode (car prefix) (cdr prefix))))

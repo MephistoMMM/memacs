@@ -62,22 +62,16 @@ LONG-NAME if given is stored in `spacemacs/prefix-titles'."
 be added. PREFIX is a string describing a key sequence. NAME is a symbol name
 used as the prefix command."
   (let  ((command (intern (concat (symbol-name mode) name)))
-         (full-prefix (concat dotspacemacs-leader-key " " prefix))
-         (full-prefix-emacs (concat dotspacemacs-emacs-leader-key " " prefix))
-         (is-major-mode-prefix (string-prefix-p "m" prefix))
          (major-mode-prefix (concat dotspacemacs-major-mode-leader-key
-                                    " " (substring prefix 1)))
+                                    " " prefix))
          (major-mode-prefix-emacs
           (concat dotspacemacs-major-mode-emacs-leader-key
-                  " " (substring prefix 1))))
+                  " " prefix)))
     (unless long-name (setq long-name name))
     (let ((prefix-name (cons name long-name)))
-      (which-key-add-major-mode-key-based-replacements mode
-        full-prefix-emacs prefix-name
-        full-prefix prefix-name)
-      (when (and is-major-mode-prefix dotspacemacs-major-mode-leader-key)
+      (when dotspacemacs-major-mode-leader-key
         (which-key-add-major-mode-key-based-replacements mode major-mode-prefix prefix-name))
-      (when (and is-major-mode-prefix dotspacemacs-major-mode-emacs-leader-key)
+      (when dotspacemacs-major-mode-emacs-leader-key
         (which-key-add-major-mode-key-based-replacements
           mode major-mode-prefix-emacs prefix-name)))))
 (put 'spacemacs/declare-prefix-for-mode 'lisp-indent-function 'defun)
@@ -115,20 +109,14 @@ to create it and bind it to `dotspacemacs-major-mode-leader-key'
 and `dotspacemacs-major-mode-emacs-leader-key'. If MODE is a
 minor-mode, the third argument should be non nil."
   (let* ((prefix (intern (format "%s-prefix" map)))
-         (leader1 (when (spacemacs//acceptable-leader-p
+         (leader (when (spacemacs//acceptable-leader-p
                          dotspacemacs-major-mode-leader-key)
                     dotspacemacs-major-mode-leader-key))
-         (leader2 (when (spacemacs//acceptable-leader-p
-                         dotspacemacs-leader-key)
-                    (concat dotspacemacs-leader-key " m")))
-         (emacs-leader1 (when (spacemacs//acceptable-leader-p
+         (emacs-leader (when (spacemacs//acceptable-leader-p
                                dotspacemacs-major-mode-emacs-leader-key)
                           dotspacemacs-major-mode-emacs-leader-key))
-         (emacs-leader2 (when (spacemacs//acceptable-leader-p
-                               dotspacemacs-emacs-leader-key)
-                          (concat dotspacemacs-emacs-leader-key " m")))
-         (leaders (delq nil (list leader1 leader2)))
-         (emacs-leaders (delq nil (list emacs-leader1 emacs-leader2))))
+         (leaders (delq nil (list leader)))
+         (emacs-leaders (delq nil (list emacs-leader))))
     (or (boundp prefix)
         (progn
           (eval
