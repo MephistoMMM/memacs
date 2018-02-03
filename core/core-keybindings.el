@@ -40,6 +40,13 @@
     (setq key (pop bindings) def (pop bindings)))
   )
 
+(defun memacs/define-keys (map key def &rest bindings)
+  "Binding funcs to map."
+  (while key
+    (define-key map (kbd key) def)
+    (setq key (pop bindings) def (pop bindings)))
+  )
+
 (defun spacemacs/declare-prefix (prefix name &optional long-name)
   "Declare a prefix PREFIX. PREFIX is a string describing a key
 sequence. NAME is a string used as the prefix command.

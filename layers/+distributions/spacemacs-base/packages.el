@@ -16,8 +16,6 @@
         (archive-mode :location built-in)
         (bookmark :location built-in)
         (conf-mode :location built-in)
-        (dired :location built-in)
-        (dired-x :location built-in)
         (electric-indent-mode :location built-in)
         (ediff :location built-in)
         (eldoc :location built-in)
@@ -95,20 +93,6 @@
   :init
   ;; explicitly derive conf-mode from text-mode major-mode
   (add-hook 'conf-mode-hook 'spacemacs/run-text-mode-hooks))
-
-(defun spacemacs-base/init-dired ()
-  (setq dired-isearch-filenames t)
-  (spacemacs/set-leader-keys
-    "ad" 'dired
-    "fj" 'dired-jump
-    "jd" 'dired-jump
-    "jD" 'dired-jump-other-window))
-
-(defun spacemacs-base/init-dired-x ()
-  (use-package dired-x
-    :commands (dired-jump
-               dired-jump-other-window
-               dired-omit-mode)))
 
 (defun spacemacs-base/init-electric-indent-mode ()
   (electric-indent-mode))

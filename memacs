@@ -26,11 +26,9 @@ This function should only modify configuration layer settings."
      ;; READY : brew install ripgrep the_silver_searcher
 
      ;; Catalogue: tools
-     (ibuffer :variables ibuffer-group-buffers-by 'projects)
      markdown
      protobuf
      docker
-     (ranger :variables ranger-show-preview t)
      ;; (shell :variables
      ;;        shell-default-shell 'eshell
      ;;        shell-protect-eshell-prompt t

@@ -12,6 +12,8 @@
  '(
    ivy
    spacemacs-base
+   (ibuffer :variables ibuffer-group-buffers-by 'projects)
+   (dired :variables ranger-show-preview t)
    spacemacs-layouts
    spacemacs-editing
    spacemacs-editing-visual
