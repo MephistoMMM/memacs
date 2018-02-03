@@ -164,18 +164,6 @@
            (make-string (length (spacemacs//symbol-highlight-doc)) 32))))
 
 
-;; golden ratio
-
-(defun spacemacs/no-golden-ratio-for-buffers (bufname)
-  "Disable golden-ratio if BUFNAME is the name of a visible buffer."
-  (and (get-buffer bufname) (get-buffer-window bufname 'visible)))
-
-(defun spacemacs/no-golden-ratio-guide-key ()
-  "Disable golden-ratio for guide-key popwin buffer."
-  (or (spacemacs/no-golden-ratio-for-buffers " *guide-key*")
-      (spacemacs/no-golden-ratio-for-buffers " *popwin-dummy*")))
-
-
 ;; smooth scrolling
 
 (defun spacemacs/enable-smooth-scrolling ()

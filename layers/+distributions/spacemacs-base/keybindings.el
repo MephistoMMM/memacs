@@ -38,6 +38,7 @@
                                        ("kD"  "delete-backward")
                                        ("k`"  "hybrid")
                                        ("L"   "lisp")
+                                       ("m"   "managers")
                                        ("n"   "narrow")
                                        ("p"   "projects")
                                        ("p$"  "projects/shell")
@@ -364,19 +365,13 @@
   "Split the window vertically and focus the new window."
   (interactive)
   (split-window-below)
-  (windmove-down)
-  (when (and (boundp 'golden-ratio-mode)
-             (symbol-value golden-ratio-mode))
-    (golden-ratio)))
+  (windmove-down))
 
 (defun split-window-right-and-focus ()
   "Split the window horizontally and focus the new window."
   (interactive)
   (split-window-right)
-  (windmove-right)
-  (when (and (boundp 'golden-ratio-mode)
-             (symbol-value golden-ratio-mode))
-    (golden-ratio)))
+  (windmove-right))
 
 (memacs/define-evil-normal-keybinding
   "C-w d"   'spacemacs/delete-window
@@ -505,18 +500,15 @@
 
 (spacemacs|define-transient-state window-manipulation
   :title "Window Manipulation Transient State"
-  :doc (concat "
+  :doc "
  Select^^^^               Move^^^^              Split^^               Resize^^             Other^^
  ──────^^^^─────────────  ────^^^^────────────  ─────^^─────────────  ──────^^───────────  ─────^^──────────────────
  [_j_/_k_]  down/up       [_J_/_K_] down/up     [_s_] vertical        [_[_] shrink horiz   [_u_] restore prev layout
  [_h_/_l_]  left/right    [_H_/_L_] left/right  [_S_] verti & follow  [_]_] enlarge horiz  [_U_] restore next layout
                       [_r_]^^   rotate fwd  [_v_] horizontal      [_{_] shrink verti   [_d_] close current
  [_w_]^^    ace window    [_R_]^^   rotate bwd  [_V_] horiz & follow  [_}_] enlarge verti  [_D_] close other
- [_f_]^^    other frame   ^^^^                  ^^                    ^^                   "
-               (if (configuration-layer/package-used-p 'golden-ratio)
-                   "[_g_] golden-ratio %`golden-ratio-mode"
-                 "")
-               "\n ^^^^                     ^^^^                  ^^                    ^^                   [_q_] quit")
+ [_f_]^^    other frame   ^^^^                  ^^                    ^^
+ ^^^^                     ^^^^                  ^^                    ^^                   [_q_] quit"
   :bindings
   ("q" nil :exit t)
   ("-" split-window-below-and-focus)

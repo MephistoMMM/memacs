@@ -426,12 +426,11 @@ If the universal prefix argument is used then kill also the window."
 If the universal prefix argument is used then kill also the window."
   (interactive "P")
   (require 'ace-window)
-  (let (golden-ratio-mode)
-    (aw-select
-     " Ace - Kill buffer in Window"
-     (lambda (window)
-       (with-selected-window window
-         (spacemacs/kill-this-buffer arg))))))
+  (aw-select
+   " Ace - Kill buffer in Window"
+   (lambda (window)
+     (with-selected-window window
+       (spacemacs/kill-this-buffer arg)))))
 
 ;; found at http://emacswiki.org/emacs/KillingBuffers
 (defun spacemacs/kill-other-buffers (&optional arg)

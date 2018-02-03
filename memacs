@@ -26,6 +26,7 @@ This function should only modify configuration layer settings."
      ;; READY : brew install ripgrep the_silver_searcher
 
      ;; Catalogue: tools
+     (ibuffer :variables ibuffer-group-buffers-by 'projects)
      markdown
      protobuf
      docker
@@ -360,8 +361,6 @@ you should place your code here."
 
   ;; start line number
   (spacemacs/toggle-line-numbers-on)
-  ;; start golden ratio
-  ;; (spacemacs/toggle-golden-ratio-on)
 
   ;; Spaceline
   (setq ns-use-srgb-colorspace nil)

@@ -13,7 +13,6 @@
 (setq ranger-packages
       '(
         (dired :location built-in)
-        golden-ratio
         ranger
         ))
 
@@ -49,7 +48,3 @@
 (defun ranger/post-init-dired ()
   ;; Be sure to override dired bindings
   (ranger//set-leader-keys))
-
-(defun ranger/post-init-golden-ratio ()
-  (with-eval-after-load 'golden-ratio
-    (add-to-list 'golden-ratio-exclude-modes "ranger-mode")))

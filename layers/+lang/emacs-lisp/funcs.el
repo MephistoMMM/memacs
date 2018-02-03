@@ -66,7 +66,4 @@ Unlike `eval-defun', this does not go to topmost function."
         (when evilified (evil-normal-state))
       ;; enable edebug-mode
       (when evilified (evil-evilified-state))
-      (evil-normalize-keymaps)
-      (when (and (fboundp 'golden-ratio-mode)
-                 golden-ratio-mode)
-        (golden-ratio)))))
+      (evil-normalize-keymaps))))

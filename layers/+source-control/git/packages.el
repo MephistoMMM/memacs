@@ -79,9 +79,8 @@
         :title "Git Timemachine Transient State"
         :doc "
 [_p_/_N_] previous [_n_] next [_c_] current [_g_] goto nth rev [_Y_] copy hash [_q_] quit"
-        :on-enter (let (golden-ratio-mode)
-                    (unless (bound-and-true-p git-timemachine-mode)
-                      (call-interactively 'git-timemachine)))
+        :on-enter (unless (bound-and-true-p git-timemachine-mode)
+                      (call-interactively 'git-timemachine))
         :on-exit (when (bound-and-true-p git-timemachine-mode)
                    (git-timemachine-quit))
         :foreign-keys run
@@ -142,9 +141,8 @@
         :title "Git Blame Transient State"
         :doc "
 Press [_b_] again to blame further in the history, [_q_] to go up or quit."
-        :on-enter (let (golden-ratio-mode)
-                    (unless (bound-and-true-p magit-blame-mode)
-                      (call-interactively 'magit-blame)))
+        :on-enter (unless (bound-and-true-p magit-blame-mode)
+                      (call-interactively 'magit-blame))
         :foreign-keys run
         :bindings
         ("b" magit-blame)
