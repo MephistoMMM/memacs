@@ -11,25 +11,14 @@
 ;;; License: GPLv3
 
 (setq ranger-packages
-      '(
-        (dired :location built-in)
-        ranger
-        ))
-
-(defun ranger//set-leader-keys ()
-  (spacemacs/set-leader-keys
-    "ar" 'ranger
-    "ad" 'deer
-    "jD" 'deer-jump-other-window
-    "jd" 'deer))
+      '(ranger))
 
 (defun ranger/init-ranger ()
   (use-package ranger
-    :commands (ranger deer deer-jump-other-window ranger-override-dired-mode)
+    :defer t
+    :commands (ranger)
     :init
     (progn
-      (ranger//set-leader-keys)
-
       ;; allow '-' to enter ranger
       (when ranger-enter-with-minus
         (define-key evil-normal-state-map (kbd "-") 'deer))
@@ -44,7 +33,3 @@
         (make-directory image-dired-dir)))
     :config
     (define-key ranger-mode-map (kbd "-") 'ranger-up-directory)))
-
-(defun ranger/post-init-dired ()
-  ;; Be sure to override dired bindings
-  (ranger//set-leader-keys))

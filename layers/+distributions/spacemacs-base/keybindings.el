@@ -33,7 +33,7 @@
                                        ("g"   "git/versions-control")
                                        ("h"   "help")
                                        ("hd"  "help-describe")
-                                       ("j"   "jump/join/split")
+                                       ("j"   "jump")
                                        ("kd"  "delete")
                                        ("kD"  "delete-backward")
                                        ("k`"  "hybrid")
@@ -225,12 +225,6 @@
   "K" 'spacemacs/insert-line-above-no-indent
   "k" 'spacemacs/evil-insert-line-above
   "j" 'spacemacs/evil-insert-line-below)
-;; format ---------------------------------------------------------------------
-(spacemacs/set-leader-keys
-  "jo" 'open-line
-  "j=" 'spacemacs/indent-region-or-buffer
-  "jS" 'spacemacs/split-and-new-line
-  "jk" 'spacemacs/evil-goto-next-line-and-indent)
 
 ;; navigation/jumping ---------------------------------------------------------
 (spacemacs/set-leader-keys
