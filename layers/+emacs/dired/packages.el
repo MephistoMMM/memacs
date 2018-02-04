@@ -46,6 +46,8 @@
       (setq dired-recursive-copies  'always)
       ;; delete files: only query once
       (setq dired-recursive-deletes 'top)
+
+      (define-key dired-mode-map (kbd "C-h") 'memacs/dired-backward)
       )
     ))
 

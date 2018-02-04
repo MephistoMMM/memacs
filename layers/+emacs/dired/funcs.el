@@ -35,6 +35,23 @@
 (defun memacs//dired-omit-auto-apply ()
   (setq dired-omit-mode memacs-dired-omit))
 
+(defun memacs/dired-backward ()
+  "Go back to the parent directory (..), and the cursor will be moved to where
+          the previous directory."
+  (interactive)
+  (let* ((DIR (buffer-name)))
+    (if (equal DIR "*Find*")
+        (quit-window t)
+      (progn (find-alternate-file "..")
+             (re-search-forward DIR nil :no-error)
+             (revert-buffer)))))
+(defun memacs/dired-find-alternate-file ()
+  (interactive)
+  (if (file-regular-p (dired-get-filename))
+      (dired-find-file)
+    (dired-find-alternate-file)))
+(put 'dired-find-alternate-file 'disabled nil)
+
 ;; 和 KDE 的 Dolphin 一樣的檔案名過濾器，按 C-i 使用。 (by letoh)
 (defun memacs/dired-show-only (regexp)
   (interactive "sFiles to show (regexp): ")

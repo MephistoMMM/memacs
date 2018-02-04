@@ -175,8 +175,11 @@
 
 (defun spacemacs-base/init-help-fns+ ()
   (use-package help-fns+
-    :commands (describe-keymap)
-    :init (spacemacs/set-leader-keys "hdK" 'describe-keymap)))
+    :defer t
+    :commands (describe-keymap describe-buffer)
+    :init (spacemacs/set-leader-keys
+            "hdB" 'describe-buffer
+            "hdK" 'describe-keymap)))
 
 (defun spacemacs-base/init-hi-lock ()
   (with-eval-after-load 'hi-lock
