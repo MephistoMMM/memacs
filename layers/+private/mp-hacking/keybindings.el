@@ -43,6 +43,10 @@
  "C-n" 'next-buffer
  "C-p" 'previous-buffer)
 
+;; terminal here
+(spacemacs/set-leader-keys
+  "jt" 'mp-hacking/terminal-here)
+
 
 ;;;; Outshine
 (spacemacs/set-leader-keys-for-minor-mode outline-minor-mode
