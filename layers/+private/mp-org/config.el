@@ -10,8 +10,8 @@
 ;;; Code:
 
 ;; mrg path
-(setq notes-org-directory-path "~/.notes_org")
-(setq mequ-conf-file "~/Dropbox/dotconf/mequ.conf")
-(setq custom-link-img-export-host "http://qiniu.com")
+(defvar notes-org-directory-path "~/.notes_org"
+  "Directroy for store notes.")
+
 (setq close-auto-org-agenda-task t)
 ;;; mp-org/config.el ends here

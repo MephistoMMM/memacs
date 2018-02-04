@@ -20,6 +20,9 @@
     (advance-words-count :location (recipe
                                     :fetcher github
                                     :repo "MephistoMMM/advance-words-count.el"))
+
+    (memacs-img-link :location local)
+
     ;; https://coldnew.github.io/d2d60fe2/
     pangu-spacing
     ;; (company-orz :location
@@ -46,12 +49,21 @@
     :defer t)
   )
 
+(defun mp-org/init-memacs-img-link ()
+  "Init memacs-img-link"
+  (use-package memacs-img-link
+    :after org
+    :config
+    (progn
+      (setq mequ-conf-file "~/Dropbox/dotconf/mequ.conf")
+      (setq custom-link-img-export-host
+            "http://7xlrfg.com1.z0.glb.clouddn.com")
+      ))
+  )
+
 (defun mp-org/post-init-org ()
   "Configurations for org mode"
   (setq-default org-directory "~/Dropbox/org")
-
-  ;; set for mequ
-  (setq mequ-conf-file "~/Dropbox/dotconf/mequ.conf")
 
   ;; config new org file in dropbox
   (setq-default notes-org-directory-path (concat org-directory "/notes"))
@@ -66,12 +78,10 @@
 
     ;; config org-download and define custom link
     (setq-default
-     custom-link-img-export-host "http://7xlrfg.com1.z0.glb.clouddn.com"
      org-download-image-dir (concat org-directory "/statics")
      org-download-image-html-width 600
      org-download-link-format "[[img:%s]]"
      org-download-heading-lvl nil)
-    (org-add-link-type "img" 'mp-org/custom-link-img-follow 'mp-org/custom-link-img-export)
 
     (org-babel-do-load-languages
      'org-babel-load-languages

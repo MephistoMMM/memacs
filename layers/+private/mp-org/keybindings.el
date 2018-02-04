@@ -25,8 +25,7 @@
   ;; Org new file in Dropbox
   "bNo" 'mp-org/new-org-buffer-in-dropdire
 
-  ;; Uploat img link file
-  "am" 'mp-org/mequ-upload-img-link-file)
+  )
 
 ;; Wraper
 (which-key-add-key-based-replacements
@@ -42,9 +41,12 @@
 ;; Org
 (with-eval-after-load 'org
   (spacemacs/set-leader-keys-for-major-mode 'org-mode
-    "C-o" 'mp-org/toggle-inline-images
+    "C-o" 'memacs-img-toggle-inline-images
     "it"  'org-insert-todo-heading
-    "ic"  'mp-org/org-insert-src-code-block)
+    "ic"  'mp-org/org-insert-src-code-block
+
+    ;; Uploat img link file
+    "C-u" 'memacs-img-mequ-upload-img-link-file)
 
   (spacemacs/declare-prefix-for-mode 'org-mode "w" "wrapper")
   (spacemacs/set-leader-keys-for-major-mode 'org-mode "ws" 'mp-org/wrap-source-code))
