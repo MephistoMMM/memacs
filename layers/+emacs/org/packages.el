@@ -599,7 +599,7 @@ Headline^^            Visit entry^^               Filter^^                    Da
     :body
     (let ((agenda-files (org-agenda-files)))
       (if agenda-files
-          (find-file (first agenda-files))
+          (find-file org-default-notes-file)
         (user-error "Error: No agenda files configured, nothing to display.")))))
 
 (defun org/init-org-journal ()

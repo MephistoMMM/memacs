@@ -38,4 +38,23 @@
 ;; (spacemacs/set-leader-keys "xf" 'fill-region)
 ;; This function is the same as 'gq' in evil(vim)
 
+
+;; Org
+(with-eval-after-load 'org
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode
+    "C-o" 'mp-org/toggle-inline-images
+    "it"  'org-insert-todo-heading
+    "ic"  'mp-org/org-insert-src-code-block)
+
+  (spacemacs/declare-prefix-for-mode 'org-mode "w" "wrapper")
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "ws" 'mp-org/wrap-source-code))
+
+(with-eval-after-load 'org-agenda
+  (define-key org-agenda-mode-map (kbd "P") 'org-pomodoro))
+
+
+;; Blog
+(spacemacs/set-leader-keys "ma" 'blog-admin-start)
+
+
 ;;; mp-org/keybindings.el ends here

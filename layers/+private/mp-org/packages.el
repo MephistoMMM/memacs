@@ -13,7 +13,6 @@
 (defconst mp-org-packages
   '(
     org
-    org-agenda
     auctex
     (blog-admin :location (recipe
                            :fetcher github
@@ -47,13 +46,6 @@
     :defer t)
   )
 
-(defun mp-org/post-init-org-agenda ()
-  "Configurations for org agenda"
-  (with-eval-after-load 'org-agenda
-    (define-key org-agenda-mode-map (kbd "P") 'org-pomodoro)
-     )
-  )
-
 (defun mp-org/post-init-org ()
   "Configurations for org mode"
   (setq-default org-directory "~/Dropbox/org")
@@ -71,12 +63,6 @@
                                         (setq org-descriptive-links nil)))
                              (setq truncate-lines nil)) 'append)
   (with-eval-after-load 'org
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "C-o" 'mp-org/toggle-inline-images)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "it" 'org-insert-todo-heading)
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "ic" 'mp-org/org-insert-src-code-block)
-    (spacemacs/declare-prefix-for-mode 'org-mode "w" "wrapper")
-    (spacemacs/set-leader-keys-for-major-mode 'org-mode "ws" 'mp-org/wrap-source-code)
-
 
     ;; config org-download and define custom link
     (setq-default
@@ -157,8 +143,6 @@
       (setq blog-admin-backend-hexo-config-file "static_blog_config.yml") ;; default assumes _config.yml
 
       (add-hook 'blog-admin-backend-after-new-post-hook 'find-file)
-
-      (spacemacs/set-leader-keys "ab" 'blog-admin-start)
       ))
    )
 
