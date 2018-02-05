@@ -399,12 +399,9 @@
       (setq save-place-file (concat spacemacs-cache-directory "places")))))
 
 (defun spacemacs-base/init-spacemacs-theme ()
-  (use-package spacemacs-theme
-    :defer t
-    :init
     (progn
       (setq spacemacs-theme-comment-bg t)
-      (setq spacemacs-theme-org-height t))))
+      (setq spacemacs-theme-org-height t)))
 
 (defun spacemacs-base/init-subword ()
   (use-package subword
