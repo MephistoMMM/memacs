@@ -6,7 +6,7 @@
 ;;; Code:
 
 
-;; Spaceline toggles
+;;;; Spaceline toggles
 (dolist (spec '((minor-modes "tmm")
                 (major-mode "tmM")
                 (version-control "tmv")
@@ -23,5 +23,12 @@
                                      (replace-regexp-in-string
                                       "-" " " (format "%S" segment)))
              :evil-leader ,(cadr spec)))))
+
+
+;;;; Swiper
+
+(memacs/define-evil-keybinding
+ (list evil-normal-state-map evil-evilified-state-map)
+ "/" 'swiper)
 
 ;;; memacs/keybindings.el ends here

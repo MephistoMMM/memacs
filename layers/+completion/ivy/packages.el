@@ -353,6 +353,7 @@ Current Action: %s(ivy-action-name)
         "S" 'spacemacs/swiper-region-or-symbol
         "b" 'swiper-all
         "B" 'spacemacs/swiper-all-region-or-symbol)
+      (define-key swiper-map (kbd "C-l") 'swiper-avy)
       )))
 
 (defun ivy/init-smex ()

@@ -32,7 +32,6 @@
       `(
         which-function
         (python-pyvenv :fallback python-pyenv)
-        (anzu :priority 4)
         (selection-info :priority 2)
         input-method
         ((buffer-encoding-abbrev
