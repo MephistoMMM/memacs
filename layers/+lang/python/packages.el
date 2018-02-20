@@ -16,6 +16,7 @@
     flycheck
     importmagic
     live-py-mode
+    (lsp-python :requires lsp-mode)
     (nose :location local)
     org
     pip-requirements
@@ -32,7 +33,7 @@
     ))
 
 (defun python/post-init-eldoc ()
-  (add-hook 'python-mode-hook 'spacemacs//init-eldoc-python-mode))
+  (add-hook 'python-mode-local-vars-hook #'spacemacs//python-setup-eldoc))
 
 (defun python/post-init-evil-matchit ()
   (add-hook `python-mode-hook `turn-on-evil-matchit-mode))
@@ -50,6 +51,10 @@
   (use-package live-py-mode
     :defer t
     :commands live-py-mode))
+
+(defun python/init-lsp-python ()
+  (use-package lsp-python
+    :commands lsp-python-enable))
 
 (defun python/init-nose ()
   (use-package nose
@@ -152,7 +157,8 @@
     :mode (("SConstruct\\'" . python-mode) ("SConscript\\'" . python-mode))
     :init
     (progn
-      (spacemacs/register-repl 'python 'spacemacs/python-start-or-switch-repl "python")
+      (spacemacs/register-repl 'python
+                               'spacemacs/python-start-or-switch-repl "python")
       (add-hook 'inferior-python-mode-hook
                 #'spacemacs//inferior-python-setup-hook)
       (add-hook 'python-mode-hook #'spacemacs//python-default)

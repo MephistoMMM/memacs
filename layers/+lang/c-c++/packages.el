@@ -38,7 +38,13 @@
 (defun c-c++/init-disaster ()
   (use-package disaster
     :defer t
-    :commands (disaster)))
+    :commands (disaster)
+    :init
+    (progn
+      (dolist (mode c-c++-modes)
+        (spacemacs/set-leader-keys-for-major-mode mode
+          "D" 'disaster)))
+    ))
 
 (defun c-c++/post-init-flycheck ()
   (dolist (mode c-c++-modes)

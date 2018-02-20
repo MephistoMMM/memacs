@@ -377,9 +377,11 @@ Current Action: %s(ivy-action-name)
     :defer t
     :init
     (progn
-      (setq xref-prompt-for-identifier
-            '(not xref-find-definitions xref-find-definitions-other-window xref-find-definitions-other-frame xref-find-references spacemacs/jump-to-definition))
+      (setq xref-prompt-for-identifier '(not xref-find-definitions
+                                             xref-find-definitions-other-window
+                                             xref-find-definitions-other-frame
+                                             xref-find-references
+                                             spacemacs/jump-to-definition))
 
-      ;; Use ivy-xref to display xref.el results.
-      (setq xref-show-xrefs-function #'ivy-xref-show-xrefs)
-      )))
+      ;; Use ivy-xref to display `xref.el' results.
+      (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))))

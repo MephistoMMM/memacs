@@ -9,7 +9,7 @@
 ;;
 ;;; License: GPLv3
 
-(defun memacs/lsp-sync-face ()
+(defun memacs//lsp-sync-face ()
   "Sync faces of lsp ui while theme changing."
   (setq
    lsp-ui-doc-background (face-attribute 'default :background nil t)

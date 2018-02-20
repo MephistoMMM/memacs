@@ -142,6 +142,7 @@ Will work on both org-mode and any mode that accepts plain html."
             (forward-char -8))))
 
       (dolist (prefix '(
+                        ("b" . "babel")
                         ("C" . "clocks")
                         ("d" . "dates")
                         ("e" . "export")
@@ -155,7 +156,6 @@ Will work on both org-mode and any mode that accepts plain html."
                         ("ti" . "insert")
                         ("tt" . "toggle")
                         ("x" . "text")
-                        ("b" . "src-blocks/babel")
                         ))
         (spacemacs/declare-prefix-for-mode 'org-mode (car prefix) (cdr prefix)))
       (spacemacs/set-leader-keys-for-major-mode 'org-mode

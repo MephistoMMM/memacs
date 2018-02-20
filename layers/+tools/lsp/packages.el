@@ -12,6 +12,11 @@
 (defconst lsp-packages
   '(
     (company-lsp :requires company)
+    ;; `flycheck-lsp' does not exist so we defined it as built-in to avoid
+    ;; fetching it from ELPA repositories.
+    ;; this logical package serves to hook all flycheck related configuration
+    ;; for LSP.
+    (flycheck-lsp :requires flycheck :location built-in)
     lsp-mode
     lsp-ui
     ))
@@ -26,15 +31,16 @@
           company-lsp-async t
           company-lsp-cache-candidates nil)))
 
+(defun lsp/init-flycheck-lsp ()
+  ;; Disable lsp-flycheck.el in favor of lsp-ui-flycheck.el
+  (setq lsp-enable-flycheck nil))
+
 (defun lsp/init-lsp-mode ()
   (use-package lsp-mode
     :config
     (progn
       (add-hook 'lsp-mode-hook #'lsp-ui-mode)
       (add-hook 'lsp-after-open-hook #'lsp-enable-imenu))
-
-      ;; Disable lsp-flycheck.el in favor of lsp-ui-flycheck.el
-      (setq lsp-enable-flycheck t)
 
       (spacemacs|diminish lsp-mode " Ⓛ" " L"))
 
@@ -49,6 +55,6 @@
     :commands lsp-ui-mode
     :config
     (progn
-      (memacs/lsp-sync-face)
-      (add-hook 'spacemacs-post-theme-change-hook #'memacs/lsp-sync-face))
+      (memacs//lsp-sync-face)
+      (add-hook 'spacemacs-post-theme-change-hook #'memacs//lsp-sync-face))
     ))
