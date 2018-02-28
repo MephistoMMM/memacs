@@ -20,7 +20,7 @@
                                        ("as"  "shells")
                                        ("ay"  "ipython notebook")
                                        ("b"   "buffers")
-                                       ("bN"  "new empty buffer")
+                                       ("bn"  "new empty buffer")
                                        ("c"   "compile")
                                        ("C"   "capture/colors")
                                        ("d"   "diff")
@@ -115,11 +115,11 @@
   "b C-d" 'spacemacs/kill-other-buffers
   "b C-S-d" 'spacemacs/kill-matching-buffers-rudely
   "bm"    'spacemacs/switch-to-messages-buffer
-  "b N h" 'spacemacs/new-empty-buffer-left
-  "b N j" 'spacemacs/new-empty-buffer-below
-  "b N k" 'spacemacs/new-empty-buffer-above
-  "b N l" 'spacemacs/new-empty-buffer-right
-  "b N n" 'spacemacs/new-empty-buffer
+  "b n h" 'spacemacs/new-empty-buffer-left
+  "b n j" 'spacemacs/new-empty-buffer-below
+  "b n k" 'spacemacs/new-empty-buffer-above
+  "b n l" 'spacemacs/new-empty-buffer-right
+  "b n n" 'spacemacs/new-empty-buffer
   "bP"    'spacemacs/copy-clipboard-to-whole-buffer
   "bR"    'spacemacs/safe-revert-buffer
   "bs"    'spacemacs/switch-to-scratch-buffer

@@ -48,7 +48,6 @@
        "C-j c"   'evil-avy-goto-char
        "C-j C"   'evil-avy-goto-char-2
        "C-j l"   'evil-avy-goto-line
-       "M-l"     'evil-avy-goto-line
        "C-j u"   'spacemacs/avy-goto-url
        "C-j C-u" 'spacemacs/avy-open-url
        "C-j w"   'evil-avy-goto-word-or-subword-1

@@ -23,7 +23,7 @@
   "aor" 'mp-org/org-agenda-reload-files
 
   ;; Org new file in Dropbox
-  "bNo" 'mp-org/new-org-buffer-in-dropdire
+  "bno" 'mp-org/new-org-buffer-in-dropdire
 
   )
 
