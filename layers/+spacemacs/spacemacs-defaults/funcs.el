@@ -1,4 +1,4 @@
-;;; funcs.el --- Spacemacs Base Layer functions File
+;;; funcs.el --- Spacemacs Defaults Layer functions File
 ;;
 ;; Copyright (c) 2012-2018 Sylvain Benner & Contributors
 ;;
@@ -396,19 +396,6 @@ If the universal prefix argument is used then kill the buffer too."
   (if (equal '(4) arg)
       (kill-buffer-and-window)
     (delete-window)))
-
-(defun spacemacs/ace-delete-window (&optional arg)
-  "Ace delete window.
-If the universal prefix argument is used then kill the buffer too."
-  (interactive "P")
-  (require 'ace-window)
-  (aw-select
-   " Ace - Delete Window"
-   (lambda (window)
-     (when (equal '(4) arg)
-       (with-selected-window window
-         (spacemacs/kill-this-buffer arg)))
-     (aw-delete-window window))))
 
 ;; our own implementation of kill-this-buffer from menu-bar.el
 (defun spacemacs/kill-this-buffer (&optional arg)

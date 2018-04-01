@@ -28,12 +28,11 @@
 (defun c-c++/init-cc-mode ()
   (use-package cc-mode
     :defer t
-    :init (add-to-list 'auto-mode-alist
-                   `("\\.h\\'" . ,c-c++-default-mode-for-headers))
-    :config
+    :init
     (progn
-      (require 'compile)
-      (c-toggle-auto-newline 1))))
+      (add-to-list 'auto-mode-alist `("\\.h\\'" . ,c-c++-default-mode-for-headers))
+      (add-hook 'c-mode-common-hook 'spacemacs//c-toggle-auto-newline))
+    :config (require 'compile)))
 
 (defun c-c++/init-disaster ()
   (use-package disaster

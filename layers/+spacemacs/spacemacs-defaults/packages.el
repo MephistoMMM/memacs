@@ -1,4 +1,4 @@
-;;; packages.el --- Spacemacs Base Layer packages File
+;;; packages.el --- Spacemacs Defaults Layer packages File
 ;;
 ;; Copyright (c) 2012-2018 Sylvain Benner & Contributors
 ;;
@@ -9,28 +9,17 @@
 ;;
 ;;; License: GPLv3
 
-(setq spacemacs-base-packages
+(setq spacemacs-defaults-packages
       '(
         (abbrev :location built-in)
-        ace-window
         (archive-mode :location built-in)
         (bookmark :location built-in)
         (conf-mode :location built-in)
         (electric-indent-mode :location built-in)
         (ediff :location built-in)
         (eldoc :location built-in)
-        evil-escape
-        (evil-evilified-state :location local :step pre :protected t)
-        evil-visualstar
-        ;; some packages need to look for binaries,
-        ;; which means the path must be ready by then
-        (exec-path-from-shell :step pre
-                              :toggle (or (spacemacs/system-is-mac)
-                                          (spacemacs/system-is-linux)
-                                          (eq window-system 'x)))
         (help-fns+ :location local)
         (hi-lock :location built-in)
-        (hybrid-mode :location local :step pre)
         (image-mode :location built-in)
         (imenu :location built-in)
         (linum :location built-in)
@@ -38,13 +27,10 @@
         (package-menu :location built-in)
         ;; page-break-lines is shipped with spacemacs core
         (page-break-lines :location built-in)
-        pcre2el
         (process-menu :location built-in)
-        projectile
         (recentf :location built-in)
         (savehist :location built-in)
         (saveplace :location built-in)
-        (spacemacs-theme :location built-in)
         (subword :location built-in)
         (tar-mode :location built-in)
         (uniquify :location built-in)
@@ -55,10 +41,10 @@
 
 ;; Initialization of packages
 
-(defun spacemacs-base/init-abbrev ()
+(defun spacemacs-defaults/init-abbrev ()
   (spacemacs|hide-lighter abbrev-mode))
 
-(defun spacemacs-base/init-ace-window ()
+(defun spacemacs-default/init-ace-window ()
   (use-package ace-window
     :defer t
     :init
@@ -74,12 +60,12 @@
       ;; set ace-window keys to home-row
       (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))))
 
-(defun spacemacs-base/init-archive-mode ()
+(defun spacemacs-defaults/init-archive-mode ()
   (evilified-state-evilify-map archive-mode-map
     :mode archive-mode
     :eval-after-load archive-mode))
 
-(defun spacemacs-base/init-bookmark ()
+(defun spacemacs-defaults/init-bookmark ()
   (use-package bookmark
     :defer t
     :init
@@ -89,15 +75,15 @@
             bookmark-save-flag 1)
       (spacemacs/set-leader-keys "fb" 'bookmark-jump))))
 
-(defun spacemacs-base/init-conf-mode ()
+(defun spacemacs-defaults/init-conf-mode ()
   :init
   ;; explicitly derive conf-mode from text-mode major-mode
   (add-hook 'conf-mode-hook 'spacemacs/run-text-mode-hooks))
 
-(defun spacemacs-base/init-electric-indent-mode ()
+(defun spacemacs-defaults/init-electric-indent-mode ()
   (electric-indent-mode))
 
-(defun spacemacs-base/init-visual-line-mode ()
+(defun spacemacs-defaults/init-visual-line-mode ()
   (spacemacs|diminish visual-line-mode " Ⓛ" " L"))
 
 ;; notes from mijoharas
@@ -117,7 +103,7 @@
 ;; ;; inside the use-package function
 ;; (add-hook 'ediff-keymap-setup-hook 'ediff/setup-ediff-keymaps)
 ;; ```
-(defun spacemacs-base/init-ediff ()
+(defun spacemacs-defaults/init-ediff ()
   (use-package ediff
     :defer t
     :init
@@ -134,7 +120,7 @@
       ;; restore window layout when done
       (add-hook 'ediff-quit-hook #'winner-undo))))
 
-(defun spacemacs-base/init-eldoc ()
+(defun spacemacs-defaults/init-eldoc ()
   (use-package eldoc
     :defer t
     :config
@@ -146,17 +132,17 @@
       ;; don't display eldoc on modeline
       (spacemacs|hide-lighter eldoc-mode))))
 
-(defun spacemacs-base/init-evil-escape ()
+(defun spacemacs-default/init-evil-escape ()
   (use-package evil-escape
     :init (evil-escape-mode)
     :config (spacemacs|hide-lighter evil-escape-mode)))
 
-(defun spacemacs-base/init-evil-evilified-state ()
+(defun spacemacs-default/init-evil-evilified-state ()
   (use-package evil-evilified-state)
   (define-key evil-evilified-state-map (kbd dotspacemacs-leader-key)
     spacemacs-default-map))
 
-(defun spacemacs-base/init-evil-visualstar ()
+(defun spacemacs-default/init-evil-visualstar ()
   (use-package evil-visualstar
     :defer t
     :commands (evil-visualstar/begin-search-forward
@@ -168,12 +154,12 @@
       (define-key evil-visual-state-map (kbd "#")
         'evil-visualstar/begin-search-backward))))
 
-(defun spacemacs-base/init-exec-path-from-shell ()
+(defun spacemacs-default/init-exec-path-from-shell ()
   (use-package exec-path-from-shell
     :demand t
     :config (exec-path-from-shell-initialize)))
 
-(defun spacemacs-base/init-help-fns+ ()
+(defun spacemacs-defaults/init-help-fns+ ()
   (use-package help-fns+
     :defer t
     :commands (describe-keymap describe-buffer)
@@ -181,20 +167,11 @@
             "hdB" 'describe-buffer
             "hdK" 'describe-keymap)))
 
-(defun spacemacs-base/init-hi-lock ()
+(defun spacemacs-defaults/init-hi-lock ()
   (with-eval-after-load 'hi-lock
     (spacemacs|hide-lighter hi-lock-mode)))
 
-(defun spacemacs-base/init-hybrid-mode ()
-  (use-package hybrid-mode
-    :config
-    (progn
-      (hybrid-mode)
-      (setq hybrid-mode-default-state 'normal
-            hybrid-mode-enable-evilified-state t)
-      (spacemacs|diminish hybrid-mode))))
-
-(defun spacemacs-base/init-image-mode ()
+(defun spacemacs-defaults/init-image-mode ()
   (use-package image-mode
     :init
     (progn
@@ -225,12 +202,12 @@
               "k" 'image-previous-line
               "l" 'image-forward-hscroll)))
 
-(defun spacemacs-base/init-imenu ()
+(defun spacemacs-defaults/init-imenu ()
   (use-package imenu
     :defer t
     :init (spacemacs/set-leader-keys "ji" 'imenu)))
 
-(defun spacemacs-base/init-linum ()
+(defun spacemacs-defaults/init-linum ()
   (use-package linum
     :init
     (progn
@@ -251,106 +228,23 @@
       (when dotspacemacs-line-numbers
         (global-linum-mode)))))
 
-(defun spacemacs-base/init-occur-mode ()
+(defun spacemacs-defaults/init-occur-mode ()
   (evilified-state-evilify-map occur-mode-map
     :mode occur-mode))
 
-(defun spacemacs-base/init-package-menu ()
+(defun spacemacs-defaults/init-package-menu ()
   (evilified-state-evilify-map package-menu-mode-map
     :mode package-menu-mode))
 
-(defun spacemacs-base/init-page-break-lines ()
+(defun spacemacs-defaults/init-page-break-lines ()
   (require 'page-break-lines)
   (global-page-break-lines-mode t)
   (spacemacs|hide-lighter page-break-lines-mode))
 
-(defun spacemacs-base/init-pcre2el ()
-  (use-package pcre2el
-    :defer t
-    :init
-    (progn
-      (spacemacs/declare-prefix "xr" "regular expressions")
-      (spacemacs/declare-prefix "xre" "elisp")
-      (spacemacs/declare-prefix "xrp" "pcre")
-      (spacemacs/set-leader-keys
-        "xr/"  'rxt-explain
-        "xr'"  'rxt-convert-to-strings
-        "xrt"  'rxt-toggle-elisp-rx
-        "xrx"  'rxt-convert-to-rx
-        "xrc"  'rxt-convert-syntax
-        "xre/" 'rxt-explain-elisp
-        "xre'" 'rxt-elisp-to-strings
-        "xrep" 'rxt-elisp-to-pcre
-        "xret" 'rxt-toggle-elisp-rx
-        "xrex" 'rxt-elisp-to-rx
-        "xrp/" 'rxt-explain-pcre
-        "xrp'" 'rxt-pcre-to-strings
-        "xrpe" 'rxt-pcre-to-elisp
-        "xrpx" 'rxt-pcre-to-rx))))
-
-(defun spacemacs-base/init-process-menu ()
+(defun spacemacs-defaults/init-process-menu ()
   (evilified-state-evilify process-menu-mode process-menu-mode-map))
 
-(defun spacemacs-base/init-projectile ()
-  (use-package projectile
-    :defer t
-    :commands (projectile-ack
-               projectile-ag
-               projectile-compile-project
-               projectile-dired
-               projectile-find-dir
-               projectile-find-file
-               projectile-find-tag
-               projectile-test-project
-               projectile-grep
-               projectile-invalidate-cache
-               projectile-kill-buffers
-               projectile-multi-occur
-               projectile-project-p
-               projectile-project-root
-               projectile-recentf
-               projectile-regenerate-tags
-               projectile-replace
-               projectile-replace-regexp
-               projectile-run-async-shell-command-in-root
-               projectile-run-shell-command-in-root
-               projectile-switch-project
-               projectile-switch-to-buffer
-               projectile-vc)
-    :init
-    (progn
-      ;; note for Windows: GNU find or Cygwin find must be in path to enable
-      ;; fast indexing
-      (when (and (spacemacs/system-is-mswindows) (executable-find "find"))
-        (setq  projectile-indexing-method 'alien
-               projectile-generic-command "find . -type f"))
-      (setq projectile-sort-order 'recentf
-            projectile-cache-file (concat spacemacs-cache-directory
-                                          "projectile.cache")
-            projectile-known-projects-file (concat spacemacs-cache-directory
-                                                   "projectile-bookmarks.eld"))
-      (spacemacs/set-leader-keys
-        "p!" 'projectile-run-shell-command-in-root
-        "p&" 'projectile-run-async-shell-command-in-root
-        "p%" 'projectile-replace-regexp
-        "pa" 'projectile-toggle-between-implementation-and-test
-        "pc" 'projectile-compile-project
-        "pD" 'projectile-dired
-        "pe" 'projectile-edit-dir-locals
-        "pF" 'projectile-find-file-dwim
-        "pg" 'projectile-find-tag
-        "pG" 'projectile-regenerate-tags
-        "pI" 'projectile-invalidate-cache
-        "pk" 'projectile-kill-buffers
-        "pr" 'projectile-recentf
-        "pR" 'projectile-replace
-        "pT" 'projectile-test-project))
-    :config
-    (progn
-      (projectile-global-mode)
-      (spacemacs|hide-lighter projectile-mode))))
-
-(defun spacemacs-base/init-recentf ()
+(defun spacemacs-defaults/init-recentf ()
   (use-package recentf
     :defer t
     :init
@@ -371,7 +265,7 @@
       (add-to-list 'recentf-exclude (file-truename package-user-dir))
       (add-to-list 'recentf-exclude "COMMIT_EDITMSG\\'"))))
 
-(defun spacemacs-base/init-savehist ()
+(defun spacemacs-defaults/init-savehist ()
   (use-package savehist
     :init
     (progn
@@ -387,7 +281,7 @@
             savehist-autosave-interval 60)
       (savehist-mode t))))
 
-(defun spacemacs-base/init-saveplace ()
+(defun spacemacs-defaults/init-saveplace ()
   (use-package saveplace
     :init
     (progn
@@ -398,12 +292,12 @@
       ;; Save point position between sessions
       (setq save-place-file (concat spacemacs-cache-directory "places")))))
 
-(defun spacemacs-base/init-spacemacs-theme ()
+(defun spacemacs-default/init-spacemacs-theme ()
     (progn
       (setq spacemacs-theme-comment-bg t)
       (setq spacemacs-theme-org-height t)))
 
-(defun spacemacs-base/init-subword ()
+(defun spacemacs-defaults/init-subword ()
   (use-package subword
     :defer t
     :init
@@ -432,12 +326,12 @@
     :config
     (spacemacs|diminish subword-mode " ⓒ" " c")))
 
-(defun spacemacs-base/init-tar-mode ()
+(defun spacemacs-defaults/init-tar-mode ()
   (evilified-state-evilify-map tar-mode-map
     :mode tar-mode
     :eval-after-load tar-mode))
 
-(defun spacemacs-base/init-uniquify ()
+(defun spacemacs-defaults/init-uniquify ()
   (require 'uniquify)
   ;; When having windows with repeated filenames, uniquify them
   ;; by the folder they are in rather those annoying <2>,<3>,.. etc
@@ -445,11 +339,11 @@
         ;; don't screw special buffers
         uniquify-ignore-buffers-re "^\\*"))
 
-(defun spacemacs-base/init-url ()
+(defun spacemacs-defaults/init-url ()
   ;; gravatars from magit use this to store their cache
   (setq url-configuration-directory (concat spacemacs-cache-directory "url/")))
 
-(defun spacemacs-base/init-whitespace ()
+(defun spacemacs-defaults/init-whitespace ()
   (use-package whitespace
     :defer t
     :init
@@ -500,7 +394,7 @@
       (spacemacs|diminish whitespace-mode " ⓦ" " w")
       (spacemacs|diminish global-whitespace-mode " ⓦ" " w"))))
 
-(defun spacemacs-base/init-winner ()
+(defun spacemacs-defaults/init-winner ()
   (use-package winner
     :init
     (progn

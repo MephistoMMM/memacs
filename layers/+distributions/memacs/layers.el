@@ -11,7 +11,8 @@
 (configuration-layer/declare-layers
  '(
    ivy
-   spacemacs-base
+   spacemacs-defaults
+   spacemacs-project
    (ibuffer :variables ibuffer-group-buffers-by 'projects)
    (dired :variables ranger-show-preview t)
    spacemacs-layouts

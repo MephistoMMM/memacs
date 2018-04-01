@@ -1,4 +1,4 @@
-#+TITLE: spacemacs-org layer
+#+TITLE: spacemacs-project layer
 
 * Table of Contents                                         :TOC_4_gh:noexport:
 - [[#description][Description]]

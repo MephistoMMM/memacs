@@ -13,6 +13,7 @@
       '(
         ;; default
         adaptive-wrap
+        (centered-buffer-mode :location local)
         column-enforce-mode
         (hide-comnt :location local)
         highlight-indentation
@@ -27,6 +28,8 @@
   (use-package adaptive-wrap
     :defer t
     :init (add-hook 'visual-line-mode-hook 'adaptive-wrap-prefix-mode)))
+
+(defun spacemacs-editing-visual/init-centered-buffer-mode ())
 
 (defun spacemacs-editing-visual/init-column-enforce-mode ()
   (use-package column-enforce-mode

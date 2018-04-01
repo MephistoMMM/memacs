@@ -197,7 +197,7 @@
       (spacemacs/declare-prefix-for-mode 'web-mode "h" "dom")
       (spacemacs/declare-prefix-for-mode 'web-mode "r" "refactor")
       (spacemacs/set-leader-keys-for-major-mode 'web-mode
-        "eh" 'web-mode-dom-errors-show
+        "El" 'web-mode-dom-errors-show
         "gb" 'web-mode-element-beginning
         "gc" 'web-mode-element-child
         "gp" 'web-mode-element-parent

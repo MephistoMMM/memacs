@@ -16,13 +16,11 @@
     flycheck
     importmagic
     live-py-mode
-    (lsp-python :requires lsp-mode)
     (nose :location local)
     org
     pip-requirements
     pippel
     py-isort
-    pyenv-mode
     (pylookup :location local)
     pytest
     (python :location built-in)
@@ -91,25 +89,6 @@
   (use-package py-isort
     :defer t
     :init (add-hook 'before-save-hook 'spacemacs//python-sort-imports)))
-
-(defun python/init-pyenv-mode ()
-  (use-package pyenv-mode
-    :defer t
-    :if (executable-find "pyenv")
-    :commands (pyenv-mode-versions)
-    :init
-    (progn
-      (pcase python-auto-set-local-pyenv-version
-       (`on-visit
-        (spacemacs/add-to-hooks 'spacemacs//pyenv-mode-set-local-version
-                                '(python-mode-hook)))
-       (`on-project-switch
-        (add-hook 'projectile-after-switch-project-hook
-                  'spacemacs//pyenv-mode-set-local-version)))
-      ;; setup shell correctly on environment switch
-      (dolist (func '(pyenv-mode-set pyenv-mode-unset))
-        (advice-add func :after 'spacemacs/python-setup-everything))
-      )))
 
 (defun python/init-pyvenv ()
   (use-package pyvenv

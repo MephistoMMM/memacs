@@ -39,7 +39,6 @@
   (use-package lsp-mode
     :config
     (progn
-      (add-hook 'lsp-mode-hook #'lsp-ui-mode)
       (add-hook 'lsp-after-open-hook #'lsp-enable-imenu))
 
       (spacemacs|diminish lsp-mode " Ⓛ" " L"))
@@ -53,6 +52,7 @@
   (use-package lsp-ui
     :defer t
     :commands lsp-ui-mode
+    :init (add-hook 'lsp-mode-hook #'lsp-ui-mode)
     :config
     (progn
       (memacs//lsp-sync-face)

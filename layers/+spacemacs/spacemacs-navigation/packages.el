@@ -11,6 +11,7 @@
 
 (setq spacemacs-navigation-packages
       '(ace-link
+        ace-window
         auto-highlight-symbol
         centered-cursor-mode
         (compile :location built-in)
@@ -33,6 +34,21 @@
         (define-key Info-mode-map "o" 'ace-link-info))
       (with-eval-after-load 'help-mode
         (define-key help-mode-map "o" 'ace-link-help)))))
+
+(defun spacemacs-navigation/init-ace-window ()
+  (use-package ace-window
+    :defer t
+    :init
+    (progn
+      (spacemacs/set-leader-keys
+        "bD" 'spacemacs/ace-kill-this-buffer
+        ;; FIXME: Needs new binding.
+        ;; "wC" 'spacemacs/ace-center-window
+        "wD" 'spacemacs/ace-delete-window
+        "wM" 'ace-swap-window
+        "wW" 'ace-window)
+      ;; set ace-window keys to home-row
+      (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))))
 
 (defun spacemacs-navigation/init-auto-highlight-symbol ()
   (use-package auto-highlight-symbol

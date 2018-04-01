@@ -18,12 +18,12 @@
 (defun cmake/init-cmake-ide ()
   (use-package cmake-ide
     :if cmake-enable-cmake-ide-support
-    :defer t
-    :init (spacemacs/add-to-hooks 'cmake-ide--mode-hook '(c-mode-hook
-                                                          c++-mode-hook))
-    :config
+    :commands (cmake-ide-delete-file cmake-ide--mode-hook)
+    :init
     (progn
-      (cmake-ide-setup)
+      (dolist (hook '(c-mode-hook c++-mode-hook))
+        ;; append the `cmake-ide--mode-hook' in order to load it last
+        (add-hook hook 'cmake-ide--mode-hook 'append))
       (dolist (mode cmake-modes)
         (spacemacs/declare-prefix-for-mode mode "c" "compile")
         (spacemacs/declare-prefix-for-mode mode "p" "project")
@@ -31,7 +31,8 @@
           "cc" 'cmake-ide-compile
           "pc" 'cmake-ide-run-cmake
           "pC" 'cmake-ide-maybe-run-cmake
-          "pd" 'cmake-ide-delete-file)))))
+          "pd" 'cmake-ide-delete-file)))
+    :config (cmake-ide-setup)))
 
 (defun cmake/init-cmake-mode ()
   (use-package cmake-mode
@@ -41,4 +42,3 @@
 (defun cmake/post-init-company ()
   (when (configuration-layer/package-used-p 'cmake-mode)
     (spacemacs|add-company-backends :backends company-cmake :modes cmake-mode)))
-
