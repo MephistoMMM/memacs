@@ -77,4 +77,9 @@
 ;;;; Outline Ivy
 (spacemacs/set-leader-keys "jo" 'oi-jump)
 
+;;;; Goenv
+(with-eval-after-load 'go-mode
+  (spacemacs/set-leader-keys-for-major-mode 'go-mode "Va" 'goenv-activate)
+  (spacemacs/set-leader-keys-for-major-mode 'go-mode "Vd" 'goenv-deactivate))
+
 ;;; keybindings.el ends here

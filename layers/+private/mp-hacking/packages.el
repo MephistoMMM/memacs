@@ -43,13 +43,7 @@
 
 (defun mp-hacking/init-goenv ()
   "Add Goenv."
-  (use-package goenv
-    :defer t
-    :init
-    (with-eval-after-load 'go-mode
-      (spacemacs/set-leader-keys-for-major-mode 'go-mode "Va" 'goenv-activate)
-      (spacemacs/set-leader-keys-for-major-mode 'go-mode "Vd" 'goenv-deactivate))
-    )
+  (use-package goenv :defer t)
   )
 
 ;; (defun mp-hacking/post-init-haskell-mode ()
