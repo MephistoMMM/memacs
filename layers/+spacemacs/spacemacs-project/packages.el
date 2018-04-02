@@ -67,6 +67,7 @@
         "pF" 'projectile-find-file-dwim
         "pg" 'projectile-find-tag
         "pG" 'projectile-regenerate-tags
+        "pi" 'memacs/create-projectile-dot-file
         "pI" 'projectile-invalidate-cache
         "pk" 'projectile-kill-buffers
         "pp" 'projectile-switch-project

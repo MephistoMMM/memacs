@@ -40,13 +40,14 @@
     :defer t
     :init
     (progn
-      (spacemacs/set-leader-keys
-        "bD" 'spacemacs/ace-kill-this-buffer
-        ;; FIXME: Needs new binding.
-        ;; "wC" 'spacemacs/ace-center-window
-        "wD" 'spacemacs/ace-delete-window
-        "wM" 'ace-swap-window
-        "wW" 'ace-window)
+      (spacemacs/set-leader-keys "bD" 'spacemacs/ace-kill-this-buffer)
+      (memacs/define-evil-normal-keybinding
+       "C-w w" 'ace-window
+       "C-w a" 'ace-window
+       "C-w m" 'ace-swap-window
+       "C-w D" 'spacemacs/ace-delete-window
+       )
+
       ;; set ace-window keys to home-row
       (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))))
 
