@@ -51,6 +51,7 @@ This function should only modify configuration layer settings."
              python-test-runner 'pytest)
      ;; READY : npm install eslint tern
      javascript
+     java
      c-c++
      ;; READY : stack install stylish-haskell hlint apply-refact hindent hasktags intero
      ;; (haskell :variables
