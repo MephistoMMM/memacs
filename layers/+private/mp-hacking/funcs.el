@@ -29,6 +29,27 @@
     (message "terminal-here: Not Support For This System.")))
   )
 
+(defun mp-hacking//user-bufferp (bufname)
+  "Test for hidden buffer."
+  (not (string-match "\\`[[:space:]]*\\*" bufname)))
+
+(defun mp-hacking/buffer-switch ()
+  (interactive)
+  ;; all the buffers
+  (setq full-buffer-list (seq-filter 'mp-hacking//user-bufferp
+                                     (mapcar (function buffer-name) (buffer-list))))
+  (if mp-hacking-buffer-switch-max
+      (progn
+        ;; if max specified, only take n buffers
+        (setq buffer-select-list (subseq full-buffer-list 1 (+ mp-hacking-buffer-switch-max 1)))
+        )
+    ;; if not specified, take all
+    (setq buffer-select-list full-buffer-list)
+    )
+  (setq dest-buffer (popup-menu* buffer-select-list :keymap switch-keymap))
+  (switch-to-buffer dest-buffer)
+  )
+
 
 ;;;; haskell
 

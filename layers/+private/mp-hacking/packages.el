@@ -22,7 +22,6 @@
         (outline-ivy :location local)
         ))
 
-
 (defun mp-hacking/init-outshine ()
   "Init outshine to manager code contents."
   (use-package outshine
