@@ -22,7 +22,8 @@
 
 (defun java/init-java-mode ()
   (use-package java-mode
-    :defer t))
+    :defer t
+    :init (add-hook 'java-mode-hook 'memacs//java-mode-keybinding-modify)))
 
 (defun java/init-maven-test-mode ()
   (use-package maven-test-mode

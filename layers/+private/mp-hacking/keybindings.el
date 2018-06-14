@@ -39,9 +39,9 @@
 (memacs/define-insert-keybinding "f" 'mp-hacking/insert-form-feed)
 
 ;; Buffer
-(memacs/define-evil-normal-keybinding
- "C-n" 'next-buffer
- "C-p" 'previous-buffer)
+;; (memacs/define-evil-normal-keybinding
+;;  "C-n" 'next-buffer
+;;  "C-p" 'previous-buffer)
 ;; keymap used in the popup menu
 (setq switch-keymap (make-sparse-keymap))
 (define-key switch-keymap (kbd "<tab>") 'popup-next)

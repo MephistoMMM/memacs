@@ -21,6 +21,9 @@
 
 ;; Misc
 
+(defun memacs//java-mode-keybinding-modify ()
+  (define-key java-mode-map (kbd ";") nil))
+
 (defun spacemacs//java-delete-horizontal-space ()
   (when (s-matches? (rx (+ (not space)))
                     (buffer-substring (line-beginning-position) (point)))

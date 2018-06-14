@@ -55,7 +55,10 @@
     :init (spacemacs/add-to-hooks 'hl-todo-mode '(text-mode-hook
                                                   prog-mode-hook))))
 
-(defun spacemacs-visual/init-popup ())
+(defun spacemacs-visual/init-popup ()
+  (use-package popup
+    :defer t
+    :commands (popup-menu*)))
 
 (defun spacemacs-visual/init-popwin ()
   (use-package popwin
