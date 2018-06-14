@@ -292,6 +292,9 @@
    `(outline-4 ((,class (:foreground ,rainbow-5))))
    `(outline-5 ((,class (:foreground ,rainbow-5))))
    `(outline-6 ((,class (:foreground ,rainbow-8))))
+   ;; flycheck-posframe
+   `(flycheck-posframe-warning-face ((,class (:foreground ,bg1 :background ,str))))
+   `(flycheck-posframe-error-face ((,class (:foreground ,bg1 :background ,aim))))
    ;; powerline
    `(powerline-evil-base-face ((t (:foreground ,bg2))))
    `(powerline-evil-emacs-face ((,class (:inherit powerline-evil-base-face :background ,rainbow-7))))

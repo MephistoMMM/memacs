@@ -51,6 +51,8 @@
       (add-hook 'company-completion-cancelled-hook 'company-maybe-turn-on-fci))
     :config
     (progn
+      ;; start posframe
+      (company-posframe-mode 1)
       (spacemacs|diminish company-mode " ⓐ" " a")
 
       ;; key bindings

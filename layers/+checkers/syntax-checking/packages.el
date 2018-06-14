@@ -12,6 +12,7 @@
 (setq syntax-checking-packages
   '(
     flycheck
+    flycheck-posframe
     flycheck-pos-tip
     popwin
     ))
@@ -94,6 +95,17 @@
         "RET" 'flycheck-error-list-goto-error
         "j" 'flycheck-error-list-next-error
         "k" 'flycheck-error-list-previous-error))))
+
+(defun syntax-checking/init-flycheck-posframe ()
+  (use-package flycheck-posframe
+    :ensure t
+    :after flycheck
+    :config
+    (progn
+      (setq flycheck-posframe-warning-prefix "\u26a0 ")
+      (setq flycheck-posframe-error-prefix "\u2718 ")
+      (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)
+      )))
 
 (defun syntax-checking/init-flycheck-pos-tip ()
   (use-package flycheck-pos-tip

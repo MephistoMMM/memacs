@@ -41,13 +41,21 @@
   (if mp-hacking-buffer-switch-max
       (progn
         ;; if max specified, only take n buffers
-        (setq buffer-select-list (subseq full-buffer-list 1 (+ mp-hacking-buffer-switch-max 1)))
+        (setq buffer-select-list (subseq full-buffer-list
+                                         1
+                                         (min
+                                          (length full-buffer-list)
+                                          (+ mp-hacking-buffer-switch-max 1))))
         )
     ;; if not specified, take all
     (setq buffer-select-list full-buffer-list)
     )
-  (setq dest-buffer (popup-menu* buffer-select-list :keymap switch-keymap))
-  (switch-to-buffer dest-buffer)
+  (if (> (length buffer-select-list) 0)
+    (progn
+      (setq dest-buffer (popup-menu* buffer-select-list :keymap switch-keymap))
+      (switch-to-buffer dest-buffer))
+    (message "Non Other User's Buffer.")
+    )
   )
 
 

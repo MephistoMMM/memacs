@@ -16,11 +16,18 @@
         hl-todo
         popup
         popwin
+        (company-posframe :location (recipe
+                                     :fetcher github
+                                     :repo "tumashu/company-posframe"))
         ))
 
 (defun spacemacs-visual/init-ansi-colors ()
   (add-hook 'compilation-filter-hook
             'spacemacs-visual//compilation-buffer-apply-ansi-colors))
+
+(defun spacemacs-visual/init-company-posframe ()
+  (use-package company-posframe
+    :defer t))
 
 (defun spacemacs-visual/init-desktop ()
   (use-package desktop
@@ -28,7 +35,11 @@
     :init
     (setq desktop-dirname spacemacs-cache-directory)
     :config
-    (add-to-list 'desktop-path spacemacs-cache-directory)))
+    (progn
+      (add-to-list 'desktop-path spacemacs-cache-directory)
+      (push '(company-posframe-mode . nil)
+            desktop-minor-mode-table)
+      )))
 
 (defun spacemacs-visual/init-fill-column-indicator ()
   (use-package fill-column-indicator
