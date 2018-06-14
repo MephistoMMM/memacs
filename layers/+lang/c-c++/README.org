@@ -13,8 +13,8 @@
     - [[#company-clang-and-flycheck][Company-clang and flycheck]]
   - [[#rtags-configuration][RTags configuration]]
   - [[#enable-google-set-c-style][Enable google-set-c-style]]
+  - [[#newlines][Newlines]]
 - [[#key-bindings][Key Bindings]]
-  - [[#debugging-realgud][Debugging (realgud)]]
   - [[#formatting-clang-format][Formatting (clang-format)]]
   - [[#rtags][RTags]]
 
@@ -102,6 +102,16 @@ To enable support for =rtags=, set the layer variable
     '((c-c++ :variables c-c++-enable-rtags-support t)))
 #+END_SRC
 
+This will also enable =company-rtags= to be used as a backend for
+auto-completion (when =auto-completion= layer is included).
+To prevent this, while retaining the rest of Rtags functionality,
+set the variable =c-c++-enable-rtags-support= to ='no-completion=:
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default dotspacemacs-configuration-layers
+    '((c-c++ :variables c-c++-enable-rtags-support 'no-completion)))
+#+END_SRC
+
 ** Enable google-set-c-style
 If you have clang enabled with =clang-format= as described earlier in this page
 you may not have a lot of neeed for =google-set-c-style= if you are already
@@ -132,6 +142,15 @@ set that up like this:
             c-c++-enable-google-newline t)
 #+END_SRC emacs-lisp
 
+** Newlines
+You can enable the =Auto-newline= minor mode that automatically adds newlines
+after certain characters by setting the =c-c++-enable-auto-newline= variable.
+
+#+BEGIN_SRC emacs-lisp
+     (c-c++ :variables
+            c-c++-enable-auto-newline t)
+#+END_SRC emacs-lisp
+
 * Key Bindings
 
 | Key Binding | Description                                                   |
@@ -144,23 +163,6 @@ set that up like this:
 | ~SPC m r~   | srefactor: refactor thing at point.                           |
 
 *Note:*  [[https://github.com/tuhdo/semantic-refactor][semantic-refactor]]  is only available for Emacs 24.4+.
-
-** Debugging (realgud)
-
- | Key Binding | Description     |
- |-------------+-----------------|
- | ~SPC m d d~ | open cmd buffer |
- | ~SPC m d e~ | eval variable   |
- | ~s~         | step over       |
- | ~i~         | step into       |
- | ~b~         | set break       |
- | ~B~         | unset break     |
- | ~o~         | step out        |
- | ~c~         | continue        |
- | ~e~         | eval variable   |
- | ~r~         | restart         |
- | ~q~         | quit debug      |
- | ~S~         | goto cmd buffer |
 
 ** Formatting (clang-format)
 

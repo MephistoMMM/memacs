@@ -14,6 +14,7 @@
         evil-ediff
         evil-escape
         evil-exchange
+        evil-goggles
         evil-iedit-state
         evil-indent-plus
         evil-lion
@@ -25,13 +26,12 @@
         evil-nerd-commenter
         evil-matchit
         evil-numbers
-        evil-search-highlight-persist
         evil-surround
         (evil-unimpaired :location (recipe :fetcher local))
         evil-visual-mark-mode
         evil-visualstar
         (hs-minor-mode :location built-in)
-        linum-relative
+        (linum-relative :toggle (version< emacs-version "26"))
         vi-tilde-fringe
         ))
 
@@ -50,12 +50,29 @@
 
 (defun spacemacs-evil/init-evil-escape ()
   (use-package evil-escape
-    :init (evil-escape-mode)
+    :init
+    (spacemacs//evil-escape-deactivate-in-holy-mode 'hybrid)
     :config (spacemacs|hide-lighter evil-escape-mode)))
 
 (defun spacemacs-evil/init-evil-exchange ()
   (use-package evil-exchange
     :init (evil-exchange-install)))
+
+(defun spacemacs-evil/init-evil-goggles ()
+  (use-package evil-goggles
+    :init
+    (progn
+      ;; disable pulses as it is more distracting than useful and
+      ;; less readable.
+      (setq evil-goggles-pulse nil
+            evil-goggles-async-duration 0.1
+            evil-goggles-blocking-duration 0.05)
+      (if (or vim-style-visual-feedback
+              hybrid-style-visual-feedback)
+          (evil-goggles-mode)
+        (evil-goggles-mode -1)))
+    :config
+    (spacemacs|hide-lighter evil-goggles-mode)))
 
 (defun spacemacs-evil/init-evil-iedit-state ()
   (use-package evil-iedit-state
@@ -87,7 +104,13 @@
 
 (defun spacemacs-evil/init-evil-lisp-state ()
   (use-package evil-lisp-state
-    :init (setq evil-lisp-state-global t)))
+    :defer t
+    :init
+    (progn
+      (add-hook 'prog-mode-hook 'spacemacs//load-evil-lisp-state)
+      (setq evil-lisp-state-global t))
+    :config (spacemacs/set-leader-keys "k" evil-lisp-state-map)))
+
 
 (defun spacemacs-evil/init-evil-mc ()
   (use-package evil-mc
@@ -115,16 +138,6 @@
 (defun spacemacs-evil/init-evil-numbers ()
   (use-package evil-numbers
     :defer t))
-
-(defun spacemacs-evil/init-evil-search-highlight-persist ()
-  (use-package evil-search-highlight-persist
-    :init
-    (progn
-      (global-evil-search-highlight-persist)
-      (evil-ex-define-cmd "nohlsearch" 'spacemacs/evil-search-clear-highlight)
-      (spacemacs//adaptive-evil-highlight-persist-face)
-      (add-hook 'spacemacs-post-theme-change-hook
-                'spacemacs//adaptive-evil-highlight-persist-face))))
 
 (defun spacemacs-evil/init-evil-surround ()
   (use-package evil-surround

@@ -67,3 +67,11 @@ Unlike `eval-defun', this does not go to topmost function."
       ;; enable edebug-mode
       (when evilified (evil-evilified-state))
       (evil-normalize-keymaps))))
+
+
+;; elisp comment text-object definition
+
+(defun spacemacs//define-elisp-comment-text-object ()
+  "Define a text object and a surround pair for elisp comments.
+Intended for use in mode hooks."
+  (spacemacs|define-text-object ";" "elisp-comment" ";; " ""))

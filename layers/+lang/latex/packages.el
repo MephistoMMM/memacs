@@ -18,7 +18,6 @@
         (reftex :location built-in)
         flycheck
         flyspell
-        ggtags
         counsel-gtags
         (magic-latex-buffer :toggle latex-enable-magic)
         typo
@@ -180,9 +179,6 @@
 
 (defun latex/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'latex-mode))
-
-(defun latex/post-init-ggtags ()
-  (add-hook 'latex-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
 
 (defun latex/post-init-typo ()
   ;; Typo mode isn't useful for LaTeX.

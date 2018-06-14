@@ -1,13 +1,17 @@
 #+TITLE: JavaScript layer
 
-[[file:img/javascript.png]] [[file:img/coffee.png]]
+[[file:img/javascript.png]]
 
 * Table of Contents                                         :TOC_4_gh:noexport:
 - [[#description][Description]]
   - [[#features][Features:]]
 - [[#install][Install]]
-- [[#configuration][Configuration]]
+  - [[#web-beautify][web-beautify]]
+  - [[#choosing-a-backend][Choosing a backend]]
+- [[#backends][Backends]]
   - [[#tern][Tern]]
+  - [[#language-server-protocol][Language Server Protocol]]
+- [[#configuration][Configuration]]
   - [[#indentation][Indentation]]
   - [[#repl][REPL]]
   - [[#node-modules][Node Modules]]
@@ -15,40 +19,24 @@
   - [[#js2-mode][js2-mode]]
   - [[#folding-js2-mode][Folding (js2-mode)]]
   - [[#refactoring-js2-refactor][Refactoring (js2-refactor)]]
-  - [[#formatting-web-beautify][Formatting (web-beautify)]]
     - [[#documentation-js-doc][Documentation (js-doc)]]
-  - [[#auto-complete-and-documentation-tern][Auto-complete and documentation (tern)]]
-  - [[#json][JSON]]
   - [[#repl-skewer-mode][REPL (skewer-mode)]]
-  - [[#coffee-mode][coffee-mode]]
 
 * Description
 This layer adds support for the JavaScript language using [[https://github.com/mooz/js2-mode][js2-mode]].
 
 ** Features:
+- Multiple backends support: Tern and LSP
 - Smart code folding
 - Refactoring: done using [[https://github.com/magnars/js2-refactor.el][js2-refactor]].
-- Auto-completion and documentation: provided by [[http://ternjs.net/][tern]]
-- CoffeeScript support
-- Formatting with [[https://github.com/yasuyk/web-beautify][web-beautify]]
-- Get the path to a JSON value with [[https://github.com/Sterlingg/json-snatcher][json-snatcher]]
+- Auto-completion and documentation
 - REPL available via [[https://github.com/skeeto/skewer-mode][skewer-mode]] and [[https://github.com/pandeiro/livid-mode][livid-mode]]
+- Formatting with [[https://github.com/yasuyk/web-beautify][web-beautify]]
 
 * Install
 To use this configuration layer, add it to your =~/.spacemacs=. You will need to
 add =javascript= to the existing =dotspacemacs-configuration-layers= list in
 this file.
-
-You will also need to install =tern= to use the auto-completion and
-documentation features:
-#+BEGIN_SRC sh
-  $ npm install -g tern
-#+END_SRC
-
-To use the formatting features, install =js-beautify=:
-#+BEGIN_SRC sh
-  $ npm install -g js-beautify
-#+END_SRC
 
 To activate error checking using flycheck, install one of the [[http://www.flycheck.org/en/latest/languages.html#javascript][available linters]]
 such as =ESLint= or =JSHint=:
@@ -63,28 +51,41 @@ If you install these in non-standard locations, then add the following to your =
   (add-to-list 'exec-path "/path/to/node/bins" t)
 #+END_SRC
 
-* Configuration
+** web-beautify
+See [[file:../../+tools/web-beautify/README.org][web-beautify layer]] documentation.
+
+** Choosing a backend
+To choose a default backend set the layer variable =javascript-backend=:
+
+#+BEGIN_SRC elisp
+(javascript :variables javascript-backend 'tern)
+#+END_SRC
+
+Backend can be chosen on a per project basis using directory local variables
+(files named =.dir-locals.el= at the root of a project), an example to use the
+=lsp= backend:
+
+#+BEGIN_SRC elisp
+;;; Directory Local Variables
+;;; For more information see (info "(emacs) Directory Variables")
+
+((js2-mode (javascript-backend . lsp)))
+#+END_SRC
+
+*Note:* you can easily add a directory local variable with ~SPC f v d~.
+
+* Backends
 ** Tern
-To make tern re-use the server across multiple different editing sessions (thus
-creating multiple =.tern-port= files for each document you have open [[http://ternjs.net/doc/manual.html][see here
-for more details]]):
+See [[file:../../+tools/tern/README.org][tern layer]] documentation.
 
-The variables provided below can be set when adding the =javascript=
-configuration layer, as detailed in [[https://github.com/syl20bnr/spacemacs/blob/develop/doc/DOCUMENTATION.org#setting-configuration-layers-variables][this]] section of the documentation.
+** Language Server Protocol
+You just have to install javascript and typescript language server packages:
 
-#+BEGIN_SRC emacs-lisp
-  (javascript :variables javascript-disable-tern-port-files nil)
-#+END_SRC
+#+begin_src sh
+npm i -g typescript javascript-typescript-langserver flow-language-server
+#+end_src
 
-Windows users may need to set the variable =tern-command= in order for emacs to
-locate and launch tern server successfully. See [[https://github.com/syl20bnr/spacemacs/issues/5733][this open issue for more
-details]]. The variable can be set when adding the =javascript= configuration
-layer:
-
-#+BEGIN_SRC emacs-lisp
-  (javascript :variables tern-command '("node" "/path/to/tern/bin/tern"))
-#+END_SRC
-
+* Configuration
 ** Indentation
 To change how js2-mode indents code, set the variable =js2-basic-offset=, as
 such:
@@ -183,12 +184,6 @@ Bindings should match the plain emacs assignments.
 | ~SPC m x m j~ | move line down, while keeping commas correctly placed                                                          |
 | ~SPC m x m k~ | move line up, while keeping commas correctly placed                                                            |
 
-** Formatting (web-beautify)
-
-| Key Binding | Description                                                  |
-|-------------+--------------------------------------------------------------|
-| ~SPC m =~   | beautify code in js2-mode, json-mode, web-mode, and css-mode |
-
 *** Documentation (js-doc)
 You can check more [[https://github.com/mooz/js-doc/][here]]
 
@@ -198,23 +193,6 @@ You can check more [[https://github.com/mooz/js-doc/][here]]
 | ~SPC m r d f~ | insert JSDoc comment for function     |
 | ~SPC m r d t~ | insert tag to comment                 |
 | ~SPC m r d h~ | show list of available jsdoc tags     |
-
-** Auto-complete and documentation (tern)
-
-| Key Binding   | Description                                                                              |
-|---------------+------------------------------------------------------------------------------------------|
-| ~SPC m C-g~   | brings you back to last place you were when you pressed M-..                             |
-| ~SPC m g g~   | jump to the definition of the thing under the cursor                                     |
-| ~SPC m g G~   | jump to definition for the given name                                                    |
-| ~SPC m h d~   | find docs of the thing under the cursor. Press again to open the associated URL (if any) |
-| ~SPC m h t~   | find the type of the thing under the cursor                                              |
-| ~SPC m r r V~ | rename variable under the cursor using tern                                              |
-
-** JSON
-
-| Key Binding | Description                        |
-|-------------+------------------------------------|
-| ~SPC m h p~ | Get the path of the value at point |
 
 ** REPL (skewer-mode)
 
@@ -234,16 +212,3 @@ You can check more [[https://github.com/mooz/js-doc/][here]]
 | ~SPC m s r~ | send current region to the skewer REPL                                             |
 | ~SPC m s R~ | send current region to the skewer REPL and switch to it in insert state            |
 | ~SPC m s s~ | switch to REPL                                                                     |
-
-** coffee-mode
-
-| Key Binding | Description                                        |
-|-------------+----------------------------------------------------|
-| ~SPC m '~   | Create or go to REPL                               |
-| ~SPC m c c~ | Compile buffer                                     |
-| ~SPC m c r~ | Compile region                                     |
-| ~SPC m s b~ | Send buffer to REPL                                |
-| ~SPC m s l~ | Send line to REPL                                  |
-| ~SPC m s i~ | Create or go to REPL                               |
-| ~SPC m s r~ | send current region to the REPL and stay in buffer |
-| ~SPC m T c~ | Toggle compile on save                             |

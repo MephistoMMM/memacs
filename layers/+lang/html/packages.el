@@ -30,6 +30,7 @@
         tagedit
         web-mode
         yasnippet
+        web-beautify
         ))
 
 (defun html/post-init-add-node-modules-path ()
@@ -72,32 +73,9 @@
       ;; Mark `css-indent-offset' as safe-local variable
       (put 'css-indent-offset 'safe-local-variable #'integerp)
 
-      (defun css-expand-statement ()
-        "Expand CSS block"
-        (interactive)
-        (save-excursion
-          (end-of-line)
-          (search-backward "{")
-          (forward-char 1)
-          (while (or (eobp) (not (looking-at "}")))
-          (let ((beg (point)))
-            (newline)
-            (search-forward ";")
-            (indent-region beg (point))
-            ))
-          (newline)))
-
-      (defun css-contract-statement ()
-        "Contract CSS block"
-        (interactive)
-        (end-of-line)
-        (search-backward "{")
-        (while (not (looking-at "}"))
-          (join-line -1)))
-
       (spacemacs/set-leader-keys-for-major-mode 'css-mode
-        "zc" 'css-contract-statement
-        "zo" 'css-expand-statement))))
+        "zc" 'spacemacs/css-contract-statement
+        "zo" 'spacemacs/css-expand-statement))))
 
 (defun html/init-emmet-mode ()
   (use-package emmet-mode
@@ -275,3 +253,6 @@
   (spacemacs/add-to-hooks 'spacemacs/load-yasnippet '(css-mode-hook
                                                       jade-mode
                                                       slim-mode)))
+(defun html/pre-init-web-beautify ()
+  (add-to-list 'spacemacs--web-beautify-modes (cons 'css-mode 'web-beautify-css))
+  (add-to-list 'spacemacs--web-beautify-modes (cons 'web-mode 'web-beautify-html)))

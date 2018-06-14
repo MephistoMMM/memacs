@@ -62,19 +62,17 @@ Otherwise, revert to the default behavior (i.e. enable `evil-insert-state')."
 (defun spacemacs/evil-search-clear-highlight ()
   "Clear evil-search or evil-ex-search persistent highlights."
   (interactive)
-  (evil-search-highlight-persist-remove-all)        ; `C-s s' highlights
   (evil-ex-nohighlight)                             ; `/' highlights
   (when (fboundp 'evil-iedit-state/quit-iedit-mode) ; `gI' evil-iedit-state-mode
       (evil-iedit-state/quit-iedit-mode))
   (evil-exchange-cancel)                            ; `gx' evil-exchange
   )
 
-(defun spacemacs//adaptive-evil-highlight-persist-face ()
-  (set-face-attribute 'evil-search-highlight-persist-highlight-face nil
-                      :inherit 'lazy-highlight
-                      :background nil
-                      :foreground nil))
+(defun spacemacs//evil-escape-deactivate-in-holy-mode  (style)
+  "Deactivate `evil-escape' if STYLE is `emacs' otherwise enable it."
+      (evil-escape-mode t))
 
+
 (defun spacemacs/linum-relative-toggle ()
   (interactive)
   (if (not (bound-and-true-p linum-relative-mode))
@@ -107,3 +105,10 @@ Otherwise, revert to the default behavior (i.e. enable `evil-insert-state')."
   (interactive "p")
   (setq this-command 'evil-paste-before)
   (evil-paste-before count (or register evil-this-register)))
+
+
+;; lisp state
+
+(defun spacemacs//load-evil-lisp-state ()
+  "Load evil-lisp-state lazily"
+  (require 'evil-lisp-state))

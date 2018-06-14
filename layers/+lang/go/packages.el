@@ -12,40 +12,78 @@
 (setq go-packages
       '(
         (company-go :requires company)
+        counsel-gtags
         flycheck
-        exec-path-from-shell
         go-eldoc
-        go-mode
+        go-fill-struct
+        go-gen-test
         go-guru
+        go-impl
+        go-mode
         go-rename
-        godoctor
         go-tag
+        godoctor
         popwin
         ))
-
-
-(defun go/post-init-popwin ()
-  (push (cons go-test-buffer-name '(:dedicated t :position bottom :stick t :noselect t :height 0.4))
-        popwin:special-display-config))
 
 (defun go/init-company-go ()
   (use-package company-go
     :defer t
-    :init
-    (spacemacs|add-company-backends
-      :backends company-go
-      :modes go-mode
-      :variables company-go-show-annotation t)))
+    :init (spacemacs|add-company-backends
+            :backends company-go
+            :modes go-mode
+            :variables company-go-show-annotation t)))
+
+(defun go/post-init-counsel-gtags ()
+  (spacemacs/counsel-gtags-define-keys-for-mode 'go-mode))
 
 (defun go/post-init-flycheck ()
   (spacemacs/enable-flycheck 'go-mode))
 
-(defun go/pre-init-exec-path-from-shell ()
-  (spacemacs|use-package-add-hook exec-path-from-shell
-    :pre-config
-    (dolist (var '("GOPATH" "GOROOT" "GO15VENDOREXPERIMENT") exec-path-from-shell-variables)
-      (unless (or (member var exec-path-from-shell-variables) (getenv var))
-        (push var exec-path-from-shell-variables)))))
+(defun go/init-go-eldoc ()
+  (add-hook 'go-mode-hook 'go-eldoc-setup))
+
+(defun go/init-go-fill-struct ()
+  (use-package go-fill-struct
+    :defer t
+    :init (spacemacs/set-leader-keys-for-major-mode 'go-mode
+            "rs" 'go-fill-struct)))
+
+(defun go/init-go-gen-test()
+  (use-package go-gen-test
+    :defer t
+    :init
+    (progn
+      (spacemacs/set-leader-keys-for-major-mode 'go-mode
+        "tgg" 'go-gen-test-dwim
+        "tgf" 'go-gen-test-exported
+        "tgF" 'go-gen-test-all))))
+
+(defun go/init-go-guru ()
+  (use-package go-impl
+    :defer t
+    :init
+    (progn
+      (spacemacs/declare-prefix-for-mode 'go-mode "mf" "guru")
+      (spacemacs/set-leader-keys-for-major-mode 'go-mode
+        "f<" 'go-guru-callers
+        "f>" 'go-guru-callees
+        "fc" 'go-guru-peers
+        "fd" 'go-guru-describe
+        "fe" 'go-guru-whicherrs
+        "ff" 'go-guru-freevars
+        "fi" 'go-guru-implements
+        "fj" 'go-guru-definition
+        "fo" 'go-guru-set-scope
+        "fp" 'go-guru-pointsto
+        "fr" 'go-guru-referrers
+        "fs" 'go-guru-callstack))))
+
+(defun go/init-go-impl()
+  (use-package go-impl
+    :defer t
+    :init (spacemacs/set-leader-keys-for-major-mode 'go-mode
+            "ri" 'go-impl)))
 
 (defun go/init-go-mode()
   (use-package go-mode
@@ -80,3 +118,7 @@
 (defun go/init-go-tag ()
   (use-package go-tag
     :defer t))
+
+(defun go/post-init-popwin ()
+  (push (cons go-test-buffer-name '(:dedicated t :position bottom :stick t :noselect t :height 0.4))
+        popwin:special-display-config))

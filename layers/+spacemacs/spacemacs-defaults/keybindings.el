@@ -34,6 +34,8 @@
                                        ("h"   "help")
                                        ("hd"  "help-describe")
                                        ("j"   "jump")
+                                       ("hP"  "profiler")
+                                       ("k"   "lisp")
                                        ("kd"  "delete")
                                        ("kD"  "delete-backward")
                                        ("k`"  "hybrid")
@@ -218,7 +220,12 @@
   "hds" 'spacemacs/describe-system-info
   "hdt" 'describe-theme
   "hdv" 'describe-variable
-  "hn"  'view-emacs-news)
+  "hI"  'spacemacs/report-issue
+  "hn"  'view-emacs-news
+  "hPs" 'profiler-start
+  "hPk" 'profiler-stop
+  "hPr" 'profiler-report
+  "hPw" 'profiler-report-write-profile)
 ;; insert stuff ---------------------------------------------------------------
 (memacs/define-insert-keybinding
   "J" 'spacemacs/insert-line-below-no-indent
@@ -422,6 +429,7 @@
   "xlS" 'spacemacs/sort-lines-reverse
   "xlu" 'spacemacs/uniquify-lines
   "xtc" 'transpose-chars
+  "xte" 'transpose-sexps
   "xtl" 'transpose-lines
   "xtp" 'transpose-paragraphs
   "xts" 'transpose-sentences

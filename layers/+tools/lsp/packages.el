@@ -37,6 +37,7 @@
 
 (defun lsp/init-lsp-mode ()
   (use-package lsp-mode
+    :defer t
     :config
     (progn
       (add-hook 'lsp-after-open-hook #'lsp-enable-imenu))

@@ -14,8 +14,10 @@
         auto-yasnippet
         company
         company-statistics
+        counsel
         fuzzy
         hippie-exp
+        (ivy-yasnippet :requires ivy)
         yasnippet
         yasnippet-snippets
         ))
@@ -79,6 +81,11 @@
                                             "company-statistics-cache.el"))
       (add-hook 'company-mode-hook 'company-statistics-mode))))
 
+(defun auto-completion/pre-init-counsel ()
+    (spacemacs|use-package-add-hook company
+      :post-config
+      (define-key company-active-map (kbd "C-/") 'counsel-company)))
+
 (defun auto-completion/init-fuzzy ()
   (use-package fuzzy :defer t))
 
@@ -110,12 +117,19 @@
           try-complete-lisp-symbol
           ;; Yasnippet
           ;; Try to expand yasnippet snippets based on prefix
-          yas-hippie-try-expand
-          )))
+          yas-hippie-try-expand)))
+
+(defun auto-completion/init-ivy-yasnippet ()
+  (use-package ivy-yasnippet
+    :defer t
+    :init
+    (progn
+      (setq ivy-yasnippet-expand-keys nil)
+      (spacemacs/set-leader-keys "is" 'spacemacs/ivy-yas))))
 
 (defun auto-completion/init-yasnippet ()
   (use-package yasnippet
-    :commands (yas-global-mode yas-minor-mode)
+    :commands (yas-global-mode yas-minor-mode yas-activate-extra-mode)
     :init
     (progn
       ;; We don't want undefined variable errors
@@ -145,19 +159,18 @@
           (if (listp auto-completion-private-snippets-directory)
               (setq yas-snippet-dirs (append yas-snippet-dirs auto-completion-private-snippets-directory))
             (add-to-list 'yas-snippet-dirs auto-completion-private-snippets-directory))))
-
-      (spacemacs/add-to-hooks 'spacemacs/load-yasnippet '(prog-mode-hook
-                                                          markdown-mode-hook
-                                                          org-mode-hook))
       (spacemacs|add-toggle yasnippet
         :mode yas-minor-mode
         :documentation "Enable snippets."
         :evil-leader "ty")
-
       (spacemacs/add-to-hooks
        'spacemacs/force-yasnippet-off '(term-mode-hook
                                         shell-mode-hook
-                                        eshell-mode-hook)))
+                                        eshell-mode-hook))
+      (spacemacs|require 'yasnippet)
+      (spacemacs/add-to-hooks 'spacemacs/load-yasnippet '(prog-mode-hook
+                                                          markdown-mode-hook
+                                                        org-mode-hook)))
     :config
     (progn
       (spacemacs|diminish yas-minor-mode " ⓨ" " y")

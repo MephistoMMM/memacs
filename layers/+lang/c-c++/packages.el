@@ -45,6 +45,23 @@
           "D" 'disaster)))
     ))
 
+(defun c-c++/post-init-company-ycmd ()
+  (spacemacs|add-company-backends :backends company-ycmd :modes c-mode-common))
+
+(defun c-c++/post-init-counsel-gtags ()
+  (dolist (mode c-c++-modes)
+    (spacemacs/counsel-gtags-define-keys-for-mode mode)))
+
+(defun c-c++/init-disaster ()
+  (use-package disaster
+    :defer t
+    :commands (disaster)
+    :init
+    (progn
+      (dolist (mode c-c++-modes)
+        (spacemacs/set-leader-keys-for-major-mode mode
+          "D" 'disaster)))))
+
 (defun c-c++/post-init-flycheck ()
   (dolist (mode c-c++-modes)
     (spacemacs/enable-flycheck mode)))

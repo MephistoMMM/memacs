@@ -28,7 +28,7 @@
     :init
     (setq desktop-dirname spacemacs-cache-directory)
     :config
-    (push spacemacs-cache-directory desktop-path)))
+    (add-to-list 'desktop-path spacemacs-cache-directory)))
 
 (defun spacemacs-visual/init-fill-column-indicator ()
   (use-package fill-column-indicator
@@ -36,10 +36,9 @@
     :init
     (progn
       (setq fci-rule-width 1)
-      (setq fci-rule-color "#D0BF8F")
       ;; manually register the minor mode since it does not define any
       ;; lighter
-      (push '(fci-mode "") minor-mode-alist)
+      (add-to-list 'minor-mode-alist '(fci-mode ""))
       (spacemacs|add-toggle fill-column-indicator
         :status fci-mode
         :on (turn-on-fci-mode)

@@ -9,10 +9,10 @@
 ;;
 ;;; License: GPLv3
 (setq message-log-max 16384)
-(defconst emacs-start-time (current-time))
 
 (require 'subr-x nil 'noerror)
 (require 'page-break-lines)
+(require 'core-hooks)
 (require 'core-debug)
 (require 'core-command-line)
 (require 'core-configuration-layer)
@@ -70,7 +70,8 @@ the final step of executing code in `emacs-startup-hook'.")
     (unless (frame-parameter nil 'fullscreen)
       (toggle-frame-maximized))
     (add-to-list 'default-frame-alist '(fullscreen . maximized)))
-  (dotspacemacs|call-func dotspacemacs/user-init "Calling dotfile user init...")
+  (spacemacs|unless-dumping
+    (dotspacemacs|call-func dotspacemacs/user-init "Calling dotfile user init..."))
   ;; Given the loading process of Spacemacs we have no choice but to set the
   ;; custom settings twice:
   ;; - once at the very beginning of startup (here)
@@ -109,10 +110,10 @@ the final step of executing code in `emacs-startup-hook'.")
    ;; believe me? Go ahead, try it. After you'll have notice that this was true,
    ;; increase the counter bellow so next people will give it more confidence.
    ;; Counter = 1
-   (message "Set fullscreen...")
+   (spacemacs-buffer/message "Set fullscreen...")
    (when dotspacemacs-fullscreen-at-startup
      (toggle-frame-fullscreen))
-   (message "Setting the font...")
+   (spacemacs-buffer/message "Setting the font...")
    (unless (spacemacs/set-default-font dotspacemacs-default-font)
      (spacemacs-buffer/warning
       "Cannot find any of the specified fonts (%s)! Font settings may not be correct."
@@ -159,7 +160,8 @@ defer call using `spacemacs-post-user-config-hook'."
     (add-hook 'spacemacs-post-user-config-hook func)))
 
 (defun spacemacs/setup-startup-hook ()
-  "Add post init processing."
+  "Add post init processing.
+Note: the hooked function is not executed when in dumped mode."
   (add-hook
    'emacs-startup-hook
    (defun spacemacs/startup-hook ()
@@ -171,9 +173,9 @@ defer call using `spacemacs-post-user-config-hook'."
      ;; Ultimate configuration decisions are given to the user who can defined
      ;; them in his/her ~/.spacemacs file
      (dotspacemacs|call-func dotspacemacs/user-config
-                             "Calling dotfile user config...")
+                   "Calling dotfile user config...")
      (dotspacemacs|call-func dotspacemacs/emacs-custom-settings
-                             "Calling dotfile Emacs custom settings...")
+                   "Calling dotfile Emacs custom settings...")
      (run-hooks 'spacemacs-post-user-config-hook)
      (setq spacemacs-post-user-config-hook-run t)
      (when (fboundp dotspacemacs-scratch-mode)

@@ -40,7 +40,9 @@
   "Setup anaconda auto-completion."
   (spacemacs|add-company-backends
     :backends company-anaconda
-    :modes python-mode)
+    :modes python-mode
+    :append-hooks nil
+    :call-hooks t)
   (company-mode))
 
 (defun spacemacs//python-setup-anaconda-eldoc ()
@@ -70,7 +72,7 @@ when this mode is enabled since the minibuffer is cleared all the time."
       (progn
         (require 'lsp-python)
         (lsp-python-enable))
-    (message "`lsp' layer is not installed, please add `lsp' layer to your dofile.")))
+    (message "`lsp' layer is not installed, please add `lsp' layer to your dotfile.")))
 
 (defun spacemacs//python-setup-lsp-company ()
   "Setup lsp auto-completion."
@@ -78,9 +80,11 @@ when this mode is enabled since the minibuffer is cleared all the time."
       (progn
         (spacemacs|add-company-backends
           :backends company-lsp
-          :modes python-mode)
+          :modes python-mode
+          :append-hooks nil
+          :call-hooks t)
         (company-mode))
-    (message "`lsp' layer is not installed, please add `lsp' layer to your dofile.")))
+    (message "`lsp' layer is not installed, please add `lsp' layer to your dotfile.")))
 
 
 ;; others
@@ -126,6 +130,7 @@ as the pyenv version then also return nil. This works around https://github.com/
     (progn
       (setq python-shell-interpreter-args "-i")
       (setq python-shell-interpreter "python"))))
+
 
 (defun spacemacs//python-setup-checkers (&rest args)
   (when (fboundp 'flycheck-set-checker-executable)

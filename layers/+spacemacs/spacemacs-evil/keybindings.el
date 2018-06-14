@@ -16,9 +16,6 @@
   "xal" 'evil-lion-left
   "xaL" 'evil-lion-right)
 
-;;; lisp state
-(spacemacs/set-leader-keys "L" evil-lisp-state-map)
-
 ;;; mc
 (define-key evil-normal-state-map "p" 'spacemacs/evil-mc-paste-after)
 (define-key evil-normal-state-map "P" 'spacemacs/evil-mc-paste-before)

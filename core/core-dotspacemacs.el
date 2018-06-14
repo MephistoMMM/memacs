@@ -20,6 +20,22 @@
 `+distributions'. For now available distributions are `spacemacs-base'
 or `spacemacs'.")
 
+(defvar dotspacemacs-enable-emacs-pdumper nil
+  "If non-nil then enable support for the portable dumper. You'll need
+to compile Emacs 27 from source following the instructions in file
+EXPERIMENTAL.org at to root of the git repository.")
+
+(defvar dotspacemacs-emacs-pdumper-executable-file "emacs-27.0.50"
+  "File path pointing to emacs 27.1 executable compiled with support for the
+portable dumper (this is currently the branch pdumper.")
+
+(defvar dotspacemacs-emacs-dumper-dump-file "spacemacs.pdmp"
+  "Name of the Spacemacs dump file. This is the file will be created by the
+portable dumper in the cache directory under dumps sub-directory.
+To load it when starting Emacs add the parameter `--dump-file'
+when invoking Emacs 27.1 executable on the command line, for instance:
+./emacs --dump-file=/Users/sylvain/.emacs.d/.cache/dumps/spacemacs.pdmp")
+
 (defvar dotspacemacs-gc-cons '(100000000 0.1)
   "Set `gc-cons-threshold' and `gc-cons-percentage' when startup finishes.
 This is an advanced option and should not be changed unless you suspect
@@ -133,16 +149,6 @@ pressing `<leader> m`. Set it to `nil` to disable it.")
   "Default font, or prioritized list of fonts. This setting has no effect when
 running Emacs in terminal.")
 
-(defvar dotspacemacs-remap-Y-to-y$ nil
-  "If non nil `Y' is remapped to `y$' in Evil states.")
-
-(defvar dotspacemacs-retain-visual-state-on-shift t
-  "If non-nil, the shift mappings `<' and `>' retain visual state
-if used there.")
-
-(defvar dotspacemacs-ex-substitute-global nil
-  "If non nil, inverse the meaning of `g' in `:substitute' Evil ex-command.")
-
 (defvar dotspacemacs-folding-method 'evil
   "Code folding method. Possible values are `evil' and `origami'.")
 
@@ -213,7 +219,9 @@ can be toggled through `toggle-transparency'.")
   "If non nil show the color guide hint for transient state keys.")
 
 (defvar dotspacemacs-mode-line-unicode-symbols t
-  "If non nil unicode symbols are displayed in the mode-line (eg. for lighters)")
+  "If non nil unicode symbols are displayed in the mode-line (eg. for lighters).
+If you use Emacs as a daemon and wants unicode characters only in GUI set
+the value to quoted `display-graphic-p'. (default t)")
 
 (defvar dotspacemacs-smooth-scrolling t
   "If non nil smooth scrolling (native-scrolling) is enabled.
@@ -237,11 +245,17 @@ This variable can also be set to a property list for finer control:
 The property `:enabled-for-modes' takes priority over `:disabled-for-modes' and
 restricts line-number to the specified list of major-mode.")
 
-(defvar dotspacemacs-enable-server t
+(defvar dotspacemacs-enable-server nil
   "If non-nil, start an Emacs server if one is not already running.")
 
 (defvar dotspacemacs-persistent-server nil
   "If non nil advises quit functions to keep server open when quitting.")
+
+(defvar dotspacemacs-server-socket-dir nil
+  "Set the emacs server socket location.
+If nil, uses whatever the Emacs default is,
+otherwise a directory path like \"~/.emacs.d/server\".
+Has no effect if `dotspacemacs-enable-server' is nil.")
 
 (defvar dotspacemacs-smart-closing-parenthesis nil
   "If non-nil pressing the closing parenthesis `)' key in insert mode passes
@@ -356,7 +370,9 @@ Called with `C-u C-u' skips `dotspacemacs/user-config' _and_ preleminary tests."
                                         "Calling dotfile init...")
                 (dotspacemacs|call-func dotspacemacs/user-init
                                         "Calling dotfile user init...")
-                (configuration-layer/load)
+                ;; try to force a redump when reloading the configuration
+                (let ((spacemacs-force-dump t))
+                  (configuration-layer/load))
                 (if (member arg '((4) (16)))
                     (message (concat "Done (`dotspacemacs/user-config' "
                                      "function has been skipped)."))
@@ -368,7 +384,7 @@ Called with `C-u C-u' skips `dotspacemacs/user-config' _and_ preleminary tests."
             (spacemacs-buffer/warning "Some tests failed, check `%s' buffer"
                                       dotspacemacs-test-results-buffer))))))
   (when (configuration-layer/package-used-p 'spaceline)
-    (spacemacs//set-powerline-for-startup-buffers)))
+    (spacemacs//restore-buffers-powerline)))
 
 (defun dotspacemacs/get-variable-string-list ()
   "Return a list of all the dotspacemacs variables as strings."

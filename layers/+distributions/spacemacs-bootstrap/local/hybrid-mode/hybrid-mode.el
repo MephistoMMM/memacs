@@ -1,6 +1,6 @@
 ;;; hybrid-mode.el --- Put one foot in the church of Emacs
 
-;; Copyright (C) 2012-2016 Sylvain Benner & Contributors
+;; Copyright (C) 2012-2018 Sylvain Benner & Contributors
 ;;
 ;; Authors: Justin Burkett <justin@burkett.cc>
 ;;          Chris Ewald <chrisewald@gmail.com>
@@ -31,7 +31,10 @@
 
 (require 'evil)
 
-(defcustom hybrid-mode-default-state 'normal
+
+(defcustom hybrid-style-default-state
+  (spacemacs|dotspacemacs-backward-compatibility
+   hybrid-mode-default-state normal)
   "Value of `evil-default-state' for hybrid-mode."
   :group 'spacemacs
   :type 'symbol)
@@ -71,7 +74,7 @@
 (defun enable-hybrid-editing-style ()
   "Enable the hybrid editing style."
   (setq hybrid-mode-default-state-backup evil-default-state
-        evil-default-state hybrid-mode-default-state)
+        evil-default-state hybrid-style-default-state)
   ;; replace evil states by `hybrid state'
   (ad-enable-advice 'evil-insert-state
                     'around 'hybrid-insert-to-hybrid-state)
@@ -143,7 +146,7 @@
         (if (memq major-mode evil-evilified-state-modes)
             (evil-evilified-state)
           (funcall (intern (format "evil-%S-state"
-                                   hybrid-mode-default-state)))))
+                                   hybrid-style-default-state)))))
        ((and (eq 'vim style)
              (memq evil-state '(hybrid emacs)))
         (cond
