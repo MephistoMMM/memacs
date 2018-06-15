@@ -60,8 +60,8 @@
 
 ;;;; Outshine
 (spacemacs/set-leader-keys-for-minor-mode outline-minor-mode
-  "M-RET"     'outshine-insert-heading
   "<backtab>" 'outshine-cycle-buffer)
+(memacs/define-insert-keybinding "h" 'outshine-insert-heading)
 (spacemacs/declare-prefix "o" "outshine")
 (spacemacs/set-leader-keys
   ;; Insert
@@ -91,5 +91,16 @@
 (with-eval-after-load 'go-mode
   (spacemacs/set-leader-keys-for-major-mode 'go-mode "Va" 'goenv-activate)
   (spacemacs/set-leader-keys-for-major-mode 'go-mode "Vd" 'goenv-deactivate))
+
+
+;;;; Better Default
+(global-set-key [(meta a)] 'mark-whole-buffer)
+(global-set-key [(meta v)] 'yank)
+(global-set-key [(meta c)] 'kill-ring-save)
+(global-set-key [(meta s)] 'save-buffer)
+(global-set-key [(meta w)]
+                (lambda () (interactive) (delete-window)))
+(global-set-key [(meta z)] 'undo)
+(global-set-key [(meta l)] 'evil-avy-goto-line)
 
 ;;; keybindings.el ends here

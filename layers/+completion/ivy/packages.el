@@ -145,8 +145,8 @@
       evil-ex-search-keymap
       evil-normal-state-map
       evil-hybrid-state-map)
-     "C-e" 'spacemacs/ivy-evil-registers
-     "C-y" 'counsel-yank-pop))
+     "M-e" 'spacemacs/ivy-evil-registers
+     "M-y" 'counsel-yank-pop))
   )
 
 (defun ivy/init-flx ()
@@ -257,8 +257,8 @@ Current Action: %s(ivy-action-name)
 
   ;; binding yank pop and evil-registers
   (with-eval-after-load 'counsel
-    (define-key ivy-minibuffer-map (kbd "C-e") 'spacemacs/ivy-evil-registers)
-    (define-key ivy-minibuffer-map (kbd "C-y") 'counsel-yank-pop))
+    (define-key ivy-minibuffer-map (kbd "M-e") 'spacemacs/ivy-evil-registers)
+    (define-key ivy-minibuffer-map (kbd "M-y") 'counsel-yank-pop))
   )
 
 (defun ivy/init-ivy-hydra ()

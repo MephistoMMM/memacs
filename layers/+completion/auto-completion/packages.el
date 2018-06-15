@@ -127,7 +127,8 @@
     :init
     (progn
       (setq ivy-yasnippet-expand-keys nil)
-      (spacemacs/set-leader-keys "is" 'spacemacs/ivy-yas))))
+      (memacs/define-insert-keybinding "s" 'spacemacs/ivy-yas)
+      (spacemacs/set-leader-keys "si" 'spacemacs/ivy-yas))))
 
 (defun auto-completion/init-yasnippet ()
   (use-package yasnippet

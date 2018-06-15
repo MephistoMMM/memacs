@@ -68,6 +68,11 @@
   :type 'character
   :group 'page-break-lines)
 
+(defcustom page-break-lines-remainder 6
+  "Remainder used to define width of other visual columns."
+  :type 'number
+  :group 'page-break-lines)
+
 (defcustom page-break-lines-lighter " PgLn"
   "Mode-line indicator for `page-break-lines-mode'."
   :type '(choice (const :tag "No lighter" "") string)
@@ -125,7 +130,7 @@ its display table will be modified as necessary."
         (progn
           (unless buffer-display-table
             (setq buffer-display-table (make-display-table)))
-          (let* ((width (- (window-width window) 1))
+          (let* ((width (- (window-width window) page-break-lines-remainder))
                  (glyph (make-glyph-code page-break-lines-char 'page-break-lines))
                  (new-display-entry (vconcat (make-list width glyph))))
             (unless (equal new-display-entry (elt buffer-display-table ?\^L))

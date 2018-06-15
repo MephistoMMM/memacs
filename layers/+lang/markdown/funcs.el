@@ -51,8 +51,7 @@ Will work on both org-mode and any mode that accepts plain html."
 (defun spacemacs//markdown-hjkl-promotion-demotion (style)
   "Set promotion/demotiion on 'hjkl' for the given editing STYLE."
   (when (or (eq 'vim style)
-            (and (eq 'hybrid style)
-                 hybrid-style-enable-hjkl-bindings))
+            (eq 'hybrid style))
     (dolist (s '(normal insert))
       (evil-define-key s markdown-mode-map
         (kbd "M-h") 'markdown-promote

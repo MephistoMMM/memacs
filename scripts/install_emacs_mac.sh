@@ -5,8 +5,8 @@
 # Author Mephis Pheies
 # Email mephistommm@gmail.com
 
-brew tap d12frosted/emacs-plus
-brew install emacs-plus
-brew linkapps emacs-plus
+brew tap railwaycat/emacsmacport/emacs-mac
+brew install emacs-mac
+brew linkapps emacs-mac
 
 ${PWD%/scripts}/scripts/link_spacemacs.sh

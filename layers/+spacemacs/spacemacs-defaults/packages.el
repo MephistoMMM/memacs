@@ -24,7 +24,6 @@
         (hi-lock :location built-in)
         (image-mode :location built-in)
         (imenu :location built-in)
-        (linum :location built-in :toggle (version< emacs-version "26"))
         (occur-mode :location built-in)
         (package-menu :location built-in)
         ;; page-break-lines is shipped with spacemacs core
@@ -200,32 +199,33 @@
     :init
     (progn
       (if (spacemacs/relative-line-numbers-p)
-          (setq display-line-numbers-type 'relative)
-        (setq display-line-numbers-type t))
-
-      (spacemacs|add-toggle line-numbers
-        :status (and (featurep 'display-line-numbers)
-                     display-line-numbers-mode
-                     (eq display-line-numbers t))
-        :on (prog1 (display-line-numbers-mode)
-              (setq display-line-numbers t))
-        :off (display-line-numbers-mode -1)
-        :on-message "Absolute line numbers enabled."
-        :off-message "Line numbers disabled."
-        :documentation "Show the line numbers."
-        :evil-leader "tn")
-      (spacemacs|add-toggle relative-line-numbers
-        :status (and (featurep 'display-line-numbers)
-                     display-line-numbers-mode
-                     (eq display-line-numbers 'relative))
-        :on (prog1 (display-line-numbers-mode)
-              (setq display-line-numbers 'relative))
-        :off (display-line-numbers-mode -1)
-        :documentation "Show relative line numbers."
-        :on-message "Relative line numbers enabled."
-        :off-message "Line numbers disabled."
-        :evil-leader "tr")
-
+          (progn
+            (setq display-line-numbers-type 'relative)
+            (spacemacs|add-toggle line-numbers
+              :status (and (featurep 'display-line-numbers)
+                           display-line-numbers-mode
+                           (eq display-line-numbers 'relative))
+              :on (prog1 (display-line-numbers-mode)
+                    (setq display-line-numbers 'relative))
+              :off (display-line-numbers-mode -1)
+              :documentation "Show relative line numbers."
+              :on-message "Relative line numbers enabled."
+              :off-message "Line numbers disabled."
+              :evil-leader "tn"))
+        ;; error
+        (progn
+          (setq display-line-numbers-type t)
+          (spacemacs|add-toggle line-numbers
+            :status (and (featurep 'display-line-numbers)
+                         display-line-numbers-mode
+                         (eq display-line-numbers t))
+            :on (prog1 (display-line-numbers-mode)
+                  (setq display-line-numbers t))
+            :off (display-line-numbers-mode -1)
+            :on-message "Absolute line numbers enabled."
+            :off-message "Line numbers disabled."
+            :documentation "Show the line numbers."
+            :evil-leader "tn")))
       (when (spacemacs//linum-backward-compabitility)
         (add-hook 'prog-mode-hook 'display-line-numbers-mode)
         (add-hook 'text-mode-hook 'display-line-numbers-mode))
@@ -235,27 +235,6 @@
       (advice-add #'display-line-numbers--turn-on :around #'spacemacs//linum-on)
       (when dotspacemacs-line-numbers
         (global-display-line-numbers-mode)))))
-
-(defun spacemacs-defaults/init-linum ()
-  (use-package linum
-    :init
-    (progn
-      (setq linum-format "%5d")
-      (spacemacs|add-toggle line-numbers
-        :mode linum-mode
-        :documentation "Show the line numbers."
-        :evil-leader "tn")
-      (advice-add #'linum-update-window
-                  :after #'spacemacs//linum-update-window-scale-fix)
-      (advice-add #'linum-on
-                  :around #'spacemacs//linum-on))
-    :config
-    (progn
-      (when (spacemacs//linum-backward-compabitility)
-        (add-hook 'prog-mode-hook 'linum-mode)
-        (add-hook 'text-mode-hook 'linum-mode))
-      (when dotspacemacs-line-numbers
-        (global-linum-mode)))))
 
 (defun spacemacs-defaults/init-occur-mode ()
   (evilified-state-evilify-map occur-mode-map

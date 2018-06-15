@@ -27,7 +27,8 @@
 
 (defun spacemacs-visual/init-company-posframe ()
   (use-package company-posframe
-    :defer t))
+    :defer t
+    :config (spacemacs|diminish company-posframe-mode)))
 
 (defun spacemacs-visual/init-desktop ()
   (use-package desktop

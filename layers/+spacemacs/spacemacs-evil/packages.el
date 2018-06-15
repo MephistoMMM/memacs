@@ -31,7 +31,6 @@
         evil-visual-mark-mode
         evil-visualstar
         (hs-minor-mode :location built-in)
-        (linum-relative :toggle (version< emacs-version "26"))
         vi-tilde-fringe
         ))
 
@@ -165,18 +164,6 @@
 
 (defun spacemacs-evil/init-hs-minor-mode ()
   (add-hook 'prog-mode-hook 'spacemacs//enable-hs-minor-mode))
-
-(defun spacemacs-evil/init-linum-relative ()
-  (use-package linum-relative
-    :commands (linum-relative-toggle linum-relative-on)
-    :init
-    (when (or (eq dotspacemacs-line-numbers 'relative)
-              (and (listp dotspacemacs-line-numbers)
-                    (car (spacemacs/mplist-get dotspacemacs-line-numbers
-                                              :relative))))
-      (add-hook 'spacemacs-post-user-config-hook 'linum-relative-on))
-    :config
-    (setq linum-relative-current-symbol "")))
 
 (defun spacemacs-evil/init-vi-tilde-fringe ()
   (spacemacs|do-after-display-system-init
