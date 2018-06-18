@@ -29,6 +29,8 @@
     ;; don't filter results on the client side.
     (setq company-transformers nil
           company-lsp-async t
+          company-lsp-enable-recompletion t
+          company-lsp-enable-snippet t
           company-lsp-cache-candidates nil)))
 
 (defun lsp/init-flycheck-lsp ()
@@ -40,6 +42,8 @@
     :defer t
     :config
     (progn
+      (setq lsp-enable-indentation nil
+            lsp-highlight-symbol-at-point nil)
       (add-hook 'lsp-after-open-hook #'lsp-enable-imenu))
 
       (spacemacs|diminish lsp-mode " Ⓛ" " L"))

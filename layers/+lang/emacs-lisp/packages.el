@@ -27,7 +27,6 @@
         nameless
         overseer
         parinfer
-        semantic
         srefactor))
 
 (defun emacs-lisp/init-ielm ()
@@ -247,11 +246,6 @@
 
 (defun emacs-lisp/post-init-parinfer ()
   (add-hook 'emacs-lisp-mode-hook 'parinfer-mode))
-
-(defun emacs-lisp/post-init-semantic ()
-  (add-hook 'emacs-lisp-mode-hook 'semantic-mode)
-  (with-eval-after-load 'semantic
-    (semantic-default-elisp-setup)))
 
 (defun emacs-lisp/post-init-srefactor ()
   (add-hook 'emacs-lisp-mode-hook 'spacemacs/load-srefactor)

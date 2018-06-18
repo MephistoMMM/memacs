@@ -45,13 +45,15 @@ This function should only modify configuration layer settings."
             latex-build-command "LatexMk" ;; latexmk -pdf --synctex=1 -interaction=nonstopmode  -file-line-error  filename.tex
             latex-enable-folding t)
      shell-scripts
-     ;; READY : pip install pylint pytest yapf jedi anaconda-mode json-rpc service_factory
+     ;; READY : pip install python-language-server pyls-isort pyls-mypy pylint pytest
      (python :variables
              python-enable-yapf-format-on-save t
              python-test-runner 'pytest)
-     ;; READY : npm install eslint tern
+     ;; READY : npm install -g
+     ;;             eslint  typescript javascript-typescript-langserver flow-language-server
      javascript
      java
+     ;; READY : brew install cquery
      c-c++
      ;; READY : stack install stylish-haskell hlint apply-refact hindent hasktags intero
      ;; (haskell :variables

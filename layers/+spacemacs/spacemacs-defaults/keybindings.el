@@ -337,24 +337,6 @@
   :on (spacemacs/toggle-transparency)
   :documentation "Make the current frame non-opaque."
   :evil-leader "TT")
-(spacemacs|add-toggle tool-bar
-  :if window-system
-  :mode tool-bar-mode
-  :documentation "Display the tool bar in GUI mode."
-  :evil-leader "Tt")
-(spacemacs|add-toggle menu-bar
-  :if window-system
-  :mode menu-bar-mode
-  :documentation "Display the menu bar."
-  :evil-leader "Tm")
-(spacemacs|add-toggle semantic-stickyfunc
-  :mode semantic-stickyfunc-mode
-  :documentation "Enable semantic-stickyfunc."
-  :evil-leader "TS")
-(spacemacs|add-toggle semantic-stickyfunc-globally
-  :mode global-semantic-stickyfunc-mode
-  :documentation "Enable semantic-stickyfunc globally."
-  :evil-leader "T C-S")
 ;; quit -----------------------------------------------------------------------
 (spacemacs/set-leader-keys
   "qs" 'spacemacs/save-buffers-kill-emacs

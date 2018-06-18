@@ -102,5 +102,8 @@
                 (lambda () (interactive) (delete-window)))
 (global-set-key [(meta z)] 'undo)
 (global-set-key [(meta l)] 'evil-avy-goto-line)
+;; C-v in ivy minibuffer
+(define-key ivy-minibuffer-map (kbd "M-v") 'yank)
+;; show ivy recent contents is C-r
 
 ;;; keybindings.el ends here
