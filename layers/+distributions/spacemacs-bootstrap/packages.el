@@ -18,15 +18,12 @@
         (bind-key :step bootstrap)
         (diminish :step bootstrap)
         (evil :step bootstrap)
-        (exec-path-from-shell :step bootstrap
-                              :toggle (or (spacemacs/system-is-mac)
-                                          (spacemacs/system-is-linux)
-                                          (eq window-system 'x)))
         (hydra :step bootstrap)
         (use-package :step bootstrap)
         (which-key :step bootstrap)
         ;; pre packages, initialized aftert the bootstrap packages
         ;; these packages can use use-package
+        (dotenv-mode :step pre)
         (evil-evilified-state :location local :step pre :protected t)
         (pcre2el :step pre)
         (hybrid-mode :location local :step pre)
@@ -43,6 +40,10 @@
 (defun spacemacs-bootstrap/init-diminish ()
   (when (not (configuration-layer/package-used-p 'spaceline))
     (add-hook 'after-load-functions 'spacemacs/diminish-hook)))
+
+(defun spacemacs-bootstrap/init-dotenv-mode ()
+  (use-package dotenv-mode
+    :defer t))
 
 (defun spacemacs-bootstrap/init-bind-map ()
   (require 'bind-map)
@@ -213,9 +214,6 @@
   ;; ignore repeat
   (evil-declare-ignore-repeat 'spacemacs/next-error)
   (evil-declare-ignore-repeat 'spacemacs/previous-error))
-
-(defun spacemacs-bootstrap/init-exec-path-from-shell ()
-  (spacemacs//initialize-exec-path-from-shell))
 
 (defun spacemacs-bootstrap/init-hydra ()
   (require 'hydra)

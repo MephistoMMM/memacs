@@ -555,9 +555,10 @@ refreshed during the current session."
    (spacemacs-force-dump
     ;; force dump
     (configuration-layer//load)
-    (configuration-layer/message (concat "--force-dump passed on the command line, "
-                       "forcing a redump."))
-    (configuration-layer//dump-emacs))
+    (when (spacemacs/emacs-with-pdumper-set-p)
+      (configuration-layer/message (concat "--force-dump passed on the command line, "
+                         "forcing a redump."))
+      (configuration-layer//dump-emacs)))
    ((spacemacs-is-dumping-p)
     ;; dumping
     (configuration-layer//load)
@@ -636,8 +637,9 @@ To prevent package from being installed or uninstalled set the variable
   (configuration-layer//set-layers-variables configuration-layer--used-layers)
   (configuration-layer//load-layers-files configuration-layer--used-layers
                         '("keybindings.el"))
-  (dotspacemacs|call-func dotspacemacs/user-load
-                          "Calling dotfile user-load..."))
+  (when (spacemacs-is-dumping-p)
+    (dotspacemacs|call-func dotspacemacs/user-load
+                            "Calling dotfile user-load...")))
 
 (defun configuration-layer//select-packages (layer-specs packages)
   "Return the selected packages of LAYER-SPECS from given PACKAGES list."
@@ -2148,18 +2150,21 @@ depends on it."
   (let ((stats (configuration-layer/configured-packages-stats
                 configuration-layer--used-packages)))
     (spacemacs-buffer/insert-page-break)
-    (spacemacs-buffer/append
-     (format "\n%s packages loaded in %.3fs (e:%s r:%s l:%s b:%s)"
-             (cadr (assq 'total stats))
-             configuration-layer--spacemacs-startup-time
-             (cadr (assq 'elpa stats))
-             (cadr (assq 'recipe stats))
-             (cadr (assq 'local stats))
-             (cadr (assq 'built-in stats))))
     (with-current-buffer (get-buffer-create spacemacs-buffer-name)
       (let ((buffer-read-only nil))
-	(spacemacs-buffer//center-line)
-	(insert "\n")))))
+        (spacemacs-buffer/append
+         (format "\n%s packages loaded in %.3fs (e:%s r:%s l:%s b:%s)"
+                 (cadr (assq 'total stats))
+                 configuration-layer--spacemacs-startup-time
+                 (cadr (assq 'elpa stats))
+                 (cadr (assq 'recipe stats))
+                 (cadr (assq 'local stats))
+                 (cadr (assq 'built-in stats))))
+        (spacemacs-buffer//center-line)
+        (spacemacs-buffer/append (format "\n(%.3fs spent in your user-config)"
+                           dotspacemacs--user-config-elapsed-time))
+        (spacemacs-buffer//center-line)
+        (insert "\n")))))
 
 (defun configuration-layer//get-indexed-elpa-package-names ()
   "Return a list of all ELPA packages in indexed packages and dependencies."

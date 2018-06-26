@@ -15,6 +15,11 @@
   (defvar dotspacemacs-filepath default-init)
   "Filepath to the installed dotfile. ~/.emacs.d/memacs")
 
+(defvar dotspacemacs--user-config-elapsed-time 0
+  "Time spent in `dotspacemacs/user-config' function.
+Useful for users in order to given them a hint of potential bottleneck in
+their configuration.")
+
 (defvar dotspacemacs-distribution 'spacemacs-base
   "Base distribution to use. This is a layer contained in the directory
 `+distributions'. For now available distributions are `spacemacs-base'
@@ -352,6 +357,14 @@ Returns non nil if the layer has been effectively inserted."
     (load-file (dotspacemacs/location))
     t))
 
+(defun dotspacemacs//profile-user-config (f &rest args)
+  "Compute time taken by the `dotspacemacs/user-config' function.
+Set the variable"
+  (let ((stime (current-time)))
+    (apply f args)
+    (setq dotspacemacs--user-config-elapsed-time
+          (float-time (time-subtract (current-time) stime)))))
+
 (defun dotspacemacs/sync-configuration-layers (&optional arg)
   "Synchronize declared layers in dotfile with spacemacs.
 
@@ -370,6 +383,8 @@ Called with `C-u C-u' skips `dotspacemacs/user-config' _and_ preleminary tests."
                                         "Calling dotfile init...")
                 (dotspacemacs|call-func dotspacemacs/user-init
                                         "Calling dotfile user init...")
+                ;; reload environment variables
+                (spacemacs/load-env)
                 ;; try to force a redump when reloading the configuration
                 (let ((spacemacs-force-dump t))
                   (configuration-layer/load))
@@ -415,7 +430,8 @@ If SYMBOL value is `display-graphic-p' then return the result of
   (let ((dotspacemacs (dotspacemacs/location)))
     (if (file-exists-p dotspacemacs)
         (unless (with-demoted-errors "Error loading .spacemacs: %S"
-                  (load dotspacemacs))))))
+                  (load dotspacemacs)))))
+  (advice-add 'dotspacemacs/user-config :around 'dotspacemacs//profile-user-config))
 
 (defun spacemacs/title-prepare (title-format)
   "A string is printed verbatim except for %-constructs.

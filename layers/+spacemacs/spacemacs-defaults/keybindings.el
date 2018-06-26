@@ -182,6 +182,10 @@
   "fD" 'spacemacs/delete-current-buffer-file
   "fei" 'spacemacs/find-user-init-file
   "fed" 'spacemacs/find-dotfile
+  "feD" 'spacemacs/ediff-dotfile-and-template
+  "fee" 'spacemacs/edit-env
+  "feE" 'spacemacs/load-env
+  "fe C-e" 'spacemacs/force-init-env
   "feR" 'dotspacemacs/sync-configuration-layers
   "fev" 'spacemacs/display-and-copy-version
   "feU"  'configuration-layer/update-packages

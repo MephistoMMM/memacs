@@ -45,6 +45,11 @@
   (evil-org-mode)
   (evil-normalize-keymaps))
 
+(defun spacemacs/org-setup-evil-surround ()
+  (with-eval-after-load 'evil-surround
+    (add-to-list 'evil-surround-pairs-alist '(?: . spacemacs//surround-drawer))
+    (add-to-list 'evil-surround-pairs-alist '(?# . spacemacs//surround-code))))
+
 
 ;; space-doc-mode
 

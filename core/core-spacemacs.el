@@ -11,6 +11,7 @@
 (setq message-log-max 16384)
 
 (require 'subr-x nil 'noerror)
+(require 'core-env)
 (require 'page-break-lines)
 (require 'core-hooks)
 (require 'core-debug)
@@ -132,7 +133,10 @@ the final step of executing code in `emacs-startup-hook'.")
     (spacemacs-buffer/message (concat "No graphical support detected, "
                                       "you won't be able to launch a "
                                       "graphical instance of Emacs"
-                                      "with this build."))))
+                                      "with this build.")))
+  ;; load environment variables
+  (spacemacs/init-env)
+  (spacemacs/load-env))
 
 (defun spacemacs//removes-gui-elements ()
   "Remove the menu bar, tool bar and scroll bars."
