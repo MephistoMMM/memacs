@@ -17,6 +17,7 @@ EXTRA_EXCLUDES=$2
 
 WORKSPACE="$HOME/Desktop/work"
 GO_BACK_SRC="$WORKSPACE/go"
+JAVA_BACK_SRC="$WORKSPACE/java"
 PY_BACK_SRC="$WORKSPACE/py"
 JS_BACK_SRC="$WORKSPACE/js"
 SHELL_BACK_SRC="$WORKSPACE/shell"
@@ -28,16 +29,23 @@ IMDATA_BACK_SRC="$HOME/Desktop/imdata"
 # * Common Value
 
 BACK_UP_VERSION=$(date "+%Y_%m_%d")
-COMMON_EXCLUDES="--exclude=.git --exclude=.svn --exclude=Icon? --exclude=.DS_Store --exclude=*.exe --exclude=*.tar.* --exclude=*.tar --exclude=*.zip --exclude=*.so --exclude=*.o --exclude=*.a --exclude=.idea"
+COMMON_EXCLUDES="--exclude=.git --exclude=.svn --exclude=Icon? --exclude=.DS_Store --exclude=*.exe --exclude=*.tar.* --exclude=*.tar --exclude=*.zip --exclude=*.so --exclude=*.o --exclude=*.a --exclude=.idea --exclude=.cache/ --exclude=.local/"
 
 # * Run Tar
 
 # ** Back Go
 GO_BACK_NAME=go_$BACK_UP_VERSION.tar
-GO_EXCLUDES="--exclude=vendor --exclude=$GO_BACK_SRC/lib --exclude=$GO_BACK_SRC/pkg --exclude=$GO_BACK_SRC/bin"
+GO_EXCLUDES="--exclude=vendor --exclude=$GO_BACK_SRC/lib --exclude=pkg/ --exclude=$GO_BACK_SRC/bin"
 echo "Back Go Source Files($GO_BACK_SRC) to $BACKUP_DEST/$GO_BACK_NAME   ...."
 echo "-----------------------------------------------"
 sh -c "tar -cv $COMMON_EXCLUDES $EXTRA_EXCLUDES $GO_EXCLUDES -f $BACKUP_DEST/$GO_BACK_NAME $GO_BACK_SRC"
+
+# ** Back Java
+JAVA_BACK_NAME=java_$BACK_UP_VERSION.tar
+JAVA_EXCLUDES="--exclude=.metadata/ --exclude=.recommenders/"
+echo "Back Java Source Files($JAVA_BACK_SRC) to $BACKUP_DEST/$JAVA_BACK_NAME   ...."
+echo "-----------------------------------------------"
+sh -c "tar -cv $COMMON_EXCLUDES $EXTRA_EXCLUDES $JAVA_EXCLUDES -f $BACKUP_DEST/$JAVA_BACK_NAME $JAVA_BACK_SRC"
 
 # ** Back Python
 PY_BACK_NAME=py_$BACK_UP_VERSION.tar
@@ -55,22 +63,22 @@ sh -c "tar -cv $COMMON_EXCLUDES $EXTRA_EXCLUDES $JS_EXCLUDES -f $BACKUP_DEST/$JS
 
 # ** Back shell
 SHELL_BACK_NAME=shell_$BACK_UP_VERSION.tar
-SHELL_EXCLUDES="--exclude=*.elc"
+SHELL_EXCLUDES="--exclude=*.elc  --exclude=elpa/ --exclude=elpa-devel/"
 echo "Back Shell Source Files($SHELL_BACK_SRC) to $BACKUP_DEST/$SHELL_BACK_NAME   ...."
 echo "-----------------------------------------------"
 sh -c "tar -cv $COMMON_EXCLUDES $EXTRA_EXCLUDES $SHELL_EXCLUDES -f $BACKUP_DEST/$SHELL_BACK_NAME $SHELL_BACK_SRC"
 
 # ** Back c
 C_BACK_NAME=c_$BACK_UP_VERSION.tar
-C_EXCLUDES=""
+C_EXCLUDES="--exclude=.cquery_cached_index/"
 echo "Back C Source Files($C_BACK_SRC) to $BACKUP_DEST/$C_BACK_NAME   ...."
 echo "-----------------------------------------------"
 sh -c "tar -cv $COMMON_EXCLUDES $EXTRA_EXCLUDES $C_EXCLUDES -f $BACKUP_DEST/$C_BACK_NAME $C_BACK_SRC"
 
 # ** Back Misc
 MISC_BACK_NAME=misc_$BACK_UP_VERSION.tar
-MISC_SRC_EXCLUDES="--exclude=$GO_BACK_SRC --exclude=$JS_BACK_SRC --exclude=$PY_BACK_SRC --exclude=$C_BACK_SRC --exclude=$SHELL_BACK_SRC"
-MISC_EXCLUDES="$GO_EXCLUDES $JS_EXCLUDES $SHELL_EXCLUDES $C_EXCLUDES $PY_EXCLUDES $MISC_SRC_EXCLUDES"
+MISC_SRC_EXCLUDES="--exclude=$GO_BACK_SRC --exclude=JAVA_BACK_SRC --exclude=$JS_BACK_SRC --exclude=$PY_BACK_SRC --exclude=$C_BACK_SRC --exclude=$SHELL_BACK_SRC"
+MISC_EXCLUDES="$GO_EXCLUDES $JAVA_EXCLUDES $JS_EXCLUDES $SHELL_EXCLUDES $C_EXCLUDES $PY_EXCLUDES $MISC_SRC_EXCLUDES --exclude=.stack-work/"
 echo "Back Misc Source Files($MISC_BACK_SRC) to $BACKUP_DEST/$MISC_BACK_NAME   ...."
 echo "-----------------------------------------------"
 sh -c "tar -cv $COMMON_EXCLUDES $EXTRA_EXCLUDES $MISC_EXCLUDES -f $BACKUP_DEST/$MISC_BACK_NAME $MISC_BACK_SRC"
