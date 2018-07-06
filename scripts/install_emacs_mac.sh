@@ -5,8 +5,9 @@
 # Author Mephis Pheies
 # Email mephistommm@gmail.com
 
-brew tap railwaycat/emacsmacport/emacs-mac
+brew tap railwaycat/emacsmacport
 brew install emacs-mac
-brew linkapps emacs-mac
+brew link emacs-mac
+ln -s /usr/local/opt/emacs-mac/Emacs.app /Applications
 
-${PWD%/scripts}/scripts/link_spacemacs.sh
+${PWD%/scripts}/scripts/link_memacs.sh
