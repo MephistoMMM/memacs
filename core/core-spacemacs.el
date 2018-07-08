@@ -135,8 +135,9 @@ the final step of executing code in `emacs-startup-hook'.")
                                       "graphical instance of Emacs"
                                       "with this build.")))
   ;; load environment variables
-  (spacemacs/init-env)
-  (spacemacs/load-env))
+  (if (fboundp 'dotspacemacs/user-env)
+      (dotspacemacs/call-user-env)
+    (spacemacs/load-spacemacs-env))
 
 (defun spacemacs//removes-gui-elements ()
   "Remove the menu bar, tool bar and scroll bars."

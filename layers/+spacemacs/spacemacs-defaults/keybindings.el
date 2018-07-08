@@ -29,6 +29,7 @@
                                        ("fC"  "files/convert")
                                        ("fe"  "emacs(spacemacs)")
                                        ("fv"  "variables")
+                                       ("fy"  "yank path")
                                        ("F"   "frame")
                                        ("g"   "git/versions-control")
                                        ("h"   "help")
@@ -184,8 +185,8 @@
   "fed" 'spacemacs/find-dotfile
   "feD" 'spacemacs/ediff-dotfile-and-template
   "fee" 'spacemacs/edit-env
-  "feE" 'spacemacs/load-env
-  "fe C-e" 'spacemacs/force-init-env
+  "feE" 'dotspacemacs/call-user-env
+  "fe C-e" 'spacemacs/force-init-spacemacs-env
   "feR" 'dotspacemacs/sync-configuration-layers
   "fev" 'spacemacs/display-and-copy-version
   "feU"  'configuration-layer/update-packages
@@ -201,7 +202,10 @@
   "fvd" 'add-dir-local-variable
   "fvf" 'add-file-local-variable
   "fvp" 'add-file-local-variable-prop-line
-  "fy" 'spacemacs/show-and-copy-buffer-filename)
+  "fyc" 'spacemacs/copy-file-path-with-line-column
+  "fyd" 'spacemacs/copy-directory-path
+  "fyl" 'spacemacs/copy-file-path-with-line
+  "fyy" 'spacemacs/copy-file-path)
 ;; frame ----------------------------------------------------------------------
 (spacemacs/set-leader-keys
   "Ff" 'find-file-other-frame
@@ -336,6 +340,12 @@
   :mode font-lock-mode
   :documentation "Toggle syntax highlighting."
   :evil-leader "ths")
+(spacemacs|add-toggle column-indexing
+  :documentation "Toggle column indexing starting at 1."
+  :on (setq column-number-indicator-zero-based nil)
+  :off (setq column-number-indicator-zero-based t)
+  :evil-leader "tz")
+
 (spacemacs|add-toggle transparent-frame
   :status nil
   :on (spacemacs/toggle-transparency)

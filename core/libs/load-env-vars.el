@@ -50,9 +50,10 @@
     (and (0+ space) "=" (0+ space))
     (and ":" (1+ space))) ;; separator
    (or
+    line-start
     (and "'" (group (0+ (or "\\'" (not (any "'"))))) "'") ;; single quoted value
     (and ?\" (group (0+ (or "\\\"" (not (any "\""))))) ?\") ;; double quoted value
-    (group (1+ (not (in "#" "\n" space)))) ;; unquoted value
+    (group (1+ (not (in "#" "\n")))) ;; unquoted value
     )
    (0+ space)
    (optional "#" (0+ any))
@@ -81,7 +82,7 @@
       (when (string-equal "PATH" key)
         (let ((paths (split-string value path-separator)))
           (dolist (p paths)
-            (add-to-list 'exec-path p))))
+            (add-to-list 'exec-path p 'append))))
       (setenv key value))))
 
 ;;;###autoload
