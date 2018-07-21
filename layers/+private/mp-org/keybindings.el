@@ -58,5 +58,13 @@
 ;; Blog
 (spacemacs/set-leader-keys "ma" 'blog-admin-start)
 
+
+;; Bookmark
+(spacemacs/set-leader-keys
+  "fBs" 'bookmark-set
+  "fBS" 'bookmark-set-no-overwrite
+  "fBd" 'bookmark-delete
+  "mm"  'bookmark-bmenu-list
+  )
 
 ;;; mp-org/keybindings.el ends here

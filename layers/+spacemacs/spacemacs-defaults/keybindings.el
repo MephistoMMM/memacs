@@ -26,6 +26,7 @@
                                        ("d"   "diff")
                                        ("e"   "errors")
                                        ("f"   "files")
+                                       ("fB"  "bookmarks")
                                        ("fC"  "files/convert")
                                        ("fe"  "emacs(spacemacs)")
                                        ("fv"  "variables")
