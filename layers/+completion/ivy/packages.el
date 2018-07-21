@@ -18,6 +18,7 @@
         smex
         (hybrid-mode :location local)
         flx
+        imenu
         ivy
         ivy-hydra
         (ivy-rich :toggle ivy-enable-advanced-buffer-information)
@@ -68,6 +69,8 @@
         ;; jump
         ;; register/ring
         "rm"  'counsel-mark-ring
+        ;; jumping
+        "bj"  'spacemacs/counsel-jump-in-buffer
         ;; themes
         "Ts"  'counsel-load-theme
         )
@@ -153,7 +156,7 @@
   (use-package flx))
 
 (defun ivy/post-init-imenu ()
-  (spacemacs/set-leader-keys "bi" 'counsel-imenu))
+  (spacemacs/set-leader-keys "bi" 'spacemacs/counsel-jump-in-buffer))
 
 (defun ivy/init-ivy ()
   (use-package ivy
@@ -175,12 +178,16 @@
        'counsel-recentf
        memacs--ivy-file-actions)
 
+      ;; add spacemacs/counsel-search command to ivy-highlight-grep-commands
+      (add-to-list 'ivy-highlight-grep-commands 'spacemacs/counsel-search)
+
       ;; mappings to quit minibuffer or enter transient state
       (define-key ivy-minibuffer-map [escape] 'minibuffer-keyboard-quit)
       (define-key ivy-minibuffer-map (kbd "M-SPC") 'hydra-ivy/body)
 
       (ivy-mode 1)
       ;; Occur
+      (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
       (evil-make-overriding-map ivy-occur-mode-map 'normal)
       (ivy-set-occur 'spacemacs/counsel-search
                      'spacemacs//counsel-occur)
