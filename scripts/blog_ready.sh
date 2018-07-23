@@ -3,6 +3,7 @@
 DropBoxBlogPath=~/Dropbox/Blog
 configPath=static_blog_config.yml
 postPath=posts
+draftPath=drafts
 BlogRoot=~/Documents/Person/Blog
 
 if [ ! -e $DropBoxBlogPath ]; then
@@ -26,7 +27,7 @@ echo "Init hexo..."
 cd $BlogRoot
 hexo init
 npm install hexo-deployer-rsync --save
-npm install https://github.com/MephistoMMM/hexo-renderer-org#emacs --save
+npm install https://github.com/MephistoMMM/hexo-renderer-org#mephis --save
 npm install hexo-generator-tag --save
 npm install hexo-renderer-marked --save
 npm install hexo-renderer-sass --save
@@ -36,10 +37,11 @@ npm install hexo-generator-feed --save
 npm install hexo-generator-search --save
 
 rm _config.yml
-rm -rf ./source/_posts
+rm -rf ./source/_posts ./source/_drafts
 mkdir ./source/_drafts
 ln -s $DropBoxBlogPath/$configPath $BlogRoot/$configPath
 ln -s $DropBoxBlogPath/$postPath $BlogRoot/source/_posts
+ln -s $DropBoxBlogPath/$draftPath $BlogRoot/source/_drafts
 
 # download theme
 echo "Start to download theme..."
