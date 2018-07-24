@@ -12,7 +12,7 @@
 (setq go-packages
       '(
         (company-go :requires company)
-        counsel-gtags
+        ;; (lsp-go :requires lsp-mode company-lsp)
         flycheck
         go-eldoc
         go-fill-struct
@@ -26,6 +26,14 @@
         popwin
         ))
 
+;; (defun go/init-lsp-go()
+;;   (use-package lsp-go
+;;     :commands lsp-go-enable
+;;     :defer t
+;;     :init (with-eval-after-load 'go-mode
+;;             (add-hook 'go-mode-hook 'lsp-mode)
+;;             (add-hook 'go-mode-hook 'lsp-go-enable))))
+
 (defun go/init-company-go ()
   (use-package company-go
     :defer t
@@ -33,9 +41,6 @@
             :backends company-go
             :modes go-mode
             :variables company-go-show-annotation t)))
-
-(defun go/post-init-counsel-gtags ()
-  (spacemacs/counsel-gtags-define-keys-for-mode 'go-mode))
 
 (defun go/post-init-flycheck ()
   (spacemacs/enable-flycheck 'go-mode))
