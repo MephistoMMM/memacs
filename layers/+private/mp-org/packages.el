@@ -87,6 +87,8 @@
      'org-babel-load-languages
      '((emacs-lisp . t)
        (python . t)
+       (ledger . t)
+       (dot . t)
        (C . t)))
 
     (load-library "find-lisp")
