@@ -127,9 +127,9 @@
          "* TODO [#C] %? link \t%^g\nCaptured On: %U\n"
          :empty-lines 1)
 
-        ("h" "Habits" entry
-         (file+headline (lambda () (concat org-directory "/TODOs.org")) "Habits")
-         "* TODO [#B] %?\t:Habits:\nSCHEDULED: %T\n:PROPERTIES:\n:STYLE:\thabit\n:END:"
+        ("b" "Books" entry
+         (file+headline (lambda () (concat org-directory "/TODOs.org")) "Books")
+         "* TODO [#B] %?"
          :empty-lines 1)
 
         ("n" "Temporary Notes" entry

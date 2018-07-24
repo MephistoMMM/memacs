@@ -35,7 +35,7 @@ bookmarks
 tmp/
 /history
 .python-environments/
-server/
+./server/server
 /network-security.data
 *.elc
 *.pyc
