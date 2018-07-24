@@ -18,7 +18,6 @@
     google-c-style
     srefactor
     stickyfunc-enhance
-    xcscope
 
     ;; lsp
     (cquery :requires lsp-mode company-lsp)
@@ -43,23 +42,6 @@
         (spacemacs/set-leader-keys-for-major-mode mode
           "D" 'disaster)))
     ))
-
-(defun c-c++/post-init-company-ycmd ()
-  (spacemacs|add-company-backends :backends company-ycmd :modes c-mode-common))
-
-(defun c-c++/post-init-counsel-gtags ()
-  (dolist (mode c-c++-modes)
-    (spacemacs/counsel-gtags-define-keys-for-mode mode)))
-
-(defun c-c++/init-disaster ()
-  (use-package disaster
-    :defer t
-    :commands (disaster)
-    :init
-    (progn
-      (dolist (mode c-c++-modes)
-        (spacemacs/set-leader-keys-for-major-mode mode
-          "D" 'disaster)))))
 
 (defun c-c++/post-init-flycheck ()
   (dolist (mode c-c++-modes)
@@ -90,8 +72,6 @@
 
 (defun c-c++/post-init-stickyfunc-enhance ()
   (spacemacs/add-to-hooks 'spacemacs/load-stickyfunc-enhance c-c++-mode-hooks))
-
-(defun c-c++/pre-init-xcscope ())
 
 ;; See also https://github.com/cquery-project/cquery/wiki/Emacs
 (defun c-c++/init-cquery ()
