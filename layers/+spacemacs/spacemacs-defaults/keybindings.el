@@ -123,6 +123,7 @@
   "b n j" 'spacemacs/new-empty-buffer-below
   "b n k" 'spacemacs/new-empty-buffer-above
   "b n l" 'spacemacs/new-empty-buffer-right
+  "b n f" 'spacemacs/new-empty-buffer-new-frame
   "b n n" 'spacemacs/new-empty-buffer
   "bP"    'spacemacs/copy-clipboard-to-whole-buffer
   "bR"    'spacemacs/safe-revert-buffer
