@@ -31,4 +31,8 @@
  (list evil-normal-state-map evil-evilified-state-map)
  "/" 'swiper)
 
+
+;;;; Deadgrep
+(spacemacs/set-leader-keys "mr" #'deadgrep)
+
 ;;; memacs/keybindings.el ends here

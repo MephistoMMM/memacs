@@ -12,6 +12,8 @@
 (defconst memacs-packages
   '(
     spaceline
+
+    deadgrep
     )
  )
 
@@ -49,5 +51,10 @@
       ;; Enable spaceline for buffers created before the configuration of
       ;; spaceline
       (spacemacs//restore-buffers-powerline))))
+
+(defun memacs/init-deadgrep ()
+  (use-package deadgrep
+    :commands (deadgrep)
+    :defer t))
 
 ;;; memacs/packages.el ends here
