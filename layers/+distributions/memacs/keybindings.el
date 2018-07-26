@@ -33,6 +33,6 @@
 
 
 ;;;; Deadgrep
-(spacemacs/set-leader-keys "mr" #'deadgrep)
+(spacemacs/set-leader-keys "ad" #'deadgrep)
 
 ;;; memacs/keybindings.el ends here
