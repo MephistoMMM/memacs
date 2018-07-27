@@ -28,12 +28,12 @@
 
 
 ;; lsp
-(defun memacs//c-c++-cquery-enable ()
+(defun memacs//c-c++-ccls-enable ()
   (if (and buffer-file-name
            (or (locate-dominating-file default-directory "compile_commands.json")
-               (locate-dominating-file default-directory ".cquery")))
+               (locate-dominating-file default-directory ".ccls")))
       ;; t
-      (lsp-cquery-enable)
+      (lsp-ccls-enable)
     ;; nil
-    (message "Not find .cquery or compile_commands, cquery is disable.")
+    (message "Not find .ccls or compile_commands, ccls is disable.")
     ))

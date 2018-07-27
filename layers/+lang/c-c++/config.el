@@ -31,6 +31,8 @@
 (defvar c-c++-default-mode-for-headers 'c-mode
   "Default mode to open header files. Can be `c-mode' or `c++-mode'.")
 
-;; lsp cquery
-;; See https://github.com/cquery-project/cquery/wiki/Initialization-options
-(defvar cquery-extra-init-params '(:cacheFormat "msgpack"))
+;; lsp ccls
+;; See https://github.com/MaskRay/ccls/wiki/Initialization-options
+(defvar ccls-extra-init-params '(:completion (:detailedLabel t)
+                                 :diagnostics (:frequencyMs 5000)
+                                 :index (:reparseForDependency 1)))

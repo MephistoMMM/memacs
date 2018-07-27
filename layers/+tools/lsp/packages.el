@@ -25,13 +25,14 @@
   (use-package company-lsp
     :defer t
     :init
-    ;; Language servers have better idea filtering and sorting,
-    ;; don't filter results on the client side.
-    (setq company-transformers nil
-          company-lsp-async t
-          company-lsp-enable-recompletion t
-          company-lsp-enable-snippet t
-          company-lsp-cache-candidates nil)))
+    (progn
+      ;; Language servers have better idea filtering and sorting,
+      ;; don't filter results on the client side.
+      (setq company-transformers nil
+            company-lsp-async t
+            company-lsp-enable-recompletion t
+            company-lsp-enable-snippet t
+            company-lsp-cache-candidates nil))))
 
 (defun lsp/init-flycheck-lsp ()
   ;; Disable lsp-flycheck.el in favor of lsp-ui-flycheck.el
@@ -61,5 +62,7 @@
     :config
     (progn
       (memacs//lsp-sync-face)
+      (setq lsp-ui-doc-include-signature nil)  ; don't include type signature in the child frame
+      (setq lsp-ui-sideline-show-symbol nil)
       (add-hook 'spacemacs-post-theme-change-hook #'memacs//lsp-sync-face))
     ))

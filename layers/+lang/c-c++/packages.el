@@ -20,7 +20,7 @@
     stickyfunc-enhance
 
     ;; lsp
-    (cquery :requires lsp-mode company-lsp)
+    (ccls :requires lsp-mode company-lsp)
     ))
 
 (defun c-c++/init-cc-mode ()
@@ -73,16 +73,28 @@
 (defun c-c++/post-init-stickyfunc-enhance ()
   (spacemacs/add-to-hooks 'spacemacs/load-stickyfunc-enhance c-c++-mode-hooks))
 
-;; See also https://github.com/cquery-project/cquery/wiki/Emacs
-(defun c-c++/init-cquery ()
-  (use-package cquery
+;; See also https://github.com/MaskRay/ccls/wiki/Emacs
+(defun c-c++/init-ccls ()
+  (use-package ccls
+    :commands lsp-ccls-enable
     :defer t
     :init
     (progn
-      (setq cquery-executable "/usr/local/bin/cquery")
+      (setq ccls-executable "/usr/local/bin/ccls")
       ;; Customize `lsp-project-whitelist' `lsp-project-blacklist' to disable auto initialization.
-      (add-hook 'c-mode-common-hook #'memacs//c-c++-cquery-enable)
+      (add-hook 'c-mode-common-hook #'memacs//c-c++-ccls-enable)
+
+      (with-eval-after-load 'projectile
+        (setq projectile-project-root-files-top-down-recurring
+              (append '("compile_commands.json"
+                        ".ccls")
+                      projectile-project-root-files-top-down-recurring))
+        (add-to-list 'projectile-globally-ignored-directories ".ccls-cache"))
 
       ;; add company-lsp
       (spacemacs|add-company-backends :backends company-lsp :modes c-mode-common))
+    :config
+    (progn
+      (setq ccls-sem-highlight-method 'font-lock)
+      (ccls-use-default-rainbow-sem-highlight))
     ))
