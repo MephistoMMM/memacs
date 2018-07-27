@@ -53,8 +53,7 @@ This function should only modify configuration layer settings."
      ;;             eslint  typescript javascript-typescript-langserver flow-language-server
      javascript
      java
-     ;; READY : brew tap twlz0ne/homebrew-ccls
-     ;;         brew install ccls
+     ;; READY : brew install cquery
      c-c++
      ;; READY : stack install stylish-haskell hlint apply-refact hindent hasktags intero
      ;; (haskell :variables

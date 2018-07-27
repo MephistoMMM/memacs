@@ -70,7 +70,7 @@ sh -c "tar -cv $COMMON_EXCLUDES $EXTRA_EXCLUDES $SHELL_EXCLUDES -f $BACKUP_DEST/
 
 # ** Back c
 C_BACK_NAME=c_$BACK_UP_VERSION.tar
-C_EXCLUDES="--exclude=.ccls-cache/"
+C_EXCLUDES="--exclude=.cquery-cache/"
 echo "Back C Source Files($C_BACK_SRC) to $BACKUP_DEST/$C_BACK_NAME   ...."
 echo "-----------------------------------------------"
 sh -c "tar -cv $COMMON_EXCLUDES $EXTRA_EXCLUDES $C_EXCLUDES -f $BACKUP_DEST/$C_BACK_NAME $C_BACK_SRC"
