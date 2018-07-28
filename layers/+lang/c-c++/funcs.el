@@ -37,3 +37,26 @@
     ;; nil
     (message "Not find .cquery or compile_commands, cquery is disable.")
     ))
+
+
+
+;; cquery
+(defun memacs/cquery-caller-hierarchy ()
+  "caller hierarchy"
+  (interactive)
+  (cquery-call-hierarchy nil))
+
+(defun memacs/cquery-callee-hierarchy ()
+  "callee hierarchy"
+  (interactive)
+  (cquery-call-hierarchy t))
+
+(defun memacs/cquery-base-inheritance-hierarchy ()
+  "base inheritance"
+  (interactive)
+  (cquery-inheritance-hierarchy nil))
+
+(defun memacs/cquery-derived-inheritance-hierarchy ()
+  "derived inheritance"
+  (interactive)
+  (cquery-inheritance-hierarchy t))
