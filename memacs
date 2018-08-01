@@ -38,6 +38,7 @@ This function should only modify configuration layer settings."
      ;; Catalogue: language
      emacs-lisp
      html
+     bibtex
      ;; READY : 1. install MacTeX https://www.latex-project.org/get/
      ;;         2. ln -s /usr/local/texlive/2017/bin/x86_64-darwin/xelatex /usr/local/bin/xelatex
      ;;         3. ln -s /usr/local/texlive/2017/bin/x86_64-darwin/latexmk /usr/local/bin/latexmk

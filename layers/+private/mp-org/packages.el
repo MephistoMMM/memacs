@@ -27,7 +27,18 @@
     pangu-spacing
     ;; (company-orz :location
     ;;              "~/.emacs.d/private/local/company-orz/")
+
+    (isolate :location (recipe
+                        :fetcher github
+                        :repo "casouri/isolate"))
     )
+  )
+
+(defun mp-org/init-isolate ()
+  "Test isolate"
+  (use-package isolate
+    :commands (isolate-quick-add isolate-quick-delete isolate-quick-change)
+    :defer t)
   )
 
 (defun mp-org/init-pangu-spacing()

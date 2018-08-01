@@ -14,4 +14,10 @@
   "Directroy for store notes.")
 
 (setq close-auto-org-agenda-task t)
+
+;; bibtex
+(setq org-ref-default-bibliography '("~/Dropbox/Papers/references.bib")
+      org-ref-pdf-directory "~/Dropbox/Papers/"
+      org-ref-bibliography-notes "~/Dropbox/Papers/notes.org")
+
 ;;; mp-org/config.el ends here

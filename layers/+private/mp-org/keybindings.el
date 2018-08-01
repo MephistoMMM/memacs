@@ -43,7 +43,7 @@
   (spacemacs/set-leader-keys-for-major-mode 'org-mode
     "C-o" 'memacs-img-toggle-inline-images
     "it"  'org-insert-todo-heading
-    "ic"  'mp-org/org-insert-src-code-block
+    "is"  'mp-org/org-insert-src-code-block
 
     ;; Uploat img link file
     "C-u" 'memacs-img-mequ-upload-img-link-file)
