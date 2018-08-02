@@ -487,8 +487,10 @@ around point as the initial input."
 
 ;; Minibuffer
 
+(setq memacs--tmp-gc-cons most-positive-fixnum)
 (defun memacs-infinite-gc-cons ()
+  (setq memacs--tmp-gc-cons gc-cons-threshold)
   (setq gc-cons-threshold most-positive-fixnum))
 
 (defun memacs-origin-gc-cons ()
-  (setq gc-cons-threshold memacs-origin-gc-cons-threshold))
+  (setq gc-cons-threshold memacs--tmp-gc-cons))

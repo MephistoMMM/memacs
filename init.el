@@ -15,8 +15,7 @@
 ;; Avoid garbage collection during startup.
 ;; see `SPC h . dotspacemacs-gc-cons' for more info
 (defconst emacs-start-time (current-time))
-(defconst memacs-origin-gc-cons-threshold 402653184)
-(setq gc-cons-threshold memacs-origin-gc-cons-threshold gc-cons-percentage 0.6)
+(setq gc-cons-threshold 402653184 gc-cons-percentage 0.6)
 (load (concat (file-name-directory load-file-name)
               "core/core-versions.el")
       nil (not init-file-debug))
