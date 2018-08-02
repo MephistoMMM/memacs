@@ -45,12 +45,14 @@
                        dotspacemacs-mode-line-unicode-symbols)))
         (setq spaceline-workspace-numbers-unicode unicodep))
       (add-hook 'spaceline-pre-hook 'spacemacs//prepare-diminish)
-      (memacs/spaceline-compile)
       ;; this mode rely on info+ package
       (spaceline-info-mode t)
       ;; Enable spaceline for buffers created before the configuration of
       ;; spaceline
-      (spacemacs//restore-buffers-powerline))))
+      (spacemacs//restore-buffers-powerline)
+
+      (setq spaceline-byte-compile t)
+      (memacs/spaceline-compile))))
 
 (defun memacs/init-deadgrep ()
   (use-package deadgrep

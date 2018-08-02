@@ -483,3 +483,12 @@ around point as the initial input."
                     (region-beginning) (region-end))
                  (thing-at-point 'symbol t))))
     (swiper-all input)))
+
+
+;; Minibuffer
+
+(defun memacs-infinite-gc-cons ()
+  (setq gc-cons-threshold most-positive-fixnum))
+
+(defun memacs-origin-gc-cons ()
+  (setq gc-cons-threshold memacs-origin-gc-cons-threshold))

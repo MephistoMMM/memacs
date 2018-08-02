@@ -195,7 +195,11 @@
         "w" 'ivy-wgrep-change-to-wgrep-mode)
 
       ;; allow to select prompt in some ivy functions
-      (setq ivy-use-selectable-prompt t))))
+      (setq ivy-use-selectable-prompt t)
+
+      ;; see http://bling.github.io/blog/2016/01/18/why-are-you-changing-gc-cons-threshold/
+      (add-hook 'minibuffer-setup-hook #'memacs-infinite-gc-cons)
+      (add-hook 'minibuffer-exit-hook #'memacs-origin-gc-cons))))
 
 (defun ivy/init-default-ivy-config ()
   (with-eval-after-load 'ivy
