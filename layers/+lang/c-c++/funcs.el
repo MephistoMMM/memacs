@@ -11,8 +11,7 @@
 
 (defun spacemacs//c-toggle-auto-newline ()
   "Toggle auto-newline."
-  (c-toggle-auto-newline 1)
-  (memacs//c-mode-keybinding-modify))
+  (c-toggle-auto-newline 1))
 
 (defun memacs//c-mode-keybinding-modify ()
   (define-key c-mode-map (kbd ";") nil))

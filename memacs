@@ -55,7 +55,8 @@ This function should only modify configuration layer settings."
      javascript
      java
      ;; READY : brew install cquery
-     c-c++
+     (c-c++ :variables
+            c-c++-enable-auto-newline nil)
      ;; READY : stack install stylish-haskell hlint apply-refact hindent hasktags intero
      ;; (haskell :variables
      ;;          haskell-completion-backend 'intero
@@ -69,6 +70,10 @@ This function should only modify configuration layer settings."
      ;; go get -u -v golang.org/x/tools/cmd/gorename
      ;; go get -u -v golang.org/x/tools/cmd/goimports
      ;; go get -u -v github.com/golang/lint/golint
+     ;; go get -u -v github.com/haya14busa/gopkgs/cmd/gopkgs
+     ;; go get -u -v github.com/josharian/impl
+     ;; go get -u -v github.com/cweill/gotests/...
+     ;; go get -u -v github.com/davidrjenni/reftools/cmd/fillstruct
      (go :variables
          gofmt-command "goimports")
 

@@ -25,6 +25,9 @@
   "If non-nil `google-make-newline-indent' will be added as as
   `c-mode-common-hook'.")
 
+(defvar c-c++-enable-auto-newline nil
+  "If non-nil press `;' will add newline after semicolon.")
+
 (spacemacs|define-jump-handlers c++-mode xref-find-definitions)
 (spacemacs|define-jump-handlers c-mode   xref-find-definitions)
 

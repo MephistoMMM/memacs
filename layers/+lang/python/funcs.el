@@ -32,9 +32,7 @@
 
 (defun spacemacs//python-setup-anaconda ()
   "Setup anaconda backend."
-  (anaconda-mode)
-  (add-to-list 'spacemacs-jump-handlers-python-mode
-               '(anaconda-mode-find-definitions :async t)))
+  (anaconda-mode))
 
 (defun spacemacs//python-setup-anaconda-company ()
   "Setup anaconda auto-completion."
@@ -64,7 +62,6 @@
   "Setup lsp backend."
   (if (configuration-layer/layer-used-p 'lsp)
       (progn
-        (require 'lsp-python)
         (lsp-python-enable))
     (message "`lsp' layer is not installed, please add `lsp' layer to your dotfile.")))
 
@@ -109,16 +106,22 @@ as the pyenv version then also return nil. This works around https://github.com/
   (if (executable-find "pyenv")
       (progn
         (let ((pyenv-string (shell-command-to-string (concat "pyenv which " command)))
-              (pyenv-version-name (string-trim (shell-command-to-string "pyenv version-name"))))
-          (and (not (string-match "not found" pyenv-string))
-               (string-match pyenv-version-name (string-trim pyenv-string))
-                 (string-trim pyenv-string))))
+              (pyenv-version-names (split-string (string-trim (shell-command-to-string "pyenv version-name")) ":"))
+              (executable nil)
+              (i 0))
+          (if (not (string-match "not found" pyenv-string))
+              (while (and (not executable)
+                          (< i (length pyenv-version-names)))
+                (if (string-match (elt pyenv-version-names i) (string-trim pyenv-string))
+                    (setq executable (string-trim pyenv-string)))
+                (setq i (1+ i))))
+          executable))
     (executable-find command)))
 
 (defun spacemacs//python-setup-shell (&rest args)
   (if (spacemacs/pyenv-executable-find "ipython")
       (progn (setq python-shell-interpreter "ipython")
-             (if (version< (replace-regexp-in-string "[\r\n|\n]$" "" (shell-command-to-string "ipython --version")) "5")
+             (if (version< (replace-regexp-in-string "[\r\n|\n]$" "" (shell-command-to-string (format "%s --version" (string-trim (spacemacs/pyenv-executable-find "ipython"))))) "5")
                  (setq python-shell-interpreter-args "-i")
                (setq python-shell-interpreter-args "--simple-prompt -i")))
     (progn
@@ -354,7 +357,7 @@ to be called for each testrunner. "
   (let ((universal-argument t)
         (compile-command (format "%s %s"
                                  (spacemacs/pyenv-executable-find python-shell-interpreter)
-                                 (file-name-nondirectory buffer-file-name))))
+                                 (shell-quote-argument (file-name-nondirectory buffer-file-name)))))
     (if arg
         (call-interactively 'compile)
       (compile compile-command t)

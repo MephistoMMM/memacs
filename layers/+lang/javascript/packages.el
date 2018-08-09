@@ -21,10 +21,7 @@
         js2-mode
         js2-refactor
         livid-mode
-        (lsp-javascript-typescript
-         :requires lsp-mode
-         :location (recipe :fetcher github
-                           :repo "emacs-lsp/lsp-javascript"))
+        (lsp-javascript-typescript :requires lsp-mode)
         org
         skewer-mode
         tern
@@ -65,7 +62,7 @@
 (defun javascript/init-js2-mode ()
   (use-package js2-mode
     :defer t
-    :mode "\\.m?js\\'"
+    :mode (("\\.m?js\\'"  . js2-mode))
     :init
     (progn
       (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
@@ -193,7 +190,9 @@
     :init (progn
             (add-hook 'js2-mode-hook 'lsp-javascript-typescript-enable)
             (add-hook 'js-mode-hook 'lsp-javascript-typescript-enable))
-    :config (require 'lsp-javascript-flow)))
+    :config (progn
+              (require 'lsp-javascript-flow)
+              (spacemacs//setup-lsp-jump-handler 'js2-mode))))
 
 (defun javascript/init-skewer-mode ()
   (use-package skewer-mode

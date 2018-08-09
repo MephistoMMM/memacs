@@ -19,6 +19,7 @@
 (spacemacs/declare-prefix-for-mode 'go-mode "t" "test")
 (spacemacs/declare-prefix-for-mode 'go-mode "x" "execute")
 (spacemacs/set-leader-keys-for-major-mode 'go-mode
+  "="  'gofmt
   "hh" 'godoc-at-point
   "ig" 'go-goto-imports
   "ia" 'go-import-add
@@ -64,6 +65,20 @@
 (spacemacs/set-leader-keys-for-major-mode 'go-mode
   "rf" 'go-tag-add
   "rF" 'go-tag-remove)
+
+;;;; go impl
+(spacemacs/set-leader-keys-for-major-mode 'go-mode
+  "ri" 'go-impl)
+
+;;;; go gen test
+(spacemacs/set-leader-keys-for-major-mode 'go-mode
+  "tgg" 'go-gen-test-dwim
+  "tgf" 'go-gen-test-exported
+  "tgF" 'go-gen-test-all)
+
+;;;; go fill struct
+(spacemacs/set-leader-keys-for-major-mode 'go-mode
+  "rs" 'go-fill-struct)
 
 ;;;; xref
 (spacemacs/set-leader-keys-for-major-mode 'go-mode

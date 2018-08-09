@@ -57,3 +57,7 @@
 (defun spacemacs//go-set-tab-width ()
   "Set the tab width."
   (setq-local tab-width go-tab-width))
+
+(defun spacemacs/go-packages-gopkgs ()
+  "Return a list of all Go packages, using `gopkgs'."
+  (sort (process-lines "gopkgs") #'string<))

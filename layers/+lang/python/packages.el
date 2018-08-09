@@ -53,7 +53,7 @@
 (defun python/init-lsp-python ()
   (use-package lsp-python
     :commands lsp-python-enable
-    :init (add-hook 'python-mode-hook 'lsp-mode)))
+    :config (spacemacs//setup-lsp-jump-handler 'python-mode)))
 
 (defun python/init-nose ()
   (use-package nose

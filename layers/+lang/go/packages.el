@@ -51,50 +51,27 @@
 (defun go/init-go-fill-struct ()
   (use-package go-fill-struct
     :defer t
-    :init (spacemacs/set-leader-keys-for-major-mode 'go-mode
-            "rs" 'go-fill-struct)))
+    ))
 
 (defun go/init-go-gen-test()
   (use-package go-gen-test
-    :defer t
-    :init
-    (progn
-      (spacemacs/set-leader-keys-for-major-mode 'go-mode
-        "tgg" 'go-gen-test-dwim
-        "tgf" 'go-gen-test-exported
-        "tgF" 'go-gen-test-all))))
+    :defer t))
 
 (defun go/init-go-guru ()
   (use-package go-impl
-    :defer t
-    :init
-    (progn
-      (spacemacs/declare-prefix-for-mode 'go-mode "mf" "guru")
-      (spacemacs/set-leader-keys-for-major-mode 'go-mode
-        "f<" 'go-guru-callers
-        "f>" 'go-guru-callees
-        "fc" 'go-guru-peers
-        "fd" 'go-guru-describe
-        "fe" 'go-guru-whicherrs
-        "ff" 'go-guru-freevars
-        "fi" 'go-guru-implements
-        "fj" 'go-guru-definition
-        "fo" 'go-guru-set-scope
-        "fp" 'go-guru-pointsto
-        "fr" 'go-guru-referrers
-        "fs" 'go-guru-callstack))))
+    :defer t))
 
 (defun go/init-go-impl()
   (use-package go-impl
-    :defer t
-    :init (spacemacs/set-leader-keys-for-major-mode 'go-mode
-            "ri" 'go-impl)))
+    :defer t))
 
 (defun go/init-go-mode()
   (use-package go-mode
     :defer t
     :init
     (progn
+      ;; get go packages much faster
+      (setq go-packages-function 'spacemacs/go-packages-gopkgs)
       (add-hook 'go-mode-hook 'spacemacs//go-set-tab-width)
       ;; Change flycheck-disabled-checkers
       (with-eval-after-load 'flycheck
@@ -104,13 +81,6 @@
                                         (add-to-list 'flycheck-disabled-checkers 'go-errcheck)
                                         ))))
     :config (add-hook 'before-save-hook 'gofmt-before-save)))
-
-(defun go/init-go-eldoc ()
-  (add-hook 'go-mode-hook 'go-eldoc-setup))
-
-(defun go/init-go-guru ()
-  (use-package go-guru
-    :defer t))
 
 (defun go/init-go-rename ()
   (use-package go-rename
