@@ -94,16 +94,19 @@
 
 
 ;;;; Better Default
-(global-set-key [(meta a)] 'mark-whole-buffer)
-(global-set-key [(meta v)] 'yank)
-(global-set-key [(meta c)] 'kill-ring-save)
-(global-set-key [(meta s)] 'save-buffer)
-(global-set-key [(meta w)]
-                (lambda () (interactive) (delete-window)))
-(global-set-key [(meta z)] 'undo)
-(global-set-key [(meta l)] 'evil-avy-goto-line)
-;; C-v in ivy minibuffer
-(define-key ivy-minibuffer-map (kbd "M-v") 'yank)
-;; show ivy recent contents is C-r
+
+(when (spacemacs/system-is-mac)
+  (global-set-key [(meta a)] 'mark-whole-buffer)
+  (global-set-key [(meta v)] 'yank)
+  (global-set-key [(meta c)] 'kill-ring-save)
+  (global-set-key [(meta s)] 'save-buffer)
+  (global-set-key [(meta w)]
+                  (lambda () (interactive) (delete-window)))
+  (global-set-key [(meta z)] 'undo)
+  (global-set-key [(meta l)] 'evil-avy-goto-line)
+  ;; C-v in ivy minibuffer
+  (define-key ivy-minibuffer-map (kbd "M-v") 'yank)
+  ;; show ivy recent contents is C-r
+  )
 
 ;;; keybindings.el ends here
