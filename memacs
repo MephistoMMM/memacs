@@ -69,13 +69,16 @@ This function should only modify configuration layer settings."
      ;; go get -u -v github.com/rogpeppe/godef
      ;; go get -u -v golang.org/x/tools/cmd/gorename
      ;; go get -u -v golang.org/x/tools/cmd/goimports
-     ;; go get -u -v github.com/golang/lint/golint
+     ;; go get -u -v github.com/zmb3/gogetdoc
      ;; go get -u -v github.com/haya14busa/gopkgs/cmd/gopkgs
      ;; go get -u -v github.com/josharian/impl
      ;; go get -u -v github.com/cweill/gotests/...
      ;; go get -u -v github.com/davidrjenni/reftools/cmd/fillstruct
+     ;; go get -u github.com/sourcegraph/go-langserver
      (go :variables
-         gofmt-command "goimports")
+         gofmt-command "goimports"
+         go-backend 'go-mode
+         godoc-at-point-function 'godoc-gogetdoc)
 
      ;; Catalogue: self layers
      ;; READY : npm install -g hexo

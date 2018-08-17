@@ -11,8 +11,8 @@
 
 (setq go-packages
       '(
+        company
         (company-go :requires company)
-        ;; (lsp-go :requires lsp-mode company-lsp)
         flycheck
         go-eldoc
         go-fill-struct
@@ -23,16 +23,12 @@
         go-rename
         go-tag
         godoctor
+        (lsp-go
+         :requires lsp-mode
+         :location (recipe :fetcher github
+                           :repo "emacs-lsp/lsp-go"))
         popwin
         ))
-
-;; (defun go/init-lsp-go()
-;;   (use-package lsp-go
-;;     :commands lsp-go-enable
-;;     :defer t
-;;     :init (with-eval-after-load 'go-mode
-;;             (add-hook 'go-mode-hook 'lsp-mode)
-;;             (add-hook 'go-mode-hook 'lsp-go-enable))))
 
 (defun go/init-company-go ()
   (use-package company-go
@@ -41,6 +37,13 @@
             :backends company-go
             :modes go-mode
             :variables company-go-show-annotation t)))
+
+(defun go/init-lsp-go ()
+  (use-package lsp-go
+    :commands lsp-go-enable))
+
+(defun go/post-init-company ()
+  (add-hook 'go-mode-local-vars-hook #'spacemacs//go-setup-company))
 
 (defun go/post-init-flycheck ()
   (spacemacs/enable-flycheck 'go-mode))
@@ -73,6 +76,11 @@
       ;; get go packages much faster
       (setq go-packages-function 'spacemacs/go-packages-gopkgs)
       (add-hook 'go-mode-hook 'spacemacs//go-set-tab-width)
+      (add-hook 'go-mode-local-vars-hook
+                #'spacemacs//go-setup-backend)
+      (dolist (value '(lsp go-mode))
+        (add-to-list 'safe-local-variable-values
+                     (cons 'go-backend value)))
       ;; Change flycheck-disabled-checkers
       (with-eval-after-load 'flycheck
         (add-hook 'flycheck-mode-hook (lambda ()
@@ -80,7 +88,10 @@
                                         (add-to-list 'flycheck-disabled-checkers 'go-gofmt)
                                         (add-to-list 'flycheck-disabled-checkers 'go-errcheck)
                                         ))))
-    :config (add-hook 'before-save-hook 'gofmt-before-save)))
+    :config
+    (when go-format-before-save
+      (add-hook 'before-save-hook 'gofmt-before-save))
+    ))
 
 (defun go/init-go-rename ()
   (use-package go-rename
