@@ -41,12 +41,11 @@
     :init
     (progn
       (spacemacs/set-leader-keys "bD" 'spacemacs/ace-kill-this-buffer)
-      (memacs/define-evil-normal-keybinding
-       "C-w w" 'ace-window
-       "C-w a" 'ace-window
-       "C-w m" 'ace-swap-window
-       "C-w D" 'spacemacs/ace-delete-window
-       )
+      (memacs/define-evil-window-keybinding
+       "w" 'ace-window
+       "a" 'ace-window
+       "m" 'ace-swap-window
+       "D" 'spacemacs/ace-delete-window)
 
       ;; set ace-window keys to home-row
       (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))))

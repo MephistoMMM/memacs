@@ -1418,3 +1418,10 @@ Decision is based on `dotspacemacs-line-numbers'."
     (define-key evil-motion-state-map (kbd key) def)
     (setq key (pop bindings) def (pop bindings)))
   )
+
+(defun memacs/define-evil-window-keybinding (key def &rest bindings)
+  "Binding keys and func for evil window map"
+  (while key
+    (define-key evil-window-map (kbd key) def)
+    (setq key (pop bindings) def (pop bindings)))
+  )

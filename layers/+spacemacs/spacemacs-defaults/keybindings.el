@@ -387,21 +387,21 @@ respond to this toggle."
   (split-window-right)
   (windmove-right))
 
-(memacs/define-evil-normal-keybinding
-  "C-w d"   'spacemacs/delete-window
-  "C-w T"   'spacemacs/toggle-current-window-dedication
-  "C-w TAB" 'spacemacs/alternate-window
-  "C-w 2"   'spacemacs/layout-double-columns
-  "C-w 3"   'spacemacs/layout-triple-columns
-  "C-w f"   'other-frame
-  "C-w F"   'make-frame
-  "C-w S"   'split-window-below-and-focus
-  "C-w U"   'winner-redo
-  "C-w u"   'winner-undo
-  "C-w V"   'split-window-right-and-focus
-  "C-w x"   'kill-buffer-and-window
-  "C-w _"   'spacemacs/maximize-horizontally
-  "C-w |"   'spacemacs/maximize-vertically
+(memacs/define-evil-window-keybinding
+  "d"   'spacemacs/delete-window
+  "T"   'spacemacs/toggle-current-window-dedication
+  "TAB" 'spacemacs/alternate-window
+  "2"   'spacemacs/layout-double-columns
+  "3"   'spacemacs/layout-triple-columns
+  "f"   'other-frame
+  "F"   'make-frame
+  "S"   'split-window-below-and-focus
+  "U"   'winner-redo
+  "u"   'winner-undo
+  "V"   'split-window-right-and-focus
+  "x"   'kill-buffer-and-window
+  "_"   'spacemacs/maximize-horizontally
+  "|"   'spacemacs/maximize-vertically
   )
 
 ;; text -----------------------------------------------------------------------
