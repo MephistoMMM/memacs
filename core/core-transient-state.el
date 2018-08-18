@@ -228,4 +228,18 @@ used."
                                 (concat "\n" guide))))))
            ,@bindkeys)))))
 
+
+(defun memacs//ts-gen-new-action-func (name action)
+  (intern (format "memacs/%S-ts/%S" name action)))
+
+(defmacro memacs|open-ts-and-do (name action &optional interactive-arg)
+  "Create a function wapper the active"
+  `(defun ,(memacs//ts-gen-new-action-func name action) (&rest args)
+     "Open transient then do action"
+     ,(if interactive-arg
+          `(interactive ,interactive-arg)
+        `(interactive))
+     (,(spacemacs//transient-state-body-func-name name))
+     (apply ',action args)))
+
 (provide 'core-transient-state)

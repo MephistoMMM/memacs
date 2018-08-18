@@ -57,7 +57,7 @@
   )
 
 (defun memacs//ibuffer-ts-hint ()
-  "Return a one liner string containing all the layout names."
+  "Return a one liner string containing all the ibuffer names."
   (if (equal 1 spacemacs--ts-full-hint-toggle)
       memacs--ibuffer-ts-full-hint
     (concat "  ([" (propertize "?" 'face 'hydra-face-red) "] help |"
@@ -65,7 +65,13 @@
             )))
 
 (defun memacs//ibuffer-ts-toggle-hint ()
-  "Toggle the full hint docstring for the layouts transient-state."
+  "Toggle the full hint docstring for the ibuffer transient-state."
   (interactive)
   (setq spacemacs--ts-full-hint-toggle
         (logxor spacemacs--ts-full-hint-toggle 1)))
+
+(defun memacs//ibuffer-ts-help ()
+  "Show ibuffer full transient state"
+  (interactive)
+  (setq spacemacs--ts-full-hint-toggle 1)
+  (spacemacs/ibuffer-transient-state/body))

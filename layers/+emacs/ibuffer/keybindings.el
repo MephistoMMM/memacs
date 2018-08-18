@@ -15,7 +15,7 @@
 (define-key ibuffer-mode-map (kbd "C-w") 'evil-window-map)
 (spacemacs|transient-state-format-hint ibuffer
   memacs--ibuffer-ts-full-hint
-  "\n\n
+  "\n
   Base^^^^                  Mark^^^^                   Operations^^^^
   ────^^^^───────────────── ────^^^^────────────────── ──────────^^^^───────────────
   [_RET_/_o_] buffer/window [_m_/_u_] mark/unmark      [_S_/_D_] (marked)SaveA/KillA            []~(￣▽￣)~*
@@ -49,5 +49,12 @@
   ("D" ibuffer-backward-next-marked)
   ("s" ibuffer-forward-next-marked)
   ("f" ibuffer-backwards-next-marked))
+(memacs|open-ts-and-do ibuffer next-line)
+(memacs|open-ts-and-do ibuffer previous-line)
+(memacs|open-ts-and-do ibuffer ibuffer-mark-forward
+                       (ibuffer-get-region-and-prefix))
 (define-key ibuffer-mode-map (kbd "C-h") 'spacemacs/ibuffer-transient-state/body)
-(define-key ibuffer-mode-map (kbd "?") 'spacemacs/ibuffer-transient-state/body)
+(define-key ibuffer-mode-map (kbd "?") 'memacs//ibuffer-ts-help)
+(define-key ibuffer-mode-map (kbd "j") 'memacs/ibuffer-ts/next-line)
+(define-key ibuffer-mode-map (kbd "k") 'memacs/ibuffer-ts/previous-line)
+(define-key ibuffer-mode-map (kbd "m") 'memacs/ibuffer-ts/ibuffer-mark-forward)
