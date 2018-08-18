@@ -11,3 +11,43 @@
 
 (spacemacs/set-leader-keys "mb" 'ibuffer)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
+
+(define-key ibuffer-mode-map (kbd "C-w") 'evil-window-map)
+(spacemacs|transient-state-format-hint ibuffer
+  memacs--ibuffer-ts-full-hint
+  "\n\n
+  Base^^^^                  Mark^^^^                   Operations^^^^
+  ────^^^^───────────────── ────^^^^────────────────── ──────────^^^^───────────────
+  [_RET_/_o_] buffer/window [_m_/_u_] mark/unmark      [_S_/_D_] (marked)SaveA/KillA            []~(￣▽￣)~*
+  [_j_/_k_]   next/previous [_t_/_U_] toggle/unmarkA   [_J_/_K_] (marked)next/previous
+  [_s_/_f_]   sort/filter   ^ ^ ^ ^                    [_?_]^ ^  toggle help
+  [_r_]^ ^    flesh         [_%_/_*_] regexp/special   [_q_]^ ^  quit")
+(spacemacs|define-transient-state ibuffer
+  :title "IBUFFER HYDRA"
+  :hint-is-doc t
+  :dynamic-hint (memacs//ibuffer-ts-hint)
+  :bindings
+  ;; base
+  ("?" memacs//ibuffer-ts-toggle-hint)
+  ("q" nil :exit t)
+  ("RET" ibuffer-visit-ibuffer)
+  ("o" ibuffer-visit-buffer-other-window)
+  ("r" ibuffer-update)
+  ("j" next-line)
+  ("k" previous-line)
+  ;; mark
+  ("m" ibuffer-mark-forward)
+  ("u" ibuffer-unmark-forward)
+  ("t" ibuffer-toggle-marks)
+  ("U" ibuffer-unmark-all-marks :exit t)
+  ("%" ibuffer-unmark-all-marks)
+  ("*" ibuffer-unmark-all-marks)
+  ("J" ibuffer-forward-next-marked)
+  ("K" ibuffer-backwards-next-marked)
+  ;; operations
+  ("S" ibuffer-forward-next-marked)
+  ("D" ibuffer-backward-next-marked)
+  ("s" ibuffer-forward-next-marked)
+  ("f" ibuffer-backwards-next-marked))
+(define-key ibuffer-mode-map (kbd "C-h") 'spacemacs/ibuffer-transient-state/body)
+(define-key ibuffer-mode-map (kbd "?") 'spacemacs/ibuffer-transient-state/body)

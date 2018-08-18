@@ -17,21 +17,13 @@
 
 (defun ibuffer/init-ibuffer()
   (use-package ibuffer
-    :defer t
     :init
     (progn
       (add-hook 'ibuffer-hook
                 'memacs//ibuffer-group-by-modes-or-projectile)
 
       ;; Use ibuffer to provide :ls
-      (evil-ex-define-cmd "buffers" 'ibuffer))
-    :config
-    (evilified-state-evilify-map ibuffer-mode-map
-      :mode ibuffer-mode
-      :bindings
-      "gr" 'ibuffer-update
-      "gj" 'ibuffer-forward-filter-group
-      "gk" 'ibuffer-backward-filter-group)))
+      (evil-ex-define-cmd "buffers" 'ibuffer))))
 
 (defun ibuffer/init-ibuffer-projectile()
     (use-package ibuffer-projectile

@@ -55,3 +55,17 @@
     (unless (eq ibuffer-sorting-mode 'alphabetic)
       (ibuffer-do-sort-by-alphabetic))))
   )
+
+(defun memacs//ibuffer-ts-hint ()
+  "Return a one liner string containing all the layout names."
+  (if (equal 1 spacemacs--ts-full-hint-toggle)
+      memacs--ibuffer-ts-full-hint
+    (concat "  ([" (propertize "?" 'face 'hydra-face-red) "] help |"
+            "  [" (propertize "q" 'face 'hydra-face-blue) "] quit)"
+            )))
+
+(defun memacs//ibuffer-ts-toggle-hint ()
+  "Toggle the full hint docstring for the layouts transient-state."
+  (interactive)
+  (setq spacemacs--ts-full-hint-toggle
+        (logxor spacemacs--ts-full-hint-toggle 1)))

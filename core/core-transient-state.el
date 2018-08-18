@@ -9,6 +9,8 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; License: GPLv3
+(defvar spacemacs--ts-full-hint-toggle 0
+  "Toggle display of transient states documentations.")
 
 (defun spacemacs//transient-state-func-name (name)
   "Return the name of the transient state function."

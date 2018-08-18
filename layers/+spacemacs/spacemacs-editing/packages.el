@@ -81,7 +81,7 @@
     :init
     (memacs/define-evil-keybinding
      (list evil-normal-state-map evil-visual-state-map)
-     "e" 'er/expand-region)
+     "C-e" 'er/expand-region)
     :config
     (progn
       ;; add search capability to expand-region
