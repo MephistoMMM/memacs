@@ -63,13 +63,11 @@
         (define-key map (kbd "C-n") 'company-select-next)
         (define-key map (kbd "C-p") 'company-select-previous)
         (define-key map (kbd "C-s") 'company-filter-candidates)
-        (define-key map (kbd "C-l") 'company-complete-common)
         (define-key map (kbd "C-d") 'company-show-doc-buffer))
       (let ((map company-search-map))
         (define-key map [escape] 'memacs/company-escape)
         (define-key map (kbd "C-[") 'memacs/company-escape)
         (define-key map (kbd "C-n") 'company-select-next)
-        (define-key map (kbd "C-l") 'company-complete-common)
         (define-key map (kbd "C-p") 'company-select-previous))
       )))
 
@@ -93,7 +91,7 @@
 
 (defun auto-completion/init-hippie-exp ()
   ;; replace dabbrev-expand
-  (define-key evil-hybrid-state-map (kbd "C-l")   'hippie-expand)
+  (define-key evil-hybrid-state-map (kbd "M-l")   'hippie-expand)
   (setq hippie-expand-try-functions-list
         '(
           ;; Try to expand word "dynamically", searching the current buffer.

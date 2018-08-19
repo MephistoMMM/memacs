@@ -53,6 +53,8 @@
 (memacs|open-ts-and-do ibuffer previous-line)
 (memacs|open-ts-and-do ibuffer ibuffer-mark-forward
                        (ibuffer-get-region-and-prefix))
+;; TODO rewrite a more powerful macro to automatically gen
+;;      enter functions and bind keys
 (define-key ibuffer-mode-map (kbd "C-h") 'spacemacs/ibuffer-transient-state/body)
 (define-key ibuffer-mode-map (kbd "?") 'memacs//ibuffer-ts-help)
 (define-key ibuffer-mode-map (kbd "j") 'memacs/ibuffer-ts/next-line)

@@ -212,7 +212,7 @@
     ;; (define-key ivy-minibuffer-map (kbd "C-p") 'ivy-previous-line)
     ;; (define-key ivy-minibuffer-map (kbd "C-h") (kbd "DEL"))
     (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-kill-line)
-    (define-key ivy-minibuffer-map (kbd "M-l") 'ivy-avy)
+    (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-avy)
     (define-key ivy-minibuffer-map (kbd "<escape>") 'minibuffer-keyboard-quit)
     ;; Transient state
     ;; ivy-hydra disabled for now, waiting to see how the dependency management
@@ -365,8 +365,8 @@ Current Action: %s(ivy-action-name)
         "S" 'spacemacs/swiper-region-or-symbol
         "b" 'swiper-all
         "B" 'spacemacs/swiper-all-region-or-symbol)
-      (define-key swiper-map (kbd "M-l") 'swiper-avy)
-      (define-key swiper-map (kbd "C-l") 'ivy-yank-word)
+      (define-key swiper-map (kbd "C-l") 'swiper-avy)
+      (define-key swiper-map (kbd "M-l") 'ivy-yank-word)
       )))
 
 (defun ivy/init-smex ()
