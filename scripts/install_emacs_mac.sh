@@ -5,9 +5,12 @@
 # Author Mephis Pheies
 # Email mephistommm@gmail.com
 
+ROOTPATH=${PWD%/scripts}
+
 brew tap railwaycat/emacsmacport
 brew install emacs-mac
 brew link emacs-mac
 ln -s /usr/local/opt/emacs-mac/Emacs.app /Applications
 
-${PWD%/scripts}/scripts/link_memacs.sh
+$ROOTPATH/scripts/compile_textinputsource.sh
+$ROOTPATH/scripts/link_memacs.sh
