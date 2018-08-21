@@ -86,6 +86,42 @@ Go files should disable fly-check."
     )
   )
 
+(defun mp-org/wrap-quote (start end)
+  "Insert '#+BEGIN_QUOTE' and '#+END_QUOTE' to the begin and end of quote region"
+  (interactive "r")
+  (save-excursion
+    (narrow-to-region start end)
+    (goto-char (point-min))
+    (insert "#+BEGIN_QUOTE\n")
+    (goto-char (point-max))
+    (insert "#+END_QUOTE\n")
+    (widen))
+  )
+
+(defun mp-org/wrap-link (start end)
+  "Insert '[' , ']' and link string to the begin and end of region."
+  (interactive "r")
+  (let ((link (ivy-completing-read "Value of link: " (mp-org//link-switch))))
+    (save-excursion
+      (narrow-to-region start end)
+      (goto-char (point-min))
+      (insert (format "[[%s][" link))
+      (goto-char (point-max))
+      (insert "]]")
+      (widen)))
+  )
+
+(defun mp-org//linkp (linkstr)
+  "Test for link line."
+  (string-match "^\\w+?:" (substring-no-properties linkstr)))
+
+(defun mp-org//link-switch ()
+  "Filter link lines in counsel kills, if used ivy layer,
+otherwise in kill-rang."
+  (if (configuration-layer/layer-usedp 'ivy)
+      (seq-filter 'mp-org//linkp (counsel--yank-pop-kills))
+      (seq-filter 'mp-org//linkp kill-ring))
+  )
 
 
 ;;;; Auto Org Agenda

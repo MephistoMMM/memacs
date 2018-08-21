@@ -49,7 +49,10 @@
     "C-u" 'memacs-img-mequ-upload-img-link-file)
 
   (spacemacs/declare-prefix-for-mode 'org-mode "w" "wrapper")
-  (spacemacs/set-leader-keys-for-major-mode 'org-mode "ws" 'mp-org/wrap-source-code))
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode
+    "wq" 'mp-org/wrap-quote
+    "wl" 'mp-org/wrap-link
+    "ws" 'mp-org/wrap-source-code))
 
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "P") 'org-pomodoro))
