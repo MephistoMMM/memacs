@@ -89,7 +89,11 @@
 (defun python/init-py-isort ()
   (use-package py-isort
     :defer t
-    :init (add-hook 'before-save-hook 'spacemacs//python-sort-imports)))
+    :init (add-hook 'python-mode-hook
+                     (lambda ()
+                       (add-hook 'before-save-hook
+                                 'spacemacs//python-sort-imports
+                                 nil t)))))
 
 (defun python/init-pyvenv ()
   (use-package pyvenv

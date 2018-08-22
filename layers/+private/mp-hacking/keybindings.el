@@ -103,15 +103,13 @@
   (global-set-key [(meta w)]
                   (lambda () (interactive) (delete-window)))
   (global-set-key [(meta z)] 'undo)
-  (global-set-key [(meta l)] 'evil-avy-goto-line)
+  ;; (global-set-key [(meta l)] 'hippie-expand)
   ;; C-v in ivy minibuffer
   (define-key ivy-minibuffer-map (kbd "M-v") 'yank)
   ;; show ivy recent contents is C-r
   )
 
-
-
-
+;; TODO: create a mp-osx layer and mv these better default codes to mp-osx
 (defvar memacs-autoescape-english-layout-name "ABC"
   "English layout name in your macOS system")
 

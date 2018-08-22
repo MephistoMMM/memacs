@@ -133,7 +133,7 @@ FILENAME is renamed using `spacemacs/delete-file' function.."
 (defun spacemacs//counsel-edit ()
   "Edit the current search results in a buffer using wgrep."
   (interactive)
-  (run-with-idle-timer 0 nil 'ivy-wgrep-change-to-wgrep-mode)
+  (run-with-idle-timer 0 nil 'spacemacs/ivy-wgrep-change-to-wgrep-mode)
   (ivy-occur))
 
 (defun spacemacs//gne-init-counsel ()
@@ -393,6 +393,11 @@ that directory."
 
 (defun spacemacs//ivy-matcher-desc ()
   (replace-regexp-in-string "ivy--" "" (format "%s" ivy--regex-function)))
+
+(defun spacemacs/ivy-wgrep-change-to-wgrep-mode ()
+  (interactive)
+  (ivy-wgrep-change-to-wgrep-mode)
+  (evil-normal-state))
 
 ;; Evil
 
