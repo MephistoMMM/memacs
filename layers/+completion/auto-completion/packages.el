@@ -128,6 +128,7 @@
       (memacs/define-insert-keybinding "s" 'spacemacs/ivy-yas)
       (spacemacs/set-leader-keys "si" 'spacemacs/ivy-yas))))
 
+;; DOCUMENTS: http://joaotavora.github.io/yasnippet/snippet-development.html
 (defun auto-completion/init-yasnippet ()
   (use-package yasnippet
     :commands (yas-global-mode yas-minor-mode yas-activate-extra-mode)

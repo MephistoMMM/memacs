@@ -53,8 +53,8 @@ This function should only modify configuration layer settings."
      ;; READY : npm install -g
      ;;             eslint  typescript javascript-typescript-langserver flow-language-server
      javascript
-     (java :variables java-backend 'lsp
-           lsp-java--workspace-folders '("~/Workspace/java/"))
+     ;; READY : see readme in java layer
+     (java :variables java-backend 'lsp)
      ;; READY : brew install cquery
      (c-c++ :variables
             c-c++-enable-auto-newline nil)

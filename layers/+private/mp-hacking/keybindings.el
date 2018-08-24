@@ -136,8 +136,10 @@
                                          memacs-autoescape--origin-outside-layout-name)))
   )
 
-(add-hook 'focus-in-hook 'memacs/autoescape-use-english-layout)
-(add-hook 'focus-out-hook 'memacs/autoescape-recover-outside-layout)
-(add-hook 'kill-emacs-hook 'memacs/autoescape-recover-outside-layout)
+;; Following statements sometimes doesn't run , so let it be called after user-config
+(spacemacs/defer-until-after-user-config (lambda ()
+                                           (add-hook 'focus-in-hook 'memacs/autoescape-use-english-layout)
+                                           (add-hook 'focus-out-hook 'memacs/autoescape-recover-outside-layout)
+                                           (add-hook 'kill-emacs-hook 'memacs/autoescape-recover-outside-layout)))
 
 ;;; keybindings.el ends here

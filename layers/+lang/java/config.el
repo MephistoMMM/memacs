@@ -15,3 +15,6 @@
 
 (defvar java-backend 'meghanada
   "The backend to use for IDE features. Possible values are `meghanada' and `lsp'.")
+
+;; TODO: make this value different from each projection.
+(setq lsp-java--workspace-folders '("~/Workspace/java/group4"))

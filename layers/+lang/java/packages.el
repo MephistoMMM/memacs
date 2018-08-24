@@ -157,6 +157,7 @@
       (setq lsp-highlight-symbol-at-point nil
             lsp-ui-sideline-update-mode 'point
             lsp-eldoc-render-all nil
+            lsp-inhibit-message t
             lsp-java-completion-guess-arguments t))))
 
 (defun java/init-mvn ()
