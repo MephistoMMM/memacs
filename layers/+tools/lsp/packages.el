@@ -61,8 +61,6 @@
     :init (add-hook 'lsp-mode-hook #'lsp-ui-mode)
     :config
     (progn
-      (memacs//lsp-sync-face)
-      (setq lsp-ui-doc-include-signature nil)  ; don't include type signature in the child frame
-      (setq lsp-ui-sideline-show-symbol nil)
-      (add-hook 'spacemacs-post-theme-change-hook #'memacs//lsp-sync-face))
-    ))
+      (spacemacs//lsp-sync-peek-face)
+      (add-hook 'spacemacs-post-theme-change-hook
+                #'spacemacs//lsp-sync-peek-face))))
