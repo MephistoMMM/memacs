@@ -29,6 +29,8 @@ This function should only modify configuration layer settings."
      markdown
      protobuf
      docker
+     (restclient :variables ;; https://github.com/zweifisch/ob-http
+                 restclient-use-org t)
      ;; (shell :variables
      ;;        shell-default-shell 'eshell
      ;;        shell-protect-eshell-prompt t

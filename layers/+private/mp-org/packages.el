@@ -87,7 +87,7 @@
      'org-babel-load-languages
      '((emacs-lisp . t)
        (python . t)
-       (ledger . t)
+       (http . t)
        (dot . t)
        (C . t)))
 
