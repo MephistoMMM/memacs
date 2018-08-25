@@ -33,7 +33,7 @@
   (use-package avy
     :defer t
     ;; avy--generic-jump is used by spacemacs/avy-goto-url
-    :commands (avy--generic-jump avy-pop-mark avy-resume)
+    :commands (avy--generic-jump avy-pop-mark avy-resume avy-with)
     :init
     (progn
       (setq avy-all-windows 'all-frames)
