@@ -88,6 +88,7 @@ This function should only modify configuration layer settings."
      ;;         brew install ledger (https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-ledger.html)
      mp-org
      mp-hacking
+     osx
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -369,11 +370,6 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
 
-  ;; better default for mac
-  (setq mac-pass-command-to-system nil)
-  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-  (add-to-list 'default-frame-alist '(ns-appearance . dark))
-
    (setq configuration-layer-elpa-archives
          '(("melpa-cn" . "https://elpa.zilongshanren.com/melpa/")
            ("org-cn"   . "https://elpa.zilongshanren.com/org/")
@@ -381,11 +377,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   ;; add local/bin to exec-path for fixing not found tern
   (push "/usr/local/bin" exec-path)
-
-  ;; clean env error while starting
-  (if (and (eq system-type 'darwin) (display-graphic-p))
-      (when (string-match-p "/zsh$" (getenv "SHELL"))
-        (setq exec-path-from-shell-arguments '("-l"))))
   )
 
 (defun dotspacemacs/user-load ()

@@ -33,8 +33,8 @@ user-config should be defined in this function!"
 
 ;;;; Source Code
 
-(setq mp-org/src-code-types
-  '("emacs-lisp" "python" "c" "shell" "java" "js2" "clojure" "c++" "css" "go" "rust" "sh" "sass" "sql" "awk" "haskell" "latex" "lisp" "matlab" "org" "perl" "ruby" "scheme" "sqlite"))
+(defconst mp-org/src-code-types
+  '("emacs-lisp" "python" "c" "shell" "java" "js2" "clojure" "c++" "css" "go" "rust" "sh" "sass" "sql" "awk" "haskell" "latex" "lisp" "matlab" "org" "perl" "ruby" "scheme" "sqlite" "yaml"))
 
 (defun mp-org/org-insert-src-code-block (src-code-type)
   "Insert a `SRC-CODE-TYPE' type source code block in org-mode.
@@ -113,7 +113,7 @@ Go files should disable fly-check."
 
 (defun mp-org//linkp (linkstr)
   "Test for link line."
-  (string-match "^\\w+?:" (substring-no-properties linkstr)))
+  (string-match "^\\(http\\|file\\|https\\|img\\):" (substring-no-properties linkstr)))
 
 (defun mp-org//link-switch ()
   "Filter link lines in counsel kills, if used ivy layer,
