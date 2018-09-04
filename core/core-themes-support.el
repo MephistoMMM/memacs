@@ -26,6 +26,8 @@
 
 (defconst spacemacs-theme-name-to-package
   '(
+    (tao-yang-theme  . spacemacs-theme)
+    (tao-yin-theme   . spacemacs-theme)
     (dracula         . spacemacs-theme)
     (spacemacs-dark  . spacemacs-theme)
     (spacemacs-light . spacemacs-theme)
