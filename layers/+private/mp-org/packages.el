@@ -109,6 +109,8 @@
       ;; html export
       org-html-style-default ""
       org-html-htmlize-output-type nil
+      org-todo-keywords
+            '((sequence "TODO(t)" "SHELVING(s@/!)" "|" "DONE(d!)" "CANCELED(c@)"))
 
       org-modules
       '(org-bbdb org-habit org-info org-irc org-w3m org-mac-link org-protocol)
