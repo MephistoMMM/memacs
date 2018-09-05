@@ -12,6 +12,6 @@
 
 ;;;; Buffer
 (setq mp-hacking-buffer-switch-max 5)
-(setq goenv-default-gopath "/Users/FusGoethe/Desktop/work/go/lib:/Users/FusGoethe/Desktop/work/go")
+(setq goenv-default-gopath (getenv "GOPATH"))
 
 ;;; config.el ends here
