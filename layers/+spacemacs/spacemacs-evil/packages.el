@@ -10,7 +10,8 @@
 ;;; License: GPLv3
 
 (setq spacemacs-evil-packages
-      '(evil-args
+      '(evil-anzu
+        evil-args
         evil-ediff
         evil-escape
         evil-exchange
@@ -33,6 +34,17 @@
         (hs-minor-mode :location built-in)
         vi-tilde-fringe
         ))
+
+(defun spacemacs-evil/init-evil-anzu ()
+  (use-package evil-anzu
+    :init
+    (global-anzu-mode t)
+    :config
+    (progn
+      (spacemacs|hide-lighter anzu-mode)
+      (setq anzu-search-threshold 1000
+            anzu-cons-mode-line-p nil)
+      )))
 
 (defun spacemacs-evil/init-evil-args ()
   (use-package evil-args

@@ -106,6 +106,7 @@
        memacs--ivy-file-actions)
 
       (define-key counsel-find-file-map (kbd "C-h") 'counsel-up-directory)
+      (define-key read-expression-map (kbd "C-r") 'counsel-minibuffer-history)
       ;; remaps built-in commands that have a counsel replacement
       (counsel-mode 1)
       (spacemacs|hide-lighter counsel-mode)
@@ -208,7 +209,8 @@
 (defun ivy/init-default-ivy-config ()
   (with-eval-after-load 'ivy
     (setq ivy-height 15
-          ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
+          ivy-re-builders-alist '((spacemacs/counsel-search . spacemacs/ivy--regex-plus)
+                                  (t . ivy--regex-ignore-order)))
     (spacemacs|hide-lighter ivy-mode)
     ;; key bindings
     ;; ensure that the correct bindings are set at startup
@@ -282,14 +284,16 @@ Current Action: %s(ivy-action-name)
 
 (defun ivy/init-ivy-rich ()
   (use-package ivy-rich
-    :defer t
+    ;; if `counsel' loads after `ivy-rich', it overrides some of `ivy-rich''s
+    ;; transformers
+    :after counsel
     :init
     (progn
-      (setq ivy-rich-abbreviate-paths t
-            ivy-virtual-abbreviate 'full
-            ivy-rich-switch-buffer-align-virtual-buffer t)
-      (ivy-set-display-transformer 'ivy-switch-buffer
-                                   'ivy-rich-switch-buffer-transformer))))
+      (setq ivy-rich-path-style 'abbrev
+            ivy-virtual-abbreviate 'full))
+    :config
+    (progn
+      (ivy-rich-mode))))
 
 (defun ivy/init-ivy-spacemacs-help ()
   (use-package ivy-spacemacs-help
