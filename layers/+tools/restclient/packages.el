@@ -11,16 +11,10 @@
 (setq restclient-packages
       '(
         (company-restclient :requires company)
-        golden-ratio
         ob-http
         ob-restclient
         restclient
-        (restclient-helm :requires helm)
         ))
-
-(defun restclient/pre-init-golden-ratio ()
-  (spacemacs|use-package-add-hook golden-ratio
-    :post-config (add-to-list 'golden-ratio-exclude-modes "restclient-mode")))
 
 (defun restclient/pre-init-ob-http ()
   (spacemacs|use-package-add-hook org
@@ -61,9 +55,3 @@
     :init (spacemacs|add-company-backends
             :backends company-restclient
             :modes restclient-mode)))
-
-(defun restclient/init-restclient-helm ()
-  (use-package restclient-helm
-    :defer t
-    :init (spacemacs/set-leader-keys-for-major-mode 'restclient-mode
-            "ji" 'helm-restclient)))

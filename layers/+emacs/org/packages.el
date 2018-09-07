@@ -645,9 +645,9 @@ Headline^^            Visit entry^^               Filter^^                    Da
     :after org
     :config
     (progn
-      (spacemacs/declare-prefix-for-mode 'org-mode "mmt" "trello")
-      (spacemacs/declare-prefix-for-mode 'org-mode "mmtd" "sync down")
-      (spacemacs/declare-prefix-for-mode 'org-mode "mmtu" "sync up")
+      (spacemacs/declare-prefix-for-mode 'org-mode "mt" "trello")
+      (spacemacs/declare-prefix-for-mode 'org-mode "mtd" "sync down")
+      (spacemacs/declare-prefix-for-mode 'org-mode "mtu" "sync up")
       (spacemacs/set-leader-keys-for-major-mode 'org-mode
         "mtI" 'org-trello-install-key-and-token
         "mta" 'org-trello-archive-card
