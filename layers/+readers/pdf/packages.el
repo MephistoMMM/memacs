@@ -73,9 +73,9 @@
         ;; Other
         ("q" nil :exit t))
 
-      (spacemacs/declare-prefix-for-mode 'pdf-view-mode "ma" "annotations")
-      (spacemacs/declare-prefix-for-mode 'pdf-view-mode "mf" "fit")
-      (spacemacs/declare-prefix-for-mode 'pdf-view-mode "ms" "slice/search")
+      (spacemacs/declare-prefix-for-mode 'pdf-view-mode "a" "annotations")
+      (spacemacs/declare-prefix-for-mode 'pdf-view-mode "f" "fit")
+      (spacemacs/declare-prefix-for-mode 'pdf-view-mode "s" "slice/search")
       (spacemacs/set-leader-keys-for-major-mode 'pdf-view-mode
         ;; Slicing image
         "sm" 'pdf-view-set-slice-using-mouse

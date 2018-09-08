@@ -50,12 +50,12 @@ https://github.com/emacs-lsp/lsp-javascript/issues/9#issuecomment-379515379"
 
 (defun spacemacs/lsp-bind-keys-for-mode (mode)
   "Define key bindings for the specific MODE."
-  (spacemacs/declare-prefix-for-mode mode "m=" "format")
-  (spacemacs/declare-prefix-for-mode mode "mg" "goto")
-  (spacemacs/declare-prefix-for-mode mode "mh" "help/hierarchy")
-  (spacemacs/declare-prefix-for-mode mode "ml" "lsp/backend")
-  (spacemacs/declare-prefix-for-mode mode "mr" "refactor")
-  (spacemacs/declare-prefix-for-mode mode "mT" "toggle")
+  (spacemacs/declare-prefix-for-mode mode "=" "format")
+  (spacemacs/declare-prefix-for-mode mode "g" "goto")
+  (spacemacs/declare-prefix-for-mode mode "h" "help/hierarchy")
+  (spacemacs/declare-prefix-for-mode mode "l" "lsp/backend")
+  (spacemacs/declare-prefix-for-mode mode "r" "refactor")
+  (spacemacs/declare-prefix-for-mode mode "T" "toggle")
 
   (spacemacs/set-leader-keys-for-major-mode mode
     ;;format

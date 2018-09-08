@@ -14,10 +14,16 @@
     cc-mode
     disaster
     flycheck
-    gdb-mi
     google-c-style
     srefactor
     stickyfunc-enhance
+
+    ;; normal
+    clang-format
+    company
+    (company-c-headers :requires company)
+    counsel-gtags
+    ggtags
 
     ;; lsp
     (cquery :requires lsp-mode company-lsp)
@@ -33,30 +39,48 @@
         (add-hook 'c-mode-common-hook 'spacemacs//c-toggle-auto-newline)))
     :config (require 'compile)))
 
+(defun c-c++/init-clang-format ()
+  (use-package clang-format
+    :if c-c++-enable-clang-support
+    :init
+    (progn
+      (when c-c++-enable-clang-format-on-save
+        (spacemacs/add-to-hooks 'spacemacs/clang-format-on-save c-c++-mode-hooks))
+      )))
+
+(defun c-c++/post-init-company ()
+  (when c-c++-enable-clang-support
+    (spacemacs|add-company-backends :backends company-clang
+      :modes c-mode-common)
+    (when c-c++-enable-c++11
+      (setq company-clang-arguments '("-std=c++11")))
+    (setq company-clang-prefix-guesser 'spacemacs/company-more-than-prefix-guesser)
+    (spacemacs/add-to-hooks 'spacemacs/c-c++-load-clang-args c-c++-mode-hooks)))
+
+(defun c-c++/init-company-c-headers ()
+  (use-package company-c-headers
+    :defer t
+    :init (spacemacs|add-company-backends
+            :backends company-c-headers
+            :modes c-mode-common)))
+
+(defun c-c++/post-init-counsel-gtags ()
+  (dolist (mode c-c++-modes)
+    (spacemacs/counsel-gtags-define-keys-for-mode mode)))
+
 (defun c-c++/init-disaster ()
   (use-package disaster
     :defer t
-    :commands (disaster)
-    :init
-    (progn
-      (dolist (mode c-c++-modes)
-        (spacemacs/set-leader-keys-for-major-mode mode
-          "D" 'disaster)))
-    ))
+    :commands (disaster)))
 
 (defun c-c++/post-init-flycheck ()
   (dolist (mode c-c++-modes)
     (spacemacs/enable-flycheck mode)))
 
-(defun c-c++/init-gdb-mi ()
-  (use-package gdb-mi
-    :defer t
-    :init
-    (setq
-     ;; use gdb-many-windows by default when `M-x gdb'
-     gdb-many-windows t
-     ;; Non-nil means display source file containing the main routine at startup
-     gdb-show-main t)))
+(defun c-c++/post-init-ggtags ()
+  (add-hook 'c-mode-local-vars-hook #'spacemacs/ggtags-mode-enable)
+  (add-hook 'c++-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
+
 
 (defun c-c++/init-google-c-style ()
   (use-package google-c-style
