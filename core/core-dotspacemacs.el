@@ -569,6 +569,7 @@ Return nil if no scale is defined."
                       all-the-icons
                       memacs
                       custom
+                      doom
                       vim-powerline
                       vanilla)))
         (or (member x themes)
