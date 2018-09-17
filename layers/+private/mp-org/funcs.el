@@ -86,6 +86,31 @@ Go files should disable fly-check."
     )
   )
 
+(defun mp-org/wrap-unordered-list (start end)
+  "Insert '- ' to the begin of each line."
+  (interactive "r")
+  (save-excursion
+    (narrow-to-region start end)
+    (goto-char (point-max))
+    (while (> (forward-line -1) -1) (insert "- "))
+    (widen))
+  )
+
+(defun mp-org/wrap-ordered-list (start end)
+  "Insert '%d. ' to the begin of each line."
+  (interactive "r")
+  (save-excursion
+    (narrow-to-region start end)
+    (goto-char (point-min))
+    (let* ((lineno 1)
+          (linecount (count-lines start end)))
+      (while (<= lineno linecount)
+        (insert (format "%d. " lineno))
+        (forward-line 1)
+        (setq lineno (1+ lineno))))
+    (widen))
+  )
+
 (defun mp-org/wrap-quote (start end)
   "Insert '#+BEGIN_QUOTE' and '#+END_QUOTE' to the begin and end of quote region"
   (interactive "r")

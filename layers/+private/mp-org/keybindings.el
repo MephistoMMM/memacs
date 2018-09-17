@@ -52,6 +52,8 @@
   (spacemacs/set-leader-keys-for-major-mode 'org-mode
     "wq" 'mp-org/wrap-quote
     "wl" 'mp-org/wrap-link
+    "wo" 'mp-org/wrap-ordered-list
+    "wu" 'mp-org/wrap-unordered-list
     "ws" 'mp-org/wrap-source-code))
 
 (with-eval-after-load 'org-agenda
