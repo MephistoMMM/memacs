@@ -91,7 +91,7 @@
 
 (defun auto-completion/init-hippie-exp ()
   ;; replace dabbrev-expand
-  (define-key evil-hybrid-state-map (kbd "M-l")   'hippie-expand)
+  (define-key evil-hybrid-state-map (kbd "TAB")   'hippie-expand)
   (setq hippie-expand-try-functions-list
         '(
           ;; Try to expand word "dynamically", searching the current buffer.

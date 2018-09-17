@@ -26,7 +26,7 @@ backends added by individual spacemacs layers.")
   "What the RET key should do when auto-completion menu is active.
 Possible values are `complete' or `nil'.")
 
-(defvar auto-completion-tab-key-behavior 'cycle
+(defvar auto-completion-tab-key-behavior 'complete
   "What the TAB key should do when auto-completion menu is active.
 Possible values are `complete', `cycle' or `nil'.")
 
