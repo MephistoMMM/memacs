@@ -56,8 +56,25 @@
         ("B" tabbar-forward-tab-other-window)
         ("F" tabbar-backward-tab-other-window)
         ("q" nil :exit t))
-      (memacs/define-evil-normal-keybinding "C-t" 'spacemacs/awesometab-transient-state/body)
-      )))
+      (memacs/define-evil-normal-keybinding "C-t" 'spacemacs/awesometab-transient-state/body))
+      :config
+      (progn
+        ;; TODO top line of tabbar to Bottom
+        ;; TODO link theme evil state color to spacemacs-Bootstrap/config.el
+        ;; TODO create a proxy hook for evil state changes
+        (setq tabbar-active-color
+              (face-attribute 'spacemacs-normal-face :background)
+              tabbar-inactive-color
+              (face-attribute 'font-lock-comment-face :foreground))
+        (set-face-attribute 'tabbar-selected nil
+                            :foreground tabbar-active-color
+                            :overline tabbar-active-color
+                            )
+        (set-face-attribute 'tabbar-unselected nil
+                            :foreground tabbar-inactive-color
+                            :overline tabbar-inactive-color
+                            ))
+      ))
 
 (defun spacemacs-navigation/init-ace-link ()
   (use-package ace-link
