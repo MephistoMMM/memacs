@@ -21,7 +21,43 @@
         open-junk-file
         paradox
         restart-emacs
+        (awesome-tab :location (recipe
+                                :fetcher github
+                                :repo "MephistoMMM/awesome-tab"))
         (smooth-scrolling :location built-in)))
+
+(defun spacemacs-navigation/init-awesome-tab ()
+  (use-package awesome-tab
+    :commands (tabbar-toggle-tabbar-mode-on tabbar-toggle-tabbar-mode-off)
+    :defer t
+    :init
+    (progn
+      (spacemacs|define-transient-state awesometab
+        :title "Scrolling Transient State"
+        :doc "
+ Tab^^                    Group^^                   Other^^
+ ───────^^────────────  ─────^^───────────────  ─────^^──────────────
+ [_p_/_n_] pre/next       [_P_/_N_] pre/next group  [_B_/_F_] other pre/next
+ [_b_/_e_] beginning/end  [_s_/_K_] switch/kill     [_q_] quit"
+        :on-enter (tabbar-toggle-tabbar-mode-on)
+        :on-exit (tabbar-toggle-tabbar-mode-off)
+        :bindings
+        ;; Tab
+        ("p" tabbar-backward)
+        ("n" tabbar-forward)
+        ("b" tabbar-select-beg-tab)
+        ("e" tabbar-select-end-tab)
+        ;; Group
+        ("P" tabbar-backward-group)
+        ("N" tabbar-forward-group)
+        ("s" tabbar-switch-group)
+        ("K" tabbar-kill-all-buffers-in-current-group)
+        ;; Other
+        ("B" tabbar-forward-tab-other-window)
+        ("F" tabbar-backward-tab-other-window)
+        ("q" nil :exit t))
+      (memacs/define-evil-normal-keybinding "C-t" 'spacemacs/awesometab-transient-state/body)
+      )))
 
 (defun spacemacs-navigation/init-ace-link ()
   (use-package ace-link
