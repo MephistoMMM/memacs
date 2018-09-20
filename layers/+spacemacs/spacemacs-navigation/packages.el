@@ -68,11 +68,11 @@
               (face-attribute 'font-lock-comment-face :foreground))
         (set-face-attribute 'tabbar-selected nil
                             :foreground tabbar-active-color
-                            :overline tabbar-active-color
+                            :underline tabbar-active-color
                             )
         (set-face-attribute 'tabbar-unselected nil
                             :foreground tabbar-inactive-color
-                            :overline tabbar-inactive-color
+                            :underline tabbar-inactive-color
                             ))
       ))
 
