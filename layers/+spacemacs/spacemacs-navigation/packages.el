@@ -37,24 +37,25 @@
         :doc "
  Tab^^                    Group^^                   Other^^
  ───────^^────────────  ─────^^───────────────  ─────^^──────────────
- [_p_/_n_] pre/next       [_P_/_N_] pre/next group  [_B_/_F_] other pre/next
- [_b_/_e_] beginning/end  [_s_/_K_] switch/kill     [_q_] quit"
+ [_h_/_l_] pre/next       [_p_/_n_] pre/next group  [_H_/_L_] other pre/next
+ [_b_/_e_] beginning/end  [_s_] switch            [_d_/_K_] delete/Kill all    [_q_] quit"
         :on-enter (tabbar-toggle-tabbar-mode-on)
         :on-exit (tabbar-toggle-tabbar-mode-off)
         :bindings
         ;; Tab
-        ("p" tabbar-backward)
-        ("n" tabbar-forward)
+        ("h" tabbar-backward)
+        ("l" tabbar-forward)
         ("b" tabbar-select-beg-tab)
         ("e" tabbar-select-end-tab)
         ;; Group
-        ("P" tabbar-backward-group)
-        ("N" tabbar-forward-group)
+        ("p" tabbar-backward-group)
+        ("n" tabbar-forward-group)
         ("s" tabbar-switch-group)
-        ("K" tabbar-kill-all-buffers-in-current-group)
         ;; Other
-        ("B" tabbar-forward-tab-other-window)
-        ("F" tabbar-backward-tab-other-window)
+        ("d" spacemacs/kill-this-buffer)
+        ("K" tabbar-kill-all-buffers-in-current-group)
+        ("H" tabbar-forward-tab-other-window)
+        ("L" tabbar-backward-tab-other-window)
         ("q" nil :exit t))
       (memacs/define-evil-normal-keybinding "C-t" 'spacemacs/awesometab-transient-state/body))
       :config
@@ -68,11 +69,13 @@
               (face-attribute 'font-lock-comment-face :foreground))
         (set-face-attribute 'tabbar-selected nil
                             :foreground tabbar-active-color
-                            :underline tabbar-active-color
+                            :underline nil
+                            :overline tabbar-active-color
                             )
         (set-face-attribute 'tabbar-unselected nil
                             :foreground tabbar-inactive-color
                             :underline tabbar-inactive-color
+                            :overline nil
                             ))
       ))
 
