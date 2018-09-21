@@ -28,7 +28,7 @@
 
 (defun spacemacs-navigation/init-awesome-tab ()
   (use-package awesome-tab
-    :commands (tabbar-toggle-tabbar-mode-on tabbar-toggle-tabbar-mode-off)
+    :commands (awesome-tab-toggle-tabbar-mode-on awesome-tab-toggle-tabbar-mode-off)
     :defer t
     :init
     (progn
@@ -39,23 +39,23 @@
  ───────^^────────────  ─────^^───────────────  ─────^^──────────────
  [_h_/_l_] pre/next       [_p_/_n_] pre/next group  [_H_/_L_] other pre/next
  [_b_/_e_] beginning/end  [_s_] switch            [_d_/_K_] delete/Kill all    [_q_] quit"
-        :on-enter (tabbar-toggle-tabbar-mode-on)
-        :on-exit (tabbar-toggle-tabbar-mode-off)
+        :on-enter (awesome-tab-toggle-tabbar-mode-on)
+        :on-exit (awesome-tab-toggle-tabbar-mode-off)
         :bindings
         ;; Tab
-        ("h" tabbar-backward)
-        ("l" tabbar-forward)
-        ("b" tabbar-select-beg-tab)
-        ("e" tabbar-select-end-tab)
+        ("h" awesome-tab-backward)
+        ("l" awesome-tab-forward)
+        ("b" awesome-tab-select-beg-tab)
+        ("e" awesome-tab-select-end-tab)
         ;; Group
-        ("p" tabbar-backward-group)
-        ("n" tabbar-forward-group)
-        ("s" tabbar-switch-group)
+        ("p" awesome-tab-backward-group)
+        ("n" awesome-tab-forward-group)
+        ("s" awesome-tab-switch-group)
         ;; Other
         ("d" spacemacs/kill-this-buffer)
-        ("K" tabbar-kill-all-buffers-in-current-group)
-        ("H" tabbar-forward-tab-other-window)
-        ("L" tabbar-backward-tab-other-window)
+        ("K" awesome-tab-kill-all-buffers-in-current-group)
+        ("H" awesome-tab-forward-tab-other-window)
+        ("L" awesome-tab-backward-tab-other-window)
         ("q" nil :exit t))
       (memacs/define-evil-normal-keybinding "C-t" 'spacemacs/awesometab-transient-state/body))
       :config
@@ -63,18 +63,18 @@
         ;; TODO top line of tabbar to Bottom
         ;; TODO link theme evil state color to spacemacs-Bootstrap/config.el
         ;; TODO create a proxy hook for evil state changes
-        (setq tabbar-active-color
+        (setq awesome-tab-active-color
               (face-attribute 'spacemacs-normal-face :background)
-              tabbar-inactive-color
+              awesome-tab-inactive-color
               (face-attribute 'font-lock-comment-face :foreground))
-        (set-face-attribute 'tabbar-selected nil
-                            :foreground tabbar-active-color
+        (set-face-attribute 'awesome-tab-selected nil
+                            :foreground awesome-tab-active-color
                             :underline nil
-                            :overline tabbar-active-color
+                            :overline awesome-tab-active-color
                             )
-        (set-face-attribute 'tabbar-unselected nil
-                            :foreground tabbar-inactive-color
-                            :underline tabbar-inactive-color
+        (set-face-attribute 'awesome-tab-unselected nil
+                            :foreground awesome-tab-inactive-color
+                            :underline awesome-tab-inactive-color
                             :overline nil
                             ))
       ))
