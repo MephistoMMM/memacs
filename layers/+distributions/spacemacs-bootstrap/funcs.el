@@ -42,7 +42,7 @@ An appropriate entry is added to `spacemacs-evil-cursors', as well.
 For evil states that do not need an evil cursor use
 `spacemacs/define-evil-state-face' instead."
   (add-to-list 'spacemacs-evil-cursors (list state color shape))
-  (spacemacs/define-evil-state-face state color)
+  (spacemacs/define-evil-state-face state (if (stringp color) color (eval color)))
   (set (intern (format "evil-%s-state-cursor" state))
        (list (when dotspacemacs-colorize-cursor-according-to-state color)
              shape)))
