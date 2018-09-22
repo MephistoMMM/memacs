@@ -159,7 +159,7 @@
     (progn
       ;; evil-mc is not compatible with the paste transient state
       (setq evil-mc-one-cursor-show-mode-line-text nil)
-      (when (or (spacemacs/system-is-mac) (spacemacs/system-is-mswindows))
+      (when (spacemacs/system-is-mac)
         (setq evil-mc-enable-bar-cursor nil)))))
 
 ;; other commenting functions in funcs.el with keybinds in keybindings.el

@@ -23,8 +23,6 @@ values."
   (eq system-type 'darwin))
 (defun spacemacs/system-is-linux ()
   (eq system-type 'gnu/linux))
-(defun spacemacs/system-is-mswindows ()
-  (eq system-type 'windows-nt))
 
 (defun spacemacs/window-system-is-mac ()
   ;; ns is returned instead of mac on Emacs 25+
