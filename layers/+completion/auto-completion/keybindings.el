@@ -32,7 +32,7 @@
 
 
 ;;; hippie-exp
-(define-key evil-hybrid-state-map (kbd "TAB")   'hippie-expand)
+(define-key evil-hybrid-state-map (kbd "TAB")   'memacs/tab-indent-or-hippie-expand)
 
 
 ;;; ivy-yasnippet

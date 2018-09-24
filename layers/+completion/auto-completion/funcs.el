@@ -283,3 +283,20 @@ Press 'q' to quit."
   (interactive)
   (company-abort)
   (evil-normal-state))
+
+
+;; hippie-expand
+
+;; A solution for indent always expand while pressing TAB.
+;; inspired from https://www.emacswiki.org/emacs/CompanyMode#toc10
+(defun memacs//check-indent ()
+  (if (looking-back "^\\\s*") t))
+
+(defun memacs/tab-indent-or-hippie-expand (arg)
+  (interactive "P")
+  (if (memacs//check-indent)
+      ;; yes
+      (insert-tab)
+    ;; no
+    (unless (call-interactively 'hippie-expand arg)
+      (insert-tab))))
