@@ -15,7 +15,7 @@ EXTRA_EXCLUDES=$2
 
 # * Source Path
 
-WORKSPACE="$HOME/Desktop/work"
+WORKSPACE="$HOME/Workspace"
 GO_BACK_SRC="$WORKSPACE/go"
 JAVA_BACK_SRC="$WORKSPACE/java"
 PY_BACK_SRC="$WORKSPACE/py"
@@ -29,7 +29,7 @@ IMDATA_BACK_SRC="$HOME/Desktop/imdata"
 # * Common Value
 
 BACK_UP_VERSION=$(date "+%Y_%m_%d")
-COMMON_EXCLUDES="--exclude=.git --exclude=.svn --exclude=Icon? --exclude=.DS_Store --exclude=*.exe --exclude=*.tar.* --exclude=*.tar --exclude=*.zip --exclude=*.so --exclude=*.o --exclude=*.a --exclude=.idea --exclude=.cache/ --exclude=.local/"
+COMMON_EXCLUDES="--exclude=.svn --exclude=Icon? --exclude=.DS_Store --exclude=*.exe --exclude=*.tar.* --exclude=*.tar --exclude=*.zip --exclude=*.so --exclude=*.o --exclude=*.a --exclude=.idea --exclude=.cache/ --exclude=.local/"
 
 # * Run Tar
 
