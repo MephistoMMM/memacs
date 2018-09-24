@@ -30,10 +30,7 @@
       (setq aya-persist-snippets-dir
             (or auto-completion-private-snippets-directory
                 (concat spacemacs-start-directory "snippets/")))
-      (spacemacs/set-leader-keys
-        "sa" 'aya-create
-        "se" 'spacemacs/auto-yasnippet-expand
-        "sp" 'aya-persist-snippet))))
+      )))
 
 (defun auto-completion/init-company ()
   (use-package company
@@ -58,17 +55,6 @@
       ;; key bindings
       (spacemacs//auto-completion-set-RET-key-behavior 'company)
       (spacemacs//auto-completion-set-TAB-key-behavior 'company)
-
-      (let ((map company-active-map))
-        (define-key map (kbd "C-n") 'company-select-next)
-        (define-key map (kbd "C-p") 'company-select-previous)
-        (define-key map (kbd "C-s") 'company-filter-candidates)
-        (define-key map (kbd "C-d") 'company-show-doc-buffer))
-      (let ((map company-search-map))
-        (define-key map [escape] 'memacs/company-escape)
-        (define-key map (kbd "C-[") 'memacs/company-escape)
-        (define-key map (kbd "C-n") 'company-select-next)
-        (define-key map (kbd "C-p") 'company-select-previous))
       )))
 
 (defun auto-completion/init-company-statistics ()
@@ -91,7 +77,6 @@
 
 (defun auto-completion/init-hippie-exp ()
   ;; replace dabbrev-expand
-  (define-key evil-hybrid-state-map (kbd "TAB")   'hippie-expand)
   (setq hippie-expand-try-functions-list
         '(
           ;; Try to expand word "dynamically", searching the current buffer.
@@ -125,8 +110,7 @@
     :init
     (progn
       (setq ivy-yasnippet-expand-keys nil)
-      (memacs/define-insert-keybinding "s" 'spacemacs/ivy-yas)
-      (spacemacs/set-leader-keys "si" 'spacemacs/ivy-yas))))
+      )))
 
 ;; DOCUMENTS: http://joaotavora.github.io/yasnippet/snippet-development.html
 (defun auto-completion/init-yasnippet ()
@@ -176,16 +160,6 @@
     :config
     (progn
       (spacemacs|diminish yas-minor-mode " ⓨ" " y")
-
-      ;; Use C-h to start complete snips and use TAB to go arround the points
-      ;; How to write yasnippet: https://joaotavora.github.io/yasnippet/snippet-development.html or http://d.pr/n/1bHuv
-      (spacemacs/set-leader-keys
-        "sn" 'yas-new-snippet
-        "sl" 'yas-load-snippet-buffer
-        "sc" 'yas-load-snippet-buffer-and-close
-        "sv" 'yas-visit-snippet-file
-        "sd" 'memacs/describe-yasnippets)
-      )
-    ))
+      )))
 
 (defun auto-completion/init-yasnippet-snippets ())

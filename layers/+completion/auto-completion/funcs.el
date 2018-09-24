@@ -228,6 +228,34 @@ Press 'q' to quit."
   (interactive)
   (select-window (yas-describe-tables)))
 
+;; A solution for completion by TAB in yas expanding state
+;; inspired from https://www.emacswiki.org/emacs/CompanyMode#toc10
+(defun memacs//check-expansion ()
+  (save-excursion
+    (if (looking-at "\\_>") t
+      (backward-char 1)
+      (if (looking-at "\\.") t
+        (backward-char 1)
+        (if (looking-at "->") t nil)))))
+
+(defun memacs/tab-complete-or-next-field ()
+  (interactive)
+  (when (company-mode)
+      (if company-candidates
+          ;; yes
+          (company-complete-selection)
+        ;; no
+        (if (memacs//check-expansion)
+            ;; yes
+            (progn
+              (company-manual-begin)
+              (if (null company-candidates)
+                  (progn
+                    (company-abort)
+                    (yas-next-field-or-maybe-expand))))
+          ;; no
+          (yas-next-field-or-maybe-expand)))))
+
 
 ;; Auto-Yasnippet
 
