@@ -60,9 +60,6 @@
       (memacs/define-evil-normal-keybinding "C-t" 'spacemacs/awesometab-transient-state/body))
       :config
       (progn
-        ;; TODO top line of tabbar to Bottom
-        ;; TODO link theme evil state color to spacemacs-Bootstrap/config.el
-        ;; TODO create a proxy hook for evil state changes
         (setq awesome-tab-active-color
               (face-attribute 'spacemacs-normal-face :background)
               awesome-tab-inactive-color
