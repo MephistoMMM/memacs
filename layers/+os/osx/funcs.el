@@ -29,3 +29,30 @@
     (call-process-shell-command (concat "textinputsource -s "
                                          memacs-autoescape--origin-outside-layout-name)))
   )
+
+
+
+(defun memacs//switch-to-item2-run-command(CMD)
+  "Open item2 run command CMD."
+  (do-applescript
+   (format "
+          tell application \"iTerm\"
+            activate
+            try
+              select first window
+            on error
+              create window with default profile
+              select first window
+            end try
+            tell the first window
+              tell current session to write text \"%s\"
+            end tell
+          end tell" CMD))
+  )
+
+(defun memacs/switch-to-item2-on-dir-of-current-buffer()
+  "Open item2 then cd into the path of the directory of
+current buffer."
+  (interactive)
+  (memacs//switch-to-item2-run-command (concat "cd " default-directory))
+  )
