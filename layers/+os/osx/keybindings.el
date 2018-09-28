@@ -18,4 +18,6 @@
   (global-set-key [(meta z)] 'undo)
   ;; (global-set-key [(meta l)] 'hippie-expand)
   ;; C-v in ivy minibuffer
-  (define-key ivy-minibuffer-map (kbd "M-v") 'yank))
+  (define-key ivy-minibuffer-map (kbd "M-v") 'yank)
+  (spacemacs/set-leader-keys "f2" 'memacs/switch-to-item2-on-dir-of-current-buffer)
+  )

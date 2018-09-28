@@ -57,7 +57,7 @@
     (progn
       (setq mequ-conf-file "~/Dropbox/dotconf/mequ.conf")
       (setq custom-link-img-export-host
-            "http://7xlrfg.com1.z0.glb.clouddn.com")
+            "http://qiniu.oeli.pub")
       ))
   )
 
