@@ -62,3 +62,6 @@ private/
 /doc/COMMUNITY.org
 /doc/CONTRIBUTING.org
 spacemacs.env
+GPATH
+GRTAGS
+GTAGS
