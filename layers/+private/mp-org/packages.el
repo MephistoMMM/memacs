@@ -65,9 +65,6 @@
   "Configurations for org mode"
   (setq-default org-directory "~/Dropbox/org")
 
-  ;; config new org file in dropbox
-  (setq-default notes-org-directory-path (concat org-directory "/notes"))
-
   (add-hook 'org-mode-hook (lambda ()
                              (if org-descriptive-links
                                  (progn (org-remove-from-invisibility-spec '(org-link))

@@ -23,7 +23,7 @@
   "aor" 'mp-org/org-agenda-reload-files
 
   ;; Org new file in Dropbox
-  "bno" 'mp-org/new-org-buffer-in-dropdire
+  "bno" 'memacs/mission-start
 
   )
 

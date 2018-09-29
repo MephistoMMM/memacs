@@ -20,14 +20,24 @@ user-config should be defined in this function!"
   ;; (run-with-idle-timer 300 t 'mp-org/auto-org-agenda-task)
   )
 
-
-(defun mp-org/new-org-buffer-in-dropdire ()
-  "Create a new buffer then init by mrg."
-  (interactive)
-  (let ((ξbuf (generate-new-buffer "Dropbox org buffer")))
-    (switch-to-buffer ξbuf))
-  (org-mode)
-  (setq default-directory notes-org-directory-path)
+(defun memacs/mission-start(mission)
+  "Select a mission to start from memacs-mission-start-mission-list."
+  (interactive
+   (list
+    (nth
+     (get-text-property 1 'idx
+                        (ivy-completing-read "MISSIONS:"
+                                             memacs-mission-start-mission-list))
+     memacs-mission-start-mission-list)
+    ))
+  (let ((name (car mission))
+        (mode (car (cdr mission)))
+        (path (car (last mission))))
+    (let ((ξbuf (generate-new-buffer name)))
+      (switch-to-buffer ξbuf))
+    (call-interactively mode)
+    (setq default-directory (if (stringp path) path (eval path)))
+    )
   )
 
 

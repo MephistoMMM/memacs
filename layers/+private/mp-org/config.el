@@ -9,9 +9,13 @@
 
 ;;; Code:
 
-;; mrg path
-(defvar notes-org-directory-path "~/.notes_org"
-  "Directroy for store notes.")
+(defvar memacs-mission-start-mission-list
+      '(
+        ("Codewar&Golang" go-mode "~/Desktop/test_elisp")
+        ;; config new org file in dropbox
+        ("Dropbox Note Buffer" org-mode (concat org-directory "/notes"))
+        )
+      "Mission list. Format (buffer-name mode path)")
 
 (setq close-auto-org-agenda-task t)
 
