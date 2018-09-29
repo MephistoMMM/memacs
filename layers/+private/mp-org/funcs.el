@@ -23,13 +23,12 @@ user-config should be defined in this function!"
 (defun memacs/mission-start(mission)
   "Select a mission to start from memacs-mission-start-mission-list."
   (interactive
-   (list
-    (nth
-     (get-text-property 1 'idx
-                        (ivy-completing-read "MISSIONS:"
-                                             memacs-mission-start-mission-list))
-     memacs-mission-start-mission-list)
-    ))
+    (let ((name (ivy-completing-read
+                "MISSIONS:"
+                memacs-mission-start-mission-list
+                ;; memacs-mission-start-mission-list
+                nil t)))
+      (seq-filter (lambda (x) (string= (car x) name)) memacs-mission-start-mission-list)))
   (let ((name (car mission))
         (mode (car (cdr mission)))
         (path (car (last mission))))
