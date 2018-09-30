@@ -20,23 +20,28 @@ user-config should be defined in this function!"
   ;; (run-with-idle-timer 300 t 'mp-org/auto-org-agenda-task)
   )
 
-;; TODO support file name property
+(defun memacs//mission-start-candidates-function (str pred _)
+  (mapcar (lambda (mission)
+            (propertize (car mission) 'property (cdr mission)))
+             memacs-mission-start-mission-list))
+
 (defun memacs/mission-start(mission)
   "Select a mission to start from memacs-mission-start-mission-list."
   (interactive
-    (let ((name (ivy-completing-read
-                "MISSIONS:"
-                memacs-mission-start-mission-list
-                ;; memacs-mission-start-mission-list
-                nil t)))
-      (seq-filter (lambda (x) (string= (car x) name)) memacs-mission-start-mission-list)))
-  (let ((name (car mission))
-        (mode (car (cdr mission)))
-        (path (car (last mission))))
-    (let ((ξbuf (generate-new-buffer name)))
+   (list (ivy-completing-read "MISSIONS:"
+    #'memacs//mission-start-candidates-function nil t)))
+  (let ((mode (nth 0 (get-text-property 0 'property mission)))
+        (path (nth 1 (get-text-property 0 'property mission)))
+        (file (nth 2 (get-text-property 0 'property mission))))
+    (let ((ξbuf (generate-new-buffer mission)))
       (switch-to-buffer ξbuf))
     (call-interactively mode)
     (setq default-directory (if (stringp path) path (eval path)))
+    (when (or (stringp file) (listp file))
+      (set-visited-file-name (concat
+                              default-directory
+                              "/"
+                              (if (stringp file) file (eval file)))))
     )
   )
 
