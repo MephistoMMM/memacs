@@ -11,7 +11,6 @@
 
 (defvar memacs-mission-start-mission-list
       '(
-        ("Codewar&Golang" go-mode (format-time-string "~/Workspace/go/src/codewar_pg/%Y_%m_%d"))
         ;; config new org file in dropbox
         ("Dropbox Note Buffer" org-mode (concat org-directory "/notes"))
         )

@@ -20,6 +20,7 @@ user-config should be defined in this function!"
   ;; (run-with-idle-timer 300 t 'mp-org/auto-org-agenda-task)
   )
 
+;; TODO support file name property
 (defun memacs/mission-start(mission)
   "Select a mission to start from memacs-mission-start-mission-list."
   (interactive
