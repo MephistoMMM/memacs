@@ -1,0 +1,6 @@
+# key: i_react
+# name: import_react
+# --
+import React, { Component } from "react"
+import ReactDOM from "react-dom"
+$0

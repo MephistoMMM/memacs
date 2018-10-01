@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: compare_float_value
+# key: compare_float_value
+# --
+# This is a good idea to use percentage
+(defvar fuzz-factor 1.0e-6)
+(defun approx-equal (x y)
+  (or (= x y)
+      (< (/ (abs (- x y))
+            (max (abs x) (abs y)))
+         fuzz-factor)))

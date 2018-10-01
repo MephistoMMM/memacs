@@ -1,0 +1,20 @@
+# -*- mode: snippet -*-
+# name: init_latex
+# key: i_latex
+# --
+\documentclass{article}
+\usepackage{xeCJK}
+\setCJKmainfont{HannotateSC-W5} %设置 CJK 主字体
+\usepackage{indentfirst} %段落开头缩进
+\usepackage{amsmath} %数学公式
+
+\title{${1:Title}}
+\author{${2:Mephis Pheies}}
+\date{${3:\today}}
+\begin{document}
+\maketitle
+\tableofcontents
+
+$0
+
+\end{document}
