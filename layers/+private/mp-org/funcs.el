@@ -23,9 +23,9 @@ user-config should be defined in this function!"
 (defun memacs//mission-start-candidates-function (str pred _)
   (mapcar (lambda (mission)
             (propertize (car mission) 'property (cdr mission)))
-             memacs-mission-start-mission-list))
+            memacs-mission-starter-mission-list))
 
-(defun memacs/mission-start(mission)
+(defun memacs/mission-starter-start(mission)
   "Select a mission to start from memacs-mission-start-mission-list."
   (interactive
    (list (ivy-completing-read "MISSIONS:"
@@ -42,6 +42,36 @@ user-config should be defined in this function!"
                               default-directory
                               "/"
                               (if (stringp file) file (eval file)))))
+    )
+  )
+
+(defun memacs//mission-help-candidates-function (str pred _)
+  (mapcar (lambda (help)
+            (propertize (car help) 'subhelp (cdr help)))
+          memacs-mission-helper-help-list))
+
+(defun memacs/mission-helper-help(help)
+  "Select a mission to start from memacs-mission-start-mission-list."
+  (interactive
+   (list (let ((subhelp
+                (get-text-property
+                 0 'subhelp
+                 (ivy-completing-read "HELP LIST:"
+                                      #'memacs//mission-help-candidates-function
+                                      nil t))))
+           (ivy-completing-read "SUBHELP LIST:"
+                                (lambda (str pred _)
+                                  (mapcar (lambda (shp)
+                                            (propertize
+                                             (car shp)
+                                             'url (cdr shp)))
+                                          subhelp))
+                                nil t)
+           )))
+  (let ((url (nth 0 (get-text-property 0 'url help))))
+    (if url
+        (browse-url url browse-url-new-window-flag)
+      (error "No URL found"))
     )
   )
 

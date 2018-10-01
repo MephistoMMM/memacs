@@ -22,9 +22,11 @@
   ;; Org Agenda Reload
   "aor" 'mp-org/org-agenda-reload-files
 
-  ;; Org new file in Dropbox
-  "bno" 'memacs/mission-start
+  ;; Mission Start
+  "bno" 'memacs/mission-starter-start
 
+  ;; Mission Help
+  "hm" 'memacs/mission-helper-help
   )
 
 ;; Wraper
