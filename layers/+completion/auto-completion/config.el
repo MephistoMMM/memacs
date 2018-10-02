@@ -39,5 +39,10 @@ Possible values are `complete', `cycle' or `nil'.")
 (defvar auto-completion-enable-sort-by-usage nil
   "If non nil suggestions are sorted by how often they are used.")
 
+(defvar auto-completion-enable-help-tooltip nil
+  "If non nil the docstring appears in a tooltip.
+If set to `manual', help tooltip appears only when invoked
+manually.")
+
 (defvar auto-completion-private-snippets-directory nil
   "Configurable private snippets directory.")

@@ -13,9 +13,12 @@
       '(
         auto-yasnippet
         company
+        (company-quickhelp :toggle auto-completion-enable-help-tooltip)
         company-statistics
         counsel
         fuzzy
+        (helm-company :requires helm)
+        (helm-c-yasnippet :requires helm)
         hippie-exp
         (ivy-yasnippet :requires ivy)
         yasnippet
@@ -75,6 +78,35 @@
 (defun auto-completion/init-fuzzy ()
   (use-package fuzzy :defer t))
 
+(defun auto-completion/init-company-quickhelp ()
+  (use-package company-quickhelp
+    :commands company-quickhelp-manual-begin
+    :defer t
+    :init
+    (spacemacs|do-after-display-system-init
+     (with-eval-after-load 'company
+       (setq company-frontends (delq 'company-echo-metadata-frontend company-frontends))
+       (define-key company-active-map (kbd "C-h") #'company-quickhelp-manual-begin)
+       (unless (eq auto-completion-enable-help-tooltip 'manual)
+         (company-quickhelp-mode))))))
+
+(defun auto-completion/init-helm-c-yasnippet ()
+  (use-package helm-c-yasnippet
+    :defer t
+    :init
+    (progn
+      (spacemacs/set-leader-keys "is" 'spacemacs/helm-yas)
+      (setq helm-c-yas-space-match-any-greedy t))))
+
+(defun auto-completion/pre-init-helm-company ()
+  (spacemacs|use-package-add-hook company
+    :post-config
+    (use-package helm-company
+      :defer t
+      :init
+      (define-key company-active-map (kbd "C-/") 'helm-company))))
+(defun auto-completion/init-helm-company ())
+
 (defun auto-completion/init-hippie-exp ()
   ;; replace dabbrev-expand
   (setq hippie-expand-try-functions-list
@@ -99,10 +131,10 @@
           ;; unique.
           try-complete-lisp-symbol-partially
           ;; Try to complete word as an Emacs Lisp symbol.
-          try-complete-lisp-symbol
-          ;; Yasnippet
-          ;; Try to expand yasnippet snippets based on prefix
-          yas-hippie-try-expand)))
+          try-complete-lisp-symbol))
+  (when (configuration-layer/package-used-p 'yasnippet)
+    ;; Try to expand yasnippet snippets based on prefix
+    (add-to-list 'hippie-expand-try-functions-list 'yas-hippie-try-expand)))
 
 (defun auto-completion/init-ivy-yasnippet ()
   (use-package ivy-yasnippet
@@ -121,7 +153,10 @@
       ;; We don't want undefined variable errors
       (defvar yas-global-mode nil)
       (setq yas-triggers-in-field t
-            yas-wrap-around-region t)
+            yas-wrap-around-region t
+            helm-yas-display-key-on-candidate t)
+      ;; on multiple keys, fall back to completing read
+      ;; typically this means helm
       (setq yas-prompt-functions '(yas-completing-prompt))
       ;; disable yas minor mode map
       ;; use hippie-expand instead
