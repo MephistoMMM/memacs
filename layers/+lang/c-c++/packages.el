@@ -24,9 +24,7 @@
     (company-c-headers :requires company)
     counsel-gtags
     ggtags
-
-    ;; lsp
-    (cquery :requires lsp-mode company-lsp)
+    helm-gtags
     ))
 
 (defun c-c++/init-cc-mode ()
@@ -90,6 +88,10 @@
             (when c-c++-enable-google-style (add-hook 'c-mode-common-hook 'google-set-c-style))
             (when c-c++-enable-google-newline (add-hook 'c-mode-common-hook 'google-make-newline-indent)))))
 
+(defun c-c++/post-init-helm-gtags ()
+  (dolist (mode c-c++-modes)
+    (spacemacs/helm-gtags-define-keys-for-mode mode)))
+
 (defun c-c++/post-init-srefactor ()
   (dolist (mode c-c++-modes)
     (spacemacs/set-leader-keys-for-major-mode mode "r" 'srefactor-refactor-at-point))
@@ -97,25 +99,3 @@
 
 (defun c-c++/post-init-stickyfunc-enhance ()
   (spacemacs/add-to-hooks 'spacemacs/load-stickyfunc-enhance c-c++-mode-hooks))
-
-;; See also https://github.com/cquery-project/cquery/wiki/Emacs
-(defun c-c++/init-cquery ()
-  (use-package cquery
-    :commands lsp-cquery-enable
-    :defer t
-    :init
-    (progn
-      (setq cquery-executable "/usr/local/bin/cquery")
-      ;; Customize `lsp-project-whitelist' `lsp-project-blacklist' to disable auto initialization.
-      (add-hook 'c-mode-common-hook #'memacs//c-c++-cquery-enable)
-
-      (with-eval-after-load 'projectile
-        (setq projectile-project-root-files-top-down-recurring
-              (append '("compile_commands.json"
-                        ".cquery")
-                      projectile-project-root-files-top-down-recurring))
-        (add-to-list 'projectile-globally-ignored-directories ".cquery_cached_index"))
-
-      ;; add company-lsp
-      (spacemacs|add-company-backends :backends company-lsp :modes c-mode-common))
-    ))

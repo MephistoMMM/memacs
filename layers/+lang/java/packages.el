@@ -14,6 +14,8 @@
         company
         eldoc
         flycheck
+        ggtags
+        helm-gtags
         (java-mode :location built-in)
         maven-test-mode
         meghanada
@@ -30,6 +32,12 @@
 
 (defun java/post-init-flycheck ()
   (add-hook 'java-mode-local-vars-hook #'spacemacs//java-setup-flycheck))
+
+(defun java/post-init-ggtags ()
+  (add-hook 'java-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
+
+(defun java/post-init-helm-gtags ()
+  (spacemacs/helm-gtags-define-keys-for-mode 'java-mode))
 
 (defun java/pre-init-org ()
   (spacemacs|use-package-add-hook org

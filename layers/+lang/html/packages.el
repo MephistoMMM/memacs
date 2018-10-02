@@ -21,6 +21,7 @@
         haml-mode
         (counsel-css :requires ivy
                      :location (recipe :fetcher github :repo "hlissner/emacs-counsel-css"))
+        (helm-css-scss :requires helm)
         impatient-mode
         less-css-mode
         pug-mode
@@ -117,6 +118,13 @@
                                             (scss-mode . scss-mode-hook))
                 do (add-hook mode-hook 'counsel-css-imenu-setup)
                 (spacemacs/set-leader-keys-for-major-mode mode "gh" 'counsel-css))))
+
+(defun html/init-helm-css-scss ()
+  (use-package helm-css-scss
+    :defer t
+    :init
+    (dolist (mode '(css-mode scss-mode))
+      (spacemacs/set-leader-keys-for-major-mode mode "gh" 'helm-css-scss))))
 
 (defun html/init-impatient-mode ()
   (use-package impatient-mode

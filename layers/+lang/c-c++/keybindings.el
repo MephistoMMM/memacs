@@ -34,12 +34,6 @@
     "==" 'spacemacs/clang-format-region-or-buffer
     "=f" 'spacemacs/clang-format-function))
 
-;;;; realgud
-(dolist (mode c-c++-modes)
-  (spacemacs/set-leader-keys-for-major-mode mode
-    "dd" 'realgud:gdb
-    "de" 'realgud:cmd-eval-dwim))
-
 ;;;; srefactor
 (dolist (mode c-c++-modes)
     (spacemacs/set-leader-keys-for-major-mode mode "r" 'srefactor-refactor-at-point))
@@ -48,12 +42,3 @@
 (dolist (mode c-c++-modes)
   (spacemacs/set-leader-keys-for-major-mode mode
     (kbd "gr") #'xref-find-references))
-
-;;;; cquery
-(dolist (mode c-c++-modes)
-  (spacemacs/set-leader-keys-for-major-mode mode
-    (kbd "hr") 'memacs/cquery-caller-hierarchy
-    (kbd "he") 'memacs/cquery-callee-hierarchy
-    (kbd "hb") 'memacs/cquery-base-inheritance-hierarchy
-    (kbd "hd") 'memacs/cquery-derived-inheritance-hierarchy
-    ))

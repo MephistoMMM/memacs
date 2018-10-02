@@ -45,20 +45,20 @@
                                    (cons (sql-get-product-feature (car product) :name)
                                          (car product)))
                                  products))
-          (action . (ivy-completing-read candidates))))
+          (action . (lambda (candidate) (helm-marked-candidates)))))
 
       (defun spacemacs/sql-highlight ()
         "set SQL dialect-specific highlighting"
         (interactive)
-        (let ((product (car (ivy-completing-read
-                             (list (spacemacs//sql-source spacemacs-sql-highlightable))))))
+        (let ((product (car (helm
+                             :sources (list (spacemacs//sql-source spacemacs-sql-highlightable))))))
           (sql-set-product product)))
 
       (defun spacemacs/sql-start ()
         "set SQL dialect-specific highlighting and start inferior SQLi process"
         (interactive)
-        (let ((product (car (ivy-completing-read
-                             (list (spacemacs//sql-source spacemacs-sql-startable))))))
+        (let ((product (car (helm
+                             :sources (list (spacemacs//sql-source spacemacs-sql-startable))))))
           (sql-set-product product)
           (sql-product-interactive product)))
 

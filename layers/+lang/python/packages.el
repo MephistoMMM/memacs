@@ -11,9 +11,13 @@
 
 (setq python-packages
   '(
+    company
     eldoc
     evil-matchit
     flycheck
+    ggtags
+    helm-gtags
+    (helm-pydoc :requires helm)
     importmagic
     live-py-mode
     (nose :location local)
@@ -27,8 +31,22 @@
     pyvenv
     stickyfunc-enhance
     xcscope
-    lsp-python
+    (lsp-python :requires lsp-mode)
     ))
+
+(defun python/post-init-company ()
+  ;; backend specific
+  (add-hook 'python-mode-local-vars-hook #'spacemacs//python-setup-company)
+  (spacemacs|add-company-backends
+    :backends (company-files company-capf)
+    :modes inferior-python-mode
+    :variables
+    company-minimum-prefix-length 0
+    company-idle-delay 0.5)
+  (when (configuration-layer/package-used-p 'pip-requirements)
+    (spacemacs|add-company-backends
+      :backends company-capf
+      :modes pip-requirements-mode)))
 
 (defun python/post-init-eldoc ()
   (add-hook 'python-mode-local-vars-hook #'spacemacs//python-setup-eldoc))
@@ -38,6 +56,18 @@
 
 (defun python/post-init-flycheck ()
   (spacemacs/enable-flycheck 'python-mode))
+
+(defun python/post-init-helm-gtags ()
+  (spacemacs/helm-gtags-define-keys-for-mode 'python-mode))
+
+(defun python/post-init-ggtags ()
+  (add-hook 'python-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
+
+(defun python/init-helm-pydoc ()
+  (use-package helm-pydoc
+    :defer t
+    :init
+    (spacemacs/set-leader-keys-for-major-mode 'python-mode "hd" 'helm-pydoc)))
 
 (defun python/init-importmagic ()
   (use-package importmagic

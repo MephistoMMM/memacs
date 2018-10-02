@@ -15,7 +15,9 @@
         fish-mode
         flycheck
         flycheck-bashate
+        ggtags
         counsel-gtags
+        helm-gtags
         insert-shebang
         org
         (sh-script :location built-in)
@@ -84,8 +86,14 @@
           (sh-set-shell "zsh")))
       (add-hook 'sh-mode-hook 'spacemacs//setup-shell))))
 
+(defun shell-scripts/post-init-ggtags ()
+  (add-hook 'sh-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
+
 (defun shell-scripts/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'sh-mode))
+
+(defun shell-scripts/post-init-helm-gtags ()
+  (spacemacs/helm-gtags-define-keys-for-mode 'sh-mode))
 
 (defun shell-scripts/pre-init-org ()
   (spacemacs|use-package-add-hook org

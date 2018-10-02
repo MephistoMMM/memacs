@@ -14,6 +14,8 @@
         company
         (company-go :requires company)
         flycheck
+        ggtags
+        helm-gtags
         go-eldoc
         go-fill-struct
         go-gen-test
@@ -47,6 +49,12 @@
 
 (defun go/post-init-flycheck ()
   (spacemacs/enable-flycheck 'go-mode))
+
+(defun go/post-init-ggtags ()
+  (add-hook 'go-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
+
+(defun go/post-init-helm-gtags ()
+  (spacemacs/helm-gtags-define-keys-for-mode 'go-mode))
 
 (defun go/init-go-eldoc ()
   (add-hook 'go-mode-hook 'go-eldoc-setup))

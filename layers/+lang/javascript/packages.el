@@ -14,8 +14,9 @@
         add-node-modules-path
         evil-matchit
         flycheck
-        counsel-gtags
-        company
+        ggtags
+        helm-gtags
+        imenu
         impatient-mode
         js-doc
         js2-mode
@@ -44,8 +45,15 @@
   (spacemacs/enable-flycheck 'js2-mode)
   (add-hook 'js2-mode-hook #'spacemacs//javascript-setup-eslint t))
 
-(defun javascript/post-init-counsel-gtags ()
-  (spacemacs/counsel-gtags-define-keys-for-mode 'js2-mode))
+(defun javascript/post-init-ggtags ()
+  (add-hook 'js2-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
+
+(defun javascript/post-init-helm-gtags ()
+  (spacemacs/helm-gtags-define-keys-for-mode 'js2-mode))
+
+(defun javascript/post-init-imenu ()
+  ;; Required to make imenu functions work correctly
+  (add-hook 'js2-mode-hook 'js2-imenu-extras-mode))
 
 (defun javascript/post-init-impatient-mode ()
   (spacemacs/set-leader-keys-for-major-mode 'js2-mode

@@ -15,18 +15,18 @@
         org
         org-ref
         markdown-mode
-        (ivy-bibtex :requires ivy)
+        (helm-bibtex :requires helm)
         biblio
         biblio-core
         ))
 
 (defun bibtex/post-init-auctex ()
   (spacemacs/set-leader-keys-for-major-mode 'latex-mode
-    "ib" 'org-ref-ivy-insert-cite-link))
+    "ib" 'org-ref-helm-insert-cite-link))
 
 (defun bibtex/post-init-org ()
   (spacemacs/set-leader-keys-for-major-mode 'org-mode
-    "ib" 'org-ref-ivy-insert-cite-link))
+    "ib" 'org-ref-helm-insert-cite-link))
 
 (defun bibtex/init-org-ref ()
   (use-package org-ref
@@ -79,9 +79,9 @@
 
 (defun bibtex/post-init-markdown-mode ()
   (spacemacs/set-leader-keys-for-major-mode 'markdown-mode
-    "ib" 'org-ref-ivy-insert-cite-link))
+    "ib" 'org-ref-helm-insert-cite-link))
 
-(defun bibtex/init-ivy-bibtex ())
+(defun bibtex/init-helm-bibtex ())
 (defun bibtex/init-biblio ())
 (defun bibtex/init-biblio-core ())
 

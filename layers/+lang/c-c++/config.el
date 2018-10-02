@@ -43,7 +43,3 @@
 
 (defvar c-c++-default-mode-for-headers 'c-mode
   "Default mode to open header files. Can be `c-mode' or `c++-mode'.")
-
-;; lsp cquery
-;; See https://github.com/cquery-project/cquery/wiki/Initialization-options
-(defvar cquery-extra-init-params '(:index (:comments 2) :cacheFormat "msgpack"))
