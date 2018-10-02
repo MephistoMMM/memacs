@@ -10,7 +10,10 @@
 ;;; License: GPLv3
 
 (setq spacemacs-misc-packages
-      '(dumb-jump))
+      '(
+        dumb-jump
+        request
+        ))
 
 (defun spacemacs-misc/init-dumb-jump ()
   (use-package dumb-jump
@@ -23,9 +26,18 @@
 
       (spacemacs/set-leader-keys "jq" #'dumb-jump-quick-look)
 
-      (setq dumb-jump-selector 'ivy)
+      ;; Use Helm or Ivy as the selector for dumb-jump.
+      (cond
+       ((configuration-layer/layer-used-p 'ivy)
+        (setq dumb-jump-selector 'ivy))
+       ((configuration-layer/layer-used-p 'helm)
+        (setq dumb-jump-selector 'helm)))
 
       ;; Since it's dumb, we add it to the end of the default jump handlers. At
       ;; the time of writing it is the only default jump handler. (gtags remains
       ;; mode-local)
       (add-to-list 'spacemacs-default-jump-handlers 'dumb-jump-go 'append))))
+
+(defun spacemacs-misc/init-request ()
+  (setq request-storage-directory
+        (concat spacemacs-cache-directory "request/")))
