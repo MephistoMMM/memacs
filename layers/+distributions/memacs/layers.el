@@ -11,6 +11,7 @@
 (configuration-layer/declare-layers
  '(
    ivy
+   helm
    spacemacs-defaults
    spacemacs-project
    (ibuffer :variables ibuffer-group-buffers-by 'projects)

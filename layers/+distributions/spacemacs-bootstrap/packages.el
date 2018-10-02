@@ -200,9 +200,11 @@
   ;; turn off evil in corelv buffers
   (add-to-list 'evil-buffer-regexps '("\\*LV\\*"))
 
+  ;; replace `dired-goto-file' with `helm-find-files', since `helm-find-files'
+  ;; can do the same thing and with fuzzy matching and other features.
   (with-eval-after-load 'dired
-    (evil-define-key 'normal dired-mode-map "J" 'counsel-find-file)
-    (define-key dired-mode-map "j" 'counsel-find-file)
+    (evil-define-key 'normal dired-mode-map "J" 'spacemacs/helm-find-files)
+    (define-key dired-mode-map "j" 'spacemacs/helm-find-files)
     (evil-define-key 'normal dired-mode-map (kbd dotspacemacs-leader-key)
       spacemacs-default-map))
 
@@ -255,17 +257,23 @@
            ("avy-goto-word-or-subword-1" . "avy word")
            ("shell-command" . "shell cmd")
            ("spacemacs/default-pop-shell" . "open shell")
+           ("spacemacs/helm-project-smart-do-search-region-or-symbol" . "smart search w/input")
+           ("spacemacs/helm-project-smart-do-search" . "smart search")
            ("spacemacs/search-project-auto-region-or-symbol" . "search project w/input")
            ("spacemacs/search-project-auto" . "search project")
+           ("helm-descbinds" . "show keybindings")
            ("sp-split-sexp" . "split sexp")
            ("avy-goto-line" . "avy line")
            ("universal-argument" . "universal arg")
            ("er/expand-region" . "expand region")
+           ("helm-apropos" . "apropos")
+           ("spacemacs/toggle-hybrid-mode" . "hybrid (hybrid-mode)")
+           ("spacemacs/toggle-holy-mode" . "emacs (holy-mode)")
            ("evil-lisp-state-\\(.+\\)" . "\\1")
            ("spacemacs/\\(.+\\)-transient-state/\\(.+\\)" . "\\2")
            ("spacemacs/\\(.+\\)-transient-state/body" . "\\1-transient-state")
-           ("ivy-switch-buffer" . "list-buffers")
-           ("spacemacs-layouts/non-restricted-buffer-list-ivy" . "global-list-buffers"))))
+           ("helm-mini" . "list-buffers")
+           ("spacemacs-layouts/non-restricted-buffer-list-helm" . "global-list-buffers"))))
     (dolist (nd new-descriptions)
       ;; ensure the target matches the whole string
       (push (cons (cons nil (concat "\\`" (car nd) "\\'")) (cons nil (cdr nd)))
@@ -391,27 +399,7 @@
 ;; (necessary when using spacemacs-base distribution)
 (defun spacemacs-bootstrap/init-pcre2el ()
   (use-package pcre2el
-    :defer t
-    :init
-    (progn
-      (spacemacs/declare-prefix "xr" "regular expressions")
-      (spacemacs/declare-prefix "xre" "elisp")
-      (spacemacs/declare-prefix "xrp" "pcre")
-      (spacemacs/set-leader-keys
-        "xr/"  'rxt-explain
-        "xr'"  'rxt-convert-to-strings
-        "xrt"  'rxt-toggle-elisp-rx
-        "xrx"  'rxt-convert-to-rx
-        "xrc"  'rxt-convert-syntax
-        "xre/" 'rxt-explain-elisp
-        "xre'" 'rxt-elisp-to-strings
-        "xrep" 'rxt-elisp-to-pcre
-        "xret" 'rxt-toggle-elisp-rx
-        "xrex" 'rxt-elisp-to-rx
-        "xrp/" 'rxt-explain-pcre
-        "xrp'" 'rxt-pcre-to-strings
-        "xrpe" 'rxt-pcre-to-elisp
-        "xrpx" 'rxt-pcre-to-rx))))
+    :defer t))
 
 (defun spacemacs-bootstrap/init-hybrid-mode ()
   (use-package hybrid-mode
