@@ -21,6 +21,8 @@
         git-link
         git-messenger
         git-timemachine
+        (helm-git-grep :requires helm)
+        (helm-gitignore :requires helm)
         magit
         magit-gitflow
         magit-svn
@@ -41,6 +43,18 @@
 
 (defun git/post-init-fill-column-indicator ()
   (add-hook 'git-commit-mode-hook 'fci-mode))
+
+(defun git/init-helm-git-grep ()
+  (use-package helm-git-grep
+    :defer t
+    :init (spacemacs/set-leader-keys
+            "g/" 'helm-git-grep
+            "g*" 'helm-git-grep-at-point)))
+
+(defun git/init-helm-gitignore ()
+  (use-package helm-gitignore
+    :defer t
+    :init (spacemacs/set-leader-keys "gI" 'helm-gitignore)))
 
 (defun git/init-git-commit ()
   (use-package git-commit

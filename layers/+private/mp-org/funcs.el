@@ -28,7 +28,7 @@ user-config should be defined in this function!"
 (defun memacs/mission-starter-start(mission)
   "Select a mission to start from memacs-mission-start-mission-list."
   (interactive
-   (list (ivy-completing-read "MISSIONS:"
+   (list (completing-read "MISSIONS:"
     #'memacs//mission-start-candidates-function nil t)))
   (let ((mode (nth 0 (get-text-property 0 'property mission)))
         (path (nth 1 (get-text-property 0 'property mission)))
@@ -56,10 +56,10 @@ user-config should be defined in this function!"
    (list (let ((subhelp
                 (get-text-property
                  0 'subhelp
-                 (ivy-completing-read "HELP LIST:"
+                 (completing-read "HELP LIST:"
                                       #'memacs//mission-help-candidates-function
                                       nil t))))
-           (ivy-completing-read "SUBHELP LIST:"
+           (completing-read "SUBHELP LIST:"
                                 (lambda (str pred _)
                                   (mapcar (lambda (shp)
                                             (propertize
@@ -84,7 +84,7 @@ user-config should be defined in this function!"
 (defun mp-org/org-insert-src-code-block (src-code-type)
   "Insert a `SRC-CODE-TYPE' type source code block in org-mode.
 Go files should disable fly-check."
-  (interactive (list (ivy-completing-read "Source code type: " mp-org/src-code-types)))
+  (interactive (list (completing-read "Source code type: " mp-org/src-code-types)))
   (progn
     (newline-and-indent)
     (insert (format "#+BEGIN_SRC %s\n" src-code-type))
@@ -120,7 +120,7 @@ Go files should disable fly-check."
 (defun mp-org/wrap-source-code (start end)
   "Insert '#+BEGIN_SRC lang' and '#+END_SRC' to the begin and end of code"
   (interactive "r")
-  (let ((lang (ivy-completing-read "Source code type: " mp-org/src-code-types)))
+  (let ((lang (completing-read "Source code type: " mp-org/src-code-types)))
     (save-excursion
       (narrow-to-region start end)
       (goto-char (point-min))
@@ -171,7 +171,7 @@ Go files should disable fly-check."
 (defun mp-org/wrap-link (start end)
   "Insert '[' , ']' and link string to the begin and end of region."
   (interactive "r")
-  (let ((link (ivy-completing-read "Value of link: " (mp-org//link-switch))))
+  (let ((link (completing-read "Value of link: " (mp-org//link-switch))))
     (save-excursion
       (narrow-to-region start end)
       (goto-char (point-min))

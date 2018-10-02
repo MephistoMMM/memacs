@@ -11,6 +11,7 @@
 
 (setq spotify-packages
       '(spotify
+        (helm-spotify-plus :toggle (configuration-layer/package-usedp 'helm))
         (counsel-spotify :toggle (configuration-layer/package-usedp 'ivy))))
 
 (defun spotify/init-spotify ()
@@ -24,6 +25,11 @@
               "amsn" 'spotify-next
               "amsN" 'spotify-previous
               "amsQ" 'spotify-quit))))
+
+(defun spotify/init-helm-spotify-plus ()
+  (use-package helm-spotify-plus
+    :defer t
+    :init (spacemacs/set-leader-keys "amsg" 'helm-spotify-plus)))
 
 (defun spotify/init-counsel-spotify ()
   (use-package counsel-spotify
