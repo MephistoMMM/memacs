@@ -101,7 +101,7 @@
   (interactive)
   (setq memacs-dired-sort
         (intern
-         (ivy-completing-read "Sort by: " '(name size extension ctime utime time))))
+         (completing-read "Sort by: " '(name size extension ctime utime time))))
   (memacs//dired-sort-auto-apply))
 (defun memacs//dired-sort-auto-apply ()
   (cond ((eq memacs-dired-sort 'name) (memacs/dired-sort-name))
