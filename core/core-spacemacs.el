@@ -128,6 +128,7 @@ the final step of executing code in `emacs-startup-hook'.")
   ;; This is set to nil during startup to allow Spacemacs to show buffers opened
   ;; as command line arguments.
   (setq initial-buffer-choice nil)
+  (setq inhibit-startup-screen t)
   (require 'core-keybindings)
   ;; for convenience and user support
   (unless (fboundp 'tool-bar-mode)

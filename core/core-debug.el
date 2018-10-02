@@ -171,7 +171,7 @@ seconds to load")
    (display-graphic-p)
    dotspacemacs-distribution
    'hybrid
-   'ivy
+   'helm
    (pp-to-string dotspacemacs--configuration-layers-saved)
    (bound-and-true-p system-configuration-features)))
 

@@ -13,7 +13,9 @@
   '(
     spaceline
 
-    deadgrep
+    (color-rg :location (recipe
+                         :fetcher github
+                         :repo "manateelazycat/color-rg"))
     )
  )
 
@@ -54,9 +56,7 @@
       (setq spaceline-byte-compile t)
       (memacs/spaceline-compile))))
 
-(defun memacs/init-deadgrep ()
-  (use-package deadgrep
-    :commands (deadgrep)
-    :defer t))
+;; TODO https://github.com/manateelazycat/color-rg
+(defun memacs/init-color-rg ())
 
 ;;; memacs/packages.el ends here
