@@ -437,13 +437,16 @@ you should place your code here."
 
   ;; Helps
   (setq memacs-mission-helper-help-list
-    '(
-      ("Projectile"
-       ("ignoring files" "https://projectile.readthedocs.io/en/latest/projects/#ignoring-files"))
-      ("Dockerfile"
-       ("docker reference" "https://docs.docker.com/engine/reference/builder/#usage")
-       ("compose reference" "https://docs.docker.com/compose/compose-file/"))
-      ))
+        '(
+          ("Projectile"
+           ("ignoring files" "https://projectile.readthedocs.io/en/latest/projects/#ignoring-files"))
+          ("Dockerfile"
+           ("docker reference" "https://docs.docker.com/engine/reference/builder/#usage")
+           ("compose reference" "https://docs.docker.com/compose/compose-file/"))
+          ("Golang"
+           ("debugger: Delve" "https://github.com/derekparker/delve/blob/master/Documentation/cli/README.md"))
+          )
+        )
 )
 
 (setq custom-file "~/.emacs.d/custom.el")
