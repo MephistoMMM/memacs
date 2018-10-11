@@ -12,8 +12,6 @@
 (defconst memacs-packages
   '(
     spaceline
-
-    deadgrep
     )
  )
 
@@ -53,10 +51,5 @@
 
       (setq spaceline-byte-compile t)
       (memacs/spaceline-compile))))
-
-(defun memacs/init-deadgrep ()
-  (use-package deadgrep
-    :commands (deadgrep)
-    :defer t))
 
 ;;; memacs/packages.el ends here
