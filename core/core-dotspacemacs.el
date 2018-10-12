@@ -311,6 +311,15 @@ List sizes may be nil, in which case
   "Run `spacemacs/prettify-org-buffer' when
 visiting README.org files of Spacemacs.")
 
+(defvar dotmemacs-username "username"
+  "Username of memacs user.")
+
+(defvar dotmemacs-email "user@email.com"
+  "Email of memacs user.")
+
+(defvar dotmemacs-github "https://gibhub.com/user"
+  "Github of memacs user.")
+
 ;; only for backward compatibility
 (defalias 'dotspacemacs-mode 'emacs-lisp-mode)
 

@@ -43,6 +43,7 @@
    (org :variables
         org-startup-indented t
         org-enable-github-support t)
+   (templates :variables auto-insert-query nil)
    ))
 
 ;;; packages.el ends here
