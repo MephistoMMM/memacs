@@ -38,17 +38,10 @@ Otherwise does nothing."
   (spacemacs/set-leader-keys-for-major-mode mode
     "gC" 'counsel-gtags-create-tags
     "gd" 'counsel-gtags-dwim
-    ;; "gD" 'helm-gtags-find-tag-other-window
     "gf" 'counsel-gtags-find-file
-    ;; "gG" 'helm-gtags-dwim-other-window
-    ;; "gi" 'helm-gtags-tags-in-this-function
-    ;; "gl" 'helm-gtags-parse-file
     "gn" 'counsel-gtags-go-forward
     "gp" 'counsel-gtags-go-backward
     "gr" 'counsel-gtags-find-reference
-    ;; "gR" 'helm-gtags-resume
-    ;; "gs" 'helm-gtags-select
-    ;; "gS" 'helm-gtags-show-stack
     "gy" 'counsel-gtags-find-symbol
     "gu" 'counsel-gtags-update-tags))
 

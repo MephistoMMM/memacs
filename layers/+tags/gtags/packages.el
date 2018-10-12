@@ -87,5 +87,4 @@
         (vhdl-mode . "Tg")
         (vimrc-mode . "Tg")))
     :config
-    (progn
-      (spacemacs|diminish ggtags-mode " 🅶" " [g]"))))
+    (progn (spacemacs|diminish ggtags-mode " 🅶" " [g]"))))
