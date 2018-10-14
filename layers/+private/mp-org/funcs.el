@@ -20,6 +20,15 @@ user-config should be defined in this function!"
   ;; (run-with-idle-timer 300 t 'mp-org/auto-org-agenda-task)
   )
 
+(defun memacs//mission-start-find-file-name ()
+  (file-name-nondirectory (ivy-read "Find file: " #'read-file-name-internal
+            :matcher #'counsel--find-file-matcher
+            :action (lambda (x) (kill-new (if (stringp x) x (car x))))
+            :preselect (counsel--preselect-file)
+            :require-match 'confirm-after-completion
+            :keymap counsel-find-file-map
+            :caller 'counsel-find-file)))
+
 (defun memacs//mission-start-candidates-function (str pred _)
   (mapcar (lambda (mission)
             (propertize (car mission) 'property (cdr mission)))
@@ -43,6 +52,8 @@ user-config should be defined in this function!"
                               "/"
                               (if (stringp file) file (eval file)))))
     )
+    ;; TODO create a mission-start-buffer-init-hook
+    (auto-insert)
   )
 
 (defun memacs//mission-help-candidates-function (str pred _)
