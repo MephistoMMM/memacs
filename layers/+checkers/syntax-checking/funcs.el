@@ -26,6 +26,12 @@ If the error list is visible, hide it.  Otherwise, show it."
       (quit-window nil window)
     (flycheck-list-errors)))
 
+(defun memacs/close-flycheck-error-list ()
+  "Close flycheck's error list window."
+  (-if-let (window (flycheck-get-error-list-window))
+      (quit-window nil window)
+    nil))
+
 (defun spacemacs/goto-flycheck-error-list ()
   "Open and go to the error list buffer."
   (interactive)

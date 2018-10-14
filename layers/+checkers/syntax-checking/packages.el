@@ -33,7 +33,7 @@
         "eb" 'flycheck-buffer
         "ec" 'flycheck-clear
         "eh" 'flycheck-describe-checker
-        "el" 'spacemacs/toggle-flycheck-error-list
+        "el" 'spacemacs/error-transient-state/body
         "eL" 'spacemacs/goto-flycheck-error-list
         "es" 'flycheck-select-checker
         "eS" 'flycheck-set-checker-executable
