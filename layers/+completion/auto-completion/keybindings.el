@@ -49,6 +49,8 @@
   "sc" 'yas-load-snippet-buffer-and-close
   "sv" 'yas-visit-snippet-file
   "sd" 'memacs/describe-yasnippets)
-(with-eval-after-load 'yas-snippet
-  (define-key yas-keymap [tab] 'memacs/tab-complete-or-next-field)
-  (define-key yas-keymap (kbd "TAB") 'memacs/tab-complete-or-next-field))
+(spacemacs/defer-until-after-user-config
+ (lambda ()
+   (define-key yas-keymap [tab] 'memacs/tab-complete-or-next-field)
+   (define-key yas-keymap (kbd "TAB") 'memacs/tab-complete-or-next-field)
+   ))
