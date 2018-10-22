@@ -57,6 +57,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(evil-snipe-matches-face ((t :foreground "#ff5555" :weight bold)))
+ '(org-done ((t (:foreground "#50fa7b" :strike-through t :slant italic))))
  '(tabbar-default ((t (:height 1.3))))
  '(tabbar-selected ((t (:inherit tabbar-default :weight ultra-bold :width semi-expanded))))
  '(tabbar-unselected ((t (:height 1.3)))))
