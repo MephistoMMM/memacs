@@ -27,7 +27,7 @@
            (shell-command-to-string "textinputsource")
            memacs-autoescape--origin-outside-layout-name)
     (call-process-shell-command (concat "textinputsource -s "
-                                         memacs-autoescape--origin-outside-layout-name)))
+                                        memacs-autoescape--origin-outside-layout-name)))
   )
 
 
@@ -54,5 +54,10 @@
   "Open item2 then cd into the path of the directory of
 current buffer."
   (interactive)
-  (memacs//switch-to-item2-run-command (concat "cd " default-directory))
+  (memacs//switch-to-item2-run-command
+   (concat
+    "cd "
+    (replace-regexp-in-string "\\\\" "\\\\\\\\"
+                              (shell-quote-argument
+                               (or default-directory "~")))))
   )

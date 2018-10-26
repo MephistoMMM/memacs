@@ -14,7 +14,7 @@
   (global-set-key [(meta c)] 'kill-ring-save)
   (global-set-key [(meta s)] 'save-buffer)
   (global-set-key [(meta w)]
-                  (lambda () (interactive) (delete-window)))
+                  (lambda () (interactive) (delete-frame)))
   (global-set-key [(meta z)] 'undo)
   ;; (global-set-key [(meta l)] 'hippie-expand)
   ;; C-v in ivy minibuffer
