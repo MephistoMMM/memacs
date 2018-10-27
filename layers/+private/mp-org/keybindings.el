@@ -7,9 +7,6 @@
 
 (spacemacs/set-leader-keys
 
-  ;; Switch auto org agenda task
-  "aoT" 'mp-org/switch-auto-org-agenda-task
-
   ;; Count Words
   "xC" 'advance-words-count
 
@@ -18,9 +15,6 @@
 
   ;; Insert Spaces to Chinese-English hybrid buffer
   "xp" 'pangu-spacing-space-current-buffer
-
-  ;; Org Agenda Reload
-  "aor" 'mp-org/org-agenda-reload-files
 
   ;; Mission Start
   "bno" 'memacs/mission-starter-start

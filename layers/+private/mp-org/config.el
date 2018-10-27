@@ -22,8 +22,6 @@
     )
   "Help list. Format (help-item-name ((help-subitem-name url))).")
 
-(setq close-auto-org-agenda-task t)
-
 ;; bibtex
 (setq org-ref-default-bibliography '("~/Dropbox/Papers/references.bib")
       org-ref-pdf-directory "~/Dropbox/Papers/"

@@ -204,32 +204,4 @@ otherwise in kill-rang."
       (seq-filter 'mp-org//linkp kill-ring))
   )
 
-
-;;;; Auto Org Agenda
-
-(defun mp-org/org-agenda-reload-files ()
-  "Reset the default value of org-agenda-reload-files."
-  (interactive)
-  (setq-default org-agenda-files (find-lisp-find-files org-directory "\.org$"))
-  (message "Reload org files success!")
-  )
-
-(defun mp-org/auto-org-agenda-task ()
-  "If auto org agenda task is not close.
-Switch to @org -> reload org agenda file -> show agenda list"
-  (unless close-auto-org-agenda-task
-    (spacemacs/custom-perspective-@Org)
-    (mp-org/org-agenda-reload-files)
-    (org-agenda-list))
-  )
-
-(defun mp-org/switch-auto-org-agenda-task ()
-  (interactive)
-  (setq close-auto-org-agenda-task (not close-auto-org-agenda-task))
-  (if close-auto-org-agenda-task
-      (message "Closed auto org agenda task.")
-      (message "Opened auto org agenda task."))
-  )
-
-
 ;;; mp-org/funcs.el ends here
