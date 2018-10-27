@@ -33,7 +33,7 @@ fi
 # Number of current visible frames,
 # Emacs daemon always has a visible frame called F1
 visible_frames() {
-  emacsclient -s $EMACS_SOCKET_NAME -a "" -e '(length (visible-frame-list))'
+  emacsclient -s $EMACS_SOCKET_NAME -e '(length (visible-frame-list))'
 }
 
 change_focus() {
