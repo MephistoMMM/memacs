@@ -10,7 +10,8 @@
 ;;; License: GPLv3
 
 (setq osx-packages
-      '(osx-trash))
+      '(osx-trash
+        counsel))
 
 (when (spacemacs/system-is-mac)
   ;; clean env error while starting
@@ -37,3 +38,5 @@
     :if (and (spacemacs/system-is-mac)
              (not (boundp 'mac-system-move-file-to-trash-use-finder)))
     :init (osx-trash-setup)))
+
+(defun osx/post-init-counsel ())
