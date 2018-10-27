@@ -27,4 +27,12 @@
       org-ref-pdf-directory "~/Dropbox/Papers/"
       org-ref-bibliography-notes "~/Dropbox/Papers/notes.org")
 
+;; mark org-local-directory and org-capture safe
+(put 'eval 'safe-local-variable
+      (lambda (x)
+        (if (listp x) (eq (car x) 'setq-local) nil)
+        ))
+(put 'org-local-directory 'safe-local-variable #'stringp)
+(put 'org-capture-templates 'safe-local-variable #'listp)
+
 ;;; mp-org/config.el ends here
