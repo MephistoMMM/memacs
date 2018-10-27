@@ -63,7 +63,7 @@
 
 (defun mp-org/post-init-org ()
   "Configurations for org mode"
-  (setq-default org-directory "~/Dropbox/org")
+  (setq-default org-directory (expand-file-name "~/Dropbox/org"))
 
   (add-hook 'org-mode-hook (lambda ()
                              (if org-descriptive-links
@@ -92,23 +92,25 @@
     (setq-default
       org-startup-with-inline-images nil
       org-bullets-bullet-list '("❁" "✾" "❀" "❖" "✧")
-      org-agenda-files (find-lisp-find-files org-directory "\.org$")
-      org-default-notes-file (concat org-directory "/TODOs.org")
+      org-agenda-files (directory-files org-directory t "\.org$" t)
+      org-default-notes-file (concat org-directory "/TODOs.org"))
 
+    (setq-default
       ;; org-log-done 'note
-
       org-agenda-span 'day
       org-agenda-restore-windows-after-quit t
       org-agenda-window-setup 'other-window
       org-footnote-auto-adjust t
-      org-footnote-auto-label 'confirm
+      org-footnote-auto-label 'confirm)
 
+    (setq-default
       ;; html export
       org-html-style-default ""
       org-html-htmlize-output-type nil
       org-todo-keywords
-      '((sequence "TODO(t)" "WAITING(w@/!)" "|" "SHELVING(s@)" "DONE(d!)" "CANCELED(c@)"))
+      '((sequence "TODO(t)" "WAITING(w@/!)" "|" "SHELVING(s@)" "DONE(d!)" "CANCELED(c@)")))
 
+    (setq-default
       org-modules
       '(org-bbdb org-habit org-info org-irc org-w3m org-mac-link org-protocol)
       org-capture-templates
