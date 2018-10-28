@@ -91,11 +91,18 @@ user-config should be defined in this function!"
 
 (defconst mp-org/src-code-types
   '("emacs-lisp" "python" "c" "shell" "java" "js2" "clojure" "c++" "css" "go" "rust" "sh" "sass" "sql" "awk" "haskell" "latex" "lisp" "matlab" "org" "perl" "ruby" "scheme" "sqlite" "yaml"))
+(defvar mp-org--org-insert-src-code-block-history nil)
 
 (defun mp-org/org-insert-src-code-block (src-code-type)
   "Insert a `SRC-CODE-TYPE' type source code block in org-mode.
 Go files should disable fly-check."
-  (interactive (list (ivy-completing-read "Source code type: " mp-org/src-code-types)))
+  (interactive (list
+                (ivy-completing-read
+                 "Source code type: "
+                 mp-org/src-code-types nil nil
+                 (car mp-org--org-insert-src-code-block-history)
+                 'mp-org--org-insert-src-code-block-history
+                 )))
   (progn
     (newline-and-indent)
     (insert (format "#+BEGIN_SRC %s\n" src-code-type))
@@ -103,6 +110,20 @@ Go files should disable fly-check."
     (insert "#+END_SRC\n")
     (previous-line 2)
     (org-edit-src-code)))
+
+(defvar mp-org--wrap-previous-function nil)
+(defvar mp-org--wrap-call-from-resume nil)
+(defun mp-org/wrap-resume (start end)
+  (interactive "r")
+  (unless (not mp-org--wrap-previous-function)
+    (setq mp-org--wrap-call-from-resume t)
+    (funcall mp-org--wrap-previous-function start end)
+    (setq mp-org--wrap-call-from-resume nil))
+  )
+(defun mp-org//wrap-save-previous-fuction (orig-fun &rest args)
+  (call-interactively orig-fun)
+  (setq mp-org--wrap-previous-function orig-fun)
+  )
 
 (defun mp-org/wrap-math-block-formula (start end)
   "Insert '\\[ ... \\]' to the begin and end of formula"
@@ -115,6 +136,7 @@ Go files should disable fly-check."
     (insert " \\]")
     (widen))
   )
+(advice-add 'mp-org/wrap-math-block-formula :around #'mp-org//wrap-save-previous-fuction)
 
 (defun mp-org/wrap-math-inline-formula (start end)
   "Insert '\\( ... \\)' or '\\[ ... \\]' to the begin and end of formula"
@@ -127,11 +149,20 @@ Go files should disable fly-check."
     (insert " \\)")
     (widen))
   )
+(advice-add 'mp-org/wrap-math-inline-formula :around #'mp-org//wrap-save-previous-fuction)
 
 (defun mp-org/wrap-source-code (start end)
   "Insert '#+BEGIN_SRC lang' and '#+END_SRC' to the begin and end of code"
   (interactive "r")
-  (let ((lang (ivy-completing-read "Source code type: " mp-org/src-code-types)))
+  (let ((lang (if mp-org--wrap-call-from-resume
+                  (car mp-org--org-insert-src-code-block-history)
+                (ivy-completing-read
+                 "Source code type: "
+                 mp-org/src-code-types nil nil
+                 (car mp-org--org-insert-src-code-block-history)
+                 'mp-org--org-insert-src-code-block-history
+                 )
+                )))
     (save-excursion
       (narrow-to-region start end)
       (goto-char (point-min))
@@ -141,6 +172,7 @@ Go files should disable fly-check."
       (widen))
     )
   )
+(advice-add 'mp-org/wrap-source-code :around #'mp-org//wrap-save-previous-fuction)
 
 (defun mp-org/wrap-unordered-list (start end)
   "Insert '- ' to the begin of each line."
@@ -151,6 +183,7 @@ Go files should disable fly-check."
     (while (> (forward-line -1) -1) (insert "- "))
     (widen))
   )
+(advice-add 'mp-org/wrap-unordered-list :around #'mp-org//wrap-save-previous-fuction)
 
 (defun mp-org/wrap-ordered-list (start end)
   "Insert '%d. ' to the begin of each line."
@@ -166,6 +199,7 @@ Go files should disable fly-check."
         (setq lineno (1+ lineno))))
     (widen))
   )
+(advice-add 'mp-org/wrap-ordered-list :around #'mp-org//wrap-save-previous-fuction)
 
 (defun mp-org/wrap-quote (start end)
   "Insert '#+BEGIN_QUOTE' and '#+END_QUOTE' to the begin and end of quote region"
@@ -178,6 +212,7 @@ Go files should disable fly-check."
     (insert "#+END_QUOTE\n")
     (widen))
   )
+(advice-add 'mp-org/wrap-quote :around #'mp-org//wrap-save-previous-fuction)
 
 (defun mp-org/wrap-link (start end)
   "Insert '[' , ']' and link string to the begin and end of region."
@@ -191,6 +226,7 @@ Go files should disable fly-check."
       (insert "]]")
       (widen)))
   )
+(advice-add 'mp-org/wrap-link :around #'mp-org//wrap-save-previous-fuction)
 
 (defun mp-org//linkp (linkstr)
   "Test for link line."

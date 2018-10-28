@@ -46,6 +46,7 @@
 
   (spacemacs/declare-prefix-for-mode 'org-mode "w" "wrapper")
   (spacemacs/set-leader-keys-for-major-mode 'org-mode
+    "wr" 'mp-org/wrap-resume
     "wq" 'mp-org/wrap-quote
     "wl" 'mp-org/wrap-link
     "wo" 'mp-org/wrap-ordered-list
