@@ -229,10 +229,10 @@
  Move/Resize^^^^      | Select Action^^^^   |  Call^^          |  Cancel^^    | Toggles
 --^-^-^-^-------------|--^-^-^-^------------|--^---^-----------|--^-^---------|---------------------
  [_j_/_k_] by line    | [_s_/_w_] next/prev | [_RET_] & done   | [_i_] & ins  | [_C_] calling: %s(if ivy-calling \"on\" \"off\")
- [_g_/_G_] first/last | [_a_]^ ^  list all  | [_TAB_] alt done | [_q_] & quit | [_m_] matcher: %s(spacemacs//ivy-matcher-desc)
+ [_g_/_G_] first/last | [_a_]  ^ ^list all  | [_TAB_] alt done | [_q_] & quit | [_m_] matcher: %s(spacemacs//ivy-matcher-desc)
  [_d_/_u_] pg down/up |  ^ ^ ^ ^            | [_c_]   & cont   |  ^ ^         | [_f_] case-fold: %`ivy-case-fold-search
  [_<_/_>_] resize     |  ^ ^ ^ ^            | [_o_]   occur    |  ^ ^         | [_t_] truncate: %`truncate-lines
- [_h_/_l_] out/in dir |  ^ ^ ^ ^            |  ^ ^             |  ^ ^         |  ^ ^
+ [_h_/_l_] out/in dir | [_M-o_]^ ^do        |  ^ ^             |  ^ ^         |  ^ ^
 
 Current Action: %s(ivy-action-name)
 "
@@ -262,14 +262,14 @@ Current Action: %s(ivy-action-name)
       ("m" ivy-rotate-preferred-builders)
       (">" ivy-minibuffer-grow)
       ("<" ivy-minibuffer-shrink)
-      ("w" ivy-prev-action)
-      ("s" ivy-next-action)
-      ("a" ivy-read-action)
+      ("w" ivy-prev-action :exit t)
+      ("s" ivy-next-action :exit t)
+      ("a" ivy-read-action :exit t)
+      ("M-o" ivy-dispatching-done-hydra :exit t)
       ("t" (setq truncate-lines (not truncate-lines)))
       ("f" ivy-toggle-case-fold)
       ("o" ivy-occur :exit t))
     (define-key ivy-minibuffer-map "\C-o" 'spacemacs/ivy-transient-state/body)
-    (define-key ivy-minibuffer-map (kbd "M-SPC") 'spacemacs/ivy-transient-state/body)
     )
 
   ;; binding yank pop and evil-registers

@@ -311,6 +311,15 @@ List sizes may be nil, in which case
   "Run `spacemacs/prettify-org-buffer' when
 visiting README.org files of Spacemacs.")
 
+(defvar dotmemacs-username "username"
+  "Username of memacs user.")
+
+(defvar dotmemacs-email "user@email.com"
+  "Email of memacs user.")
+
+(defvar dotmemacs-github "https://gibhub.com/user"
+  "Github of memacs user.")
+
 ;; only for backward compatibility
 (defalias 'dotspacemacs-mode 'emacs-lisp-mode)
 
@@ -467,11 +476,9 @@ If SYMBOL value is `display-graphic-p' then return the result of
   %z -- prints mnemonics of buffer, terminal, and keyboard coding systems
   %Z -- like %z, but including the end-of-line format"
   (let* ((fs (format-spec-make
-              ?a (when (string-match-p "%a" title-format)
-                   (abbreviate-file-name (or (buffer-file-name)
-                                             (buffer-name))))
-              ?t (if (and (string-match-p "%t" title-format)
-                          (fboundp 'projectile-project-name))
+              ?a (abbreviate-file-name (or (buffer-file-name)
+                                           (buffer-name)))
+              ?t (if (fboundp 'projectile-project-name)
                      (projectile-project-name)
                    "-")
               ?S system-name

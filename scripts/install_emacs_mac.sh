@@ -19,3 +19,5 @@ $ROOTPATH/scripts/install_fonts.sh
 $ROOTPATH/scripts/compile_textinputsource.sh
 # link emacs
 $ROOTPATH/scripts/link_memacs.sh
+# link tools
+$ROOTPATH/scripts/link_tools.sh

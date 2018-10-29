@@ -1,0 +1,4 @@
+#+SETUPFILE: ~/Dropbox/dotconf/export_setup.org
+#+Title: ${1:`(file-name-base (buffer-file-name))`}
+
+$0

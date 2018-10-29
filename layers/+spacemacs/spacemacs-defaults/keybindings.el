@@ -173,10 +173,13 @@
                                 (1+ (- spacemacs--gne-max-line
                                        spacemacs--gne-min-line))))))
           "\nNo next-error capable buffer found.")))))
+  :on-exit (memacs/close-flycheck-error-list)
+  :foreign-keys run
   :bindings
   ("n" spacemacs/next-error "next")
   ("p" spacemacs/previous-error "prev")
-  ("N" spacemacs/previous-error "prev")
+  ("l" spacemacs/toggle-flycheck-error-list "list")
+  ("y" flycheck-copy-errors-as-kill "copy")
   ("q" nil "quit" :exit t)
   :evil-leader "e.")
 ;; file -----------------------------------------------------------------------

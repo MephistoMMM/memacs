@@ -32,11 +32,7 @@
 
 (defun go/init-company-go ()
   (use-package company-go
-    :defer t
-    :init (spacemacs|add-company-backends
-            :backends company-go
-            :modes go-mode
-            :variables company-go-show-annotation t)))
+    :defer t))
 
 (defun go/init-lsp-go ()
   (use-package lsp-go

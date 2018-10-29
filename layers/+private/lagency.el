@@ -94,5 +94,42 @@ and UPPER_CASE (siu) are all just 3 keystrokes away."
     )
   )
 
+
+;;;; Auto Org Agenda
+
+(defun mp-org/org-agenda-reload-files ()
+  "Reset the default value of org-agenda-reload-files."
+  (interactive)
+  (setq-default org-agenda-files (find-lisp-find-files org-directory "\.org$"))
+  (message "Reload org files success!")
+  )
+
+(defun mp-org/auto-org-agenda-task ()
+  "If auto org agenda task is not close.
+Switch to @org -> reload org agenda file -> show agenda list"
+  (unless close-auto-org-agenda-task
+    (spacemacs/custom-perspective-@Org)
+    (mp-org/org-agenda-reload-files)
+    (org-agenda-list))
+  )
+
+(defun mp-org/switch-auto-org-agenda-task ()
+  (interactive)
+  (setq close-auto-org-agenda-task (not close-auto-org-agenda-task))
+  (if close-auto-org-agenda-task
+      (message "Closed auto org agenda task.")
+    (message "Opened auto org agenda task."))
+  )
+
+(spacemacs/set-leader-keys
+
+  ;; Switch auto org agenda task
+  "aoT" 'mp-org/switch-auto-org-agenda-task
+
+  ;; Org Agenda Reload
+  "aor" 'mp-org/org-agenda-reload-files
+  )
+
+(setq close-auto-org-agenda-task t)
 
 ;;; lagency.el ends here
