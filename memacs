@@ -431,7 +431,7 @@ you should place your code here."
     '(
       ;; config new org file in dropbox
       ("Dropbox Note Buffer" org-mode
-       (concat org-directory "/notes/") (memacs//mission-start-find-file-name))
+       (concat org-directory "/notes/") (memacs//mission-start-find-file-name nil))
       ("Codewar&Golang" go-mode
        (format-time-string "~/Workspace/go/src/codewar_pg/%Y_%m_%d"))
       ("Daily Report" org-mode

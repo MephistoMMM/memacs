@@ -20,14 +20,23 @@ user-config should be defined in this function!"
   ;; (run-with-idle-timer 300 t 'mp-org/auto-org-agenda-task)
   )
 
-(defun memacs//mission-start-find-file-name ()
-  (file-name-nondirectory (ivy-read "Find file: " #'read-file-name-internal
-            :matcher #'counsel--find-file-matcher
-            :action (lambda (x) (kill-new (if (stringp x) x (car x))))
-            :preselect (counsel--preselect-file)
-            :require-match 'confirm-after-completion
-            :keymap counsel-find-file-map
-            :caller 'counsel-find-file)))
+(defun memacs//mission-start-find-file-name (nodirectory)
+  (let ((full-file-name
+         (ivy-read "Find file: " #'read-file-name-internal
+                   :matcher #'counsel--find-file-matcher
+                   :action (lambda (x) (kill-new
+                                        (expand-file-name
+                                         (if (stringp x) x (car x))
+                                         ivy--directory)))
+                   :preselect (counsel--preselect-file)
+                   :require-match 'confirm-after-completion
+                   :keymap counsel-find-file-map
+                   :caller 'counsel-find-file)))
+    (if nodirectory
+        (file-name-nondirectory full-file-name)
+      full-file-name
+      ))
+  )
 
 (defun memacs//mission-start-candidates-function (str pred _)
   (mapcar (lambda (mission)
@@ -42,15 +51,18 @@ user-config should be defined in this function!"
   (let ((mode (nth 0 (get-text-property 0 'property mission)))
         (path (nth 1 (get-text-property 0 'property mission)))
         (file (nth 2 (get-text-property 0 'property mission))))
-    (let ((ξbuf (generate-new-buffer mission)))
-      (switch-to-buffer ξbuf))
+    (switch-to-buffer (generate-new-buffer mission))
     (call-interactively mode)
     (setq default-directory (if (stringp path) path (eval path)))
     (when (or (stringp file) (listp file))
-      (set-visited-file-name (concat
-                              default-directory
-                              "/"
-                              (if (stringp file) file (eval file)))))
+      (let ((visited-file-name (if (stringp file)
+                                   (concat default-directory "/" file)
+                                 (eval file))))
+        (set-visited-file-name visited-file-name)
+        (if (not (string= (file-name-directory visited-file-name)
+                          default-directory))
+            (setq default-directory (file-name-directory visited-file-name)))
+        ))
     )
     ;; TODO create a mission-start-buffer-init-hook
     (auto-insert)
