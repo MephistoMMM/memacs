@@ -228,32 +228,47 @@ Dedicated (locked) windows are left untouched."
 
 When NEW-FILENAME is not specified, asks user for a new name.
 
-Also renames associated buffer (if any exists), invalidates
-projectile cache when it's possible and update recentf list."
+Also renames associated buffers (if any exists), invalidates
+projectile cache and updates recentf list."
   (interactive "f")
   (when (and filename (file-exists-p filename))
-    (let* ((buffer (find-buffer-visiting filename))
-           (short-name (file-name-nondirectory filename))
-           (new-name (if new-filename new-filename
-                       (read-file-name
-                        (format "Rename %s to: " short-name)))))
-      (cond ((get-buffer new-name)
-             (error "A buffer named '%s' already exists!" new-name))
-            (t
-             (let ((dir (file-name-directory new-name)))
-               (when (and (not (file-exists-p dir)) (yes-or-no-p (format "Create directory '%s'?" dir)))
-                 (make-directory dir t)))
-             (rename-file filename new-name 1)
-             (when buffer
-               (kill-buffer buffer)
-               (find-file new-name))
-             (when (fboundp 'recentf-add-file)
-               (recentf-add-file new-name)
-               (recentf-remove-if-non-kept filename))
-             (when (and (configuration-layer/package-used-p 'projectile)
-                        (projectile-project-p))
-               (call-interactively #'projectile-invalidate-cache))
-             (message "File '%s' successfully renamed to '%s'" short-name (file-name-nondirectory new-name)))))))
+    (let* ((is-dir (file-directory-p filename))
+           (short-name
+            (if is-dir
+                (file-name-base (directory-file-name filename))
+              (file-name-nondirectory filename)))
+           (new-filename
+            (if new-filename new-filename
+              (read-file-name
+               (format "Rename %s to: " short-name)))))
+
+      ;; Rename filename to new-filename and error if new-filename already
+      ;; exists. `dired-rename-file' handles renaming of directories and files.
+      ;; It updates the name of all associated buffers.
+      (dired-rename-file filename new-filename nil)
+
+      ;; Update recentf list.
+      (when (fboundp 'recentf-add-file)
+        (seq-map
+         (lambda (fp)
+           (recentf-add-file
+            (concat new-filename (string-remove-prefix filename fp)))
+           (recentf-remove-if-non-kept fp))
+         (seq-filter
+          (lambda (fp)
+            (string-prefix-p filename fp))
+          recentf-list)))
+
+      ;; Invalidate projectile cache.
+      (when (and (configuration-layer/package-used-p 'projectile)
+                 (projectile-project-p))
+        (call-interactively #'projectile-invalidate-cache))
+
+      ;; Inform user about tremendous success.
+      (message "%s '%s' successfully renamed to '%s'"
+               (if is-dir "Directory" "File")
+               short-name
+               (file-name-nondirectory new-filename)))))
 
 ;; from magnars
 (defun spacemacs/rename-current-buffer-file (&optional arg)
@@ -297,7 +312,8 @@ initialized with the current filename."
                                (format
                                 (concat "Buffer '%s' is not visiting a file: "
                                         "[s]ave to file or [r]ename buffer?")
-                                name) 'face 'minibuffer-prompt)))
+                                name)
+                               'face 'minibuffer-prompt)))
           (cond ((eq key ?s)            ; save to file
                  ;; this allows for saving a new empty (unmodified) buffer
                  (unless (buffer-modified-p) (set-buffer-modified-p t))
@@ -308,7 +324,8 @@ initialized with the current filename."
                      ;; ask to rename again, if the new buffer name exists
                      (if (yes-or-no-p
                           (format (concat "A buffer named '%s' already exists: "
-                                          "Rename again?") new-name))
+                                          "Rename again?")
+                                  new-name))
                          (setq new-name (read-string "New buffer name: "))
                        (keyboard-quit)))
                    (rename-buffer new-name)
