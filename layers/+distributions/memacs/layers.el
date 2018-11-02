@@ -13,8 +13,6 @@
    ivy
    spacemacs-defaults
    spacemacs-project
-   (ibuffer :variables ibuffer-group-buffers-by 'projects)
-   (dired :variables ranger-show-preview t)
    spacemacs-layouts
    spacemacs-editing
    spacemacs-editing-visual
@@ -28,6 +26,7 @@
    spacemacs-navigation
    spacemacs-org
    spacemacs-visual
+   multiple-cursors
 
 
    (auto-completion :variables

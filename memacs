@@ -31,6 +31,8 @@ This function should only modify configuration layer settings."
      docker
      (restclient :variables ;; https://github.com/zweifisch/ob-http
                  restclient-use-org t)
+     (ibuffer :variables ibuffer-group-buffers-by 'projects)
+     (dired :variables ranger-show-preview t)
      ;; (shell :variables
      ;;        shell-default-shell 'eshell
      ;;        shell-protect-eshell-prompt t
