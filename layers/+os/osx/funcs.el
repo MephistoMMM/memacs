@@ -19,7 +19,7 @@
 ;; The onlyin option limits results to my home directory
 ;; and directories below that
 ;; mdfind is the command-line interface to spotlight
-(defun memacs/counsel-mdfind-function (string &rest _unused)
+(defun memacs//counsel-mdfind-function (string &rest _unused)
   "Issue mdfind for STRING."
   (or(counsel-more-chars)
      (let* ((memacs--counsel-search-cmd
@@ -36,9 +36,10 @@ INITIAL-INPUT can be given as the initial minibuffer input."
   (interactive)
   (ivy-read (concat ivy-count-format
                     "Spotlight: ")
-            'memacs/counsel-mdfind-function
+            'memacs//counsel-mdfind-function
             :initial-input initial-input
             :dynamic-collection t
+            :history 'counsel-git-grep-history
             :caller 'memacs/counsel-spotlight
             :action (lambda (x)
                       (when (string-match "\\(\/.*\\)\\'" x)
