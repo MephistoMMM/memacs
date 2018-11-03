@@ -20,21 +20,21 @@
         (ob :location built-in)
         (org :location built-in)
         (org-agenda :location built-in)
-        (org-brain :toggle (version<= "25" emacs-version))
+        org-brain
         (org-expiry :location built-in)
-        (org-journal :toggle org-enable-org-journal-support)
+        org-journal
         org-download
         org-pomodoro
         org-present
         (org-projectile :requires projectile)
-        (ox-twbs :toggle org-enable-bootstrap-support)
+        ox-twbs
         ;; use a for of ox-gfm to fix index generation
-        (ox-gfm :location (recipe :fetcher github :repo "syl20bnr/ox-gfm")
-                :toggle org-enable-github-support)
-        (ox-reveal :toggle org-enable-reveal-js-support)
+        ;; (ox-gfm :location (recipe :fetcher github :repo "syl20bnr/ox-gfm")
+        ;;         :toggle org-enable-github-support)
+        ;; (ox-reveal :toggle org-enable-reveal-js-support)
         persp-mode
-        (ox-hugo :toggle org-enable-hugo-support)
-        (org-trello :toggle org-enable-trello-support)
+        ;; TODO research hugo
+        ;; (ox-hugo :toggle org-enable-hugo-support)
         ))
 
 (defun org/post-init-company ()
@@ -608,17 +608,18 @@ Headline^^            Visit entry^^               Filter^^                    Da
       (org-projectile-per-project)
       (setq org-projectile-per-project-filepath org-projectile-file))))
 
+;; Twitter Bootstrap related
 (defun org/pre-init-ox-twbs ()
   (spacemacs|use-package-add-hook org :post-config (require 'ox-twbs)))
 (defun org/init-ox-twbs ())
 
-(defun org/pre-init-ox-gfm ()
-  (spacemacs|use-package-add-hook org :post-config (require 'ox-gfm)))
-(defun org/init-ox-gfm ())
+;; (defun org/pre-init-ox-gfm ()
+;;   (spacemacs|use-package-add-hook org :post-config (require 'ox-gfm)))
+;; (defun org/init-ox-gfm ())
 
-(defun org/pre-init-ox-reveal ()
-  (spacemacs|use-package-add-hook org :post-config (require 'ox-reveal)))
-(defun org/init-ox-reveal ())
+;; (defun org/pre-init-ox-reveal ()
+;;   (spacemacs|use-package-add-hook org :post-config (require 'ox-reveal)))
+;; (defun org/init-ox-reveal ())
 
 (defun org/post-init-persp-mode ()
   (spacemacs|define-custom-layout "@Org"
@@ -631,6 +632,7 @@ Headline^^            Visit entry^^               Filter^^                    Da
 
 (defun org/init-org-journal ()
   (use-package org-journal
+    :if org-enable-org-journal-support
     :defer t
     :commands (org-journal-new-entry org-journal-search-forever)
     :init
@@ -655,24 +657,5 @@ Headline^^            Visit entry^^               Filter^^                    Da
         "n" 'org-journal-open-next-entry
         "p" 'org-journal-open-previous-entry))))
 
-(defun org/init-ox-hugo ()
-  (use-package ox-hugo :after ox))
-
-(defun org/init-org-trello ()
-  (use-package org-trello
-    :after org
-    :config
-    (progn
-      (spacemacs/declare-prefix-for-mode 'org-mode "mt" "trello")
-      (spacemacs/declare-prefix-for-mode 'org-mode "mtd" "sync down")
-      (spacemacs/declare-prefix-for-mode 'org-mode "mtu" "sync up")
-      (spacemacs/set-leader-keys-for-major-mode 'org-mode
-        "mtI" 'org-trello-install-key-and-token
-        "mta" 'org-trello-archive-card
-        "mtc" 'org-trello-create-board-and-install-metadata
-        "mti" 'org-trello-install-board-metadata
-        "mtm" 'org-trello-update-board-metadata
-        "mtdb" 'spacemacs/org-trello-pull-buffer
-        "mtdc" 'spacemacs/org-trello-pull-card
-        "mtub" 'spacemacs/org-trello-push-buffer
-        "mtuc" 'spacemacs/org-trello-push-card))))
+;; (defun org/init-ox-hugo ()
+;;   (use-package ox-hugo :after ox))

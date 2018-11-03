@@ -26,8 +26,7 @@
         macrostep
         nameless
         overseer
-        parinfer
-        srefactor))
+        parinfer))
 
 (defun emacs-lisp/init-ielm ()
   (use-package ielm
@@ -246,19 +245,3 @@
 
 (defun emacs-lisp/post-init-parinfer ()
   (add-hook 'emacs-lisp-mode-hook 'parinfer-mode))
-
-(defun emacs-lisp/post-init-srefactor ()
-  (add-hook 'emacs-lisp-mode-hook 'spacemacs/load-srefactor)
-  (use-package srefactor-lisp
-    :commands (srefactor-lisp-format-buffer
-               srefactor-lisp-format-defun
-               srefactor-lisp-format-sexp
-               srefactor-lisp-one-line)
-    :init
-    (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
-      (spacemacs/declare-prefix-for-mode mode "=" "srefactor")
-      (spacemacs/set-leader-keys-for-major-mode mode
-        "=b" 'srefactor-lisp-format-buffer
-        "=d" 'srefactor-lisp-format-defun
-        "=o" 'srefactor-lisp-one-line
-        "=s" 'srefactor-lisp-format-sexp))))

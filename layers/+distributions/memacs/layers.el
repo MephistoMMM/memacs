@@ -10,7 +10,7 @@
 ;;; Code:
 (configuration-layer/declare-layers
  '(
-   ivy
+   (ivy :variables ivy-enable-advanced-buffer-information t)
    spacemacs-defaults
    spacemacs-project
    spacemacs-layouts

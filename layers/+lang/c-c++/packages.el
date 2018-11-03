@@ -15,7 +15,6 @@
     disaster
     flycheck
     google-c-style
-    srefactor
     stickyfunc-enhance
 
     ;; normal
@@ -89,11 +88,6 @@
     :init (progn
             (when c-c++-enable-google-style (add-hook 'c-mode-common-hook 'google-set-c-style))
             (when c-c++-enable-google-newline (add-hook 'c-mode-common-hook 'google-make-newline-indent)))))
-
-(defun c-c++/post-init-srefactor ()
-  (dolist (mode c-c++-modes)
-    (spacemacs/set-leader-keys-for-major-mode mode "r" 'srefactor-refactor-at-point))
-  (spacemacs/add-to-hooks 'spacemacs/load-srefactor c-c++-mode-hooks))
 
 (defun c-c++/post-init-stickyfunc-enhance ()
   (spacemacs/add-to-hooks 'spacemacs/load-stickyfunc-enhance c-c++-mode-hooks))

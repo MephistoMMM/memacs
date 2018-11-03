@@ -22,7 +22,6 @@
         git-messenger
         git-timemachine
         magit
-        magit-gitflow
         magit-svn
         (orgit :requires org)
         smeargle
@@ -193,15 +192,6 @@ Press [_b_] again to blame further in the history, [_q_] to go up or quit."
       (when git-magit-status-fullscreen
         (setq magit-display-buffer-function 'magit-display-buffer-fullframe-status-v1))
       (add-to-list 'magit-log-arguments "--color"))))
-
-(defun git/init-magit-gitflow ()
-  (use-package magit-gitflow
-    :commands turn-on-magit-gitflow
-    :init (progn
-            (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
-            (with-eval-after-load 'magit
-              (define-key magit-mode-map "%" 'magit-gitflow-popup)))
-    :config (spacemacs|diminish magit-gitflow-mode "Flow")))
 
 (defun git/init-magit-svn ()
   (use-package magit-svn

@@ -33,6 +33,8 @@ This function should only modify configuration layer settings."
                  restclient-use-org t)
      (ibuffer :variables ibuffer-group-buffers-by 'projects)
      (dired :variables ranger-show-preview t)
+     copy-as-format
+     deft
      ;; (shell :variables
      ;;        shell-default-shell 'eshell
      ;;        shell-protect-eshell-prompt t
@@ -310,7 +312,7 @@ It should only modify the values of Spacemacs settings."
                                :size-limit-kb 1000)
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
-   dotspacemacs-folding-method 'evil
+   dotspacemacs-folding-method 'origami
    ;; If non-nil pressing the closing parenthesis `)' key in insert mode passes
    ;; over any automatically added closing parenthesis, bracket, quote, etc…
    ;; This can be temporary disabled by pressing `C-q' before `)'. (default nil)
@@ -388,7 +390,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
           ("gnu-cn"   . "https://elpa.zilongshanren.com/gnu/")))
 
   ;; add local/bin to exec-path for fixing not found tern
-  (push "/usr/local/bin" exec-path)
+  ;; (push "/usr/local/bin" exec-path)
   )
 
 (defun dotspacemacs/user-load ()

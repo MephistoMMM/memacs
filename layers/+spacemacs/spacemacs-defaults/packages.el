@@ -140,11 +140,6 @@
       (define-key evil-visual-state-map (kbd "#")
         'evil-visualstar/begin-search-backward))))
 
-(defun spacemacs-default/init-exec-path-from-shell ()
-  (use-package exec-path-from-shell
-    :demand t
-    :config (exec-path-from-shell-initialize)))
-
 (defun spacemacs-defaults/init-help-fns+ ()
   (use-package help-fns+
     :defer t
@@ -300,11 +295,6 @@
         (setq save-place t))
       ;; Save point position between sessions
       (setq save-place-file (concat spacemacs-cache-directory "places")))))
-
-(defun spacemacs-default/init-spacemacs-theme ()
-    (progn
-      (setq spacemacs-theme-comment-bg t)
-      (setq spacemacs-theme-org-height t)))
 
 (defun spacemacs-defaults/init-subword ()
   (use-package subword

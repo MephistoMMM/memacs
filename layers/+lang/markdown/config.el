@@ -11,9 +11,6 @@
 
 ;; variables
 
-(defvar markdown-live-preview-engine 'eww
-  "Possibe values are `eww' (built-in browser) or `vmd' (installed with `npm').")
-
 (defvar markdown-mmm-auto-modes
   '(
     ;; in alphabetical order, symbols first then lists

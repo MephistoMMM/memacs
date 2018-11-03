@@ -873,7 +873,7 @@ to 'auto, tags may not be properly aligned. "
   (add-to-list 'custom-theme-load-path
                (file-name-as-directory (file-name-directory load-file-name))))
 
-(provide 'spacemacs-common)
+(provide 'spacemacs-theme)
 
 ;; Local Variables:
 ;; no-byte-compile: t

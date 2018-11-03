@@ -20,6 +20,7 @@
   "RET" 'memacs/dired-find-alternate-file
   "C-j" 'memacs/dired-find-alternate-file
   "^"   'memacs/dired-backward
+  "C-h" 'memacs/dired-backward
   )
 (spacemacs/set-leader-keys
   "jd" 'dired

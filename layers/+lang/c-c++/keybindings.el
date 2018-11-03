@@ -34,16 +34,6 @@
     "==" 'spacemacs/clang-format-region-or-buffer
     "=f" 'spacemacs/clang-format-function))
 
-;;;; realgud
-(dolist (mode c-c++-modes)
-  (spacemacs/set-leader-keys-for-major-mode mode
-    "dd" 'realgud:gdb
-    "de" 'realgud:cmd-eval-dwim))
-
-;;;; srefactor
-(dolist (mode c-c++-modes)
-    (spacemacs/set-leader-keys-for-major-mode mode "r" 'srefactor-refactor-at-point))
-
 ;;;; xref
 (dolist (mode c-c++-modes)
   (spacemacs/set-leader-keys-for-major-mode mode

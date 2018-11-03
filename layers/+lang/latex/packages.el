@@ -19,7 +19,7 @@
         flycheck
         flyspell
         counsel-gtags
-        (magic-latex-buffer :toggle latex-enable-magic)
+        magic-latex-buffer
         typo
         yasnippet
         which-key
@@ -195,6 +195,7 @@
 
 (defun latex/init-magic-latex-buffer ()
   (use-package magic-latex-buffer
+    :if latex-enable-magic
     :defer t
     :init
     (progn
