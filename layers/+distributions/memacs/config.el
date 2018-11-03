@@ -49,9 +49,6 @@
 ;; Recomplie
 (defconst memacs-recompile-list
   '(
-    "init.el"
-    "early-init.el"
-    "dump-init.el"
     "core"
     "layers/+checkers"
     "layers/+completion"
