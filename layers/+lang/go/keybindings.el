@@ -83,3 +83,8 @@
 ;;;; xref
 (spacemacs/set-leader-keys-for-major-mode 'go-mode
   (kbd "gr") #'xref-find-references)
+
+;;;; Goenv
+(with-eval-after-load 'go-mode
+  (spacemacs/set-leader-keys-for-major-mode 'go-mode "Va" 'goenv-activate)
+  (spacemacs/set-leader-keys-for-major-mode 'go-mode "Vd" 'goenv-deactivate))

@@ -90,6 +90,7 @@ This function should only modify configuration layer settings."
          gofmt-command "goimports"
          go-backend 'go-mode
          godoc-at-point-function 'godoc-gogetdoc)
+     rust
 
      ;; Catalogue: self layers
      ;; READY : npm install -g hexo

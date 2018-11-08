@@ -14,9 +14,6 @@
         (leave-delimited :location (recipe
                                     :fetcher github
                                     :repo "MephistoMMM/leave-delimited"))
-        (goenv :location (recipe
-                          :fetcher github
-                          :repo "MephistoMMM/goenv"))
         ;; haskell-mode
         outshine
         (outline-ivy :location local)
@@ -39,11 +36,6 @@
 (defun mp-hacking/init-outline-ivy ()
   (use-package outline-ivy
     :after ivy outshine))
-
-(defun mp-hacking/init-goenv ()
-  "Add Goenv."
-  (use-package goenv :defer t)
-  )
 
 ;; (defun mp-hacking/post-init-haskell-mode ()
 ;;   "Add haskell cabal bin path to 'exec-path."
