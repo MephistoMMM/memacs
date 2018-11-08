@@ -59,8 +59,9 @@ user-config should be defined in this function!"
                                    (concat default-directory "/" file)
                                  (eval file))))
         (set-visited-file-name visited-file-name)
-        (if (not (string= (file-name-directory visited-file-name)
-                          default-directory))
+        (if (and (file-name-directory visited-file-name)
+                 (not (string= (file-name-directory visited-file-name)
+                               default-directory)))
             (setq default-directory (file-name-directory visited-file-name)))
         ))
     )
@@ -102,7 +103,7 @@ user-config should be defined in this function!"
 ;;;; Source Code
 
 (defconst mp-org/src-code-types
-  '("emacs-lisp" "python" "c" "shell" "java" "js2" "clojure" "c++" "css" "go" "rust" "sh" "sass" "sql" "awk" "haskell" "latex" "lisp" "matlab" "org" "perl" "ruby" "scheme" "sqlite" "yaml"))
+  '("emacs-lisp" "python" "c" "shell" "java" "js" "clojure" "c++" "css" "go" "rust" "sh" "sass" "sql" "awk" "haskell" "latex" "lisp" "matlab" "org" "perl" "ruby" "scheme" "sqlite" "yaml"))
 (defvar mp-org--org-insert-src-code-block-history nil)
 
 (defun mp-org/org-insert-src-code-block (src-code-type)
@@ -123,16 +124,24 @@ Go files should disable fly-check."
     (previous-line 2)
     (org-edit-src-code)))
 
-(defvar mp-org--wrap-previous-function nil)
-(defvar mp-org--wrap-call-from-resume nil)
+(defvar mp-org--wrap-previous-function nil
+  "Store previous wrap function.")
+(defvar mp-org--wrap-call-from-resume nil
+  "Record current function is whether calling from `mp-org/wrap-resume'.")
 (defun mp-org/wrap-resume (start end)
+  "Resume previous function from `mp-org--wrap-previous-function', while
+set `mp-org--wrap-call-from-resume' to t."
   (interactive "r")
+  ;; do nothing if `mp-org--wrap-previous-function' is nil
   (unless (not mp-org--wrap-previous-function)
     (setq mp-org--wrap-call-from-resume t)
     (funcall mp-org--wrap-previous-function start end)
     (setq mp-org--wrap-call-from-resume nil))
   )
 (defun mp-org//wrap-save-previous-fuction (orig-fun &rest args)
+  "Save orig-fun to `mp-org--wrap-previous-function'. This is a advice function,
+please use it like `(advice-add 'fun
+                        :around #'mp-org//wrap-save-previous-fuction)'"
   (call-interactively orig-fun)
   (setq mp-org--wrap-previous-function orig-fun)
   )

@@ -22,7 +22,7 @@
                                :fetcher github
                                :repo "alex-hhh/emacs-sql-indent"
                                :files ("sql-indent.el")))
-        (sqlup-mode :toggle sql-capitalize-keywords)
+        sqlup-mode 
         ))
 
 (defun sql/init-sql ()
@@ -140,6 +140,7 @@
 
 (defun sql/init-sqlup-mode ()
   (use-package sqlup-mode
+    :if sql-capitalize-keywords
     :defer t
     :init
     (progn

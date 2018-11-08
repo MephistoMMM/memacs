@@ -11796,9 +11796,9 @@ If no one is selected, symmetric encryption will be performed.  "
 ;; $$$$$$ (define-key dired-mode-map [(control meta ?+)] 'diredp-tag-this-file)
 ;; $$$$$$ (define-key dired-mode-map [(control meta ?-)] 'diredp-untag-this-file)
 (define-key dired-mode-map "\r"      'dired-find-file)                      ; `RET'
-(when (fboundp 'diredp-describe-file)
-  (define-key dired-mode-map (kbd "C-h RET")        'diredp-describe-file)  ; `C-h RET'
-  (define-key dired-mode-map (kbd "C-h C-<return>") 'diredp-describe-file)) ; `C-h C-RET'
+;; (when (fboundp 'diredp-describe-file)
+;;   (define-key dired-mode-map (kbd "C-h RET")        'diredp-describe-file)  ; `C-h RET'
+;;   (define-key dired-mode-map (kbd "C-h C-<return>") 'diredp-describe-file)) ; `C-h C-RET'
 (define-key dired-mode-map "%c"      'diredp-capitalize)                    ; `% c'
 (define-key dired-mode-map "b"       'diredp-byte-compile-this-file)        ; `b'
 (define-key dired-mode-map [(control shift ?b)] 'diredp-bookmark-this-file) ; `C-B'

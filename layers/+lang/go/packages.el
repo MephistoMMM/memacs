@@ -27,8 +27,16 @@
          :requires lsp-mode
          :location (recipe :fetcher github
                            :repo "emacs-lsp/lsp-go"))
+        (goenv :location (recipe
+                          :fetcher github
+                          :repo "MephistoMMM/goenv"))
         popwin
         ))
+
+(defun go/init-goenv ()
+  "Add Goenv."
+  (use-package goenv :defer t)
+  )
 
 (defun go/init-company-go ()
   (use-package company-go

@@ -51,7 +51,8 @@
 (define-key switch-keymap (kbd "k") 'popup-previous)
 (define-key switch-keymap (kbd "C-j") 'popup-select)
 (define-key switch-keymap (kbd "<return>") 'popup-select)
-(define-key evil-normal-state-map (kbd "M-<return>") 'mp-hacking/buffer-switch)
+(evil-define-key 'normal prog-mode-map (kbd "RET") 'mp-hacking/buffer-switch)
+(evil-define-key 'normal org-mode-map (kbd "RET") 'mp-hacking/buffer-switch)
 
 ;; terminal here
 (spacemacs/set-leader-keys
@@ -86,11 +87,6 @@
 
 ;;;; Outline Ivy
 (spacemacs/set-leader-keys "jo" 'oi-jump)
-
-;;;; Goenv
-(with-eval-after-load 'go-mode
-  (spacemacs/set-leader-keys-for-major-mode 'go-mode "Va" 'goenv-activate)
-  (spacemacs/set-leader-keys-for-major-mode 'go-mode "Vd" 'goenv-deactivate))
 
 
 ;;;; Better Default

@@ -20,6 +20,8 @@
       (setq deft-extensions '("org" "md" "txt")
             deft-text-mode 'org-mode
             deft-use-filename-as-title t
+            deft-recursive t
+            deft-directory "~/Dropbox/org/notes"
             deft-use-filter-string-for-filename t)
       (spacemacs/set-leader-keys "an" 'spacemacs/deft)
 

@@ -16,7 +16,6 @@
     gh-md
     markdown-mode
     markdown-toc
-    (vmd-mode :toggle (eq 'vmd markdown-live-preview-engine))
     ))
 
 (defun markdown/post-init-company ()
@@ -118,10 +117,7 @@
           "N"   'markdown-next-link
           "f"   'markdown-follow-thing-at-point
           "P"   'markdown-previous-link
-          "<RET>" 'markdown-do)
-        (when (eq 'eww markdown-live-preview-engine)
-          (spacemacs/set-leader-keys-for-major-mode mode
-            "cP" 'markdown-live-preview-mode)))
+          "<RET>" 'markdown-do))
       ;; Header navigation in normal state movements
       (evil-define-key 'normal markdown-mode-map
         "gj" 'outline-forward-same-level
@@ -143,11 +139,3 @@
     (dolist (mode markdown--key-bindings-modes)
       (spacemacs/set-leader-keys-for-major-mode mode
         "it" 'markdown-toc-generate-toc))))
-
-(defun markdown/init-vmd-mode ()
-  (use-package vmd-mode
-    :defer t
-    :init
-    (dolist (mode markdown--key-bindings-modes)
-      (spacemacs/set-leader-keys-for-major-mode mode
-        "cP" 'vmd-mode))))

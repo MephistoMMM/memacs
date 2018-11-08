@@ -369,7 +369,6 @@ Current Action: %s(ivy-action-name)
     :config
     (progn
       (memacs/define-search-keybinding
-        "s" 'swiper
         "S" 'spacemacs/swiper-region-or-symbol
         "b" 'swiper-all
         "B" 'spacemacs/swiper-all-region-or-symbol)

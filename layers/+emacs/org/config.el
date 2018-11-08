@@ -14,9 +14,6 @@
 (defvar org-want-todo-bindings nil
   "If non-nil, evil-org's todo bindings are activated.")
 
-(defvar org-enable-bootstrap-support nil
-  "If non-nil Twitter Bootstrap related packages are configured.")
-
 (defvar org-enable-github-support nil
   "If non-nil Github related packages are configured.")
 
@@ -34,6 +31,3 @@ used.")
 
 (defvar org-enable-hugo-support nil
   "If non-nil, Hugo (https://gohugo.io) related packages are configured.")
-
-(defvar org-enable-trello-support nil
-  "If non-nil org-trello is configured")

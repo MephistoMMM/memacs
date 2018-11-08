@@ -31,4 +31,13 @@
  (list evil-normal-state-map evil-evilified-state-map)
  "/" 'swiper)
 
+
+;;;; Recompile
+
+(spacemacs/set-leader-keys
+  "fec"  'memacs/recompile
+  "fef"  'byte-recompile-file
+  "feF"  'byte-recompile-directory
+  )
+
 ;;; memacs/keybindings.el ends here
