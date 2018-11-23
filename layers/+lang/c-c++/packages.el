@@ -26,6 +26,7 @@
 
     ;; lsp
     (cquery :requires lsp-mode company-lsp)
+    projectile
     ))
 
 (defun c-c++/init-cc-mode ()
@@ -40,7 +41,7 @@
 
 (defun c-c++/init-clang-format ()
   (use-package clang-format
-    :if c-c++-enable-clang-support
+    :if (or c-c++-enable-clang-support (spacemacs//c-c++-lsp-enabled))
     :init
     (progn
       (when c-c++-enable-clang-format-on-save
@@ -49,10 +50,13 @@
 
 (defun c-c++/post-init-company ()
   (when c-c++-enable-clang-support
-    (spacemacs|add-company-backends :backends company-clang
-      :modes c-mode-common)
-    (setq company-clang-prefix-guesser 'spacemacs/company-more-than-prefix-guesser)
-    (spacemacs/add-to-hooks 'spacemacs/c-c++-load-clang-args c-c++-mode-hooks)))
+    (if (spacemacs//c-c++-lsp-enabled)
+      (display-warning :error "`c-c++-enable-clang-support' ignored when using lsp backend")
+      (progn
+        (spacemacs|add-company-backends :backends company-clang :modes c-mode-common)
+        (setq company-clang-prefix-guesser 'spacemacs/company-more-than-prefix-guesser)
+        (spacemacs/add-to-hooks 'spacemacs/c-c++-load-clang-args c-c++-mode-hooks)
+        ()))))
 
 (defun c-c++/init-company-c-headers ()
   (use-package company-c-headers
@@ -92,24 +96,32 @@
 (defun c-c++/post-init-stickyfunc-enhance ()
   (spacemacs/add-to-hooks 'spacemacs/load-stickyfunc-enhance c-c++-mode-hooks))
 
+;; BEGIN LSP BACKEND PACKAGES
+
 ;; See also https://github.com/cquery-project/cquery/wiki/Emacs
 (defun c-c++/init-cquery ()
   (use-package cquery
-    :commands lsp-cquery-enable
+    :if (eq c-c++-backend 'lsp-cquery)
     :defer t
+    :commands lsp-cquery-enable
     :init
+    (add-hook 'c-mode-common-hook #'spacemacs//c-c++-lsp-enable)
+    :config
+    (spacemacs//c-c++-lsp-config)))
+
+;;Intentionally adding both cquery and ccls cache dirs to ignore list, to facilitate switching between
+;;two without multiple caches polluting projectile find file results
+(defun c-c++/pre-init-projectile ()
+  (spacemacs|use-package-add-hook projectile
+    :post-config
     (progn
-      (setq cquery-executable "/usr/local/bin/cquery")
-      ;; Customize `lsp-project-whitelist' `lsp-project-blacklist' to disable auto initialization.
-      (add-hook 'c-mode-common-hook #'memacs//c-c++-cquery-enable)
-
-      (with-eval-after-load 'projectile
+      (add-to-list 'projectile-globally-ignored-directories ".cquery_cached_index")
+      (when c-c++-lsp-cache-dir
+        (add-to-list 'projectile-globally-ignored-directories c-c++-lsp-cache-dir))
+      (when c-c++-adopt-subprojects
         (setq projectile-project-root-files-top-down-recurring
-              (append '("compile_commands.json"
-                        ".cquery")
-                      projectile-project-root-files-top-down-recurring))
-        (add-to-list 'projectile-globally-ignored-directories ".cquery_cached_index"))
+          (append '("compile_commands.json"
+                     ".cquery")
+            projectile-project-root-files-top-down-recurring))))))
 
-      ;; add company-lsp
-      (spacemacs|add-company-backends :backends company-lsp :modes c-mode-common))
-    ))
+;; END LSP BACKEND PACKAGES

@@ -18,9 +18,7 @@
     flycheck
     (flycheck-rust :requires flycheck)
     ggtags
-    helm-gtags
     rust-mode
-    smartparens
     toml-mode
     ;; packages for lsp-rust
     (lsp-rust :requires lsp-mode)
@@ -104,11 +102,6 @@
   ;; backend specific
   (spacemacs//rust-setup-company))
 
-(defun rust/post-init-smartparens ()
-  (with-eval-after-load 'smartparens
-    ;; Don't pair lifetime specifiers
-    (sp-local-pair 'rust-mode "'" nil :actions nil)))
-
 (defun rust/post-init-flycheck ()
   (spacemacs/enable-flycheck 'rust-mode))
 
@@ -117,6 +110,3 @@
 
 (defun rust/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'rust-mode))
-
-(defun rust/post-init-helm-gtags ()
-  (spacemacs/helm-gtags-define-keys-for-mode 'rust-mode))
