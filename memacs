@@ -31,6 +31,10 @@ This function should only modify configuration layer settings."
      docker
      (restclient :variables ;; https://github.com/zweifisch/ob-http
                  restclient-use-org t)
+     (ibuffer :variables ibuffer-group-buffers-by 'projects)
+     (dired :variables ranger-show-preview t)
+     copy-as-format
+     deft
      ;; (shell :variables
      ;;        shell-default-shell 'eshell
      ;;        shell-protect-eshell-prompt t
@@ -62,7 +66,6 @@ This function should only modify configuration layer settings."
      gtags
      (c-c++ :variables
             gtags-enable-by-default t
-            c-c++-enable-clang-support t
             c-c++-enable-auto-newline nil)
      ;; READY : stack install stylish-haskell hlint apply-refact hindent hasktags intero
      ;; (haskell :variables
@@ -86,6 +89,7 @@ This function should only modify configuration layer settings."
          gofmt-command "goimports"
          go-backend 'go-mode
          godoc-at-point-function 'godoc-gogetdoc)
+     rust
 
      ;; Catalogue: self layers
      ;; READY : npm install -g hexo
@@ -121,6 +125,9 @@ It should only modify the values of Spacemacs settings."
   ;; This setq-default sexp is an exhaustive list of all the supported
   ;; spacemacs settings.
   (setq-default
+   dotmemacs-username "Mephis Pheies"
+   dotmemacs-email    "mephistommm@gmail.com"
+   dotmemacs-github   "https://github.com/MephistoMMM/memacs"
    ;; If non-nil then enable support for the portable dumper. You'll need
    ;; to compile Emacs 27 from source following the instructions in file
    ;; EXPERIMENTAL.org at to root of the git repository.
@@ -305,7 +312,7 @@ It should only modify the values of Spacemacs settings."
                                :size-limit-kb 1000)
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
-   dotspacemacs-folding-method 'evil
+   dotspacemacs-folding-method 'origami
    ;; If non-nil pressing the closing parenthesis `)' key in insert mode passes
    ;; over any automatically added closing parenthesis, bracket, quote, etc…
    ;; This can be temporary disabled by pressing `C-q' before `)'. (default nil)
@@ -383,7 +390,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
           ("gnu-cn"   . "https://elpa.zilongshanren.com/gnu/")))
 
   ;; add local/bin to exec-path for fixing not found tern
-  (push "/usr/local/bin" exec-path)
+  ;; (push "/usr/local/bin" exec-path)
   )
 
 (defun dotspacemacs/user-load ()
@@ -428,7 +435,7 @@ you should place your code here."
     '(
       ;; config new org file in dropbox
       ("Dropbox Note Buffer" org-mode
-       (concat org-directory "/notes"))
+       (concat org-directory "/notes/") (memacs//mission-start-find-file-name nil))
       ("Codewar&Golang" go-mode
        (format-time-string "~/Workspace/go/src/codewar_pg/%Y_%m_%d"))
       ("Daily Report" org-mode
@@ -437,13 +444,16 @@ you should place your code here."
 
   ;; Helps
   (setq memacs-mission-helper-help-list
-    '(
-      ("Projectile"
-       ("ignoring files" "https://projectile.readthedocs.io/en/latest/projects/#ignoring-files"))
-      ("Dockerfile"
-       ("docker reference" "https://docs.docker.com/engine/reference/builder/#usage")
-       ("compose reference" "https://docs.docker.com/compose/compose-file/"))
-      ))
+        '(
+          ("Projectile"
+           ("ignoring files" "https://projectile.readthedocs.io/en/latest/projects/#ignoring-files"))
+          ("Dockerfile"
+           ("docker reference" "https://docs.docker.com/engine/reference/builder/#usage")
+           ("compose reference" "https://docs.docker.com/compose/compose-file/"))
+          ("Golang"
+           ("debugger: Delve" "https://github.com/derekparker/delve/blob/master/Documentation/cli/README.md"))
+          )
+        )
 )
 
 (setq custom-file "~/.emacs.d/custom.el")
