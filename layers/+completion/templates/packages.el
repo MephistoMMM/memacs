@@ -9,8 +9,7 @@
 ;;
 ;;; License: GPLv3
 
-(setq templates-packages
-      '(yatemplate))
+(setq templates-packages '(yatemplate))
 
 ;; TODO design an approach to support local special template
 (defun templates/init-yatemplate ()

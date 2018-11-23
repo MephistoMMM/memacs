@@ -61,7 +61,7 @@
       (spacemacs//lsp-sync-peek-face)
       (add-hook 'spacemacs-post-theme-change-hook #'spacemacs//lsp-sync-peek-face)
 
-      (if lsp-ui-remap-xref-keybindings
+      (if lsp-remap-xref-keybindings
         (progn (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
           (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)))
 

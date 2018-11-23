@@ -477,10 +477,10 @@ respond to this toggle."
 (spacemacs|define-transient-state buffer
   :title "Buffer Selection Transient State"
   :doc (concat "
- [_n_/_<right>_]^^  next buffer       [_b_]   buffer list
- [_N_/_p_/_<left>_] previous buffer   [_C-d_] bury buffer
- [_d_]^^^^          kill buffer       [_o_]   other window
- ^^^^                                      [_q_]^^^^          quit")
+ [_n_/_<right>_]^^  next buffer       [_b_]^^^^   buffer list
+ [_N_/_p_/_<left>_] previous buffer   [_C-d_]^^^^ bury buffer
+ [_d_]^^^^          kill buffer       [_o_]^^^^   other window
+ [_z_]^^^^          recenter          [_q_]^^^^          quit")
   :bindings
   ("n" next-buffer)
   ("<right>" next-buffer)
@@ -491,6 +491,7 @@ respond to this toggle."
   ("b" ivy-switch-buffer)
   ("d" spacemacs/kill-this-buffer)
   ("C-d" bury-buffer)
+  ("z" recenter-top-bottom)
   ("q" nil :exit t)
   )
 (spacemacs/set-leader-keys "b." 'spacemacs/buffer-transient-state/body)

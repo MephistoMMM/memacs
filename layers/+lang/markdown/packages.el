@@ -12,6 +12,7 @@
 (setq markdown-packages
   '(
     company
+    company-emoji
     emoji-cheat-sheet-plus
     gh-md
     markdown-mode
@@ -22,6 +23,12 @@
   (dolist (mode markdown--key-bindings-modes)
     (eval `(spacemacs|add-company-backends
              :backends company-capf
+             :modes ,mode))))
+
+(defun markdown/post-init-company-emoji ()
+  (dolist (mode markdown--key-bindings-modes)
+    (eval `(spacemacs|add-company-backends
+             :backends company-emoji
              :modes ,mode))))
 
 (defun markdown/post-init-emoji-cheat-sheet-plus ()
