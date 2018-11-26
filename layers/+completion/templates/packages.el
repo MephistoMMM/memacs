@@ -22,4 +22,7 @@
     :config
     (progn
       (yatemplate-fill-alist)
-      (auto-insert-mode +1))))
+      (auto-insert-mode +1)
+      (add-hook 'find-file-hook
+                #'memacs//templates-switch-to-insert-mode-if-file-not-exits)
+      )))
