@@ -18,7 +18,7 @@
         maven-test-mode
         meghanada
         mvn
-        (lsp-java :requires lsp-mode lsp-ui company-lsp)
+        (lsp-java :requires lsp-mode lsp-ui company-lsp dap-mode)
         org
         ))
 
@@ -148,7 +148,15 @@
         "rem" 'lsp-java-extract-method
         "cc"  'lsp-java-build-project
         "an"  'lsp-java-actionable-notifications
-        "="   'lsp-format-buffer)
+        "="   'lsp-format-buffer
+        ;; dap-mode
+        ;; debug
+        "ddj" 'dap-java-debug
+        "dtt" 'dap-java-debug-test-method
+        "dtc" 'dap-java-debug-test-class
+        ;; run
+        "tt" 'dap-java-run-test-method
+        "tc" 'dap-java-run-test-class)
 
       (setq lsp-highlight-symbol-at-point nil
             lsp-ui-sideline-update-mode 'point

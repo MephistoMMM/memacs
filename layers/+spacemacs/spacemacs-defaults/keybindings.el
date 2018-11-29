@@ -399,7 +399,7 @@ respond to this toggle."
   "TAB" 'spacemacs/alternate-window
   "2"   'spacemacs/layout-double-columns
   "3"   'spacemacs/layout-triple-columns
-  "f"   'other-frame
+  "f"   'follow-mode
   "F"   'make-frame
   "S"   'split-window-below-and-focus
   "U"   'winner-redo
@@ -408,7 +408,14 @@ respond to this toggle."
   "x"   'kill-buffer-and-window
   "_"   'spacemacs/maximize-horizontally
   "|"   'spacemacs/maximize-vertically
-  )
+  "b"   'spacemacs/switch-to-minibuffer-window
+  "t"   'spacemacs/toggle-current-window-dedication
+  "c"   'spacemacs/toggle-centered-buffer
+  "C"   'spacemacs/toggle-distraction-free
+  "o"   'other-frame
+  "r"   'spacemacs/rotate-windows-forward
+  "R"   'spacemacs/rotate-windows-backward
+  "/"   'split-window-right)
 
 ;; text -----------------------------------------------------------------------
 (defalias 'count-region 'count-words-region)
