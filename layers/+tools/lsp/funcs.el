@@ -210,3 +210,10 @@ a find extension defined using `lsp-define-extensions'"
   (while key
     (spacemacs//lsp-bind-extensions mode layer-name key kind)
     (setq key (pop bindings) kind (pop bindings))))
+
+;; toggle lsp-ui-doc
+(defun memacs/toggle-lsp-ui-doc ()
+  (interactive)
+  (when (boundp 'lsp-ui-doc-mode)
+    (lsp-ui-doc--hide-frame))
+  )
