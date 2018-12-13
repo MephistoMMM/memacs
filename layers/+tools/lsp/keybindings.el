@@ -9,5 +9,6 @@
 ;;;; lsp ui
 (define-key evil-normal-state-map (kbd "C-n") 'lsp-ui-peek-jump-forward)
 (define-key evil-normal-state-map (kbd "C-p") 'lsp-ui-peek-jump-backward)
+(define-key evil-normal-state-map (kbd "C-q") #'memacs/toggle-lsp-ui-doc)
 
 ;;; lsp/keybindings.el ends here

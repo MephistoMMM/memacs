@@ -86,7 +86,7 @@ This function should only modify configuration layer settings."
      ;; go get -u github.com/sourcegraph/go-langserver
      (go :variables
          gofmt-command "goimports"
-         go-backend 'lsp-mode
+         go-backend 'lsp
          godoc-at-point-function 'godoc-gogetdoc)
      rust
 
@@ -451,6 +451,8 @@ you should place your code here."
            ("compose reference" "https://docs.docker.com/compose/compose-file/"))
           ("Golang"
            ("debugger: Delve" "https://github.com/derekparker/delve/blob/master/Documentation/cli/README.md"))
+          ("Tools"
+           ("RestClient" "https://github.com/pashky/restclient.el"))
           )
         )
 )
