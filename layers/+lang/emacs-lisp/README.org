@@ -14,6 +14,7 @@
 - [[#structuraly-safe-editing][Structuraly safe editing]]
 - [[#key-bindings][Key bindings]]
   - [[#additional-testing-functions-with-overseer][Additional testing functions with overseer]]
+  - [[#additional-evaluation-functions][Additional evaluation functions]]
   - [[#format-code][Format code]]
   - [[#debugging][Debugging]]
 
@@ -155,7 +156,7 @@ When enabled the symbol =🆂= should be displayed in the mode-line.
 
 * Key bindings
 
-| Key Binding                | Description                                            |
+| Key binding                | Description                                            |
 |----------------------------+--------------------------------------------------------|
 | ~SPC m g g~                | go to definition of symbol under point                 |
 | ~SPC m g G~                | go to definition of symbol under point in other window |
@@ -177,7 +178,7 @@ When enabled the symbol =🆂= should be displayed in the mode-line.
 ** Additional testing functions with overseer
 Function related to test are present under the ~SPC m t~ prefix:
 
-| Key Binding | Description   |
+| Key binding | Description   |
 |-------------+---------------|
 | ~SPC m t a~ | overseer test |
 | ~SPC m t A~ | test debug    |
@@ -189,10 +190,18 @@ Function related to test are present under the ~SPC m t~ prefix:
 | ~SPC m t q~ | test quiet    |
 | ~SPC m t h~ | test help     |
 
+** Additional evaluation functions
+If =smartparens= is used the following additional key bindings are available:
+
+| Key binding | Description                  |
+|-------------+------------------------------|
+| ~SPC m e c~ | evaluate sexp around point   |
+| ~SPC m e s~ | evaluate symbol around point |
+
 ** Format code
 The [[https://github.com/syl20bnr/spacemacs/blob/develop/layers/%2Bemacs/semantic/README.org][semantic]] layer should be installed for these key bindings to become active.
 
-| Key Binding | Description             |
+| Key binding | Description             |
 |-------------+-------------------------|
 | ~SPC m = b~ | format current buffer   |
 | ~SPC m = f~ | format current function |
@@ -202,7 +211,7 @@ The [[https://github.com/syl20bnr/spacemacs/blob/develop/layers/%2Bemacs/semanti
 ** Debugging
 To start debugging:
 
-| Key Binding | Description                                                            |
+| Key binding | Description                                                            |
 |-------------+------------------------------------------------------------------------|
 | ~SPC m d f~ | on a =defun= symbol toggle on the instrumentalisation of the function  |
 | ~SPC m d F~ | on a =defun= symbol toggle off the instrumentalisation of the function |
