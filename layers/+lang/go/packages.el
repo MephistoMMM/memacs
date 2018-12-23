@@ -23,10 +23,6 @@
         go-rename
         go-tag
         godoctor
-        (lsp-go
-         :requires lsp-mode
-         :location (recipe :fetcher github
-                           :repo "emacs-lsp/lsp-go"))
         (goenv :location (recipe
                           :fetcher github
                           :repo "MephistoMMM/goenv"))

@@ -38,8 +38,7 @@
   "Setup lsp backend"
   (if (configuration-layer/layer-used-p 'lsp)
       (progn
-        (require 'lsp-go)
-        (lsp-go-enable))
+        (lsp))
     (message "`lsp' layer is not installed, please add `lsp' layer to your dotfile.")))
 
 (defun spacemacs//go-setup-company-lsp ()
