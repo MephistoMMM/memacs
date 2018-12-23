@@ -53,7 +53,6 @@ This function should only modify configuration layer settings."
      shell-scripts
      ;; READY : pip install python-language-server pyls-isort pyls-mypy pylint pytest
      (python :variables
-             python-enable-yapf-format-on-save t
              python-test-runner 'pytest)
      ;; READY : npm install -g
      ;;             eslint  typescript javascript-typescript-langserver flow-language-server

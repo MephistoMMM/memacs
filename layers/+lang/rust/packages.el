@@ -20,8 +20,6 @@
     ggtags
     rust-mode
     toml-mode
-    ;; packages for lsp-rust
-    (lsp-rust :requires lsp-mode)
     ))
 
 (defun rust/init-cargo ()
@@ -86,17 +84,6 @@
   (use-package flycheck-rust
     :defer t
     :init (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
-
-(defun rust/init-lsp-rust ()
-  (use-package lsp-rust
-    :defer t
-    :commands lsp-rust-enable
-    :init (setq lsp-rust-rls-cmd rust-rls-cmd)
-    :config
-    (progn
-      (spacemacs/lsp-bind-keys-for-mode 'rust-mode)
-      (spacemacs//setup-lsp-jump-handler 'rust-mode)
-      (add-hook 'rust-mode-hook #'lsp-rust-enable))))
 
 (defun rust/post-init-company ()
   ;; backend specific

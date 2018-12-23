@@ -21,7 +21,6 @@
         js2-mode
         js2-refactor
         livid-mode
-        (lsp-javascript-typescript :requires lsp-mode)
         org
         skewer-mode
         tern
@@ -184,17 +183,6 @@
         :documentation "Live evaluation of JS buffer change."
         :evil-leader-for-mode (js2-mode . "Tl"))
       (spacemacs|diminish livid-mode " 🅻" " [l]"))))
-
-(defun javascript/init-lsp-javascript-typescript ()
-  (use-package lsp-javascript-typescript
-    :commands lsp-javascript-typescript-enable
-    :defer t
-    :init (progn
-            (add-hook 'js2-mode-hook 'lsp-javascript-typescript-enable)
-            (add-hook 'js-mode-hook 'lsp-javascript-typescript-enable))
-    :config (progn
-              (require 'lsp-javascript-flow)
-              (spacemacs//setup-lsp-jump-handler 'js2-mode))))
 
 (defun javascript/init-skewer-mode ()
   (use-package skewer-mode

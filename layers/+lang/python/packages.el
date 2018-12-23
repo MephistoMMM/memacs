@@ -10,25 +10,41 @@
 ;;; License: GPLv3
 
 (setq python-packages
-  '(
-    eldoc
-    evil-matchit
-    flycheck
-    importmagic
-    live-py-mode
-    (nose :location local)
-    org
-    pip-requirements
-    pippel
-    py-isort
-    (pylookup :location local)
-    pytest
-    (python :location built-in)
-    pyvenv
-    stickyfunc-enhance
-    xcscope
-    lsp-python
-    ))
+      '(
+        company
+        counsel-gtags
+        eldoc
+        evil-matchit
+        flycheck
+        ggtags
+        importmagic
+        live-py-mode
+        (nose :location local)
+        org
+        pip-requirements
+        pippel
+        py-isort
+        (pylookup :location local)
+        pytest
+        (python :location built-in)
+        pyvenv
+        stickyfunc-enhance
+        xcscope
+        ))
+
+(defun python/post-init-company ()
+  ;; backend specific
+  (add-hook 'python-mode-local-vars-hook #'spacemacs//python-setup-company)
+  (spacemacs|add-company-backends
+    :backends (company-files company-capf)
+    :modes inferior-python-mode
+    :variables
+    company-minimum-prefix-length 0
+    company-idle-delay 0.5)
+  (when (configuration-layer/package-used-p 'pip-requirements)
+    (spacemacs|add-company-backends
+      :backends company-capf
+      :modes pip-requirements-mode)))
 
 (defun python/post-init-eldoc ()
   (add-hook 'python-mode-local-vars-hook #'spacemacs//python-setup-eldoc))
@@ -38,6 +54,12 @@
 
 (defun python/post-init-flycheck ()
   (spacemacs/enable-flycheck 'python-mode))
+
+(defun python/post-init-counsel-gtags ()
+  (spacemacs/counsel-gtags-define-keys-for-mode 'python-mode))
+
+(defun python/post-init-ggtags ()
+  (add-hook 'python-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
 
 (defun python/init-importmagic ()
   (use-package importmagic
@@ -49,11 +71,6 @@
   (use-package live-py-mode
     :defer t
     :commands live-py-mode))
-
-(defun python/init-lsp-python ()
-  (use-package lsp-python
-    :commands lsp-python-enable
-    :config (spacemacs//setup-lsp-jump-handler 'python-mode)))
 
 (defun python/init-nose ()
   (use-package nose
@@ -145,7 +162,9 @@
                                'spacemacs/python-start-or-switch-repl "python")
       (add-hook 'inferior-python-mode-hook
                 #'spacemacs//inferior-python-setup-hook)
-      (add-hook 'python-mode-hook #'spacemacs//python-default)
+      (spacemacs/add-to-hook 'python-mode-hook
+                             '(spacemacs//python-setup-backend
+                               spacemacs//python-default))
       ;; Toggle the indent guide
       (add-hook 'python-mode-hook (lambda ()
                                     (highlight-indentation-mode)
@@ -157,23 +176,18 @@
 
       ;; call `spacemacs//python-setup-shell' once, don't put it in a hook
       ;; (see issue #5988)
-      (spacemacs//python-setup-shell))))
+      (spacemacs//python-setup-shell))
+    :config
+    (progn
+      (define-key inferior-python-mode-map
+        (kbd "C-r") 'comint-history-isearch-backward)
+      ;; this key binding is for recentering buffer in Emacs
+      ;; it would be troublesome if Emacs user
+      ;; Vim users can use this key since they have other key
+      (define-key inferior-python-mode-map
+        (kbd "C-h") 'spacemacs/comint-clear-buffer))))
 
 (defun python/post-init-stickyfunc-enhance ()
   (add-hook 'python-mode-hook 'spacemacs/load-stickyfunc-enhance))
 
 (defun python/pre-init-xcscope ())
-
-(defun python/init-lsp-python ()
-  (use-package lsp-python
-    :defer t
-    :commands (lsp-python-enable)
-    :init
-    (progn
-      (add-hook 'python-mode-hook #'lsp-python-enable)
-
-      ;; add company lsp
-      (spacemacs|add-company-backends :backends company-lsp :modes python-mode)
-      (when python-enable-lsp-format-on-save
-        (add-hook 'python-mode-hook 'spacemacs//add-python-format-on-save))
-      )))
