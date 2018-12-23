@@ -14,10 +14,19 @@
         (leave-delimited :location (recipe
                                     :fetcher github
                                     :repo "MephistoMMM/leave-delimited"))
+        (beacon :location (recipe
+                                    :fetcher github
+                                    :repo "Malabarba/beacon"))
         ;; haskell-mode
         outshine
         (outline-ivy :location local)
         ))
+
+(defun mp-hacking/init-beacon ()
+  "Init beacon."
+  (use-package beacon
+    :init (spacemacs|diminish beacon-mode)
+    :config (beacon-mode 1)))
 
 (defun mp-hacking/init-outshine ()
   "Init outshine to manager code contents."

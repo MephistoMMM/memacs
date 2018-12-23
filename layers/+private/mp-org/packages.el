@@ -75,7 +75,7 @@
 
     ;; config org-download and define custom link
     (setq-default
-     org-download-image-dir (concat org-directory "/statics")
+     org-download-image-dir (concat org-directory "/statics/")
      org-download-image-html-width 600
      org-download-link-format "[[img:%s]]"
      org-download-heading-lvl nil)

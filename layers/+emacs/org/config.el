@@ -31,3 +31,5 @@ used.")
 
 (defvar org-enable-hugo-support nil
   "If non-nil, Hugo (https://gohugo.io) related packages are configured.")
+
+(setq org-download-method 'memacs//org-download-stored-by-filename-method)

@@ -74,3 +74,24 @@
 (defun spacemacs/org-trello-push-card ()
   (interactive)
   (org-trello-sync-card))
+
+
+;; org-download
+(defun memacs//org-download-stored-by-filename-method (link)
+  (let ((filename
+         (file-name-nondirectory
+          (car (url-path-and-query
+                (url-generic-parse-url link)))))
+        (dirname (concat org-download-image-dir (file-name-sans-extension (buffer-name)) "_img")))
+    (unless (file-accessible-directory-p dirname)
+      (make-directory dirname))
+    (expand-file-name filename dirname)))
+
+
+;; ;; org-export
+;; (defadvice memacs//org-export-output-file-name (before org-add-export-dir activate)
+;;   "Modifies org-export to place exported files in a different directory"
+;;   (when (not pub-dir)
+;;     (setq pub-dir "~/Desktop")
+;;     (when (not (file-directory-p pub-dir))
+;;       (make-directory pub-dir t))))
