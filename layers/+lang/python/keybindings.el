@@ -65,11 +65,6 @@
 (spacemacs/set-leader-keys-for-major-mode 'python-mode
   "rI" 'py-isort-buffer)
 
-;;;; pyenv
-(spacemacs/set-leader-keys-for-major-mode 'python-mode
-  "vu" 'pyenv-mode-unset
-  "vs" 'pyenv-mode-set)
-
 ;;;; pyvenv
 (spacemacs/set-leader-keys-for-major-mode 'python-mode
   "Va" 'pyvenv-activate
@@ -83,11 +78,3 @@
 ;;;; xcscope
 (spacemacs/set-leader-keys-for-major-mode 'python-mode
   "gi" 'cscope/run-pycscope)
-
-;;;; lsp
-(spacemacs/set-leader-keys-for-major-mode 'python-mode
-  "=" 'lsp-format-buffer)
-
-;;;; xref
-(spacemacs/set-leader-keys-for-major-mode 'python-mode
-  (kbd "gr") #'xref-find-references)

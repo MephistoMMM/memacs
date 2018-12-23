@@ -10,10 +10,6 @@
 ;;; License: GPLv3
 
 
-;;; lsp-ui
-(spacemacs/lsp-bind-keys-for-mode 'go-mode)
-
-
 ;;; go-mode
 (spacemacs/declare-prefix-for-mode 'go-mode "e" "playground")
 (spacemacs/declare-prefix-for-mode 'go-mode "g" "goto")

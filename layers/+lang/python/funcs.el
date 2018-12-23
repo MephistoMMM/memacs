@@ -11,49 +11,20 @@
 
 (defun spacemacs//python-setup-backend ()
   "Conditionally setup python backend."
+  (when python-pipenv-activate (pipenv-activate))
   (pcase python-backend
-    (`anaconda (spacemacs//python-setup-anaconda))
     (`lsp (spacemacs//python-setup-lsp))))
 
 (defun spacemacs//python-setup-company ()
   "Conditionally setup company based on backend."
   (pcase python-backend
-    (`anaconda (spacemacs//python-setup-anaconda-company))
     (`lsp (spacemacs//python-setup-lsp-company))))
 
 (defun spacemacs//python-setup-eldoc ()
   "Conditionally setup eldoc based on backend."
   (pcase python-backend
     ;; lsp setup eldoc on its own
-    (`anaconda (spacemacs//python-setup-anaconda-eldoc))))
-
-
-;; anaconda
-
-(defun spacemacs//python-setup-anaconda ()
-  "Setup anaconda backend."
-  (anaconda-mode))
-
-(defun spacemacs//python-setup-anaconda-company ()
-  "Setup anaconda auto-completion."
-  (spacemacs|add-company-backends
-    :backends company-anaconda
-    :modes python-mode
-    :append-hooks nil
-    :call-hooks t)
-  (company-mode))
-
-(defun spacemacs//python-setup-anaconda-eldoc ()
-  "Setup anaconda eldoc."
-  (eldoc-mode)
-  (when (configuration-layer/package-used-p 'anaconda-mode)
-    (anaconda-eldoc-mode)))
-
-(defun spacemacs/anaconda-view-forward-and-push ()
-  "Find next button and hit RET"
-  (interactive)
-  (forward-button 1)
-  (call-interactively #'push-button))
+    (`lsp (message "lsp setup eldoc on its own."))))
 
 
 ;; lsp
@@ -61,8 +32,7 @@
 (defun spacemacs//python-setup-lsp ()
   "Setup lsp backend."
   (if (configuration-layer/layer-used-p 'lsp)
-      (progn
-        (lsp-python-enable))
+      (lsp)
     (message "`lsp' layer is not installed, please add `lsp' layer to your dotfile.")))
 
 (defun spacemacs//python-setup-lsp-company ()
@@ -177,24 +147,6 @@ as the pyenv version then also return nil. This works around https://github.com/
                                (shell-quote-argument (buffer-file-name))))
         (revert-buffer t t t))
     (message "Error: Cannot find autoflake executable.")))
-
-(defun spacemacs//pyenv-mode-set-local-version ()
-  "Set pyenv version from \".python-version\" by looking in parent directories."
-  (interactive)
-  (let ((root-path (locate-dominating-file default-directory
-                                           ".python-version")))
-    (when root-path
-      (let* ((file-path (expand-file-name ".python-version" root-path))
-             (version
-              (with-temp-buffer
-                (insert-file-contents-literally file-path)
-                (nth 0 (split-string (buffer-substring-no-properties
-                                       (line-beginning-position)
-                                       (line-end-position)))))))
-        (if (member version (pyenv-mode-versions))
-            (pyenv-mode-set version)
-          (message "pyenv: version `%s' is not installed (set by %s)"
-                   version file-path))))))
 
 (defun spacemacs//pyvenv-mode-set-local-virtualenv ()
   "Set pyvenv virtualenv from \".venv\" by looking in parent directories."
@@ -377,16 +329,3 @@ to be called for each testrunner. "
   (switch-to-buffer-other-window "*compilation*")
   (end-of-buffer)
   (evil-insert-state))
-
-
-;; Eldoc
-
-(defun spacemacs//init-eldoc-python-mode ()
-  "Initialize elddoc for python buffers"
-  (eldoc-mode))
-
-
-;; Lsp
-
-(defun spacemacs//add-python-format-on-save ()
-  (add-hook 'before-save-hook 'lsp-format-buffer))
