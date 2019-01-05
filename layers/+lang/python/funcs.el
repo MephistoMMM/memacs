@@ -11,7 +11,6 @@
 
 (defun spacemacs//python-setup-backend ()
   "Conditionally setup python backend."
-  (when python-pipenv-activate (pipenv-activate))
   (pcase python-backend
     (`lsp (spacemacs//python-setup-lsp))))
 
