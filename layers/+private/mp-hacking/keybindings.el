@@ -51,8 +51,8 @@
 (define-key switch-keymap (kbd "k") 'popup-previous)
 (define-key switch-keymap (kbd "C-j") 'popup-select)
 (define-key switch-keymap (kbd "<return>") 'popup-select)
-(evil-define-key 'normal prog-mode-map (kbd "RET") 'mp-hacking/buffer-switch)
-(evil-define-key 'normal org-mode-map (kbd "RET") 'mp-hacking/buffer-switch)
+(define-key evil-normal-state-map (kbd "C-p") 'mp-hacking/buffer-switch)
+(define-key evil-normal-state-map (kbd "C-n") 'mp-hacking/buffer-switch)
 
 ;; terminal here
 (spacemacs/set-leader-keys
