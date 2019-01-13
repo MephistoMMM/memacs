@@ -20,6 +20,9 @@
     (advance-words-count :location (recipe
                                     :fetcher github
                                     :repo "MephistoMMM/advance-words-count.el"))
+    ;; (maple-preview :location (recipe
+    ;;                           :fetcher github
+    ;;                           :repo "honmaple/emacs-maple-preview"))
 
     (memacs-img-link :location local)
 
@@ -29,6 +32,25 @@
     ;;              "~/.emacs.d/private/local/company-orz/")
     )
   )
+
+;; (defun mp-org/init-maple-preview()
+;;   "Init maple-preview
+;; https://github.com/honmaple/emacs-maple-preview"
+;;   (use-package maple-preview
+;;     :defer t
+;;     :commands (maple-preview-mode maple-preview-cleanup)
+;;     :init
+;;     (progn
+;;       (setq
+;;        maple-preview:home-path
+;;        (expand-file-name (concat spacemacs-start-directory "extensions/maple-preview/"))
+;;        maple-preview:preview-file
+;;        (concat maple-preview:home-path "index.html")
+;;        maple-preview:css-file
+;;        (concat maple-preview:home-path "static/css/markdown.css")
+;;        maple-preview:js-file nil))
+;;     )
+;;   )
 
 (defun mp-org/init-pangu-spacing()
   "Insert White Spece Automatically."
