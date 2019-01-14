@@ -34,7 +34,7 @@ This function should only modify configuration layer settings."
      (ibuffer :variables ibuffer-group-buffers-by 'projects)
      (dired :variables ranger-show-preview t)
      copy-as-format
-     deft
+     color-rg
      ;; (shell :variables
      ;;        shell-default-shell 'eshell
      ;;        shell-protect-eshell-prompt t
