@@ -23,6 +23,8 @@
   "hm" 'memacs/mission-helper-help
   )
 
+
+;;;; Notes
 ;; Wraper
 (which-key-add-key-based-replacements
   "M-i w" '("wrapper" . "Insert wrapper chars"))
@@ -30,11 +32,18 @@
   "ww" 'mp-org/wrap-math-inline-formula
   "wb" 'mp-org/wrap-math-block-formula)
 
+(when (configuration-layer/package-used-p 'color-rg)
+  (which-key-add-key-based-replacements
+    (concat dotspacemacs-leader-key " m o")
+    '("org notes searcher" . "Org notes searcher"))
+  (spacemacs/set-leader-keys
+    "mo" 'mp-org/color-rg-search-org-notes))
+
 ;; (spacemacs/set-leader-keys "xf" 'fill-region)
 ;; This function is the same as 'gq' in evil(vim)
 
 
-;; Org
+;;;; Org
 (with-eval-after-load 'org
   (spacemacs/set-leader-keys-for-major-mode 'org-mode
     "C-o" 'memacs-img-toggle-inline-images
@@ -57,11 +66,11 @@
   (define-key org-agenda-mode-map (kbd "P") 'org-pomodoro))
 
 
-;; Blog
+;;;; Blog
 (spacemacs/set-leader-keys "ma" 'blog-admin-start)
 
 
-;; Bookmark
+;;;; Bookmark
 (spacemacs/set-leader-keys
   "fBs" 'bookmark-set
   "fBS" 'bookmark-set-no-overwrite

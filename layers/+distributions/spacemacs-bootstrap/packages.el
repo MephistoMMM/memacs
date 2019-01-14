@@ -21,6 +21,7 @@
         (hydra :step bootstrap)
         (use-package :step bootstrap)
         (which-key :step bootstrap)
+        (websocket :step bootstrap)
         ;; pre packages, initialized aftert the bootstrap packages
         ;; these packages can use use-package
         (dotenv-mode :step pre)
@@ -426,3 +427,5 @@
     :init (setq spacemacs-theme-keyword-italic t
                 spacemacs-theme-comment-bg t
                 spacemacs-theme-org-height t)))
+
+(defun spacemacs-bootstrap/init-websocket())
