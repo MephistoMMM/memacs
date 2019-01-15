@@ -20,7 +20,8 @@
 https://github.com/manateelazycat/color-rg"
   (use-package color-rg
     :defer t
-    :commands (color-rg-search-input))
+    :commands (color-rg-search-input color-rg-read-input)
+    )
   )
 
 

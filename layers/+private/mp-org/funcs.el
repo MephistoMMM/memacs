@@ -266,7 +266,7 @@ otherwise in kill-rang."
 (defun mp-org/color-rg-search-org-notes ()
   "Search all notes in ord directory by color-rg"
   (interactive)
-  (color-rg-search-input
+  (color-rg/slim-color-rg-transient-state/body
    (color-rg-read-input) org-directory)
   )
 
