@@ -165,6 +165,9 @@ the final step of executing code in `emacs-startup-hook'.")
      ;; more natural navigation keys: up, down to change current item
      ;; left to go up dir
      ;; right to open the selected item
+     (define-key ido-completion-map (kbd "C-p") 'ido-prev-match)
+     (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
+     (define-key ido-completion-map (kbd "C-h") 'ido-delete-backward-updir)
      (define-key ido-completion-map (kbd "<up>") 'ido-prev-match)
      (define-key ido-completion-map (kbd "<down>") 'ido-next-match)
      (define-key ido-completion-map (kbd "<left>") 'ido-delete-backward-updir)

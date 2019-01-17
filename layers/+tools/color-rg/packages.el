@@ -26,10 +26,10 @@ https://github.com/manateelazycat/color-rg"
       (spacemacs|define-transient-state slim-color-rg
         :title "Slim color-rg Transient State"
         :doc "
- Move^^                   Toggle^^         Research^^     Other^^
-───────^^───────────────  ─────^^───────  ─────^^───────  ─────^^───────────
- [_n_/_p_] next/pre        [_i_] ignore   [_s_] regexp    [_RET_] open file
- [_N_/_P_] next/pre file   [_c_] case     [_l_] literal   [_q_]   quit
+ Move^^^^^^^^              Search^^^^              Filter^^          Other^^^^
+─────^^^^^^^^───────────  ───────^^^^───────────  ───────^^───────  ─────^^^^───────
+ [_n_|_j_/_p_|_k_] line   [_s_/_l_] re/literal     [_f_] match      [_u_] unfilter
+ [_N_|_J_/_P_|_K_] file   [_i_/_c_] ignore/case    [_F_] mismatch   [_RET_/_q_] open/quit
 "
         :bindings
         ;; Move
@@ -37,12 +37,20 @@ https://github.com/manateelazycat/color-rg"
         ("p" color-rg-jump-prev-keyword)
         ("N" color-rg-jump-next-file)
         ("P" color-rg-jump-prev-file)
+        ("j" color-rg-jump-next-keyword)
+        ("k" color-rg-jump-prev-keyword)
+        ("J" color-rg-jump-next-file)
+        ("K" color-rg-jump-prev-file)
         ;; Research
         ("s" color-rg-rerun-regexp)
         ("l" color-rg-rerun-literal)
         ;; Toggle
         ("i" color-rg-rerun-toggle-ignore)
         ("c" color-rg-rerun-toggle-case)
+        ;; Filter
+        ("f" color-rg-filter-match-results)
+        ("F" color-rg-filter-mismatch-results)
+        ("u" color-rg-unfilter)
         ;; Other
         ("RET" color-rg-open-file)
         ("q" (ignore-errors (color-rg-quit)) :exit t)
