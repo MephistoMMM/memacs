@@ -26,7 +26,7 @@ https://github.com/manateelazycat/color-rg"
       (spacemacs|define-transient-state slim-color-rg
         :title "Slim color-rg Transient State"
         :doc "
- Move^^^^^^^^              Search^^^^              Filter^^          Other^^^^
+ Move^^^^^^^^              Search&Toggle^^^^       Filter^^          Other^^^^
 ─────^^^^^^^^───────────  ───────^^^^───────────  ───────^^───────  ─────^^^^───────
  [_n_|_j_/_p_|_k_] line   [_s_/_l_] re/literal     [_f_] match      [_u_] unfilter
  [_N_|_J_/_P_|_K_] file   [_i_/_c_] ignore/case    [_F_] mismatch   [_RET_/_q_] open/quit

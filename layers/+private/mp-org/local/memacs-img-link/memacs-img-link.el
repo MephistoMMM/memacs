@@ -47,25 +47,29 @@
   "Click event of custom link img."
   (org-open-file-with-emacs path))
 
+(defun memacs-img//export-to-Internet (path desc format)
+  "A aspect for change path to url in the internet."
+  (let ((uri-slices (split-string path "/")))
+    (if (< (length uri-slices) 2)
+        (concat custom-link-img-export-host "/" (car uri-slices))
+      (concat custom-link-img-export-host "/"
+              (nth (- (length uri-slices) 2) uri-slices) "/"
+              (nth (- (length uri-slices) 1) uri-slices)))
+    )
+  )
+
+(setq memacs-img/before-export-aspect #'memacs-img//export-to-Internet)
+
 (defun memacs-img--custom-link-img-export (path desc format)
   "export event of custom link img."
   ;; concat custom img host and final two section of the path
-  (let (uri-slices slices-len url)
-    (setq uri-slices (split-string path "/"))
-    (setq slices-len (length uri-slices))
-    (setq url (if (< slices-len 2)
-                  (concat custom-link-img-export-host "/" (car uri-slices))
-                (concat custom-link-img-export-host "/"
-                        (nth (- slices-len 2) uri-slices) "/"
-                        (nth (- slices-len 1) uri-slices))))
-    (message (url-encode-url url))
-    (cond
-     ((eq format 'html)
-      (format "<img src=\"%s\" alt=\"%s\"/>" (url-encode-url url) desc))
-     ((eq format 'md)
-      (format "![%s](%s)" desc (url-encode-url url)))
-     )
-    )
+  (let ((url (funcall memacs-img/before-export-aspect path desc format)))
+     (cond
+      ((eq format 'html)
+       (format "<img src=\"%s\" alt=\"%s\"/>" (url-encode-url url) desc))
+      ((eq format 'md)
+       (format "![%s](%s)" desc (url-encode-url url)))
+      ))
   )
 
 

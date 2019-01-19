@@ -86,12 +86,21 @@
     (unless (file-accessible-directory-p dirname)
       (make-directory dirname))
     (expand-file-name filename dirname)))
-
 
-;; ;; org-export
-;; (defadvice memacs//org-export-output-file-name (before org-add-export-dir activate)
-;;   "Modifies org-export to place exported files in a different directory"
-;;   (when (not pub-dir)
-;;     (setq pub-dir "~/Desktop")
-;;     (when (not (file-directory-p pub-dir))
-;;       (make-directory pub-dir t))))
+;; org export
+(setq memacs--org-export-directory (expand-file-name "~/Desktop"))
+(defun memacs/org-export-dispatch (&optional arg)
+  "Change exported destination to the special path."
+  (interactive "P")
+  (let ((dest (read-directory-name "Export to Directory: "
+                                   nil default-directory nil)))
+    (setq memacs--org-export-directory dest)
+    (org-export-dispatch))
+  )
+
+(defadvice org-export-output-file-name (before org-add-export-dir activate)
+  "Modifies org-export to place exported files in a different directory"
+  (when (not pub-dir)
+    (setq pub-dir memacs--org-export-directory)
+    (when (not (file-directory-p pub-dir))
+      (make-directory pub-dir))))
