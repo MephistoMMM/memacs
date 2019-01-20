@@ -22,8 +22,11 @@ This function should only modify configuration layer settings."
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-
      ;; READY : brew install ripgrep the_silver_searcher
+
+     ;; ui
+     ;; https://github.com/tonsky/FiraCode
+     pretty-code
 
      ;; Catalogue: tools
      markdown
@@ -369,6 +372,8 @@ It should only modify the values of Spacemacs settings."
 
 (defun dotspacemacs/user-env ()
   "Environment variables setup. This function defines the environment variables for your Emacs session. By default it calls `spacemacs/load-spacemacs-env' which loads the environment variables declared in `~/.spacemacs.env' or `~/.spacemacs.d/.spacemacs.env'. See the header of this file for more information."
+  (set-language-environment "UTF-8")
+  (set-default-coding-systems 'utf-8)
   (spacemacs/load-spacemacs-env))
 
 (defun dotspacemacs/user-init ()
