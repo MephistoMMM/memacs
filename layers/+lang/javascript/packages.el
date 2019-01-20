@@ -41,8 +41,7 @@
   (add-hook 'js2-mode-local-vars-hook #'spacemacs//javascript-setup-company))
 
 (defun javascript/post-init-flycheck ()
-  (spacemacs/enable-flycheck 'js2-mode)
-  (add-hook 'js2-mode-hook #'spacemacs//javascript-setup-eslint t))
+  (spacemacs/enable-flycheck 'js2-mode))
 
 (defun javascript/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'js2-mode))
