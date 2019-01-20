@@ -180,7 +180,7 @@ Will work on both org-mode and any mode that accepts plain html."
         "ds" 'org-schedule
         "dt" 'org-time-stamp
         "dT" 'org-time-stamp-inactive
-        "ee" 'org-export-dispatch
+        "ee" 'memacs/org-export-dispatch
         "fi" 'org-feed-goto-inbox
         "fu" 'org-feed-update-all
 

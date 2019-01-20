@@ -37,7 +37,6 @@
   ("q" nil :exit t))
 (spacemacs/set-leader-keys
   "+" 'spacemacs/evil-numbers-transient-state/evil-numbers/inc-at-pt
-  "=" 'spacemacs/evil-numbers-transient-state/evil-numbers/inc-at-pt
   "-" 'spacemacs/evil-numbers-transient-state/evil-numbers/dec-at-pt)
 
 ;;; search highlight

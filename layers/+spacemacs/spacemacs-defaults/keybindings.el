@@ -470,6 +470,8 @@ respond to this toggle."
 (define-key indent-rigidly-map "H" 'indent-rigidly-left-to-tab-stop)
 (define-key indent-rigidly-map "L" 'indent-rigidly-right-to-tab-stop)
 
+(spacemacs/set-leader-keys
+  "=" 'spacemacs/indent-region-or-buffer)
 ;; shell ----------------------------------------------------------------------
 (with-eval-after-load 'shell
   (evil-define-key 'insert comint-mode-map [up] 'comint-previous-input)

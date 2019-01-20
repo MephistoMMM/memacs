@@ -5,6 +5,7 @@
 # ChangeDate: 2018/9/21
 # Author Mephis Pheies <mephistommm@gmail.com>
 #
+ROOTPATH=${PWD%/scripts}
 
 echo "Start install powerline fonts..."
 export FONTS_PATH=/tmp/memacs_`date "+%Y%m%d"`/install_fonts
@@ -19,4 +20,12 @@ if [ $? -eq 0 ]; then
     echo "Finish installing powerline fonts."
 else
     echo "Failed to install powerline fonts!"
+fi
+
+echo "Start install Fira Code Symbol fonts..."
+cp $ROOTPATH/local/fonts/FiraCode-Regular-Symbol.otf ~/Library/Fonts/FiraCode-Regular-Symbol.otf
+if [ $? -eq 0 ]; then
+    echo "Finish installing Fira Code Symbol fonts."
+else
+    echo "Failed to install Fira Code Symbol fonts!"
 fi

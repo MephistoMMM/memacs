@@ -17,7 +17,8 @@
   ;; clean env error while starting
   (if (display-graphic-p)
       (when (string-match-p "/zsh$" (getenv "SHELL"))
-        (setq exec-path-from-shell-arguments '("-l"))))
+        (setq exec-path-from-shell-arguments '("-l")))
+      (mac-auto-operator-composition-mode))
   ;; better default for mac
   (setq mac-pass-command-to-system nil)
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
