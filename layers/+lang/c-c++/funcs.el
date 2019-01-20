@@ -148,7 +148,7 @@ and the arguments for flyckeck-clang based on a project-specific text file."
   (interactive "P")
   (gtags-find-tag))
 
-(defun spacemacs/c-c++-tags-find-refs-at-point (&optional prefix)
+(defun spacemacs/c-c++-tags-find-references-at-point (&optional prefix)
   (interactive "P")
   (gtags-find-rtag))
 

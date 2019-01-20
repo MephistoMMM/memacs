@@ -285,6 +285,7 @@ Will work on both org-mode and any mode that accepts plain html."
         ;; attachments
         "A" 'org-attach
         ;; insertion
+        "ib" 'org-insert-structure-template
         "id" 'org-insert-drawer
         "ie" 'org-set-effort
         "if" 'org-footnote-new
@@ -295,7 +296,7 @@ Will work on both org-mode and any mode that accepts plain html."
         "in" 'org-add-note
         "ip" 'org-set-property
         "is" 'org-insert-subheading
-        "it" 'org-set-tags
+        "it" 'org-set-tags-command
         ;; region manipulation
         "xb" (spacemacs|org-emphasize spacemacs/org-bold ?*)
         "xc" (spacemacs|org-emphasize spacemacs/org-code ?~)
@@ -643,6 +644,8 @@ Headline^^            Visit entry^^               Filter^^                    Da
         "aojj" 'org-journal-new-entry
         "aojs" 'org-journal-search-forever)
 
+      (setq spacemacs-org-journal-mode-map (copy-keymap spacemacs-org-mode-map))
+
       (spacemacs/set-leader-keys-for-major-mode 'calendar-mode
         "r" 'org-journal-read-entry
         "i" 'org-journal-new-date-entry
@@ -656,7 +659,9 @@ Headline^^            Visit entry^^               Filter^^                    Da
       (spacemacs/set-leader-keys-for-major-mode 'org-journal-mode
         "j" 'org-journal-new-entry
         "n" 'org-journal-open-next-entry
-        "p" 'org-journal-open-previous-entry))))
+        "p" 'org-journal-open-previous-entry)
+
+      (spacemacs//init-leader-mode-map 'org-journal-mode 'spacemacs-org-journal-mode-map))))
 
 ;; (defun org/init-ox-hugo ()
 ;;   (use-package ox-hugo :after ox))
