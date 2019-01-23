@@ -24,7 +24,7 @@
     ;;                           :fetcher github
     ;;                           :repo "honmaple/emacs-maple-preview"))
 
-    (memacs-img-link :location local)
+    (memacs-org-ext :location local)
 
     ;; https://coldnew.github.io/d2d60fe2/
     pangu-spacing
@@ -71,15 +71,18 @@
     :defer t)
   )
 
-(defun mp-org/init-memacs-img-link ()
-  "Init memacs-img-link"
-  (use-package memacs-img-link
+(defun mp-org/init-memacs-org-ext ()
+  "Init memacs-org-ext"
+  (use-package memacs-org-ext
     :after org
+    :commands (memacs/org-export-dispatch)
     :config
     (progn
       (setq mequ-conf-file "~/Dropbox/dotconf/mequ.conf")
       (setq custom-link-img-export-host
             "http://qiniu.oeli.pub")
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode
+        "ee" 'memacs/org-export-dispatch)
       ))
   )
 

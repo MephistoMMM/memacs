@@ -1,4 +1,4 @@
-;;; memacs-img-link.el --- package provides methods for define img custom link
+;;; memacs-org-ext.el --- package provides methods for define img custom link
 
 ;; Author: Mephis Pheies <mephistommm@gmail.com>
 ;; Keywords: org img customlink
@@ -10,9 +10,10 @@
 ;;; Code:
 
 (require 'org)
+(require 'ox)
 
 
-;;;; Mequ And Custom Link
+;;;; Mequ
 
 (defvar mequ-conf-file "~/Dropbox/dotconf/mequ.conf"
   "Configuration file about mequ.")
@@ -47,6 +48,46 @@
   "Click event of custom link img."
   (org-open-file-with-emacs path))
 
+
+;; org export
+(defvar memacs--org-export-directory (expand-file-name "~/Desktop"))
+(defun memacs/org-export-dispatch (&optional arg)
+  "Change exported destination to the special path."
+  (interactive "P")
+  (let ((dest (read-directory-name "Export to Directory: "
+                                   nil default-directory nil)))
+    (setq memacs--org-export-directory dest)
+    (org-export-dispatch))
+  )
+
+(defadvice org-export-output-file-name (before org-add-export-dir activate)
+  "Modifies org-export to place exported files in a different directory"
+  (when (not pub-dir)
+    (setq pub-dir memacs--org-export-directory)
+    (when (not (file-directory-p pub-dir))
+      (make-directory pub-dir))))
+
+
+;;;; Custom Link
+
+(defun memacs-img//copy-to-destination-statics-dir (path desc format)
+  "A aspect for copy src file to statics dir in destination."
+  (let ((uri-slices (split-string path "/"))
+        (abs-path (expand-file-name path))
+        (statics-dir (concat memacs--org-export-directory "statics/")))
+    (if (not (file-exists-p abs-path))
+        ;; return nil if image does not exist
+        nil
+      ;; modify url and copy image file if image exists
+      (unless (file-exists-p statics-dir)
+        (make-directory statics-dir))
+      (let ((dest (concat statics-dir (nth (- (length uri-slices) 1) uri-slices)))
+            (relative-path (concat "./statics/" (nth (- (length uri-slices) 1) uri-slices))))
+        (unless (file-exists-p dest)
+          (copy-file abs-path dest))
+        relative-path)))
+  )
+
 (defun memacs-img//export-to-Internet (path desc format)
   "A aspect for change path to url in the internet."
   (let ((uri-slices (split-string path "/")))
@@ -58,7 +99,7 @@
     )
   )
 
-(setq memacs-img/before-export-aspect #'memacs-img//export-to-Internet)
+(setq memacs-img/before-export-aspect #'memacs-img//copy-to-destination-statics-dir)
 
 (defun memacs-img--custom-link-img-export (path desc format)
   "export event of custom link img."
@@ -195,6 +236,6 @@ Same as 'org-display-inline-images', except img link type."
 
 (memacs-img--link-init)
 
-(provide 'memacs-img-link)
+(provide 'memacs-org-ext)
 
-;;; outline-ivy.el ends here
+;;; memacs-org-ext.el ends here
