@@ -76,13 +76,14 @@
   (use-package memacs-org-ext
     :after org
     :commands (memacs/org-export-dispatch)
+    :init
+    (spacemacs/set-leader-keys-for-major-mode 'org-mode
+      "ee" 'memacs/org-export-dispatch)
     :config
     (progn
       (setq mequ-conf-file "~/Dropbox/dotconf/mequ.conf")
       (setq custom-link-img-export-host
             "http://qiniu.oeli.pub")
-      (spacemacs/set-leader-keys-for-major-mode 'org-mode
-        "ee" 'memacs/org-export-dispatch)
       ))
   )
 
