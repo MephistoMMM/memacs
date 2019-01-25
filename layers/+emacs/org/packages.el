@@ -29,8 +29,8 @@
         (org-projectile :requires projectile)
         ox-twbs
         ;; use a for of ox-gfm to fix index generation
-        ;; (ox-gfm :location (recipe :fetcher github :repo "syl20bnr/ox-gfm")
-        ;;         :toggle org-enable-github-support)
+        (ox-gfm :location (recipe :fetcher github :repo "syl20bnr/ox-gfm")
+                :toggle org-enable-github-support)
         ;; (ox-reveal :toggle org-enable-reveal-js-support)
         persp-mode
         ;; TODO research hugo
@@ -180,7 +180,7 @@ Will work on both org-mode and any mode that accepts plain html."
         "ds" 'org-schedule
         "dt" 'org-time-stamp
         "dT" 'org-time-stamp-inactive
-        "ee" 'memacs/org-export-dispatch
+        "ee" 'org-export-dispatch
         "fi" 'org-feed-goto-inbox
         "fu" 'org-feed-update-all
 
@@ -615,9 +615,9 @@ Headline^^            Visit entry^^               Filter^^                    Da
   (spacemacs|use-package-add-hook org :post-config (require 'ox-twbs)))
 (defun org/init-ox-twbs ())
 
-;; (defun org/pre-init-ox-gfm ()
-;;   (spacemacs|use-package-add-hook org :post-config (require 'ox-gfm)))
-;; (defun org/init-ox-gfm ())
+(defun org/pre-init-ox-gfm ()
+  (spacemacs|use-package-add-hook org :post-config (require 'ox-gfm)))
+(defun org/init-ox-gfm ())
 
 ;; (defun org/pre-init-ox-reveal ()
 ;;   (spacemacs|use-package-add-hook org :post-config (require 'ox-reveal)))
