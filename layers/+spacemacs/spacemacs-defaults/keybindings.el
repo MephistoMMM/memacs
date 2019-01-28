@@ -410,8 +410,9 @@ respond to this toggle."
   "|"   'spacemacs/maximize-vertically
   "b"   'spacemacs/switch-to-minibuffer-window
   "t"   'spacemacs/toggle-current-window-dedication
-  "c"   'spacemacs/toggle-centered-buffer
-  "C"   'spacemacs/toggle-distraction-free
+  "cc"  'spacemacs/toggle-centered-buffer
+  "cC"  'spacemacs/toggle-distraction-free
+  "c."  'spacemacs/centered-buffer-transient-state
   "o"   'other-frame
   "r"   'spacemacs/rotate-windows-forward
   "R"   'spacemacs/rotate-windows-backward
