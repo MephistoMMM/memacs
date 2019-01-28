@@ -110,8 +110,9 @@
                lorem-ipsum-insert-sentences)
     :init
     (progn
-      (which-key-add-key-based-replacements
-        "M-i l" '("lorem ipsum" . "Insert lorem ipsum"))
+      (memacs/declare-prefix-for-special-leader-key
+        memacs--insert-map-keybinding-prefix "l"
+        "lorem ipsum" "Insert lorem ipsum")
       (memacs/define-insert-keybinding
         "ll" 'lorem-ipsum-insert-list
         "lp" 'lorem-ipsum-insert-paragraphs
@@ -186,8 +187,9 @@
     :defer t
     :init
     (progn
-      (which-key-add-key-based-replacements
-        "M-i p" '("passwords" . "Insert Passwords"))
+      (memacs/declare-prefix-for-special-leader-key
+        memacs--insert-map-keybinding-prefix "p"
+        "passwords" "Insert Passwords")
       (memacs/define-insert-keybinding
         "p1" 'password-generator-simple
         "p2" 'password-generator-strong
@@ -289,8 +291,9 @@
     :commands (uuidgen-1 uuidgen-4)
     :init
     (progn
-      (which-key-add-key-based-replacements
-        "M-i u" '("uuid" . "Insert UUID"))
+      (memacs/declare-prefix-for-special-leader-key
+        memacs--insert-map-keybinding-prefix "u"
+        "uuid" "Insert UUID")
       (memacs/define-insert-keybinding
         "u1" 'spacemacs/uuidgen-1
         "u4" 'spacemacs/uuidgen-4

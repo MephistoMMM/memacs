@@ -26,8 +26,9 @@
 
 ;;;; Notes
 ;; Wraper
-(which-key-add-key-based-replacements
-  "M-i w" '("wrapper" . "Insert wrapper chars"))
+(memacs/declare-prefix-for-special-leader-key
+  memacs--insert-map-keybinding-prefix "w"
+  "wrapper" "Insert wrapper chars")
 (memacs/define-insert-keybinding
   "ww" 'mp-org/wrap-math-inline-formula
   "wb" 'mp-org/wrap-math-block-formula)

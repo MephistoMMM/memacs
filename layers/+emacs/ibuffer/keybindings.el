@@ -12,7 +12,7 @@
 (spacemacs/set-leader-keys "mb" 'ibuffer)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 
-(define-key ibuffer-mode-map (kbd "C-w") 'evil-window-map)
+(define-key ibuffer-mode-map (kbd "C-w") 'memacs-window-map)
 (spacemacs|transient-state-format-hint ibuffer
   memacs--ibuffer-ts-full-hint
   "\n
