@@ -393,7 +393,9 @@ respond to this toggle."
   (split-window-right)
   (windmove-right))
 
-(memacs/define-evil-window-keybinding
+(memacs/define-window-keybinding "c" nil)
+(memacs/declare-prefix-for-special-leader-key memacs--window-map-keybinding-prefix "c" "center")
+(memacs/define-window-keybinding
   "d"   'spacemacs/delete-window
   "T"   'spacemacs/toggle-current-window-dedication
   "TAB" 'spacemacs/alternate-window
@@ -410,8 +412,9 @@ respond to this toggle."
   "|"   'spacemacs/maximize-vertically
   "b"   'spacemacs/switch-to-minibuffer-window
   "t"   'spacemacs/toggle-current-window-dedication
-  "c"   'spacemacs/toggle-centered-buffer
-  "C"   'spacemacs/toggle-distraction-free
+  "cc"  'spacemacs/toggle-centered-buffer
+  "cC"  'spacemacs/toggle-distraction-free
+  "c."  'spacemacs/centered-buffer-transient-state
   "o"   'other-frame
   "r"   'spacemacs/rotate-windows-forward
   "R"   'spacemacs/rotate-windows-backward

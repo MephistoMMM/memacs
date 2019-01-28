@@ -93,7 +93,7 @@
     :init
     (progn
       (spacemacs/set-leader-keys "bD" 'spacemacs/ace-kill-this-buffer)
-      (memacs/define-evil-window-keybinding
+      (memacs/define-window-keybinding
        "w" 'ace-window
        "a" 'ace-window
        "m" 'ace-swap-window

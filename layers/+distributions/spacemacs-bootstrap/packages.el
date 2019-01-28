@@ -65,6 +65,7 @@
   ;; work properly sometimes.
   (require 'evil)
   (evil-mode 1)
+  (setq-default memacs-window-map evil-window-map)
 
   ;; Use evil as a default jump handler
   (add-to-list 'spacemacs-default-jump-handlers 'evil-goto-definition)
