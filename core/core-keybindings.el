@@ -21,10 +21,20 @@
   "Search keymap for all text content search commands.")
 
 (defvar memacs-insert-map (make-sparse-keymap)
-  "Search keymap for all text content search commands.")
+  "Insert keymap for all text content insert commands.")
 
-(global-set-key (kbd "C-s") memacs-search-map)
-(global-set-key (kbd "M-i") memacs-insert-map)
+(defvar memacs-window-map (make-sparse-keymap)
+  "Window keymap for all text content window commands.")
+
+(defvar memacs--search-map-keybinding-prefix "C-s"
+  "Keybinding prefix for memacs-search-map.")
+(defvar memacs--insert-map-keybinding-prefix "M-i"
+  "Keybinding prefix for memacs-insert-map.")
+(defvar memacs--window-map-keybinding-prefix "C-w"
+  "Keybinding prefix for memacs-window-map")
+
+(global-set-key (kbd memacs--search-map-keybinding-prefix) memacs-search-map)
+(global-set-key (kbd memacs--insert-map-keybinding-prefix) memacs-insert-map)
 
 (defun memacs/define-search-keybinding (key def &rest bindings)
   "Binding funcs to search map."
@@ -34,9 +44,16 @@
   )
 
 (defun memacs/define-insert-keybinding (key def &rest bindings)
-  "Binding funcs to search map."
+  "Binding funcs to insert map."
   (while key
     (define-key memacs-insert-map (kbd key) def)
+    (setq key (pop bindings) def (pop bindings)))
+  )
+
+(defun memacs/define-window-keybinding (key def &rest bindings)
+  "Binding keys and func for window map"
+  (while key
+    (define-key memacs-window-map (kbd key) def)
     (setq key (pop bindings) def (pop bindings)))
   )
 
@@ -46,6 +63,23 @@
     (define-key map (kbd key) def)
     (setq key (pop bindings) def (pop bindings)))
   )
+
+(defun memacs/declare-prefix-for-special-leader-key (leader-key prefix name &optional long-name)
+  "Declare a prefix PREFIX. PREFIX is a string describing a key
+sequence. NAME is a string used as the prefix command.
+LONG-NAME if given is stored in `spacemacs/prefix-titles'."
+  (let* ((command name)
+         (full-prefix (concat leader-key " " prefix))
+         (full-prefix-emacs (concat leader-key " " prefix))
+         (full-prefix-lst (listify-key-sequence (kbd full-prefix)))
+         (full-prefix-emacs-lst (listify-key-sequence
+                                 (kbd full-prefix-emacs))))
+    ;; define the prefix command only if it does not already exist
+    (unless long-name (setq long-name name))
+    (which-key-add-key-based-replacements
+      full-prefix-emacs (cons name long-name)
+      full-prefix (cons name long-name))))
+(put 'memacs/declare-prefix-for-special-leader-key 'lisp-indent-function 'defun)
 
 (defun spacemacs/declare-prefix (prefix name &optional long-name)
   "Declare a prefix PREFIX. PREFIX is a string describing a key

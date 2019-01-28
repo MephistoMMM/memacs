@@ -393,7 +393,9 @@ respond to this toggle."
   (split-window-right)
   (windmove-right))
 
-(memacs/define-evil-window-keybinding
+(memacs/define-window-keybinding "c" nil)
+(memacs/declare-prefix-for-special-leader-key memacs--window-map-keybinding-prefix "c" "center")
+(memacs/define-window-keybinding
   "d"   'spacemacs/delete-window
   "T"   'spacemacs/toggle-current-window-dedication
   "TAB" 'spacemacs/alternate-window

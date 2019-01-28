@@ -84,8 +84,9 @@
        "F" 'spacemacs/search-auto-region-or-symbol
        )
       ;; ag search
-      (which-key-add-key-based-replacements
-        "C-s a" '("ag" . "Search By Ag"))
+      (memacs/declare-prefix-for-special-leader-key
+        memacs--search-map-keybinding-prefix "a"
+        "ag" "Search By Ag")
       (memacs/define-search-keybinding
        "a/" 'spacemacs/search-project-ag
        "a?" 'spacemacs/search-project-auto-region-or-ag
