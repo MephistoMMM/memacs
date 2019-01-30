@@ -38,6 +38,7 @@ This function should only modify configuration layer settings."
      (dired :variables ranger-show-preview t)
      copy-as-format
      color-rg
+     pass
      ;; (shell :variables
      ;;        shell-default-shell 'eshell
      ;;        shell-protect-eshell-prompt t
