@@ -37,7 +37,7 @@
   (memacs//pass-store-copy-run-in-iterm (format "%s | awk 'NR > 1'" entry))
   )
 
-(defun memacs//pass-store-copy-run-in-iterm(entry)
+(defun memacs//pass-store-show-run-in-iterm(entry)
   "Wrapper pass-store-copy to support iTerm2."
   (memacs//switch-to-item2-run-command (format "pass show %s" entry))
   )
