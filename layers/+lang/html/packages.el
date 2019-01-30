@@ -241,6 +241,7 @@
      ("\\.handlebars\\'" . web-mode)
      ("\\.hbs\\'"        . web-mode)
      ("\\.eco\\'"        . web-mode)
+     ("\\.vue\\'"        . web-mode)
      ("\\.ejs\\'"        . web-mode)
      ("\\.djhtml\\'"     . web-mode))))
 
