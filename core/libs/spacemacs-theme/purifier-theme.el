@@ -73,7 +73,7 @@
    `(info-quoted-name ((,class (:foreground ,base))))
    `(info-string ((,class (:foreground ,str))))
    `(lazy-highlight ((,class (:foreground ,fg2 :background ,markup))))
-   `(link ((,class (:foreground ,const :underline t))))
+   `(link ((,class (:foreground ,type :underline t))))
    `(linum ((,class (:slant italic :foreground ,bg4 :background ,bg1))))
    `(minibuffer-prompt ((,class (:bold t :foreground ,keyword))))
    `(region ((,class (:background ,type :foreground ,bg1))))
@@ -295,7 +295,7 @@
    `(diredp-tagged-autofile-name ((,class (:foreground ,str))))
 
 ;;;;; ahs
-     `(ahs-face ((,class (:background bg3))))
+     `(ahs-face ((,class (:background ,bg3))))
      `(ahs-plugin-whole-buffer-face ((,class (:background ,rainbow-4 :foreground ,bg1))))
 
 ;;;;; anzu-mode

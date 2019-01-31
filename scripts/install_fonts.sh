@@ -29,3 +29,12 @@ if [ $? -eq 0 ]; then
 else
     echo "Failed to install Fira Code Symbol fonts!"
 fi
+
+# https://github.com/sebastiencs/icons-in-terminal
+echo "Start install icons-in-terminal fonts..."
+cp $ROOTPATH/local/fonts/icons-in-terminal.ttf ~/Library/Fonts/icons-in-terminal.ttf
+if [ $? -eq 0 ]; then
+    echo "Finish installing icons-in-terminal fonts."
+else
+    echo "Failed to install icons-in-terminal fonts!"
+fi
