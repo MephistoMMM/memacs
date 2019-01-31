@@ -275,21 +275,21 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
   "Create and insert the interactive buttons under Spacemacs banner."
   (goto-char (point-max))
   (widget-create 'url-link
-                 :tag (propertize "Spacemacs" 'face 'font-lock-type-face)
+                 :tag (propertize "Spacemacs" 'face 'font-lock-reference-face)
                  :help-echo "Open the Spacemacs Github page in your browser."
                  :mouse-face 'highlight
                  :follow-link "\C-m"
                  "http://spacemacs.org")
   (insert " ")
   (widget-create 'url-link
-                 :tag (propertize "Documentation" 'face 'font-lock-type-face)
+                 :tag (propertize "Documentation" 'face 'font-lock-reference-face)
                  :help-echo "Open the Spacemacs documentation in your browser."
                  :mouse-face 'highlight
                  :follow-link "\C-m"
                  "http://spacemacs.org/doc/DOCUMENTATION.html")
   (insert " ")
   (widget-create 'url-link
-                 :tag (propertize "Mephis Pheies" 'face 'font-lock-type-face)
+                 :tag (propertize "Mephis Pheies" 'face 'font-lock-reference-face)
                  :help-echo "Open the blog of mephis pheies in your browser."
                  :mouse-face 'highlight
                  :follow-link "\C-m"
@@ -307,7 +307,7 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
                            (configuration-layer/update-packages))
                  :mouse-face 'highlight
                  :follow-link "\C-m"
-                 (propertize "Update Packages" 'face 'font-lock-type-face))
+                 (propertize "Update Packages" 'face 'font-lock-reference-face))
   (insert " ")
   (widget-create 'push-button
                  :help-echo
@@ -317,7 +317,7 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
                  :mouse-face 'highlight
                  :follow-link "\C-m"
                  (propertize "Rollback Package Update"
-                             'face 'font-lock-type-face))
+                             'face 'font-lock-reference-face))
   (spacemacs-buffer//center-line)
   (insert "\n\n"))
 
