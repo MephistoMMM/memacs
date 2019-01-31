@@ -165,9 +165,9 @@
    `(magit-section-heading        ((,class (:foreground ,keyword :weight bold))))
    `(magit-section-highlight      ((,class (:background ,bg2))))
    ;; mode-line
-   `(mode-line ((,class (:foreground nil :background ,bg3 :box ,bg3))))
-   `(mode-line-buffer-id ((,class (:inherit bold :foreground ,func))))
-   `(mode-line-inactive ((,class (:foreground ,fg1 :background ,bg1 :box ,bg1))))
+   `(mode-line ((,class (:foreground nil :background ,bg1 :box ,bg1))))
+   `(mode-line-buffer-id ((,class (:inherit bold :foreground ,const))))
+   `(mode-line-inactive ((,class (:foreground ,comment :background ,bg1 :box ,bg1))))
    ;; org
    `(org-agenda-date ((,class (:foreground ,rainbow-2 :underline nil))))
    `(org-agenda-dimmed-todo-face ((,class (:foreground ,comment))))
@@ -405,10 +405,17 @@
      `(persp-selected-face ((,class (:inherit bold :foreground ,func))))
 
 ;;;;; spaceline
+     `(spaceline-highlight-face ((,class (:background ,bg1 :foreground ,fg1))))
      `(spaceline-flycheck-error  ((,class (:foreground ,err))))
      `(spaceline-flycheck-info   ((,class (:foreground ,keyword))))
      `(spaceline-flycheck-warning((,class (:foreground ,warning))))
      `(spaceline-python-venv ((,class (:foreground ,type))))
+
+;;;;; powerline
+     `(powerline-active1 ((,class (:background ,bg2 :foreground ,fg2))))
+     `(powerline-active2 ((,class (:background ,bg1 :foreground ,fg1))))
+     `(powerline-inactive1 ((,class (:background ,bg2 :foreground ,comment))))
+     `(powerline-inactive2 ((,class (:background ,bg1 :foreground ,comment))))
 
 ;;;;; spacemacs-specific
      `(spacemacs-transient-state-title-face ((,class (:background nil :foreground ,type :box nil :inherit bold))))
