@@ -34,12 +34,13 @@
     :defer t
     :init
     (progn
-      (spacemacs|diminish outline-minor-mode " ☰" " os")
+      (spacemacs|diminish outline-minor-mode)
+      (spacemacs|diminish outshine-mode " ☰" " os")
       ;; Narrowing works within the headline rather than requiring to be on it
       (advice-add 'outshine-narrow-to-subtree :before
                   'mp-hacking//advise-outshine-narrow-start-pos)
 
-      (add-hook 'outline-minor-mode-hook 'outshine-hook-function)
+      (add-hook 'outline-minor-mode-hook 'outshine-mode)
       (add-hook 'prog-mode-hook 'outline-minor-mode))))
 
 (defun mp-hacking/init-outline-ivy ()

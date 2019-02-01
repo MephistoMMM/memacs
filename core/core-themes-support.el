@@ -28,6 +28,7 @@
   '(
     (tao-yang        . spacemacs-theme)
     (tao-yin         . spacemacs-theme)
+    (purifier        . spacemacs-theme)
     (dracula         . spacemacs-theme)
     (spacemacs-dark  . spacemacs-theme)
     (spacemacs-light . spacemacs-theme)

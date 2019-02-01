@@ -22,10 +22,19 @@ else
     echo "Failed to install powerline fonts!"
 fi
 
-echo "Start install Fira Code Symbol fonts..."
-cp $ROOTPATH/local/fonts/FiraCode-Regular-Symbol.otf ~/Library/Fonts/FiraCode-Regular-Symbol.otf
+echo "Start install Fira Code Memacs Symbol fonts..."
+cp $ROOTPATH/local/fonts/FiraCode-Regular-Memacs-Symbol.otf ~/Library/Fonts/FiraCode-Regular-Symbol.otf
 if [ $? -eq 0 ]; then
-    echo "Finish installing Fira Code Symbol fonts."
+    echo "Finish installing Fira Code Memacs Symbol fonts."
 else
-    echo "Failed to install Fira Code Symbol fonts!"
+    echo "Failed to install Fira Code Memacs Symbol fonts!"
+fi
+
+# https://github.com/sebastiencs/icons-in-terminal
+echo "Start install icons-in-terminal fonts..."
+cp $ROOTPATH/local/fonts/icons-in-terminal.ttf ~/Library/Fonts/icons-in-terminal.ttf
+if [ $? -eq 0 ]; then
+    echo "Finish installing icons-in-terminal fonts."
+else
+    echo "Failed to install icons-in-terminal fonts!"
 fi

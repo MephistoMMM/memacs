@@ -34,6 +34,7 @@
       (add-hook 'text-mode-hook 'turn-on-evil-mc-mode))
     :config
     (progn
+      (spacemacs|diminish evil-mc-mode)
       (setq evil-mc-one-cursor-show-mode-line-text nil)
       (when (spacemacs/system-is-mac)
         (setq evil-mc-enable-bar-cursor nil))
