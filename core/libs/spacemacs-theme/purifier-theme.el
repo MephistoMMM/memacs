@@ -24,16 +24,17 @@
       (bg3 "#3D424D")
       (bg4 "#464752")
       (bg5 "#1F2430")
-      (base "#E6B450")
+      (builtin "#73D0FF")
       (keyword "#FF8F40") ;; keywords
       (const   "#FFEE99") ;; const
       (comment "#626A73") ;; comment
       (func    "#FFB454") ;; func
       (str     "#C2D94C") ;; string
-      (type    "#39BAE6")
-      (var     "#59C2FF")
       (tag     "#39BAE6") ;; tag
       (entity  "#59C2FF") ;; entity
+      (interface "#A37ACC")
+      (type    "#39BAE6")
+      (var     "#59C2FF")
       (markup "#F29668")   ;; markup
       ;; (operator "#F29668") ;; operator
       (regexp  "#95E6CB") ;; regexp
@@ -49,8 +50,8 @@
       (rainbow-8 "#0189cc")
       (rainbow-9 "#ff5555")
       (head1 "#F2AE49")
-      (head2 "#86B300")
-      (head3 "#55B4D4")
+      (head2 "#55B4D4")
+      (head3 "#BAE67E")
       (head4 "#f1fa8c")
       (eph-verbatim "#f1fa8c")
       (eph-code "#ff79c6")
@@ -70,10 +71,10 @@
    `(fringe ((,class (:background ,bg1 :foreground ,fg4))))
    `(highlight ((,class (:foreground ,fg2 :background ,bg3))))
    `(hl-line ((,class (:background  ,bg5))))
-   `(info-quoted-name ((,class (:foreground ,base))))
+   `(info-quoted-name ((,class (:foreground ,builtin))))
    `(info-string ((,class (:foreground ,str))))
    `(lazy-highlight ((,class (:foreground ,fg2 :background ,markup))))
-   `(link ((,class (:foreground ,type :underline t))))
+   `(link ((,class (:foreground ,const :underline t))))
    `(linum ((,class (:slant italic :foreground ,bg4 :background ,bg1))))
    `(minibuffer-prompt ((,class (:bold t :foreground ,keyword))))
    `(region ((,class (:background ,type :foreground ,bg1))))
@@ -83,7 +84,7 @@
    `(warning ((,class (:foreground ,warning))))
    `(whitespace-trailing ((,class :inherit trailing-whitespace)))
    ;; syntax
-   `(font-lock-builtin-face ((,class (:foreground ,base))))
+   `(font-lock-builtin-face ((,class (:foreground ,builtin))))
    `(font-lock-comment-face ((,class (:foreground ,comment))))
    `(font-lock-constant-face ((,class (:foreground ,const))))
    `(font-lock-doc-face ((,class (:foreground ,comment))))
@@ -95,6 +96,8 @@
    `(font-lock-type-face ((,class (:foreground ,type ))))
    `(font-lock-variable-name-face ((,class (:foreground ,var))))
    `(font-lock-warning-face ((,class (:foreground ,warning :background ,bg2))))
+   `(font-lock-regexp-grouping-construct ((,class (:foreground ,regexp))))
+   `(font-lock-preprocessor-face ((,class (:foreground ,interface))))
    ;; auto-complete
    `(ac-completion-face ((,class (:underline t :foreground ,keyword))))
    ;; company
@@ -105,15 +108,23 @@
    `(company-scrollbar-bg ((,class (:background ,bg3))))
    `(company-scrollbar-fg ((,class (:foreground ,keyword))))
    `(company-template-field ((,class (:inherit region))))
-   `(company-tooltip ((,class (:foreground ,fg2 :background ,black :bold t))))
-   `(company-tooltip-annotation ((,class (:foreground ,const))))
-   `(company-tooltip-annotation-selection ((,class (:foreground ,keyword))))
+   `(company-tooltip ((,class (:foreground ,fg3 :background ,bg2))))
+   `(company-tooltip-annotation ((,class (:foreground ,comment))))
+   `(company-tooltip-annotation-selection ((,class (:foreground ,bg1 :bold t))))
    `(company-tooltip-common ((,class ( :foreground ,fg3))))
-   `(company-tooltip-common-selection ((,class (:foreground ,str))))
+   `(company-tooltip-common-selection ((,class (:foreground ,builtin))))
    `(company-tooltip-mouse ((,class (:inherit highlight))))
-   `(company-tooltip-selection ((,class (:background ,bg5 :foreground ,fg1))))
+   `(company-tooltip-selection ((,class (:background ,var :foreground ,bg1))))
    `(company-tooltip-search ((,class (:foreground ,markup :weight bold))))
    `(company-tooltip-search-selection ((,class (:foreground ,markup :weight bold))))
+   ;; company-box
+   `(company-box-candidate ((,class (:inherit company-tooltip))))
+   `(company-box-annotation ((,class (:inherit company-tooltip-annotation))))
+   `(company-box-selection ((,class (:inherit company-tooltip-selection))))
+   `(company-box-background ((,class (:inherit company-tooltip))))
+   `(company-box-scrollbar ((,class (:inherit company-box-selection))))
+   `(memacs-company-box-backend-yasnippet-face ((,class (:foreground ,str :background ,bg2))))
+   `(memacs-company-box-backend-yasnippet-selected-face ((,class (:foreground ,bg2 :background ,str))))
    ;; lsp ui
    `(lsp-ui-sideline-symbol ((,class (:foreground ,comment :box (:line-width -1 :color ,comment) :height 0.99))))
    `(lsp-ui-sideline-current-symbol ((,class (:foreground ,const :weight ultra-bold :box (:line-width -1 :color ,const) :height 0.99))))
@@ -126,11 +137,11 @@
    `(diff-hl-delete ((,class (:foreground ,rainbow-9 :background ,rainbow-9))))
    `(diff-hl-insert ((,class (:foreground ,rainbow-6 :background ,rainbow-6))))
    ;; icomplete
-   `(icompletep-determined ((,class :foreground ,base)))
+   `(icompletep-determined ((,class :foreground ,builtin)))
    ;; ido
    `(ido-first-match ((,class (:foreground ,keyword :bold t))))
    `(ido-only-match ((,class (:foreground ,warning))))
-   `(ido-subdir ((,class (:foreground ,base))))
+   `(ido-subdir ((,class (:foreground ,builtin))))
    ;; isearch
    `(isearch ((,class (:bold t :foreground ,markup :background ,bg3))))
    `(isearch-fail ((,class (:foreground ,bg1 :background ,warning))))
@@ -262,7 +273,7 @@
    `(dired-header ((,class (:foreground ,fg3 :background ,bg1))))
    `(dired-ignored ((,class (:inherit shadow))))
    `(dired-mark ((,class (:foreground ,var :weight bold))))
-   `(dired-marked ((,class (:foreground ,base :weight bold))))
+   `(dired-marked ((,class (:foreground ,builtin :weight bold))))
    `(dired-perm-write ((,class (:foreground ,fg3 :underline t))))
    `(dired-symlink ((,class (:foreground ,str :weight normal :slant italic))))
    `(dired-warning ((,class (:foreground ,warning :underline t))))
@@ -274,7 +285,7 @@
    `(diredp-dir-heading ((,class (:foreground ,fg2 :background ,bg4))))
    `(diredp-dir-name ((,class (:inherit dired-directory))))
    `(diredp-dir-priv ((,class (:inherit dired-directory))))
-   `(diredp-executable-tag ((,class (:foreground ,base))))
+   `(diredp-executable-tag ((,class (:foreground ,builtin))))
    `(diredp-file-name ((,class (:foreground ,fg1))))
    `(diredp-file-suffix ((,class (:foreground ,fg4))))
    `(diredp-flag-mark-line ((,class (:foreground ,fg2 :slant italic :background ,bg5))))
@@ -284,8 +295,8 @@
    `(diredp-mode-line-marked ((,class (:foreground ,warning))))
    `(diredp-no-priv ((,class (:foreground ,fg1))))
    `(diredp-number ((,class (:foreground ,const))))
-   `(diredp-other-priv ((,class (:foreground ,base))))
-   `(diredp-rare-priv ((,class (:foreground ,base))))
+   `(diredp-other-priv ((,class (:foreground ,builtin))))
+   `(diredp-rare-priv ((,class (:foreground ,builtin))))
    `(diredp-read-priv ((,class (:foreground ,type))))
    `(diredp-write-priv ((,class (:foreground ,keyword))))
    `(diredp-exec-priv ((,class (:foreground ,str))))
@@ -312,7 +323,7 @@
      `(flycheck-error
        ((,(append '((supports :underline (:style line))) class)
          (:underline (:style line :color ,err)))
-        (,class (:foreground ,base :background ,err :inherit bold :underline t))))
+        (,class (:foreground ,builtin :background ,err :inherit bold :underline t))))
      `(flycheck-error-list-checker-name ((,class (:foreground ,keyword))))
      `(flycheck-fringe-error ((,class (:foreground ,err :inherit bold))))
      `(flycheck-fringe-info ((,class (:foreground ,keyword :inherit bold))))
@@ -320,30 +331,30 @@
      `(flycheck-info
        ((,(append '((supports :underline (:style line))) class)
          (:underline (:style line :color ,keyword)))
-        (,class (:foreground ,base :background ,keyword :inherit bold :underline t))))
+        (,class (:foreground ,builtin :background ,keyword :inherit bold :underline t))))
      `(flycheck-warning
        ((,(append '((supports :underline (:style line))) class)
          (:underline (:style line :color ,warning)))
-        (,class (:foreground ,base :background ,warning :inherit bold :underline t))))
+        (,class (:foreground ,builtin :background ,warning :inherit bold :underline t))))
 
 ;;;;; flymake
      `(flymake-error ((,(append '((supports :underline (:style line))) class)
                        (:underline (:style line :color ,err)))
-                      (,class (:foreground ,base :background ,err :inherit bold :underline t))))
+                      (,class (:foreground ,builtin :background ,err :inherit bold :underline t))))
      `(flymake-note ((,(append '((supports :underline (:style line))) class)
                       (:underline (:style wave :color ,keyword)))
-                     (,class (:foreground ,base :background ,keyword :inherit bold :underline t))))
+                     (,class (:foreground ,builtin :background ,keyword :inherit bold :underline t))))
      `(flymake-warning ((,(append '((supports :underline (:style line))) class)
                          (:underline (:style line :color ,warning)))
-                        (,class (:foreground ,base :background ,warning :inherit bold :underline t))))
+                        (,class (:foreground ,builtin :background ,warning :inherit bold :underline t))))
 
 ;;;;; flyspell
      `(flyspell-incorrect ((,(append '((supports :underline (:style line))) class)
                             (:underline (:style wave :color ,warning)))
-                           (,class (:foreground ,base :background ,warning :inherit bold :underline t))))
+                           (,class (:foreground ,builtin :background ,warning :inherit bold :underline t))))
      `(flyspell-duplicate ((,(append '((supports :underline (:style line))) class)
                             (:underline (:style wave :color ,keyword)))
-                           (,class (:foreground ,base :background ,keyword :inherit bold :underline t))))
+                           (,class (:foreground ,builtin :background ,keyword :inherit bold :underline t))))
 
 ;;;;; git-gutter-fr
      `(git-gutter-fr:added ((,class (:foreground ,rainbow-6 :inherit bold))))
@@ -391,7 +402,7 @@
 
 ;;;;; line-numbers
      `(line-number ((,class (:foreground ,fg1 :background ,bg2 :inherit default))))
-     `(line-number-current-line ((,class (:foreground ,base :background ,bg2 :inherit line-number))))
+     `(line-number-current-line ((,class (:foreground ,builtin :background ,bg2 :inherit line-number))))
 
 ;;;;; linum-relative
      `(linum-relative-current-face ((,class (:foreground ,type))))
@@ -436,7 +447,7 @@
      ;; `(swiper-match-face-4 ((,class (:foreground ,head3 :underline t))))
 
 ;;;;; which-key
-     `(which-key-command-description-face ((,class (:foreground ,base))))
+     `(which-key-command-description-face ((,class (:foreground ,builtin))))
      `(which-key-group-description-face ((,class (:foreground ,keyword))))
      `(which-key-key-face ((,class (:foreground ,func :inherit bold))))
      `(which-key-separator-face ((,class (:background nil :foreground ,str))))
@@ -447,15 +458,15 @@
      `(whitespace-indentation ((,class (:background nil :foreground ,warning))))
      `(whitespace-line ((,class (:background nil :foreground ,type))))
      `(whitespace-newline ((,class (:background nil :foreground ,type))))
-     `(whitespace-space ((,class (:background nil :foreground ,base))))
+     `(whitespace-space ((,class (:background nil :foreground ,builtin))))
      `(whitespace-space-after-tab ((,class (:background nil :foreground ,rainbow-7))))
      `(whitespace-space-before-tab ((,class (:background nil :foreground ,rainbow-7))))
-     `(whitespace-tab ((,class (:background nil :foreground ,base))))
+     `(whitespace-tab ((,class (:background nil :foreground ,builtin))))
      `(whitespace-trailing ((,class (:background ,err :foreground ,fg2))))
 
 ;;;;; other, need more work
      `(undo-tree-visualizer-current-face ((,class :foreground ,keyword)))
-     `(undo-tree-visualizer-default-face ((,class :foreground ,base)))
+     `(undo-tree-visualizer-default-face ((,class :foreground ,builtin)))
      `(undo-tree-visualizer-register-face ((,class :foreground ,type)))
      `(undo-tree-visualizer-unmodified-face ((,class :foreground ,var)))
    ))
