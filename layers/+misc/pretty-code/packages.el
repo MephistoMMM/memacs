@@ -29,13 +29,19 @@
 https://github.com/sebastiencs/company-box"
   (use-package company-box
     :defer t
-    :hook (company-mode . company-box-mode))
+    :hook (company-mode . company-box-mode)
+    :config
+    (progn
+      (spacemacs|diminish company-box-mode))
+    )
   )
 
 (defun pretty-code/init-pretty-code ()
   "Init pretty code."
   (spacemacs|do-after-display-system-init
    (use-package pretty-code
+     :init
+     (setq +pretty-code-fira-code-font-name "Fira Code Memacs Symbol")
      :config
      (progn
        (+pretty-code|setup-fira-ligatures)

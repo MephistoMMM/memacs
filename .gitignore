@@ -66,3 +66,4 @@ spacemacs.env
 /GRTAGS
 /GTAGS
 .lsp-session-*
+.mypy_cache/
