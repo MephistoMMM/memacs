@@ -107,15 +107,15 @@ FILENAME is renamed using `spacemacs/delete-file' function.."
         ;; minimal chars count is configurable via `counsel-more-chars-alist'
         (or (counsel-more-chars)
             (let* ((default-directory (ivy-state-directory ivy-last))
-                   (args (if (string-match-p " -- " string)
+                   (regex0 (if (string-match-p " -- " string)
                              (let ((split (split-string string " -- ")))
                                (prog1 (pop split)
                                  (setq string (mapconcat #'identity split " -- "))))
                            ""))
                    (regex (counsel--elisp-to-pcre
                            (setq ivy--old-re
-                                 (ivy--regex string)))))
-              (setq spacemacs--counsel-search-cmd (format base-cmd args regex))
+                                 (ivy--regex regex0)))))
+              (setq spacemacs--counsel-search-cmd (format base-cmd string regex))
               (spacemacs//counsel-async-command spacemacs--counsel-search-cmd)
               nil)))))
 

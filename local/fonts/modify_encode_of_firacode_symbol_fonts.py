@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# This file is used to generate Fira Code Memacs Symbol font farmily.
+# It should be run in fontforge menu item: File > Excute Python
 import fontforge
 
 FONT_EM = 1024
