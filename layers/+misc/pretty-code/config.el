@@ -45,7 +45,7 @@
         (5 . (fa_cog :face font-lock-builtin-face)) ;; Field
         (6 . (fa_cog :face font-lock-variable-name-face)) ;; Variable
         (7 . (fa_cube :face font-lock-preprocessor-face)) ;; Class
-        (8 . (fa_cube :face font-lock-preprocessor-face)) ;; Interface
+        (8 . (fa_puzzle_piece :face font-lock-preprocessor-face)) ;; Interface
         (9 . (fa_cube :face font-lock-preprocessor-face)) ;; Module
         (10 . (fa_cog :face font-lock-builtin-face)) ;; Property
         (11 . md_settings_system_daydream) ;; Unit
