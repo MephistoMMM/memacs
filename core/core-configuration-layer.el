@@ -2357,8 +2357,8 @@ ELPA stable repository."
       (when untar
         (spacemacs-buffer/set-mode-line
          (format "Extracting %s archive..." name) t)
-        (tar-mode)
-        (tar-untar-buffer)))
+        (call-process "tar" nil nil nil "-xzf" archive)
+        ))
     untar))
 
 (defun configuration-layer/stable-elpa-download-tarball ()
