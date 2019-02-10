@@ -26,6 +26,11 @@
   "Current width of the home buffer if responsive, 80 otherwise.
 See `dotspacemacs-startup-buffer-responsive'.")
 
+(defface font-lock-reference-face
+  '((t (:inherit link)))
+  "My company-box-backends-color for yasnippet"
+  :group 'spacemacs)
+
 (defvar spacemacs-buffer-startup-lists-length 20
   "Length used for startup lists with otherwise unspecified bounds.
 Set to nil for unbounded.")

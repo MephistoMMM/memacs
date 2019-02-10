@@ -75,7 +75,7 @@
   "Init memacs-org-ext"
   (use-package memacs-org-ext
     :after org
-    :commands (memacs/org-export-dispatch)
+    :commands (memacs/org-export-dispatch memacs-img-toggle-inline-images)
     :init
     (spacemacs/set-leader-keys-for-major-mode 'org-mode
       "ee" 'memacs/org-export-dispatch)
