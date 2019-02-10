@@ -56,7 +56,9 @@
   (interactive "P")
   (let ((dest (read-directory-name "Export to Directory: "
                                    nil default-directory nil)))
-    (setq memacs--org-export-directory dest)
+    (setq memacs--org-export-directory dest
+          memacs-img/before-export-aspect
+          #'memacs-img//copy-to-destination-statics-dir)
     (org-export-dispatch))
   )
 
@@ -90,12 +92,13 @@
 
 (defun memacs-img//export-to-Internet (path desc format)
   "A aspect for change path to url in the internet."
-  (let ((uri-slices (split-string path "/")))
-    (if (< (length uri-slices) 2)
-        (concat custom-link-img-export-host "/" (car uri-slices))
-      (concat custom-link-img-export-host "/"
-              (nth (- (length uri-slices) 2) uri-slices) "/"
-              (nth (- (length uri-slices) 1) uri-slices)))
+  (let ((index (string-match "statics/" path)))
+    (if (not index)
+        ;; index is nil
+        (concat custom-link-img-export-host "/statics/not_found.png")
+      ;; index is the offset of "statics/"
+      (concat custom-link-img-export-host "/" (substring path index))
+      )
     )
   )
 
@@ -110,7 +113,8 @@
        (format "<img src=\"%s\" alt=\"%s\"/>" (url-encode-url url) desc))
       ((eq format 'md)
        (format "![%s](%s)" desc (url-encode-url url)))
-      ))
+      )
+     )
   )
 
 
