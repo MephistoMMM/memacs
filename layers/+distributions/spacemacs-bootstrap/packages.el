@@ -232,6 +232,17 @@
 (defun spacemacs-bootstrap/init-which-key ()
   (require 'which-key)
 
+  (setq which-key-special-keys nil
+        which-key-use-C-h-for-paging t
+        which-key-prevent-C-h-from-cycling t
+        which-key-echo-keystrokes 0.02
+        which-key-max-description-length 32
+        which-key-allow-multiple-replacements t
+        which-key-sort-order 'which-key-key-order-alpha
+        which-key-idle-delay dotspacemacs-which-key-delay
+        which-key-idle-secondary-delay 0.01
+        which-key-allow-evil-operators t)
+
   (spacemacs|add-toggle which-key
     :mode which-key-mode
     :documentation
@@ -250,7 +261,10 @@
          ;; being higher in this list means the replacement is applied later
          '(
            ("spacemacs/\\(.+\\)" . "\\1")
+           ("spacemacs-\\(.+\\)" . "\\1")
            ("spacemacs/toggle-\\(.+\\)" . "\\1")
+           ("\\(.+\\)-transient-state/\\(.+\\)" . "\\2")
+           ("\\(.+\\)-transient-state/body" . "\\1-transient-state")
            ("spacemacs/alternate-buffer" . "last buffer")
            ("spacemacs/toggle-mode-line-\\(.+\\)" . "\\1")
            ("avy-goto-word-or-subword-1" . "avy word")
@@ -260,11 +274,9 @@
            ("spacemacs/search-project-auto" . "search project")
            ("sp-split-sexp" . "split sexp")
            ("avy-goto-line" . "avy line")
-           ("universal-argument" . "universal arg")
            ("er/expand-region" . "expand region")
            ("evil-lisp-state-\\(.+\\)" . "\\1")
-           ("spacemacs/\\(.+\\)-transient-state/\\(.+\\)" . "\\2")
-           ("spacemacs/\\(.+\\)-transient-state/body" . "\\1-transient-state")
+           ("universal-argument" . "universal arg")
            ("ivy-switch-buffer" . "list-buffers")
            ("spacemacs-layouts/non-restricted-buffer-list-ivy" . "global-list-buffers"))))
     (dolist (nd new-descriptions)
@@ -367,16 +379,6 @@
     (`right (which-key-setup-side-window-right))
     (`bottom (which-key-setup-side-window-bottom))
     (`right-then-bottom (which-key-setup-side-window-right-bottom)))
-
-  (setq which-key-special-keys nil
-        which-key-use-C-h-for-paging t
-        which-key-prevent-C-h-from-cycling t
-        which-key-echo-keystrokes 0.02
-        which-key-max-description-length 32
-        which-key-sort-order 'which-key-key-order-alpha
-        which-key-idle-delay dotspacemacs-which-key-delay
-        which-key-idle-secondary-delay 0.01
-        which-key-allow-evil-operators t)
 
   (which-key-mode)
   (spacemacs|diminish which-key-mode " Ⓚ" " K"))
