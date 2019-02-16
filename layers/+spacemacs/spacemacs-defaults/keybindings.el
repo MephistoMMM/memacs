@@ -139,13 +139,15 @@
   :doc "\n[_n_/_<right>_] next  [_p_/_<left>_] previous  [_t_/_<up>_] ivy-themes"
   :bindings
   ("n" spacemacs/cycle-spacemacs-theme)
-  ("p" (spacemacs/cycle-spacemacs-theme 'backward))
+  ("p" spacemacs/cycle-spacemacs-theme-backward)
   ("t" counsel-load-theme)
   ("<up>" counsel-load-theme)
   ("<right>" spacemacs/cycle-spacemacs-theme)
-  ("<left>" (spacemacs/cycle-spacemacs-theme 'backward)))
+  ("<left>" spacemacs/cycle-spacemacs-theme-backward))
 (spacemacs/set-leader-keys "Tn"
   'spacemacs/theme-transient-state/spacemacs/cycle-spacemacs-theme)
+(spacemacs/set-leader-keys "TN"
+  'spacemacs/theme-transient-state/spacemacs/cycle-spacemacs-theme-backward)
 ;; errors ---------------------------------------------------------------------
 (spacemacs/set-leader-keys
   "en" 'spacemacs/next-error
