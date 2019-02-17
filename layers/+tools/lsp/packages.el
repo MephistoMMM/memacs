@@ -19,6 +19,11 @@
 (defun lsp/init-lsp-mode ()
   (use-package lsp-mode
     :defer t
+    :init
+    (progn
+      (setq lsp-clients-python-library-directories '("/usr/local/" "/usr/"))
+      (setq lsp-clients-go-language-server-flags
+            '("-gocodecompletion" "--format-style=\"goimports\"")))
     :config
     (progn
       (require 'lsp-clients)

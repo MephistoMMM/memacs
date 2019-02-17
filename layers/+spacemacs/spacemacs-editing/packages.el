@@ -10,7 +10,8 @@
 ;;; License: GPLv3
 
 (setq spacemacs-editing-packages
-      '(avy
+      '(aggressive-indent
+        avy
         clean-aindent-mode
         editorconfig
         eval-sexp-fu
@@ -28,6 +29,46 @@
         ws-butler))
 
 ;; Initialization of packages
+
+(defun spacemacs-editing/init-aggressive-indent ()
+  (use-package aggressive-indent
+    :defer t
+    :init
+    (progn
+      (spacemacs|add-toggle aggressive-indent
+        :mode aggressive-indent-mode
+        :documentation "Always keep code indented."
+        :evil-leader "tI")
+      (spacemacs|add-toggle aggressive-indent-globally
+        :mode global-aggressive-indent-mode
+        :documentation "Always keep code indented globally."
+        :evil-leader "t C-I"))
+    :hook ((after-init . global-aggressive-indent-mode)
+           ;; FIXME: Disable in big files due to the performance issues
+           ;; https://github.com/Malabarba/aggressive-indent-mode/issues/73
+           (find-file . (lambda ()
+                          (if (> (buffer-size) (* 2000 80))
+                              (aggressive-indent-mode -1))))
+           (diff-auto-refine-mode . spacemacs/toggle-aggressive-indent-off))
+    :config
+    (progn
+      (spacemacs|diminish aggressive-indent-mode " Ⓘ" " I")
+      ;; Disable in some modes
+      (dolist (mode '(asm-mode web-mode html-mode css-mode robot-mode go-mode))
+        (push mode aggressive-indent-excluded-modes))
+
+      ;; Be slightly less aggressive in C/C++/C#/Java/Go/Swift
+      (add-to-list
+       'aggressive-indent-dont-indent-if
+       '(and (or (derived-mode-p 'c-mode)
+                 (derived-mode-p 'c++-mode)
+                 (derived-mode-p 'csharp-mode)
+                 (derived-mode-p 'java-mode)
+                 (derived-mode-p 'go-mode)
+                 (derived-mode-p 'swift-mode))
+             (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
+                                 (thing-at-point 'line)))))
+      )))
 
 (defun spacemacs-editing/init-avy ()
   (use-package avy
