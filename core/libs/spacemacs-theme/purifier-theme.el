@@ -130,7 +130,7 @@
    `(lsp-ui-sideline-current-symbol ((,class (:foreground ,const :weight ultra-bold :box (:line-width -1 :color ,const) :height 0.99))))
    `(lsp-ui-sideline-code-action ((,class (:foreground ,str))))
    `(lsp-ui-sideline-symbol-info ((,class  (:slant italic :height 0.99))))
-   `(lsp-ui-doc-header ((,class  (:foreground ,fg3 :background ,bg1))))
+   `(lsp-ui-doc-header ((,class  (:foreground "gold"  :background ,bg1))))
    `(lsp-ui-doc-url ((,class  (:inherit link))))
    ;; diff-hl
    `(diff-hl-change ((,class (:foreground ,rainbow-5 :background ,rainbow-5))))
@@ -306,169 +306,169 @@
    `(diredp-tagged-autofile-name ((,class (:foreground ,str))))
 
 ;;;;; ahs
-     `(ahs-face ((,class (:background ,bg3))))
-     `(ahs-plugin-whole-buffer-face ((,class (:background ,rainbow-4 :foreground ,bg1))))
+   `(ahs-face ((,class (:background ,bg3))))
+   `(ahs-plugin-whole-buffer-face ((,class (:background ,rainbow-4 :foreground ,bg1))))
 
 ;;;;; anzu-mode
-     `(anzu-mode-line ((,class (:foreground ,rainbow-7 :inherit bold))))
+   `(anzu-mode-line ((,class (:foreground ,rainbow-7 :inherit bold))))
 
 ;;;;; eldoc
-     `(eldoc-highlight-function-argument ((,class (:foreground ,rainbow-4 :inherit bold))))
+   `(eldoc-highlight-function-argument ((,class (:foreground ,rainbow-4 :inherit bold))))
 
 ;;;;; evil
-     `(evil-ex-substitute-matches ((,class (:background ,markup :foreground ,fg2))))
-     `(evil-ex-substitute-replacement ((,class (:background ,bg1 :foreground ,regexp))))
+   `(evil-ex-substitute-matches ((,class (:background ,markup :foreground ,fg2))))
+   `(evil-ex-substitute-replacement ((,class (:background ,bg1 :foreground ,regexp))))
 
 ;;;;; flycheck
-     `(flycheck-error
-       ((,(append '((supports :underline (:style line))) class)
-         (:underline (:style line :color ,err)))
-        (,class (:foreground ,builtin :background ,err :inherit bold :underline t))))
-     `(flycheck-error-list-checker-name ((,class (:foreground ,keyword))))
-     `(flycheck-fringe-error ((,class (:foreground ,err :inherit bold))))
-     `(flycheck-fringe-info ((,class (:foreground ,keyword :inherit bold))))
-     `(flycheck-fringe-warning ((,class (:foreground ,warning :inherit bold))))
-     `(flycheck-info
-       ((,(append '((supports :underline (:style line))) class)
-         (:underline (:style line :color ,keyword)))
-        (,class (:foreground ,builtin :background ,keyword :inherit bold :underline t))))
-     `(flycheck-warning
-       ((,(append '((supports :underline (:style line))) class)
-         (:underline (:style line :color ,warning)))
-        (,class (:foreground ,builtin :background ,warning :inherit bold :underline t))))
+   `(flycheck-error
+     ((,(append '((supports :underline (:style line))) class)
+       (:underline (:style line :color ,err)))
+      (,class (:foreground ,builtin :background ,err :inherit bold :underline t))))
+   `(flycheck-error-list-checker-name ((,class (:foreground ,keyword))))
+   `(flycheck-fringe-error ((,class (:foreground ,err :inherit bold))))
+   `(flycheck-fringe-info ((,class (:foreground ,keyword :inherit bold))))
+   `(flycheck-fringe-warning ((,class (:foreground ,warning :inherit bold))))
+   `(flycheck-info
+     ((,(append '((supports :underline (:style line))) class)
+       (:underline (:style line :color ,keyword)))
+      (,class (:foreground ,builtin :background ,keyword :inherit bold :underline t))))
+   `(flycheck-warning
+     ((,(append '((supports :underline (:style line))) class)
+       (:underline (:style line :color ,warning)))
+      (,class (:foreground ,builtin :background ,warning :inherit bold :underline t))))
 
 ;;;;; flymake
-     `(flymake-error ((,(append '((supports :underline (:style line))) class)
-                       (:underline (:style line :color ,err)))
-                      (,class (:foreground ,builtin :background ,err :inherit bold :underline t))))
-     `(flymake-note ((,(append '((supports :underline (:style line))) class)
-                      (:underline (:style wave :color ,keyword)))
-                     (,class (:foreground ,builtin :background ,keyword :inherit bold :underline t))))
-     `(flymake-warning ((,(append '((supports :underline (:style line))) class)
-                         (:underline (:style line :color ,warning)))
-                        (,class (:foreground ,builtin :background ,warning :inherit bold :underline t))))
+   `(flymake-error ((,(append '((supports :underline (:style line))) class)
+                     (:underline (:style line :color ,err)))
+                    (,class (:foreground ,builtin :background ,err :inherit bold :underline t))))
+   `(flymake-note ((,(append '((supports :underline (:style line))) class)
+                    (:underline (:style wave :color ,keyword)))
+                   (,class (:foreground ,builtin :background ,keyword :inherit bold :underline t))))
+   `(flymake-warning ((,(append '((supports :underline (:style line))) class)
+                       (:underline (:style line :color ,warning)))
+                      (,class (:foreground ,builtin :background ,warning :inherit bold :underline t))))
 
 ;;;;; flyspell
-     `(flyspell-incorrect ((,(append '((supports :underline (:style line))) class)
-                            (:underline (:style wave :color ,warning)))
-                           (,class (:foreground ,builtin :background ,warning :inherit bold :underline t))))
-     `(flyspell-duplicate ((,(append '((supports :underline (:style line))) class)
-                            (:underline (:style wave :color ,keyword)))
-                           (,class (:foreground ,builtin :background ,keyword :inherit bold :underline t))))
+   `(flyspell-incorrect ((,(append '((supports :underline (:style line))) class)
+                          (:underline (:style wave :color ,warning)))
+                         (,class (:foreground ,builtin :background ,warning :inherit bold :underline t))))
+   `(flyspell-duplicate ((,(append '((supports :underline (:style line))) class)
+                          (:underline (:style wave :color ,keyword)))
+                         (,class (:foreground ,builtin :background ,keyword :inherit bold :underline t))))
 
 ;;;;; git-gutter-fr
-     `(git-gutter-fr:added ((,class (:foreground ,rainbow-6 :inherit bold))))
-     `(git-gutter-fr:deleted ((,class (:foreground ,warning :inherit bold))))
-     `(git-gutter-fr:modified ((,class (:foreground ,keyword :inherit bold))))
+   `(git-gutter-fr:added ((,class (:foreground ,rainbow-6 :inherit bold))))
+   `(git-gutter-fr:deleted ((,class (:foreground ,warning :inherit bold))))
+   `(git-gutter-fr:modified ((,class (:foreground ,keyword :inherit bold))))
 
 ;;;;; git-timemachine
-     `(git-timemachine-minibuffer-detail-face ((,class (:foreground ,rainbow-8 :inherit bold :background ,bg4))))
+   `(git-timemachine-minibuffer-detail-face ((,class (:foreground ,rainbow-8 :inherit bold :background ,bg4))))
 
 ;;;;; highlight-symbol
-     `(highlight-symbol-face ((,class (:background ,bg2))))
+   `(highlight-symbol-face ((,class (:background ,bg2))))
 
 ;;;;; hydra
-     `(hydra-face-blue ((,class (:foreground ,rainbow-8))))
-     `(hydra-face-red ((,class (:foreground ,rainbow-9))))
+   `(hydra-face-blue ((,class (:foreground ,rainbow-8))))
+   `(hydra-face-red ((,class (:foreground ,rainbow-9))))
 
 ;;;;; info
-     `(info-header-xref ((,class (:foreground ,func :underline t))))
-     `(info-menu ((,class (:foreground ,rainbow-6))))
-     `(info-node ((,class (:foreground ,func :inherit bold))))
-     `(info-quoted-name ((,class (:foreground ,keyword))))
-     `(info-reference-item ((,class (:background nil :underline t :inherit bold))))
-     `(info-string ((,class (:foreground ,str))))
-     `(info-title-1 ((,class (:height 1.4 :inherit bold))))
-     `(info-title-2 ((,class (:height 1.3 :inherit bold))))
-     `(info-title-3 ((,class (:height 1.3))))
-     `(info-title-4 ((,class (:height 1.2))))
+   `(info-header-xref ((,class (:foreground ,func :underline t))))
+   `(info-menu ((,class (:foreground ,rainbow-6))))
+   `(info-node ((,class (:foreground ,func :inherit bold))))
+   `(info-quoted-name ((,class (:foreground ,keyword))))
+   `(info-reference-item ((,class (:background nil :underline t :inherit bold))))
+   `(info-string ((,class (:foreground ,str))))
+   `(info-title-1 ((,class (:height 1.4 :inherit bold))))
+   `(info-title-2 ((,class (:height 1.3 :inherit bold))))
+   `(info-title-3 ((,class (:height 1.3))))
+   `(info-title-4 ((,class (:height 1.2))))
 
 ;;;;; latex
-     `(font-latex-bold-face ((,class (:foreground ,type))))
-     `(font-latex-italic-face ((,class (:foreground ,keyword :italic t))))
-     `(font-latex-match-reference-keywords ((,class (:foreground ,const))))
-     `(font-latex-match-variable-keywords ((,class (:foreground ,var))))
-     `(font-latex-sectioning-0-face ((,class (:inherit bold :foreground ,head3 :height 1.3))))
-     `(font-latex-sectioning-1-face ((,class (:inherit bold :foreground ,head4 :height 1.3))))
-     `(font-latex-sectioning-2-face ((,class (:inherit bold :foreground ,head1 :height 1.3 ))))
-     `(font-latex-sectioning-3-face ((,class (:inherit bold :foreground ,head2 :height 1.2))))
-     `(font-latex-sectioning-4-face ((,class (:bold nil :foreground ,head3 :height 1.1))))
-     `(font-latex-sectioning-5-face ((,class (:bold nil :foreground ,head4))))
-     `(font-latex-string-face ((,class (:foreground ,str))))
-     `(font-latex-warning-face ((,class (:foreground ,warning))))
+   `(font-latex-bold-face ((,class (:foreground ,type))))
+   `(font-latex-italic-face ((,class (:foreground ,keyword :italic t))))
+   `(font-latex-match-reference-keywords ((,class (:foreground ,const))))
+   `(font-latex-match-variable-keywords ((,class (:foreground ,var))))
+   `(font-latex-sectioning-0-face ((,class (:inherit bold :foreground ,head3 :height 1.3))))
+   `(font-latex-sectioning-1-face ((,class (:inherit bold :foreground ,head4 :height 1.3))))
+   `(font-latex-sectioning-2-face ((,class (:inherit bold :foreground ,head1 :height 1.3 ))))
+   `(font-latex-sectioning-3-face ((,class (:inherit bold :foreground ,head2 :height 1.2))))
+   `(font-latex-sectioning-4-face ((,class (:bold nil :foreground ,head3 :height 1.1))))
+   `(font-latex-sectioning-5-face ((,class (:bold nil :foreground ,head4))))
+   `(font-latex-string-face ((,class (:foreground ,str))))
+   `(font-latex-warning-face ((,class (:foreground ,warning))))
 
 ;;;;; linum-mode
-     `(linum ((,class (:foreground ,fg1 :background ,bg2 :inherit default))))
+   `(linum ((,class (:foreground ,fg1 :background ,bg2 :inherit default))))
 
 ;;;;; line-numbers
-     `(line-number ((,class (:foreground ,fg1 :background ,bg2 :inherit default))))
-     `(line-number-current-line ((,class (:foreground ,builtin :background ,bg2 :inherit line-number))))
+   `(line-number ((,class (:foreground ,fg1 :background ,bg2 :inherit default))))
+   `(line-number-current-line ((,class (:foreground ,builtin :background ,bg2 :inherit line-number))))
 
 ;;;;; linum-relative
-     `(linum-relative-current-face ((,class (:foreground ,type))))
+   `(linum-relative-current-face ((,class (:foreground ,type))))
 
 ;;;;; man
-     `(Man-overstrike ((,class (:foreground ,head1 :inherit bold))))
-     `(Man-reverse ((,class (:foreground ,bg3))))
-     `(Man-underline ((,class (:foreground ,type :underline t))))
+   `(Man-overstrike ((,class (:foreground ,head1 :inherit bold))))
+   `(Man-reverse ((,class (:foreground ,bg3))))
+   `(Man-underline ((,class (:foreground ,type :underline t))))
 
 ;;;;; perspective
-     `(persp-selected-face ((,class (:inherit bold :foreground ,func))))
+   `(persp-selected-face ((,class (:inherit bold :foreground ,func))))
 
 ;;;;; spaceline
-     `(spaceline-highlight-face ((,class (:background ,bg1 :foreground ,fg1))))
-     `(spaceline-flycheck-error  ((,class (:foreground ,err))))
-     `(spaceline-flycheck-info   ((,class (:foreground ,keyword))))
-     `(spaceline-flycheck-warning((,class (:foreground ,warning))))
-     `(spaceline-python-venv ((,class (:foreground ,type))))
+   `(spaceline-highlight-face ((,class (:background ,bg1 :foreground ,fg1))))
+   `(spaceline-flycheck-error  ((,class (:foreground ,err))))
+   `(spaceline-flycheck-info   ((,class (:foreground ,keyword))))
+   `(spaceline-flycheck-warning((,class (:foreground ,warning))))
+   `(spaceline-python-venv ((,class (:foreground ,type))))
 
 ;;;;; powerline
-     `(powerline-active1 ((,class (:background ,bg2 :foreground ,fg2))))
-     `(powerline-active2 ((,class (:background ,bg1 :foreground ,fg1))))
-     `(powerline-inactive1 ((,class (:background ,bg2 :foreground ,comment))))
-     `(powerline-inactive2 ((,class (:background ,bg1 :foreground ,comment))))
+   `(powerline-active1 ((,class (:background ,bg2 :foreground ,fg2))))
+   `(powerline-active2 ((,class (:background ,bg1 :foreground ,fg1))))
+   `(powerline-inactive1 ((,class (:background ,bg2 :foreground ,comment))))
+   `(powerline-inactive2 ((,class (:background ,bg1 :foreground ,comment))))
 
 ;;;;; spacemacs-specific
-     `(spacemacs-transient-state-title-face ((,class (:background nil :foreground ,type :box nil :inherit bold))))
+   `(spacemacs-transient-state-title-face ((,class (:background nil :foreground ,type :box nil :inherit bold))))
 
 ;;;;; ivy
-     ;; `(ivy-current-match ((,class (:background ,var :foreground ,bg1))))
-     ;; `(ivy-minibuffer-match-face-1 ((,class (:inherit bold))))
-     ;; `(ivy-minibuffer-match-face-2 ((,class (:foreground ,head1 :underline t))))
-     ;; `(ivy-minibuffer-match-face-3 ((,class (:foreground ,head4 :underline t))))
-     ;; `(ivy-minibuffer-match-face-4 ((,class (:foreground ,head3 :underline t))))
-     ;; `(ivy-remote ((,class (:foreground ,rainbow-2))))
+   ;; `(ivy-current-match ((,class (:background ,var :foreground ,bg1))))
+   ;; `(ivy-minibuffer-match-face-1 ((,class (:inherit bold))))
+   ;; `(ivy-minibuffer-match-face-2 ((,class (:foreground ,head1 :underline t))))
+   ;; `(ivy-minibuffer-match-face-3 ((,class (:foreground ,head4 :underline t))))
+   ;; `(ivy-minibuffer-match-face-4 ((,class (:foreground ,head3 :underline t))))
+   ;; `(ivy-remote ((,class (:foreground ,rainbow-2))))
 
 ;;;;; swiper
-     ;; `(swiper-line-face ((,class (:background ,var :foreground ,bg1))))
-     ;; `(swiper-match-face-1 ((,class (:inherit bold))))
-     ;; `(swiper-match-face-2 ((,class (:foreground ,markup :underline t))))
-     ;; `(swiper-match-face-3 ((,class (:foreground ,head4 :underline t))))
-     ;; `(swiper-match-face-4 ((,class (:foreground ,head3 :underline t))))
+   ;; `(swiper-line-face ((,class (:background ,var :foreground ,bg1))))
+   ;; `(swiper-match-face-1 ((,class (:inherit bold))))
+   ;; `(swiper-match-face-2 ((,class (:foreground ,markup :underline t))))
+   ;; `(swiper-match-face-3 ((,class (:foreground ,head4 :underline t))))
+   ;; `(swiper-match-face-4 ((,class (:foreground ,head3 :underline t))))
 
 ;;;;; which-key
-     `(which-key-command-description-face ((,class (:foreground ,builtin))))
-     `(which-key-group-description-face ((,class (:foreground ,keyword))))
-     `(which-key-key-face ((,class (:foreground ,func :inherit bold))))
-     `(which-key-separator-face ((,class (:background nil :foreground ,str))))
-     `(which-key-special-key-face ((,class (:background ,func :foreground ,bg1))))
+   `(which-key-command-description-face ((,class (:foreground ,builtin))))
+   `(which-key-group-description-face ((,class (:foreground ,keyword))))
+   `(which-key-key-face ((,class (:foreground ,func :inherit bold))))
+   `(which-key-separator-face ((,class (:background nil :foreground ,str))))
+   `(which-key-special-key-face ((,class (:background ,func :foreground ,bg1))))
 
 ;;;;; whitespace-mode
-     `(whitespace-empty ((,class (:background nil :foreground ,rainbow-7))))
-     `(whitespace-indentation ((,class (:background nil :foreground ,warning))))
-     `(whitespace-line ((,class (:background nil :foreground ,type))))
-     `(whitespace-newline ((,class (:background nil :foreground ,type))))
-     `(whitespace-space ((,class (:background nil :foreground ,builtin))))
-     `(whitespace-space-after-tab ((,class (:background nil :foreground ,rainbow-7))))
-     `(whitespace-space-before-tab ((,class (:background nil :foreground ,rainbow-7))))
-     `(whitespace-tab ((,class (:background nil :foreground ,builtin))))
-     `(whitespace-trailing ((,class (:background ,err :foreground ,fg2))))
+   `(whitespace-empty ((,class (:background nil :foreground ,rainbow-7))))
+   `(whitespace-indentation ((,class (:background nil :foreground ,warning))))
+   `(whitespace-line ((,class (:background nil :foreground ,type))))
+   `(whitespace-newline ((,class (:background nil :foreground ,type))))
+   `(whitespace-space ((,class (:background nil :foreground ,builtin))))
+   `(whitespace-space-after-tab ((,class (:background nil :foreground ,rainbow-7))))
+   `(whitespace-space-before-tab ((,class (:background nil :foreground ,rainbow-7))))
+   `(whitespace-tab ((,class (:background nil :foreground ,builtin))))
+   `(whitespace-trailing ((,class (:background ,err :foreground ,fg2))))
 
 ;;;;; other, need more work
-     `(undo-tree-visualizer-current-face ((,class :foreground ,keyword)))
-     `(undo-tree-visualizer-default-face ((,class :foreground ,builtin)))
-     `(undo-tree-visualizer-register-face ((,class :foreground ,type)))
-     `(undo-tree-visualizer-unmodified-face ((,class :foreground ,var)))
+   `(undo-tree-visualizer-current-face ((,class :foreground ,keyword)))
+   `(undo-tree-visualizer-default-face ((,class :foreground ,builtin)))
+   `(undo-tree-visualizer-register-face ((,class :foreground ,type)))
+   `(undo-tree-visualizer-unmodified-face ((,class :foreground ,var)))
    ))
 
 
