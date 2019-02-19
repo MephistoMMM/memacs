@@ -348,7 +348,7 @@
 
   ;; hide the "C-c -> eyebrowse-create-window-config" entry
   (push '(("\\(.*\\)C-c C-w C-c" . "eyebrowse-create-window-config") . t)
-          which-key-replacement-alist)
+        which-key-replacement-alist)
 
   ;; C-c C-d-
   ;; Combine the d and C-d key entries
@@ -358,20 +358,11 @@
 
   ;; hide the "C-d -> elisp-slime-nav-describe-elisp-thing-at-point" entry
   (push '(("\\(.*\\)C-c C-d C-d" . "elisp-slime-nav-describe-elisp-thing-at-point") . t)
-          which-key-replacement-alist)
-
-  (dolist (leader-key `(,dotspacemacs-leader-key ,dotspacemacs-emacs-leader-key))
-    (which-key-add-key-based-replacements
-      (concat leader-key " m")    "major mode commands"
-      (concat leader-key " " dotspacemacs-emacs-command-key) "M-x"))
+        which-key-replacement-alist)
 
   (which-key-add-key-based-replacements
     dotspacemacs-leader-key '("root" . "Spacemacs root")
-    dotspacemacs-emacs-leader-key '("root" . "Spacemacs root")
-    (concat dotspacemacs-leader-key " m")
-    '("major-mode-cmd" . "Major mode commands")
-    (concat dotspacemacs-emacs-leader-key " m")
-    '("major-mode-cmd" . "Major mode commands"))
+    dotspacemacs-emacs-leader-key '("root" . "Spacemacs root"))
 
   ;; disable special key handling for spacemacs, since it can be
   ;; disorienting if you don't understand it

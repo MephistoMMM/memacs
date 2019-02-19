@@ -22,9 +22,11 @@
         git-messenger
         git-timemachine
         magit
+        magit-gitflow
         magit-svn
         (orgit :requires org)
         smeargle
+        transient
         ))
 
 (defun git/pre-init-evil-magit ()
@@ -131,7 +133,6 @@
       (when (eq window-system 'w32)
         (setenv "GIT_ASKPASS" "git-gui--askpass"))
       ;; key bindings
-      (spacemacs/declare-prefix "gd" "diff")
       (spacemacs/declare-prefix "gf" "file")
       (spacemacs/set-leader-keys
         "gb"  'spacemacs/git-blame-micro-state
@@ -162,8 +163,8 @@ Press [_b_] again to blame further in the history, [_q_] to go up or quit."
         ;; micro-state only if the magit-blame-quit effectively disable
         ;; the magit-blame mode.
         ("q" nil :exit (progn (when (bound-and-true-p magit-blame-mode)
-                                (magit-blame-quit))
-                              (not (bound-and-true-p magit-blame-mode))))))
+                              (magit-blame-quit))
+                            (not (bound-and-true-p magit-blame-mode))))))
     :config
     (progn
       ;; seems to be necessary at the time of release
@@ -171,10 +172,10 @@ Press [_b_] again to blame further in the history, [_q_] to go up or quit."
       ;; bind function keys
       ;; (define-key magit-mode-map (kbd "<tab>") 'magit-section-toggle)
       (evilified-state-evilify-map magit-repolist-mode-map
-          :mode magit-repolist-mode
-          :bindings
-          (kbd "gr") 'magit-list-repositories
-          (kbd "RET") 'magit-repolist-status)
+        :mode magit-repolist-mode
+        :bindings
+        (kbd "gr") 'magit-list-repositories
+        (kbd "RET") 'magit-repolist-status)
       ;; confirm/abort
       (when dotspacemacs-major-mode-leader-key
         (add-hook 'with-editor-mode-hook 'evil-normalize-keymaps)
@@ -193,6 +194,15 @@ Press [_b_] again to blame further in the history, [_q_] to go up or quit."
         (setq magit-display-buffer-function 'magit-display-buffer-fullframe-status-v1))
       (add-to-list 'magit-log-arguments "--color"))))
 
+(defun git/init-magit-gitflow ()
+  (use-package magit-gitflow
+    :defer t
+    :init (add-hook 'magit-mode-hook 'turn-on-magit-gitflow)
+    :config
+    (progn
+      (spacemacs|diminish magit-gitflow-mode "Flow")
+      (define-key magit-mode-map "%" 'magit-gitflow-popup))))
+
 (defun git/init-magit-svn ()
   (use-package magit-svn
     :if git-enable-magit-svn-plugin
@@ -200,7 +210,7 @@ Press [_b_] again to blame further in the history, [_q_] to go up or quit."
     :init (add-hook 'magit-mode-hook 'turn-on-magit-svn)
     :config (progn
               (spacemacs|diminish magit-svn-mode "SVN")
-              (define-key magit-mode-map "~" 'magit-svn-popup))))
+              (define-key magit-mode-map "~" 'magit-svn))))
 
 (defun git/init-orgit ()
   (use-package orgit
@@ -226,3 +236,15 @@ Press [_b_] again to blame further in the history, [_q_] to go up or quit."
         "gHc" 'smeargle-clear
         "gHh" 'smeargle-commits
         "gHt" 'smeargle))))
+
+(defun git/init-transient ()
+  (use-package transient
+    :defer t
+    :init
+    (setq
+     transient-levels-file
+     (expand-file-name "transient/levels.el" spacemacs-cache-directory)
+     transient-values-file
+     (expand-file-name "transient/values.el" spacemacs-cache-directory)
+     transient-history-file
+     (expand-file-name "transient/history.el" spacemacs-cache-directory))))
