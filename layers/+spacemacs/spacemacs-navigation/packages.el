@@ -32,7 +32,7 @@
     :init
     (progn
       (spacemacs|define-transient-state awesometab
-        :title "Scrolling Transient State"
+        :title "Awesome-tab Transient State"
         :doc "
  Tab^^                    Group^^                   Other^^
  ───────^^────────────  ─────^^───────────────  ─────^^──────────────
