@@ -96,7 +96,6 @@ This function should only modify configuration layer settings."
 
      ;; Catalogue: self layers
      ;; READY : npm install -g hexo
-     ;;         brew install ledger (https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-ledger.html)
      mp-org
      mp-hacking
      osx
