@@ -20,7 +20,7 @@
              auto-completion-front-end))
   :off
   (progn (company-mode -1)
-    (message "Disabled auto-completion."))
+         (message "Disabled auto-completion."))
   :documentation "Enable auto-completion."
   :evil-leader "ta")
 
@@ -88,16 +88,16 @@ Available PROPS:
           (push `(add-to-list ',raw-backends-var-name ',backend) result))
         ;; define initialization hook function
         (push `(defun ,init-func-name ()
-                ,(format "Initialize company for %S." mode)
-                (if auto-completion-enable-snippets-in-popup
-                    (setq ,backends-var-name
-                          (mapcar 'spacemacs//show-snippets-in-company
-                                  ,raw-backends-var-name))
-                  (setq ,backends-var-name ,raw-backends-var-name))
-                (set (make-variable-buffer-local 'auto-completion-front-end)
-                     'company)
-                (set (make-variable-buffer-local 'company-backends)
-                     ,backends-var-name)) result)
+                 ,(format "Initialize company for %S." mode)
+                 (if auto-completion-enable-snippets-in-popup
+                     (setq ,backends-var-name
+                           (mapcar 'spacemacs//show-snippets-in-company
+                                   ,raw-backends-var-name))
+                   (setq ,backends-var-name ,raw-backends-var-name))
+                 (set (make-variable-buffer-local 'auto-completion-front-end)
+                      'company)
+                 (set (make-variable-buffer-local 'company-backends)
+                      ,backends-var-name)) result)
         (when call-hooks
           (push `(,init-func-name) result))
         (when hooks
@@ -241,20 +241,25 @@ Press 'q' to quit."
 (defun memacs/tab-complete-or-next-field ()
   (interactive)
   (when (company-mode)
-      (if company-candidates
+    (if company-candidates
+        ;; yes
+        (company-complete-selection)
+      ;; no
+      (if (not (memacs//check-expansion))
           ;; yes
-          (company-complete-selection)
+          (yas-next-field-or-maybe-expand)
         ;; no
-        (if (memacs//check-expansion)
+        (if (not (company-manual-begin))
             ;; yes
-            (progn
-              (company-manual-begin)
-              (if (null company-candidates)
-                  (progn
-                    (company-abort)
-                    (yas-next-field-or-maybe-expand))))
+            (yas-next-field-or-maybe-expand)
           ;; no
-          (yas-next-field-or-maybe-expand)))))
+          (if (or (null company-candidates)
+                 (and lsp-mode (<= (length company-candidates) 1)))
+              (progn
+                (company-abort)
+                (yas-next-field-or-maybe-expand)))
+          )))
+    ))
 
 
 ;; Auto-Yasnippet

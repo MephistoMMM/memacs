@@ -49,7 +49,8 @@
     :config
     (progn
       ;; start posframe
-      (company-posframe-mode 1)
+      (when (configuration-layer/package-used-p 'company-posframe)
+        (company-posframe-mode 1))
       (spacemacs|diminish company-mode " ⓐ" " a")
 
       ;; key bindings

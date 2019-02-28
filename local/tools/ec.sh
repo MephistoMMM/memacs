@@ -24,8 +24,13 @@
 # -n returns control back to the terminal
 # -e eval the script
 
+if [[ ! -e $EMACS_SOCKET_NAME ]]; then
+    echo 'Please Config $EMACS_SOCKET_NAME First!'
+    exit 1
+fi
+
 ps aux | grep 'Emacs' | grep -v 'grep' > /dev/null
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
     echo "Please Start Emacs Daemon First!"
     exit 1
 fi
@@ -33,21 +38,26 @@ fi
 # Number of current visible frames,
 # Emacs daemon always has a visible frame called F1
 visible_frames() {
-  emacsclient -s $EMACS_SOCKET_NAME -e '(length (visible-frame-list))'
+    emacsclient -s $EMACS_SOCKET_NAME -e '(length (visible-frame-list))'
 }
 
 change_focus() {
     emacsclient -s $EMACS_SOCKET_NAME -n -e "(select-frame-set-input-focus (selected-frame))" > /dev/null
 }
 
-if [ $(visible_frames) -lt  2 ]; then
-  # need to create a frame
-  # -c $@ with no args just opens the scratch buffer
-  exec emacsclient -s $EMACS_SOCKET_NAME -n -c "$@" && change_focus
+if [[ $(visible_frames) -lt  2 ]]; then
+    # need to create a frame
+    # -c $@ with no args just opens the scratch buffer
+    exec emacsclient -s $EMACS_SOCKET_NAME -n -c "$@" && change_focus
 else
-  # there is already a visible frame besides the daemon, so
-  # -n $@ errors if there are no args
-  [ $# -ne 0 ] && emacsclient -s $EMACS_SOCKET_NAME -n "$@" && change_focus
+    # there is already a visible frame besides the daemon, so
+    # -n $@ errors if there are no args
+    [[ $# -ne 0 ]] && emacsclient -s $EMACS_SOCKET_NAME -n "$@" && change_focus
+fi
+
+if [[ $? -ne 0 ]]; then
+    echo "Failed to open file in emacs."
+    exit 1
 fi
 
 # switch to emacs

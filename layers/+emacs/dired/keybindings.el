@@ -11,17 +11,19 @@
 
 
 ;; dired
-(memacs/define-keys dired-mode-map
-  ", o" 'memacs/dired-omit-and-remember
-  ", i" 'memacs/dired-show-only
-  ", f" 'memacs/dired-find-name-in-current-directory
-  ", m" 'memacs/dired-open-mounted-media-dir
-  ", s" 'memacs/dired-sort-and-remember
-  "RET" 'memacs/dired-find-alternate-file
-  "C-j" 'memacs/dired-find-alternate-file
-  "^"   'memacs/dired-backward
-  "C-h" 'memacs/dired-backward
-  )
+(with-eval-after-load 'dired+
+  (memacs/define-keys dired-mode-map
+                      ", o" 'memacs/dired-omit-and-remember
+                      ", i" 'memacs/dired-show-only
+                      ", f" 'memacs/dired-find-name-in-current-directory
+                      ", m" 'memacs/dired-open-mounted-media-dir
+                      ", s" 'memacs/dired-sort-and-remember
+                      "RET" 'memacs/dired-find-alternate-file
+                      "C-j" 'memacs/dired-find-alternate-file
+                      "^"   'memacs/dired-backward
+                      "C-h" 'memacs/dired-backward
+                      ))
+
 (spacemacs/set-leader-keys
   "jd" 'dired
   "fj" 'dired

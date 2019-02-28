@@ -87,7 +87,7 @@ This function should only modify configuration layer settings."
      ;; go get -u -v github.com/josharian/impl
      ;; go get -u -v github.com/cweill/gotests/...
      ;; go get -u -v github.com/davidrjenni/reftools/cmd/fillstruct
-     ;; go get -u github.com/sourcegraph/go-langserver
+     ;; go get -v -u github.com/saibing/bingo
      (go :variables
          gofmt-command "goimports"
          go-backend 'lsp
@@ -96,7 +96,6 @@ This function should only modify configuration layer settings."
 
      ;; Catalogue: self layers
      ;; READY : npm install -g hexo
-     ;;         brew install ledger (https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-ledger.html)
      mp-org
      mp-hacking
      osx
@@ -109,8 +108,7 @@ This function should only modify configuration layer settings."
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
-   dotspacemacs-excluded-packages
-   '(magit-gitflow)
+   dotspacemacs-excluded-packages '()
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
    ;; `used-only' installs only explicitly used packages and uninstall any

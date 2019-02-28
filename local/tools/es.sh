@@ -9,6 +9,11 @@
 # If the server-process is bound and the server is in a good state, then kill
 # the server
 
+if [[ ! -e $EMACS_SOCKET_NAME ]]; then
+    echo 'Please Config $EMACS_SOCKET_NAME First!'
+    exit 1
+fi
+
 server_ok() {
     emacsclient -s $EMACS_SOCKET_NAME -a "false" -e "(boundp 'server-process)"
 }

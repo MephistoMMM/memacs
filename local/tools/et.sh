@@ -19,4 +19,9 @@
 # -t starts in terminal, since I won't be using the gui
 # can also pass in -n if you want to have the shell return right away
 
+if [[ ! -e $EMACS_SOCKET_NAME ]]; then
+    echo 'Please Config $EMACS_SOCKET_NAME First!'
+    exit 1
+fi
+
 exec emacsclient -s $EMACS_SOCKET_NAME -n -t "$@"
