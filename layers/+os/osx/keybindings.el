@@ -71,6 +71,7 @@ other than the three sane values listed above."
     )
 
   ;; C-v in ivy minibuffer
-  (define-key ivy-minibuffer-map (kbd "M-v") 'yank)
+  (with-eval-after-load 'ivy
+    (define-key ivy-minibuffer-map (kbd "M-v") 'yank))
   (memacs/define-search-keybinding "s" 'memacs/counsel-spotlight)
   )
