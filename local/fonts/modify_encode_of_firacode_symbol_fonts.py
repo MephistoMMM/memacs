@@ -6,7 +6,7 @@ import fontforge
 FONT_EM = 1024
 FIRACODE_SYMBOL_START= 0xE100
 FIRACODE_SYMBOL_END = 0xE170
-OFFSET = 0x0E00
+OFFSET = 0x1C00
 
 dest = fontforge.font()
 dest.em = FONT_EM
