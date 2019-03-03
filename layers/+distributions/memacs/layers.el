@@ -34,7 +34,7 @@
                     auto-completion-return-key-behavior 'complete
                     auto-completion-tab-key-behavior 'complete
                     auto-completion-enable-snippets-in-popup t
-                    auto-completion-idle-delay 0.6
+                    auto-completion-idle-delay 0.3
                     auto-completion-private-snippets-directory "~/.emacs.d/snippets/")
    (syntax-checking :variables syntax-checking-enable-by-default nil)
    lsp

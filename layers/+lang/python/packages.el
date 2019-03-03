@@ -40,7 +40,7 @@
     :modes inferior-python-mode
     :variables
     company-minimum-prefix-length 0
-    company-idle-delay 0.5)
+    company-idle-delay 0.3)
   (when (configuration-layer/package-used-p 'pip-requirements)
     (spacemacs|add-company-backends
       :backends company-capf

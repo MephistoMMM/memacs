@@ -80,7 +80,7 @@
    `(region ((,class (:background ,type :foreground ,bg1))))
    `(show-paren-match-face ((,class (:background ,warning))))
    `(trailing-whitespace ((,class :foreground nil :background ,warning)))
-   `(vertical-border ((,class (:foreground ,bg2))))
+   `(vertical-border ((,class (:foreground ,bg3))))
    `(warning ((,class (:foreground ,warning))))
    `(whitespace-trailing ((,class :inherit trailing-whitespace)))
    ;; syntax
