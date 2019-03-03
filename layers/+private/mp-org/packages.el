@@ -25,6 +25,7 @@
     ;;                           :repo "honmaple/emacs-maple-preview"))
 
     (memacs-org-ext :location local)
+    org-wild-notifier
 
     ;; https://coldnew.github.io/d2d60fe2/
     pangu-spacing
@@ -51,6 +52,19 @@
 ;;        maple-preview:js-file nil))
 ;;     )
 ;;   )
+
+(defun mp-org/init-org-wild-notifier()
+  "A package which adds notification support for org-agenda views. With this
+package you’ll get notifications for TODO entries.
+
+ https://github.com/akhramov/org-wild-notifier.el"
+  (use-package org-wild-notifier
+    :after org
+    :commands (org-wild-notifier-mode)
+    :init
+    (progn
+      (setq alert-default-style 'osx-notifier)))
+  )
 
 (defun mp-org/init-pangu-spacing()
   "Insert White Spece Automatically."
@@ -97,6 +111,7 @@
                                         (org-restart-font-lock)
                                         (setq org-descriptive-links nil)))
                              (setq truncate-lines nil)) 'append)
+  (setq-default org-bullets-bullet-list '("❁" "✾" "❀" "❖" "✧"))
   (with-eval-after-load 'org
 
     ;; config org-download and define custom link
@@ -116,56 +131,55 @@
 
     (load-library "find-lisp")
     (setq-default
-      org-startup-with-inline-images nil
-      org-bullets-bullet-list '("❁" "✾" "❀" "❖" "✧")
-      org-agenda-files (directory-files org-directory t "\.org$" t)
-      org-default-notes-file (concat org-directory "/TODOs.org"))
+     org-startup-with-inline-images nil
+     org-agenda-files (directory-files org-directory t "\.org$" t)
+     org-default-notes-file (concat org-directory "/TODOs.org"))
 
     (setq-default
-      ;; org-log-done 'note
-      org-agenda-span 'day
-      org-agenda-restore-windows-after-quit t
-      org-agenda-window-setup 'other-window
-      org-footnote-auto-adjust t
-      org-footnote-auto-label 'confirm)
+     ;; org-log-done 'note
+     org-agenda-span 'day
+     org-agenda-restore-windows-after-quit t
+     org-agenda-window-setup 'other-window
+     org-footnote-auto-adjust t
+     org-footnote-auto-label 'confirm)
 
     (setq-default
-      ;; html export
-      org-html-style-default ""
-      org-html-htmlize-output-type nil
-      org-todo-keywords
-      '((sequence "TODO(t)" "WAITING(w@/!)" "|" "SHELVING(s@)" "DONE(d!)" "CANCELED(c@)")))
+     ;; html export
+     org-html-style-default ""
+     org-html-htmlize-output-type nil
+     org-todo-keywords
+     '((sequence "TODO(t)" "WAITING(w@/!)" "|" "SHELVING(s@)" "DONE(d!)" "CANCELED(c@)")))
 
     (setq-default
-      org-modules
-      '(org-bbdb org-habit org-info org-irc org-w3m org-mac-link org-protocol)
-      org-capture-templates
-      '(("w" "Task" entry
-         (file+headline (lambda () (concat org-directory "/TODOs.org")) "Fighting")
-         "* TODO [#A] %^{Task}\nSCHEDULED: %t\n")
+     org-modules
+     '(org-bbdb org-habit org-info org-irc org-w3m org-mac-link org-protocol)
+     org-capture-templates
+     '(("w" "Task" entry
+        (file+headline (lambda () (concat org-directory "/TODOs.org")) "Fighting")
+        "* TODO [#A] %^{Task}\nSCHEDULED: %t\n")
 
-        ("t" "Todo" entry
-         (file+headline (lambda () (concat org-directory "/TODOs.org")) "Play Space")
-         "* TODO [#%^{level|B|C}] %?\nSCHEDULED: %t\n%i\n"
-         :empty-lines 1)
+       ("t" "Todo" entry
+        (file+headline (lambda () (concat org-directory "/TODOs.org")) "Play Space")
+        "* TODO [#%^{level|B|C}] %?\nSCHEDULED: %t\n%i\n"
+        :empty-lines 1)
 
-        ("l" "Links" entry
-         (file+headline (lambda () (concat org-directory "/TODOs.org")) "Play Space")
-         "* TODO [#C] %? link \t%^g\nCaptured On: %U\n"
-         :empty-lines 1)
+       ("l" "Links" entry
+        (file+headline (lambda () (concat org-directory "/TODOs.org")) "Play Space")
+        "* TODO [#C] %? link \t%^g\nCaptured On: %U\n"
+        :empty-lines 1)
 
-        ("b" "Books" entry
-         (file+headline (lambda () (concat org-directory "/TODOs.org")) "Books")
-         "* TODO [#B] %?"
-         :empty-lines 1)
+       ("b" "Books" entry
+        (file+headline (lambda () (concat org-directory "/TODOs.org")) "Books")
+        "* TODO [#B] %?"
+        :empty-lines 1)
 
-        ("n" "Temporary Notes" entry
-         (file+headline (lambda () (concat org-directory "/Temp.org")) "Temporary Notes")
-         "* %?\n  %i%a\n%U"
-         :empty-lines 1)
-      )
-    ))
- )
+       ("n" "Temporary Notes" entry
+        (file+headline (lambda () (concat org-directory "/Temp.org")) "Temporary Notes")
+        "* %?\n  %i%a\n%U"
+        :empty-lines 1)
+       )
+     ))
+  )
 
 
 (defun mp-org/init-blog-admin ()

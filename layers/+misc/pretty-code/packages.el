@@ -16,6 +16,31 @@
     (icons-in-terminal :location local)
 
     (company-box :requires company)
+    all-the-icons
+    ))
+
+(defun pretty-code/init-all-the-icons()
+  "Init all-the-icons."
+  (use-package all-the-icons
+    :config
+    (progn
+      (when (configuration-layer/layer-used-p 'org)
+        (setq org-bullets-bullet-list
+              `(
+                ,(all-the-icons-material "filter")
+                ,(all-the-icons-material "adb")
+                ,(all-the-icons-faicon "folder-o")
+                ,(all-the-icons-faicon "inbox")
+                ,(all-the-icons-faicon "book")
+                ,(all-the-icons-faicon "file-text-o")
+                ,(all-the-icons-faicon "file-o")
+                ,(all-the-icons-faicon "floppy-o")
+                ,(all-the-icons-faicon "header")
+                ,(all-the-icons-faicon "bookmark")
+                ,(all-the-icons-faicon "bookmark-o")
+                ,(all-the-icons-faicon "paperclip")
+                ,(all-the-icons-faicon "hashtag"))))
+      )
     ))
 
 (defun pretty-code/init-font-lock+()
