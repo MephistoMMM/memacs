@@ -18,6 +18,8 @@
 (spacemacs/declare-prefix-for-mode 'go-mode "r" "refactoring")
 (spacemacs/declare-prefix-for-mode 'go-mode "t" "test")
 (spacemacs/declare-prefix-for-mode 'go-mode "x" "execute")
+(spacemacs/declare-prefix-for-mode 'go-mode "tg" "generate")
+(spacemacs/declare-prefix-for-mode 'go-mode "T" "toggle")
 (spacemacs/set-leader-keys-for-major-mode 'go-mode
   "=="  'gofmt
   "hh" 'godoc-at-point

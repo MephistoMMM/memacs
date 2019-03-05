@@ -63,7 +63,10 @@ package you’ll get notifications for TODO entries.
     :commands (org-wild-notifier-mode)
     :init
     (progn
-      (setq alert-default-style 'osx-notifier)))
+      (setq alert-default-style 'osx-notifier))
+    :config
+    (progn
+      (org-wild-notifier-mode)))
   )
 
 (defun mp-org/init-pangu-spacing()
