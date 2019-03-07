@@ -8,7 +8,14 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; License: GPLv3
-
+
+;; Base
+(setq swiper-action-recenter t)
+(setq ivy-count-format "(%d/%d) ")
+(setq ivy-on-del-error-function nil)
+(setq counsel-find-file-at-point t)
+(setq counsel-yank-pop-separator "\n-------\n")
+(setq ivy-format-function 'memacs//ivy-format-function-arrow)
 
 
 ;; Layer Variables
@@ -55,8 +62,8 @@ than this amount.")
 
 (defvar memacs--ivy-grep-actions
   (cl-loop for j in memacs--ivy-file-actions
-        for key = (nth 0 j)
-        for func = (nth 1 j)
-        for desc = (nth 2 j)
-        collect `(,key (lambda (x) (spacemacs//counsel-with-git-grep (quote ,func) x)) ,desc))
+           for key = (nth 0 j)
+           for func = (nth 1 j)
+           for desc = (nth 2 j)
+           collect `(,key (lambda (x) (spacemacs//counsel-with-git-grep (quote ,func) x)) ,desc))
   "Default ivy actions to be used with git-grep output.")

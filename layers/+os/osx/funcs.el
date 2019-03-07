@@ -22,10 +22,10 @@
 (defun memacs//counsel-mdfind-function (string &rest _unused)
   "Issue mdfind for STRING."
   (or(counsel-more-chars)
-     (let* ((memacs--counsel-search-cmd
-             (format "mdfind -onlyin ~/ '%s'" string)))
-       (spacemacs//counsel-async-command memacs--counsel-search-cmd)
-       nil)))
+    (let* ((memacs--counsel-search-cmd
+            (format "mdfind -onlyin ~/ '%s'" string)))
+      (spacemacs//counsel-async-command memacs--counsel-search-cmd)
+      nil)))
 
 ;; Main function
 (defun memacs/counsel-spotlight (&optional initial-input)
@@ -34,8 +34,7 @@ You'll be given a list of files that match.
 Selecting a file will launch `swiper' for that file.
 INITIAL-INPUT can be given as the initial minibuffer input."
   (interactive)
-  (ivy-read (concat ivy-count-format
-                    "Spotlight: ")
+  (ivy-read "Spotlight: "
             'memacs//counsel-mdfind-function
             :initial-input initial-input
             :dynamic-collection t

@@ -106,20 +106,20 @@ FILENAME is renamed using `spacemacs/delete-file' function.."
       ;; `counsel-more-chars' returns non-nil when more chars are needed,
       ;; minimal chars count is configurable via `counsel-more-chars-alist'
       (or (counsel-more-chars)
-          (let* ((default-directory (ivy-state-directory ivy-last))
-                 (search-args "")
-                 (regex0 (if (string-match-p " -- " string)
-                             (let ((split (split-string string " -- ")))
-                               (prog1 (pop split)
-                                 (setq string (mapconcat #'identity split " -- "))
-                                 (setq search-args string)))
-                           string))
-                 (regex (counsel--elisp-to-pcre
-                         (setq ivy--old-re
-                               (ivy--regex regex0)))))
-            (setq spacemacs--counsel-search-cmd (format base-cmd search-args regex))
-            (spacemacs//counsel-async-command spacemacs--counsel-search-cmd)
-            nil)))))
+         (let* ((default-directory (ivy-state-directory ivy-last))
+                (search-args "")
+                (regex0 (if (string-match-p " -- " string)
+                            (let ((split (split-string string " -- ")))
+                              (prog1 (pop split)
+                                (setq string (mapconcat #'identity split " -- "))
+                                (setq search-args string)))
+                          string))
+                (regex (counsel--elisp-to-pcre
+                        (setq ivy--old-re
+                              (ivy--regex regex0)))))
+           (setq spacemacs--counsel-search-cmd (format base-cmd search-args regex))
+           (spacemacs//counsel-async-command spacemacs--counsel-search-cmd)
+           nil)))))
 
 (defun spacemacs//counsel-save-in-buffer ()
   (interactive)
@@ -165,7 +165,7 @@ for example by setting the variable's value to:
   ((t . spacemacs/ivy--regex-plus))
 "
   (if (and (eq (ivy-state-caller ivy-last) 'spacemacs/counsel-search)
-           (string-match-p " -- " str))
+         (string-match-p " -- " str))
       (ivy--regex-plus (car (last (split-string str " -- "))))
     (ivy--regex-plus str)))
 
@@ -187,23 +187,22 @@ that directory."
           (tool (catch 'tool
                   (dolist (tool tools)
                     (when (and (assoc-string tool spacemacs--counsel-commands)
-                               (executable-find tool))
+                             (executable-find tool))
                       (throw 'tool tool)))
                   (throw 'tool "grep")))
           (default-directory
             (or initial-directory (read-directory-name "Start from directory: "))))
     (ivy-read
-     (concat ivy-count-format
-             (format "%s from [%s]: "
-                     tool
-                     (if (< (length default-directory)
-                            spacemacs--counsel-search-max-path-length)
-                         default-directory
-                       (concat
-                        "..." (substring default-directory
-                                         (- (length default-directory)
-                                            spacemacs--counsel-search-max-path-length)
-                                         (length default-directory))))))
+     (format "%s from [%s]: "
+             tool
+             (if (< (length default-directory)
+                    spacemacs--counsel-search-max-path-length)
+                 default-directory
+               (concat
+                "..." (substring default-directory
+                                 (- (length default-directory)
+                                    spacemacs--counsel-search-max-path-length)
+                                 (length default-directory)))))
      (spacemacs//make-counsel-search-function tool)
      :initial-input (when initial-input (rxt-quote-pcre initial-input))
      :dynamic-collection t
@@ -231,7 +230,7 @@ that directory."
        (interactive)
        (spacemacs/counsel-search ,tools))
      (defun ,(intern (format "spacemacs/search-%s-region-or-symbol"
-                             tool-name)) ()
+                         tool-name)) ()
        ,(format
          "Use `spacemacs/counsel-search' to search for
  the selected region or the symbol around point in the current
@@ -249,7 +248,7 @@ that directory."
        (interactive)
        (spacemacs/counsel-search ,tools nil (projectile-project-root)))
      (defun ,(intern (format "spacemacs/search-project-%s-region-or-symbol"
-                             tool-name)) ()
+                         tool-name)) ()
        ,(format
          "Use `spacemacs/counsel-search' to search for
  the selected region or the symbol around point in the current
@@ -501,3 +500,13 @@ around point as the initial input."
 
 (defun memacs-origin-gc-cons ()
   (setq gc-cons-threshold memacs--tmp-gc-cons))
+
+;; FIXME this function is write according to ivy-format-function-arrow in ivy.
+(defun memacs//ivy-format-function-arrow (cands)
+  "Transform CANDS into a string for minibuffer."
+  (ivy--format-function-generic
+   (lambda (str)
+     (ivy--add-face (concat " " str) 'ivy-current-match))
+   (lambda (str) (concat " " str))
+   cands
+   "\n"))
