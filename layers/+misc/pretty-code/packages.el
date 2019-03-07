@@ -17,6 +17,7 @@
                                   :repo emacsmirror/font-lock-plus))
     (icons-in-terminal :location local)
     all-the-icons
+    all-the-icons-ivy
 
     (company-box :requires company)
     ))
@@ -30,6 +31,14 @@
     (unless (member "all-the-icons" (font-family-list))
       (all-the-icons-install-fonts t))
     ))
+
+(defun pretty-code/init-all-the-icons-ivy ()
+  "Init all the icons for ivy. "
+  (use-package all-the-icons-ivy
+    :after (all-the-icons ivy)
+    :config
+    (all-the-icons-ivy-setup))
+  )
 
 (defun pretty-code/init-font-lock+()
   "Init font-lock+.")

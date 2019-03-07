@@ -501,55 +501,6 @@ around point as the initial input."
 (defun memacs-origin-gc-cons ()
   (setq gc-cons-threshold memacs--tmp-gc-cons))
 
-
-
-;; Ivy rich
-
-(defun ivy-rich-file-icon (candidate)
-  "Display file icons in `ivy-rich'."
-  (when (display-graphic-p)
-    (let ((icon (if (file-directory-p candidate)
-                    (cond
-                     ((and (fboundp 'tramp-tramp-file-p)
-                           (tramp-tramp-file-p default-directory))
-                      (all-the-icons-octicon "file-directory"))
-                     ((file-symlink-p candidate)
-                      (all-the-icons-octicon "file-symlink-directory"))
-                     ((all-the-icons-dir-is-submodule candidate)
-                      (all-the-icons-octicon "file-submodule"))
-                     ((file-exists-p (format "%s/.git" candidate))
-                      (all-the-icons-octicon "repo"))
-                     (t (let ((matcher (all-the-icons-match-to-alist candidate all-the-icons-dir-icon-alist)))
-                          (apply (car matcher) (list (cadr matcher))))))
-                  (all-the-icons-icon-for-file candidate))))
-      (unless (symbolp icon)
-        (propertize icon
-                    'face `(
-                            :height 1.1
-                            :family ,(all-the-icons-icon-family icon)
-                            ))))))
-
-(defun ivy-rich-bookmark-name (candidate)
-  (car (assoc candidate bookmark-alist)))
-
-(defun ivy-rich-buffer-icon (candidate)
-  "Display buffer icons in `ivy-rich'."
-  (when (display-graphic-p)
-    (when-let* ((buffer (get-buffer candidate))
-                (major-mode (buffer-local-value 'major-mode buffer))
-                (icon (if (and (buffer-file-name buffer)
-                               (all-the-icons-auto-mode-match? candidate))
-                          (all-the-icons-icon-for-file candidate)
-                        (all-the-icons-icon-for-mode major-mode))))
-      (if (symbolp icon)
-          (setq icon (all-the-icons-icon-for-mode 'fundamental-mode)))
-      (unless (symbolp icon)
-        (propertize icon
-                    'face `(
-                            :height 1.1
-                            :family ,(all-the-icons-icon-family icon)
-                            ))))))
-
 ;; FIXME this function is write according to ivy-format-function-arrow in ivy.
 (defun memacs//ivy-format-function-arrow (cands)
   "Transform CANDS into a string for minibuffer."
