@@ -8,6 +8,12 @@
 ;;
 ;;; License: GPLv3
 
+;;; Swiper
+(memacs/define-evil-keybinding
+ (list evil-normal-state-map evil-evilified-state-map)
+ "/" 'swiper)
+
+
 ;;; iedit
 (define-key evil-normal-state-map "gI" 'evil-iedit-state/iedit-mode)
 

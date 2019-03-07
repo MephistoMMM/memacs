@@ -68,6 +68,9 @@
         "hdv" 'counsel-describe-variable
         "hi"  'counsel-info-lookup-symbol
         ;; jump
+        "fj" 'counsel-file-jump
+        "jd" 'counsel-dired-jump
+        "md" 'counsel-dired-jump
         ;; register/ring
         "rm"  'counsel-mark-ring
         ;; jumping
@@ -285,17 +288,28 @@ Current Action: %s(ivy-action-name)
   (define-key hydra-ivy/keymap [escape] 'hydra-ivy/keyboard-escape-quit-and-exit))
 
 (defun ivy/init-ivy-rich ()
+  ;; More friendly display transformer for Ivy
   (use-package ivy-rich
-    ;; if `counsel' loads after `ivy-rich', it overrides some of `ivy-rich''s
-    ;; transformers
     :after counsel
-    :init
-    (progn
-      (setq ivy-rich-path-style 'abbrev
-            ivy-virtual-abbreviate 'full))
+    :defines (all-the-icons-mode-icon-alist all-the-icons-dir-icon-alist bookmark-alist)
+    :functions (all-the-icons-icon-family
+                all-the-icons-match-to-alist
+                all-the-icons-auto-mode-match?
+                all-the-icons-octicon
+                all-the-icons-dir-is-submodule)
+    :hook (ivy-rich-mode . (lambda ()
+                             (setq ivy-virtual-abbreviate
+                                   (or (and ivy-rich-mode 'abbreviate) 'name))))
+    :preface
+    (with-eval-after-load 'all-the-icons
+      (add-to-list 'all-the-icons-mode-icon-alist
+                   '(gfm-mode  all-the-icons-octicon "markdown" :v-adjust 0.0 :face all-the-icons-lblue)))
     :config
     (progn
-      (ivy-rich-mode))))
+      (setq ivy-rich-parse-remote-buffer nil)
+      (ivy-rich-mode 1)))
+  )
+
 
 (defun ivy/init-ivy-spacemacs-help ()
   (use-package ivy-spacemacs-help
@@ -371,9 +385,9 @@ Current Action: %s(ivy-action-name)
     :config
     (progn
       (memacs/define-search-keybinding
-        "S" 'spacemacs/swiper-region-or-symbol
-        "b" 'swiper-all
-        "B" 'spacemacs/swiper-all-region-or-symbol)
+       "S" 'spacemacs/swiper-region-or-symbol
+       "b" 'swiper-all
+       "B" 'spacemacs/swiper-all-region-or-symbol)
       (define-key swiper-map (kbd "C-l") 'swiper-avy)
       )))
 

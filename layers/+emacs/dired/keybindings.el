@@ -24,11 +24,6 @@
                       "C-h" 'memacs/dired-backward
                       ))
 
-(spacemacs/set-leader-keys
-  "jd" 'dired
-  "fj" 'dired
-  "md" 'dired-jump)
-
 
 ;; ranger
 (spacemacs/set-leader-keys "ar" 'ranger)

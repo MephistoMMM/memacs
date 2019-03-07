@@ -9,6 +9,7 @@
 ;;
 ;;; License: GPLv3
 
+
 ;;;; company-box
 (defface memacs-company-box-backend-yasnippet-face
   '((t (:inherit font-lock-string-face)))
@@ -65,5 +66,9 @@
         (24 . (fa_square_o                 :height 1                                   )) ;; Operator
         (25 . (fa_arrows                   :height 1                                   )) ;; TypeParameter
         ))
+
+
+;;;; all-the-icons
+(setq all-the-icons-scale-factor 1)
 
 ;;; config.el ends here

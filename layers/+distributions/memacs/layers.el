@@ -22,6 +22,7 @@
                evil-snipe-scope 'whole-visible
                evil-snipe-repeat-keys nil
                )
+   spacemacs-modeline
    spacemacs-misc
    spacemacs-navigation
    spacemacs-org
