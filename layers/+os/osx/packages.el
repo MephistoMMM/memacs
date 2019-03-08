@@ -27,10 +27,9 @@
   (when (boundp 'mac-system-move-file-to-trash-use-finder)
     (setq mac-system-move-file-to-trash-use-finder t))
   ;; Following statements sometimes doesn't run , so let it be called after user-config
-  (spacemacs/defer-until-after-user-config (lambda ()
-                                             (add-hook 'focus-in-hook 'memacs/autoescape-use-english-layout)
-                                             (add-hook 'focus-out-hook 'memacs/autoescape-recover-outside-layout)
-                                             (add-hook 'kill-emacs-hook 'memacs/autoescape-recover-outside-layout)))
+  (spacemacs/defer-until-after-user-config
+   (lambda ()
+     (add-hook 'focus-in-hook 'memacs/autoescape-use-english-layout)))
   )
 
 (defun osx/init-osx-trash ()

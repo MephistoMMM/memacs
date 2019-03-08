@@ -1,7 +1,7 @@
-;;; lagency.el --- abandoned configuration
+;;; legacy.el --- abandoned configuration
 
 ;; Author: Mephis Pheies <mephistommm@gmail.com>
-;; Keywords: lagency
+;; Keywords: legacy
 
 ;; License:
 
@@ -132,4 +132,40 @@ Switch to @org -> reload org agenda file -> show agenda list"
 
 (setq close-auto-org-agenda-task t)
 
-;;; lagency.el ends here
+
+;;;; Autoescape
+
+(defvar memacs-autoescape-english-layout-name "ABC"
+  "English layout name in your macOS system")
+
+(setq memacs-autoescape--origin-outside-layout-name "ABC")
+
+(defun memacs/autoescape-use-english-layout()
+  "Change input source to english layout while emacs frame focused."
+  (unless (evil-hybrid-state-p)
+    (setq memacs-autoescape--origin-outside-layout-name (shell-command-to-string "textinputsource"))
+    (unless (string= memacs-autoescape--origin-outside-layout-name
+                     memacs-autoescape-english-layout-name)
+      (start-process-shell-command "changeInputSource" nil
+                                   (concat "textinputsource -s "
+                                           memacs-autoescape-english-layout-name))
+      ))
+  )
+
+(defun memacs/autoescape-recover-outside-layout()
+  "Recover input source to origin layout while emacs frame unfocused."
+  (unless (string=
+           (shell-command-to-string "textinputsource")
+           memacs-autoescape--origin-outside-layout-name)
+    (call-process-shell-command (concat "textinputsource -s "
+                                        memacs-autoescape--origin-outside-layout-name)))
+  )
+
+;; Following statements sometimes doesn't run , so let it be called after user-config
+(spacemacs/defer-until-after-user-config
+ (lambda ()
+   (add-hook 'focus-in-hook 'memacs/autoescape-use-english-layout)
+   (add-hook 'focus-out-hook 'memacs/autoescape-recover-outside-layout)
+   (add-hook 'kill-emacs-hook 'memacs/autoescape-recover-outside-layout)))
+
+;;; legacy.el ends here

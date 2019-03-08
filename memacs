@@ -62,6 +62,9 @@ This function should only modify configuration layer settings."
      ;; READY : npm install -g
      ;;             eslint  typescript javascript-typescript-langserver flow-language-server
      javascript
+     ;; READY : brew install luarocks
+     ;;         luarocks install luacheck
+     lua
      ;; READY : see readme in java layer
      (java :variables java-backend 'lsp)
      ;; READY : brew install cquery clang-format

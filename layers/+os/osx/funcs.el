@@ -52,31 +52,7 @@ INITIAL-INPUT can be given as the initial minibuffer input."
                       (swiper--cleanup))))
 
 
-;;; Autoescape
-
-(defun memacs/autoescape-use-english-layout()
-  "Change input source to english layout while emacs frame focused."
-  (unless (evil-hybrid-state-p)
-    (setq memacs-autoescape--origin-outside-layout-name (shell-command-to-string "textinputsource"))
-    (unless (string= memacs-autoescape--origin-outside-layout-name
-                     memacs-autoescape-english-layout-name)
-      (start-process-shell-command "changeInputSource" nil
-                                   (concat "textinputsource -s "
-                                           memacs-autoescape-english-layout-name))
-      ))
-  )
-
-(defun memacs/autoescape-recover-outside-layout()
-  "Recover input source to origin layout while emacs frame unfocused."
-  (unless (string=
-           (shell-command-to-string "textinputsource")
-           memacs-autoescape--origin-outside-layout-name)
-    (call-process-shell-command (concat "textinputsource -s "
-                                        memacs-autoescape--origin-outside-layout-name)))
-  )
-
-
-
+;;; Switch To Item2
 (defun memacs//switch-to-item2-run-command(CMD)
   "Open item2 run command CMD."
   (do-applescript
@@ -105,4 +81,20 @@ current buffer."
     (replace-regexp-in-string "\\\\" "\\\\\\\\"
                               (shell-quote-argument
                                (or default-directory "~")))))
+  )
+
+
+
+;;; Autoescape
+(defun memacs/autoescape-use-english-layout()
+  "Change input source to english layout while emacs frame focused."
+  (unless (evil-hybrid-state-p)
+    (let ((origin-layout (shell-command-to-string "textinputsource")))
+      (unless (string= origin-layout
+                       memacs-autoescape-english-layout-name)
+        (start-process-shell-command
+         "changeInputSource" nil
+         (concat "textinputsource -s "
+                 memacs-autoescape-english-layout-name))
+        )))
   )
