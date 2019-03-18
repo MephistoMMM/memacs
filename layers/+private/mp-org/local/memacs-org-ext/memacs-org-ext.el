@@ -69,6 +69,36 @@
     (when (not (file-directory-p pub-dir))
       (make-directory pub-dir))))
 
+;; export files in dired or directory
+(defmacro memacs||export-org-in-dired (type org-export-func)
+  "Macro to export org files in a dired or directory."
+  `(defun ,(intern (format "memacs/export-org-in-dired-to-%s" type)) ()
+     ,(format "Export org files in a dired or directory to %s." type)
+     (interactive)
+     (let ((files
+            (if (eq major-mode 'dired-mode)
+                (dired-get-marked-files)
+              (let ((default-directory (read-directory-name "Source Directory: ")))
+                (mapcar #'expand-file-name
+                        (file-expand-wildcards "*.org")))))
+           (dest (read-directory-name "Export to Directory: "
+                                      nil default-directory nil))
+           )
+       (setq memacs--org-export-directory dest
+             memacs-img/before-export-aspect
+             #'memacs-img//copy-to-destination-statics-dir)
+       (mapc
+        (lambda (f)
+          (with-current-buffer
+              (find-file-noselect f)
+            (,org-export-func)))
+        files))
+     )
+  )
+
+;; html
+(memacs||export-org-in-dired "html" org-html-export-to-html)
+
 
 ;;;; Custom Link
 
@@ -108,13 +138,13 @@
   "export event of custom link img."
   ;; concat custom img host and final two section of the path
   (let ((url (funcall memacs-img/before-export-aspect path desc format)))
-     (cond
-      ((eq format 'html)
-       (format "<img src=\"%s\" alt=\"%s\"/>" (url-encode-url url) desc))
-      ((eq format 'md)
-       (format "![%s](%s)" desc (url-encode-url url)))
-      )
+    (cond
+     ((eq format 'html)
+      (format "<img src=\"%s\" alt=\"%s\"/>" (url-encode-url url) desc))
+     ((eq format 'md)
+      (format "![%s](%s)" desc (url-encode-url url)))
      )
+    )
   )
 
 
@@ -152,82 +182,82 @@ Same as 'org-display-inline-images', except img link type."
     (org-with-wide-buffer
      (goto-char (or beg (point-min)))
      (let* ((case-fold-search t)
-	    (file-extension-re (image-file-name-regexp))
-	    (link-abbrevs (mapcar #'car
-				  (append org-link-abbrev-alist-local
-					  org-link-abbrev-alist)))
-	    ;; Check absolute, relative file names and explicit
-	    ;; "img:" or “file:" links.  Also check link abbreviations since
-	    ;; some might expand to "file" links.
-	    (file-types-re (format "[][]\\[\\(?:img\\|file\\|[./~]%s\\)"
-				   (if (not link-abbrevs) ""
-				     (format "\\|\\(?:%s:\\)"
-					     (regexp-opt link-abbrevs))))))
+            (file-extension-re (image-file-name-regexp))
+            (link-abbrevs (mapcar #'car
+                                  (append org-link-abbrev-alist-local
+                                          org-link-abbrev-alist)))
+            ;; Check absolute, relative file names and explicit
+            ;; "img:" or “file:" links.  Also check link abbreviations since
+            ;; some might expand to "file" links.
+            (file-types-re (format "[][]\\[\\(?:img\\|file\\|[./~]%s\\)"
+                                   (if (not link-abbrevs) ""
+                                     (format "\\|\\(?:%s:\\)"
+                                             (regexp-opt link-abbrevs))))))
        (while (re-search-forward file-types-re end t)
-	 (let ((link (save-match-data (org-element-context))))
-	   ;; Check if we're at an inline image, i.e., an image file
-	   ;; link without a description (unless INCLUDE-LINKED is
-	   ;; non-nil).
-	   (when (and (or (equal "img" (org-element-property :type link))
-                    (equal "file" (org-element-property :type link)))
-		      (or include-linked
-			  (null (org-element-contents link)))
-		      (string-match-p file-extension-re
-				      (org-element-property :path link)))
-	     (let ((file (expand-file-name
-			  (org-link-unescape
-			   (org-element-property :path link)))))
-	       (when (file-exists-p file)
-		 (let ((width
-			(cond
-			 ((not (image-type-available-p 'imagemagick)) nil)
-			 ((eq org-image-actual-width t) nil)
-			 ((listp org-image-actual-width)
-			  (or
-			   (let ((paragraph
-				  (let ((e link))
-				    (while (and (setq e (org-element-property
-							 :parent e))
-						(not (eq (org-element-type e)
-							 'paragraph))))
-				    e)))
-			     (when paragraph
-			       (save-excursion
-				 (goto-char (org-element-property :begin paragraph))
-				 (when
-				     (re-search-forward
-				      "^[ \t]*#\\+attr_.*?: +.*?:width +\\(\\S-+\\)"
-				      (org-element-property
-				       :post-affiliated paragraph)
-				      t)
-				   (string-to-number (match-string 1))))))
-			   (car org-image-actual-width)))
-			 ((numberp org-image-actual-width)
-			  org-image-actual-width)))
-		       (old (get-char-property-and-overlay
-			     (org-element-property :begin link)
-			     'org-image-overlay)))
-		   (if (and (car-safe old) refresh)
-		       (image-refresh (overlay-get (cdr old) 'display))
-		     (let ((image (create-image file
-						(and width 'imagemagick)
-						nil
-						:width width)))
-		       (when image
-			 (let ((ov (make-overlay
-				    (org-element-property :begin link)
-				    (progn
-				      (goto-char
-				       (org-element-property :end link))
-				      (skip-chars-backward " \t")
-				      (point)))))
-			   (overlay-put ov 'display image)
-			   (overlay-put ov 'face 'default)
-			   (overlay-put ov 'org-image-overlay t)
-			   (overlay-put
-			    ov 'modification-hooks
-			    (list 'org-display-inline-remove-overlay))
-			   (push ov org-inline-image-overlays)))))))))))))))
+         (let ((link (save-match-data (org-element-context))))
+           ;; Check if we're at an inline image, i.e., an image file
+           ;; link without a description (unless INCLUDE-LINKED is
+           ;; non-nil).
+           (when (and (or (equal "img" (org-element-property :type link))
+                          (equal "file" (org-element-property :type link)))
+                      (or include-linked
+                          (null (org-element-contents link)))
+                      (string-match-p file-extension-re
+                                      (org-element-property :path link)))
+             (let ((file (expand-file-name
+                          (org-link-unescape
+                           (org-element-property :path link)))))
+               (when (file-exists-p file)
+                 (let ((width
+                        (cond
+                         ((not (image-type-available-p 'imagemagick)) nil)
+                         ((eq org-image-actual-width t) nil)
+                         ((listp org-image-actual-width)
+                          (or
+                           (let ((paragraph
+                                  (let ((e link))
+                                    (while (and (setq e (org-element-property
+                                                         :parent e))
+                                                (not (eq (org-element-type e)
+                                                         'paragraph))))
+                                    e)))
+                             (when paragraph
+                               (save-excursion
+                                 (goto-char (org-element-property :begin paragraph))
+                                 (when
+                                     (re-search-forward
+                                      "^[ \t]*#\\+attr_.*?: +.*?:width +\\(\\S-+\\)"
+                                      (org-element-property
+                                       :post-affiliated paragraph)
+                                      t)
+                                   (string-to-number (match-string 1))))))
+                           (car org-image-actual-width)))
+                         ((numberp org-image-actual-width)
+                          org-image-actual-width)))
+                       (old (get-char-property-and-overlay
+                             (org-element-property :begin link)
+                             'org-image-overlay)))
+                   (if (and (car-safe old) refresh)
+                       (image-refresh (overlay-get (cdr old) 'display))
+                     (let ((image (create-image file
+                                                (and width 'imagemagick)
+                                                nil
+                                                :width width)))
+                       (when image
+                         (let ((ov (make-overlay
+                                    (org-element-property :begin link)
+                                    (progn
+                                      (goto-char
+                                       (org-element-property :end link))
+                                      (skip-chars-backward " \t")
+                                      (point)))))
+                           (overlay-put ov 'display image)
+                           (overlay-put ov 'face 'default)
+                           (overlay-put ov 'org-image-overlay t)
+                           (overlay-put
+                            ov 'modification-hooks
+                            (list 'org-display-inline-remove-overlay))
+                           (push ov org-inline-image-overlays)))))))))))))))
 
 
 ;;;; Init
