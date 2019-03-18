@@ -35,9 +35,14 @@
 (defun pretty-code/init-all-the-icons-ivy ()
   "Init all the icons for ivy. "
   (use-package all-the-icons-ivy
-    :after (all-the-icons ivy)
-    :config
-    (all-the-icons-ivy-setup))
+    :if (configuration-layer/package-used-p 'all-the-icons)
+    :init
+    (progn
+      (add-hook 'spacemacs-post-user-config-hook
+                #'all-the-icons-ivy-setup)
+      (with-eval-after-load 'counsel-projectile
+        (all-the-icons-ivy-setup)))
+    )
   )
 
 (defun pretty-code/init-font-lock+()

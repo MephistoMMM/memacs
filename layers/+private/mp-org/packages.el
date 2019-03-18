@@ -101,6 +101,8 @@ package you’ll get notifications for TODO entries.
       (setq mequ-conf-file "~/Dropbox/dotconf/mequ.conf")
       (setq custom-link-img-export-host
             "http://qiniu.oeli.pub")
+      (when (configuration-layer/package-used-p 'ox-gfm)
+        (memacs||export-org-in-dired "markdown" org-gfm-export-to-markdown))
       ))
   )
 

@@ -53,8 +53,7 @@
 
   (defvar memacs-autoescape-english-layout-name "ABC"
     "English layout name in your macOS system")
-
-  (setq memacs-autoescape--origin-outside-layout-name "ABC"))
+  )
 
 ;; Use the OS X Emoji font for Emoticons
 (when (fboundp 'set-fontset-font)
