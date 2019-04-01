@@ -16,6 +16,9 @@
         hl-todo
         popup
         popwin
+        (posframe :location (recipe
+                             :fetcher github
+                             :repo "tumashu/posframe"))
         (company-posframe :location (recipe
                                      :fetcher github
                                      :repo "tumashu/company-posframe"))
@@ -24,6 +27,8 @@
 (defun spacemacs-visual/init-ansi-colors ()
   (add-hook 'compilation-filter-hook
             'spacemacs-visual//compilation-buffer-apply-ansi-colors))
+
+(defun spacemacs-visual/init-posframe ())
 
 (defun spacemacs-visual/init-company-posframe ()
   (use-package company-posframe
