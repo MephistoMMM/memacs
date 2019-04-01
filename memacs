@@ -439,15 +439,15 @@ you should place your code here."
 
   ;; Missions
   (setq memacs-mission-starter-mission-list
-    '(
-      ;; config new org file in dropbox
-      ("Dropbox Note Buffer" org-mode
-       (concat org-directory "/notes/") (memacs//mission-start-find-file-name nil))
-      ("Codewar&Golang" go-mode
-       (format-time-string "~/Workspace/go/src/codewar_pg/%Y_%m_%d"))
-      ("Daily Report" org-mode
-       "~/Documents/works/seven/daily_report" (format-time-string "%Y_%m_%d.org"))
-      ))
+        '(
+          ;; config new org file in dropbox
+          ("Dropbox Note Buffer" org-mode
+           (concat org-directory "/notes/") (memacs//mission-start-find-file-name nil))
+          ("Codewar&Golang" go-mode
+           (format-time-string "~/Workspace/go/src/codewar_pg/%Y_%m_%d"))
+          ("Daily Report" org-mode
+           "~/Documents/works/seven/daily_report" (format-time-string "%Y_%m_%d.org"))
+          ))
 
   ;; Helps
   (setq memacs-mission-helper-help-list
@@ -463,7 +463,7 @@ you should place your code here."
            ("RestClient" "https://github.com/pashky/restclient.el"))
           )
         )
-)
+  )
 
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file 'no-error 'no-message)

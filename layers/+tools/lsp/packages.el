@@ -11,10 +11,10 @@
 
 (defconst lsp-packages
   '(
-     lsp-mode
-     lsp-ui
-     (company-lsp :requires company)
-     ))
+    lsp-mode
+    lsp-ui
+    (company-lsp :requires company)
+    ))
 
 (defun lsp/init-lsp-mode ()
   (use-package lsp-mode
@@ -53,6 +53,34 @@
        "k" #'lsp-ui-peek--select-prev
        "l" #'lsp-ui-peek--select-next-file
        )
+
+      (setq memacs--lsp-ui-doc-max-width 1200)
+
+      ;; redefine it to fix error position bug
+      (defun lsp-ui-doc--move-frame (frame)
+        "Place our FRAME on screen."
+        (-let* (((left top _right _bottom) (window-edges nil nil nil t))
+                (window (frame-root-window frame))
+                ((width . height) (window-text-pixel-size window nil nil 10000 10000 t))
+                (width (+ width (* (frame-char-width frame) 1))) ;; margins
+                (width (if (< memacs--lsp-ui-doc-max-width width)
+                           memacs--lsp-ui-doc-max-width
+                         width))
+                (char-h (frame-char-height))
+                (height (min (- (* lsp-ui-doc-max-height char-h) (/ char-h 2)) height))
+                (frame-resize-pixelwise t))
+          (set-frame-size frame width height t)
+          (set-frame-position
+           frame
+           (if (and (>= left (+ width 10 (frame-char-width)))
+                  (not (lsp-ui-doc--next-to-side-window-p)))
+               10
+             (- (frame-pixel-width) width 10 (frame-char-width)))
+           (pcase lsp-ui-doc-position
+             ('top (+ top 10))
+             ('bottom (- (lsp-ui-doc--line-height 'mode-line)
+                         height
+                         10))))))
       )))
 
 (defun lsp/init-company-lsp ()
