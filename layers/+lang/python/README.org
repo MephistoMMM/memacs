@@ -18,8 +18,7 @@
   - [[#automatic-save-of-buffer-when-testing][Automatic save of buffer when testing]]
   - [[#autoflake][autoflake]]
   - [[#pylookup][pylookup]]
-  - [[#hy-mode][Hy-mode]]
-  - [[#lsp][Lsp]]
+  - [[#dap-mode-debuggeronly-for-lsp-backend][dap-mode debugger(only for lsp backend)]]
 - [[#configuration][Configuration]]
   - [[#fill-column][Fill column]]
   - [[#sort-imports][Sort imports]]
@@ -35,6 +34,7 @@
   - [[#pip-package-management][Pip package management]]
   - [[#live-coding][Live coding]]
   - [[#other-python-commands][Other Python commands]]
+  - [[#debugger][Debugger]]
 
 * Description
 This layer adds support for the Python language.
@@ -193,23 +193,11 @@ To be able to suppress unused imports easily, install [[https://github.com/myint
 To use =pylookup= on ~SPC m h H~, make sure you update the database first, using
 ~SPC SPC pylookup-update~.
 
-** Hy-mode
-To be able to connect to an inferior lisp repl in =hy-mode=, you need to make sure
-that hy is installed.
+** dap-mode debugger(only for lsp backend)
+To use =dap-mode= for debugging do:
 
-#+BEGIN_SRC sh
-  pip install hy
-#+END_SRC
-
-** Lsp
-For the layer to function, you have to install python languange server.
-#+BEGIN_SRC shell
-# mandatory
-pip install python-language-server
-# for import sorting
-pip install pyls-isort
-# for mypy checking
-pip install pyls-mypy
+#+BEGIN_SRC bash
+  pip install "ptvsd>=4.2"
 #+END_SRC
 
 * Configuration
@@ -398,3 +386,50 @@ Live coding is provided by the [[https://github.com/donkirkby/live-py-plugin][li
 | ~SPC m v p o~ | open pipenv module in buffer                                                      |
 | ~SPC m v p s~ | launch pipenv shell in current project                                            |
 | ~SPC m v p u~ | uninstall module from pipenv environment                                          |
+
+** Debugger
+
+| Key binding   | Description                     |
+|---------------+---------------------------------|
+| ~SPC m d d d~ | start debugging                 |
+| ~SPC m d d l~ | debug last configuration        |
+| ~SPC m d d r~ | debug recent configuration      |
+|---------------+---------------------------------|
+| ~SPC m d c~   | continue                        |
+| ~SPC m d i~   | step in                         |
+| ~SPC m d o~   | step out                        |
+| ~SPC m d s~   | next step                       |
+| ~SPC m d v~   | inspect value at point          |
+| ~SPC m d r~   | restart frame                   |
+|---------------+---------------------------------|
+| ~SPC m d .~   | debug transient state           |
+|---------------+---------------------------------|
+| ~SPC m d a~   | abandon current session         |
+| ~SPC m d A~   | abandon all process             |
+|---------------+---------------------------------|
+| ~SPC m d e e~ | eval                            |
+| ~SPC m d e r~ | eval region                     |
+| ~SPC m d e t~ | eval value at point             |
+|---------------+---------------------------------|
+| ~SPC m d S s~ | switch session                  |
+| ~SPC m d S t~ | switch thread                   |
+| ~SPC m d S f~ | switch frame                    |
+|---------------+---------------------------------|
+| ~SPC m d I i~ | inspect                         |
+| ~SPC m d I r~ | inspect region                  |
+| ~SPC m d I t~ | inspect value at point          |
+|---------------+---------------------------------|
+| ~SPC m d b b~ | toggle a breakpoint             |
+| ~SPC m d b c~ | change breakpoint condition     |
+| ~SPC m d b l~ | change breakpoint log condition |
+| ~SPC m d b h~ | change breakpoint hit count     |
+| ~SPC m d b a~ | add a breakpoint                |
+| ~SPC m d b d~ | delete a breakpoint             |
+| ~SPC m d b D~ | clear all breakpoints           |
+|---------------+---------------------------------|
+| ~SPC m d '_~  | Run debug REPL                  |
+|---------------+---------------------------------|
+| ~SPC m d w l~ | list local variables            |
+| ~SPC m d w o~ | goto output buffer if present   |
+| ~SPC m d w s~ | list sessions                   |
+| ~SPC m d w b~ | list breakpoints                |

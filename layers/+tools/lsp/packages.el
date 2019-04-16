@@ -14,6 +14,7 @@
     lsp-mode
     lsp-ui
     (company-lsp :requires company)
+    lsp-treemacs
     ))
 
 (defun lsp/init-lsp-mode ()
@@ -85,3 +86,6 @@
 
 (defun lsp/init-company-lsp ()
   (use-package company-lsp :defer t))
+
+(defun lsp/init-lsp-treemacs ()
+  (use-package lsp-treemacs :defer t))

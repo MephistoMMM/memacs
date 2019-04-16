@@ -52,8 +52,9 @@
           (setq display-now t)
           (setq spacemacs--counsel-initial-cands-shown t)))
       (let ((ivy--prompt
-             (format (ivy-state-prompt ivy-last)
-                     size)))
+             (ivy-add-prompt-count
+              (format (ivy-state-prompt ivy-last)
+                      size))))
         (if display-now
             (ivy--insert-minibuffer
              (ivy--format ivy--all-candidates))

@@ -21,6 +21,9 @@
     :defer t
     :init
     (progn
+      (setq-default evil-mc-one-cursor-show-mode-line-text nil)
+      (setq evil-mc-enable-bar-cursor nil)
+
       ;; evil-mc is not compatible with the paste transient state
       (define-key evil-normal-state-map "p" 'spacemacs/evil-mc-paste-after)
       (define-key evil-normal-state-map "P" 'spacemacs/evil-mc-paste-before)

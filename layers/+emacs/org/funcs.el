@@ -75,6 +75,10 @@
   (interactive)
   (org-trello-sync-card))
 
+(defun spacemacs/org-clock-jump-to-current-clock ()
+  (interactive)
+  (org-clock-jump-to-current-clock))
+
 
 ;; org-download
 (defun memacs//org-download-stored-by-filename-method (link)
