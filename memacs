@@ -101,6 +101,7 @@ This function should only modify configuration layer settings."
      ;; READY : npm install -g hexo
      mp-org
      mp-hacking
+     coding
      osx
      )
    ;; List of additional packages that will be installed without being

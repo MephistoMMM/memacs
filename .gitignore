@@ -67,3 +67,4 @@ spacemacs.env
 /GTAGS
 .lsp-session-*
 .mypy_cache/
+/LEETCODE
