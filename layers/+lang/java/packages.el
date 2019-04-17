@@ -64,7 +64,6 @@
 (defun java/init-meghanada ()
   (use-package meghanada
     :defer t
-    :if (eq java-backend 'meghanada)
     :init
     (progn
       (setq meghanada-server-install-dir (concat spacemacs-cache-directory
@@ -83,7 +82,7 @@
                         ("t" . "test")
                         ("x" . "execute")))
         (spacemacs/declare-prefix-for-mode
-          'java-mode (car prefix) (cdr prefix)))
+         'java-mode (car prefix) (cdr prefix)))
       (spacemacs/set-leader-keys-for-major-mode 'java-mode
         "cb" 'meghanada-compile-file
         "cc" 'meghanada-compile-project
@@ -118,23 +117,17 @@
 (defun java/init-lsp-java ()
   (use-package lsp-java
     :defer t
-    :if (eq java-backend 'lsp)
     :config
     (progn
       ;; key bindings
       (dolist (prefix '(("c" . "compile")
                         ("g" . "goto")
                         ("r" . "refactor")
-                        ("ra" . "add")
-                        ("rc" . "create")
-                        ("re" . "extract")
-                        ("q" . "lsp")
-                        ("t" . "test")
-                        ("x" . "execute")))
+                        ("q" . "lsp")))
         (spacemacs/declare-prefix-for-mode 'java-mode (car prefix) (cdr prefix)))
       (spacemacs/set-leader-keys-for-major-mode 'java-mode
         "pu"  'lsp-java-update-user-settings
-        "ro" 'lsp-java-organize-imports
+        "roi" 'lsp-java-organize-imports
         "rai" 'lsp-java-add-import
         "ram" 'lsp-java-add-unimplemented-methods
         "rcp" 'lsp-java-create-parameter
