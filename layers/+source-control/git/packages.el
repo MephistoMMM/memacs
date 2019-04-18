@@ -29,11 +29,6 @@
         transient
         ))
 
-(defun git/pre-init-golden-ratio ()
-  (spacemacs|use-package-add-hook golden-ratio
-    :post-config
-    (add-to-list 'golden-ratio-exclude-buffer-names " *transient*")))
-
 (defun git/pre-init-evil-magit ()
   (spacemacs|use-package-add-hook magit
     :post-config

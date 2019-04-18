@@ -35,8 +35,6 @@
         persp-mode
         ;; TODO research hugo
         ;; (ox-hugo :toggle org-enable-hugo-support)
-        (org-trello :toggle org-enable-trello-support)
-        (org-sticky-header :toggle org-enable-sticky-header)
         ))
 
 (defun org/post-init-company ()
