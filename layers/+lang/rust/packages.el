@@ -27,7 +27,7 @@
     :defer t
     :init
     (progn
-      (spacemacs/declare-prefix-for-mode 'rust-mode "mc" "cargo")
+      (spacemacs/declare-prefix-for-mode 'rust-mode "c" "cargo")
       (spacemacs/set-leader-keys-for-major-mode 'rust-mode
         "c." 'cargo-process-repeat
         "cC" 'cargo-process-clean
@@ -54,9 +54,9 @@
     :init
     (progn
       (spacemacs/add-to-hook 'rust-mode-hook '(spacemacs//rust-setup-backend))
-      (spacemacs/declare-prefix-for-mode 'rust-mode "mg" "goto")
-      (spacemacs/declare-prefix-for-mode 'rust-mode "mh" "help")
-      (spacemacs/declare-prefix-for-mode 'rust-mode "m=" "format")
+      (spacemacs/declare-prefix-for-mode 'rust-mode "g" "goto")
+      (spacemacs/declare-prefix-for-mode 'rust-mode "h" "help")
+      (spacemacs/declare-prefix-for-mode 'rust-mode "=" "format")
       (spacemacs/set-leader-keys-for-major-mode 'rust-mode
         "==" 'rust-format-buffer
         "q" 'spacemacs/rust-quick-run))))

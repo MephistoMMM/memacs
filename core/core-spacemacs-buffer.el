@@ -163,8 +163,8 @@ Insert it in the first line of the buffer, right justified."
   (save-excursion
     (let* ((heart-path spacemacs-purple-heart-png)
            (heart (when (and (display-graphic-p)
-                             (image-type-available-p
-                              (intern (file-name-extension heart-path))))
+                           (image-type-available-p
+                            (intern (file-name-extension heart-path))))
                     (create-image heart-path)))
            (heart-size (when heart (car (image-size heart))))
            (build-lhs "Made with ")

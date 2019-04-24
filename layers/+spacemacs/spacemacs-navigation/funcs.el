@@ -30,12 +30,11 @@ If the universal prefix argument is used then kill the buffer too."
 If the universal prefix argument is used then kill also the window."
   (interactive "P")
   (require 'ace-window)
-  (let (golden-ratio-mode)
-    (aw-select
-     " Ace - Kill buffer in Window"
-     (lambda (window)
-       (with-selected-window window
-         (spacemacs/kill-this-buffer arg))))))
+  (aw-select
+   " Ace - Kill buffer in Window"
+   (lambda (window)
+     (with-selected-window window
+       (spacemacs/kill-this-buffer arg)))))
 
 
 ;; auto-highlight symbol
@@ -51,30 +50,30 @@ If the universal prefix argument is used then kill also the window."
     (message "No symbol has been searched for now.")))
 
 (defun spacemacs/integrate-evil-search (forward)
-        ;; isearch-string is last searched item.  Next time
-        ;; "n" is hit we will use this.
-        (let* ((symbol (evil-find-thing forward 'symbol))
-               (regexp (concat "\\<" symbol "\\>")))
-          (setq isearch-string regexp
-                isearch-regexp regexp
-                evil-ex-search-pattern (evil-ex-make-search-pattern regexp)))
-        ;; Next time "n" is hit, go the correct direction.
-        (setq isearch-forward forward)
-        (setq evil-ex-search-direction (if forward 'forward 'backward))
-        ;; ahs does a case sensitive search.  We could set
-        ;; this, but it would break the user's current
-        ;; sensitivity settings.  We could save the setting,
-        ;; then next time the user starts a search we could
-        ;; restore the setting.
-        ;;(setq case-fold-search nil)
-        ;; Place the search term into the search rings.
-        (isearch-update-ring isearch-string t)
-        (evil-push-search-history isearch-string forward)
-        ;; Use this search term for empty pattern "%s//replacement/"
-        ;; Append case sensitivity
-        (setq evil-ex-last-was-search nil
-              evil-ex-substitute-pattern `(,(concat isearch-string "\\C")
-                                           nil (0 0))))
+  ;; isearch-string is last searched item.  Next time
+  ;; "n" is hit we will use this.
+  (let* ((symbol (evil-find-thing forward 'symbol))
+         (regexp (concat "\\<" symbol "\\>")))
+    (setq isearch-string regexp
+          isearch-regexp regexp
+          evil-ex-search-pattern (evil-ex-make-search-pattern regexp)))
+  ;; Next time "n" is hit, go the correct direction.
+  (setq isearch-forward forward)
+  (setq evil-ex-search-direction (if forward 'forward 'backward))
+  ;; ahs does a case sensitive search.  We could set
+  ;; this, but it would break the user's current
+  ;; sensitivity settings.  We could save the setting,
+  ;; then next time the user starts a search we could
+  ;; restore the setting.
+  ;;(setq case-fold-search nil)
+  ;; Place the search term into the search rings.
+  (isearch-update-ring isearch-string t)
+  (evil-push-search-history isearch-string forward)
+  ;; Use this search term for empty pattern "%s//replacement/"
+  ;; Append case sensitivity
+  (setq evil-ex-last-was-search nil
+        evil-ex-substitute-pattern `(,(concat isearch-string "\\C")
+                                     nil (0 0))))
 
 (defun spacemacs/ensure-ahs-enabled-locally ()
   "Ensures ahs is enabled for the local buffer."
@@ -152,28 +151,28 @@ If the universal prefix argument is used then kill also the window."
 
 ;; transient state
 (defun spacemacs//symbol-highlight-doc ()
-        (let* ((i 0)
-               (overlay-count (length ahs-overlay-list))
-               (overlay (format "%s" (nth i ahs-overlay-list)))
-               (current-overlay (format "%s" ahs-current-overlay))
-               (st (ahs-stat))
-               (plighter (ahs-current-plugin-prop 'lighter))
-               (plugin (format "%s"
-                               (cond ((string= plighter "HS")  "Display")
-                                     ((string= plighter "HSA") "Buffer")
-                                     ((string= plighter "HSD") "Function"))))
-               (face (cond ((string= plighter "HS")  ahs-plugin-defalt-face)
-                           ((string= plighter "HSA") ahs-plugin-whole-buffer-face)
-                           ((string= plighter "HSD") ahs-plugin-bod-face))))
-          (while (not (string= overlay current-overlay))
-            (setq i (1+ i))
-            (setq overlay (format "%s" (nth i ahs-overlay-list))))
-          (let* ((x/y (format "[%s/%s]" (- overlay-count i) overlay-count))
-                 (hidden (if (< 0 (- overlay-count (nth 4 st))) "*" "")))
-            (concat
-             (propertize (format " %s " plugin) 'face face)
-             (propertize (format " %s%s " x/y hidden) 'face
-                         `(:foreground "#ffffff" :background "#000000"))))))
+  (let* ((i 0)
+         (overlay-count (length ahs-overlay-list))
+         (overlay (format "%s" (nth i ahs-overlay-list)))
+         (current-overlay (format "%s" ahs-current-overlay))
+         (st (ahs-stat))
+         (plighter (ahs-current-plugin-prop 'lighter))
+         (plugin (format "%s"
+                         (cond ((string= plighter "HS")  "Display")
+                               ((string= plighter "HSA") "Buffer")
+                               ((string= plighter "HSD") "Function"))))
+         (face (cond ((string= plighter "HS")  ahs-plugin-defalt-face)
+                     ((string= plighter "HSA") ahs-plugin-whole-buffer-face)
+                     ((string= plighter "HSD") ahs-plugin-bod-face))))
+    (while (not (string= overlay current-overlay))
+      (setq i (1+ i))
+      (setq overlay (format "%s" (nth i ahs-overlay-list))))
+    (let* ((x/y (format "[%s/%s]" (- overlay-count i) overlay-count))
+           (hidden (if (< 0 (- overlay-count (nth 4 st))) "*" "")))
+      (concat
+       (propertize (format " %s " plugin) 'face face)
+       (propertize (format " %s%s " x/y hidden) 'face
+                   `(:foreground "#ffffff" :background "#000000"))))))
 
 (defun spacemacs/ahs-to-iedit ()
   "Trigger iedit from ahs."
@@ -223,9 +222,9 @@ If the universal prefix argument is used then kill also the window."
   (interactive)
   (require 'avy)
   (let ((res (avy-with spacemacs/ace-buffer-links
-               (avy--process
-                (spacemacs//collect-spacemacs-buffer-links)
-                #'avy--overlay-pre))))
+                       (avy--process
+                        (spacemacs//collect-spacemacs-buffer-links)
+                        #'avy--overlay-pre))))
     (when res
       (goto-char (1+ res))
       (widget-button-press (point)))))

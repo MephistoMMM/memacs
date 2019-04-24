@@ -70,6 +70,10 @@
       ;; Mark `css-indent-offset' as safe-local variable
       (put 'css-indent-offset 'safe-local-variable #'integerp)
 
+      (spacemacs/declare-prefix-for-mode 'css-mode "=" "format")
+      (spacemacs/declare-prefix-for-mode 'css-mode "g" "goto")
+      (spacemacs/declare-prefix-for-mode 'css-mode "z" "foldz")
+
       (spacemacs/set-leader-keys-for-major-mode 'css-mode
         "zc" 'spacemacs/css-contract-statement
         "zo" 'spacemacs/css-expand-statement))))
@@ -121,7 +125,7 @@
     :init
     (progn
       (dolist (mode '(web-mode css-mode))
-        (spacemacs/set-leader-keys-for-major-mode 'web-mode "i" 'spacemacs/impatient-mode)))))
+        (spacemacs/set-leader-keys-for-major-mode 'web-mode "I" 'spacemacs/impatient-mode)))))
 
 (defun html/init-less-css-mode ()
   (use-package less-css-mode
@@ -165,7 +169,8 @@
       (setq web-mode-code-indent-offset 2
             web-mode-markup-indent-offset 2
             web-mode-css-indent-offset 2)
-      (spacemacs/declare-prefix-for-mode 'web-mode "e" "errors")
+      (spacemacs/declare-prefix-for-mode 'web-mode "=" "format")
+      (spacemacs/declare-prefix-for-mode 'web-mode "E" "errors")
       (spacemacs/declare-prefix-for-mode 'web-mode "g" "goto")
       (spacemacs/declare-prefix-for-mode 'web-mode "h" "dom")
       (spacemacs/declare-prefix-for-mode 'web-mode "r" "refactor")
@@ -188,20 +193,20 @@
       ;; (defvar spacemacs--web-mode-ms-doc-toggle 0
       ;;   "Display a short doc when nil, full doc otherwise.")
 
-  ;;     (defun spacemacs//web-mode-ms-doc ()
-  ;;       (if (equal 0 spacemacs--web-mode-ms-doc-toggle)
-  ;;           "[_?_] for help"
-  ;;         "
-  ;; [_?_] display this help
-  ;; [_k_] previous [_j_] next   [_K_] previous sibling [_J_] next sibling
-  ;; [_h_] parent   [_l_] child  [_c_] clone [_d_] delete [_D_] kill [_r_] rename
-  ;; [_w_] wrap     [_p_] xpath
-  ;; [_q_] quit"))
+      ;;     (defun spacemacs//web-mode-ms-doc ()
+      ;;       (if (equal 0 spacemacs--web-mode-ms-doc-toggle)
+      ;;           "[_?_] for help"
+      ;;         "
+      ;; [_?_] display this help
+      ;; [_k_] previous [_j_] next   [_K_] previous sibling [_J_] next sibling
+      ;; [_h_] parent   [_l_] child  [_c_] clone [_d_] delete [_D_] kill [_r_] rename
+      ;; [_w_] wrap     [_p_] xpath
+      ;; [_q_] quit"))
 
-  ;;     (defun spacemacs//web-mode-ms-toggle-doc ()
-  ;;       (interactive)
-  ;;       (setq spacemacs--web-mode-ms-doc-toggle
-  ;;             (logxor spacemacs--web-mode-ms-doc-toggle 1)))
+      ;;     (defun spacemacs//web-mode-ms-toggle-doc ()
+      ;;       (interactive)
+      ;;       (setq spacemacs--web-mode-ms-doc-toggle
+      ;;             (logxor spacemacs--web-mode-ms-doc-toggle 1)))
 
       (spacemacs|define-transient-state web-mode
         :title "Web-mode Transient State"

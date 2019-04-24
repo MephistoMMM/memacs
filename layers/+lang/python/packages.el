@@ -65,7 +65,12 @@
   (use-package importmagic
     :defer t
     :commands (importmagic-mode importmagic-fix-symbol-at-point)
-    :init (add-hook 'python-mode-hook 'importmagic-mode)))
+    :init
+    (progn
+      (add-hook 'python-mode-hook 'importmagic-mode)
+      (spacemacs|diminish importmagic-mode " ⓘ" " [i]")
+      (spacemacs/set-leader-keys-for-major-mode 'python-mode
+        "rf" 'importmagic-fix-symbol-at-point))))
 
 (defun python/init-live-py-mode ()
   (use-package live-py-mode
@@ -107,10 +112,10 @@
   (use-package py-isort
     :defer t
     :init (add-hook 'python-mode-hook
-                     (lambda ()
-                       (add-hook 'before-save-hook
-                                 'spacemacs//python-sort-imports
-                                 nil t)))))
+                    (lambda ()
+                      (add-hook 'before-save-hook
+                                'spacemacs//python-sort-imports
+                                nil t)))))
 
 (defun python/init-pyvenv ()
   (use-package pyvenv
@@ -139,7 +144,7 @@
         (setq pylookup-dir (concat dir "pylookup/")
               pylookup-program (concat pylookup-dir "pylookup.py")
               pylookup-db-file (concat pylookup-dir "pylookup.db")))
-        (setq pylookup-completing-read 'completing-read))))
+      (setq pylookup-completing-read 'completing-read))))
 
 (defun python/init-pytest ()
   (use-package pytest

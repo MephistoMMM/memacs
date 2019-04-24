@@ -208,41 +208,47 @@ and the arguments for flyckeck-clang based on a project-specific text file."
 
 (defun spacemacs//c-c++-lsp-config ()
   "Configure the LSP backend specified by the `c-c++-backend' configuration variable."
-    (progn
-      (remhash 'clangd lsp-clients)
-      (spacemacs//c-c++-lsp-define-extensions)
-      (spacemacs//c-c++-lsp-wrap-functions)
-      (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc))
+  (progn
+    (spacemacs//c-c++-lsp-define-extensions)
+    (spacemacs//c-c++-lsp-wrap-functions)
+    (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-gcc))
 
-      (spacemacs//c-c++-lsp-apply-config "executable" "initialization-options" "args" "project-whitelist" "project-blacklist" "sem-highlight-method")
+    (spacemacs//c-c++-lsp-apply-config "executable" "initialization-options" "args" "project-whitelist" "project-blacklist" "sem-highlight-method")
 
-      (if (eq c-c++-lsp-cache-dir nil)
+    (if (eq c-c++-lsp-cache-dir nil)
         (progn
           (setq c-c++-lsp-cache-dir (file-truename(concat "~/.emacs.d/.cache/" (symbol-name c-c++-backend))))
           (message (concat "c-c++: No c-c++-lsp-cache-dir specified: defaulting to " c-c++-lsp-cache-dir))))
 
+    (ecase c-c++-backend
+      ('lsp-cquery (setq cquery-cache-dir c-c++-lsp-cache-dir)
+                   (setq cquery-extra-args c-c++-lsp-args)
+                   (setq cquery-extra-init-params
+                         (if c-c++-lsp-initialization-options
+                             (append c-c++-lsp-initialization-options '(:cacheFormat "msgpack"))
+                           '(:cacheFormat "msgpack")))))
+
+    (when c-c++-lsp-sem-highlight-rainbow
+      (unless c-c++-lsp-sem-highlight-method
+        (progn
+          (setq c-c++-lsp-sem-highlight-method 'font-lock)
+          (message "c-c++: No semantic highlight method specified. Defaulting to `font-lock'.")))
       (ecase c-c++-backend
-        ('lsp-cquery (setq cquery-cache-dir c-c++-lsp-cache-dir)
-          (setq cquery-extra-args c-c++-lsp-args)
-          (setq cquery-extra-init-params
-            (if c-c++-lsp-initialization-options
-              (append c-c++-lsp-initialization-options '(:cacheFormat "msgpack"))
-              '(:cacheFormat "msgpack")))))
+        ('lsp-cquery (cquery-use-default-rainbow-sem-highlight))))
 
-      (when c-c++-lsp-sem-highlight-rainbow
-        (unless c-c++-lsp-sem-highlight-method
-          (progn
-            (setq c-c++-lsp-sem-highlight-method 'font-lock)
-            (message "c-c++: No semantic highlight method specified. Defaulting to `font-lock'.")))
-        (ecase c-c++-backend
-          ('lsp-cquery (cquery-use-default-rainbow-sem-highlight))))
+    (dolist (mode c-c++-modes)
+      (spacemacs//c-c++-lsp-bind-keys-for-mode mode))
 
-      (dolist (mode c-c++-modes)
-        (spacemacs//c-c++-lsp-bind-keys-for-mode mode))
+    (evil-set-initial-state '(spacemacs//c-c++-lsp-symbol nil "-tree-mode") 'emacs)
+    ;;evil-record-macro keybinding clobbers q in cquery-tree-mode-map for some reason?
+    (evil-make-overriding-map (symbol-value (spacemacs//c-c++-lsp-symbol nil "-tree-mode-map")))
 
-      (evil-set-initial-state '(spacemacs//c-c++-lsp-symbol nil "-tree-mode") 'emacs)
-      ;;evil-record-macro keybinding clobbers q in cquery-tree-mode-map for some reason?
-      (evil-make-overriding-map (symbol-value (spacemacs//c-c++-lsp-symbol nil "-tree-mode-map")))))
+    (if (configuration-layer/layer-used-p 'dap)
+        (progn
+          (require 'dap-gdb-lldb)
+          (dolist (mode c-c++-modes)
+            (spacemacs/dap-bind-keys-for-mode mode)))
+      (message "`dap' layer is not installed, please add `dap' layer to your dotfile."))))
 
 (defun spacemacs//c-c++-lsp-wrap-functions ()
   "Wrap navigation functions for the LSP backend specified by the `c-c++-backend' configuration variable."

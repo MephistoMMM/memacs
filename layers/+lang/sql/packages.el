@@ -12,6 +12,7 @@
 (setq sql-packages
       '(
         company
+        org
         sql
         ;; This mode is more up-to-date than the MELPA one.
         ;; Turns out that it is available in GNU ELPA but we cannot
@@ -22,7 +23,8 @@
                                :fetcher github
                                :repo "alex-hhh/emacs-sql-indent"
                                :files ("sql-indent.el")))
-        sqlup-mode 
+        (sqlfmt :location local)
+        (sqlup-mode :toggle sql-capitalize-keywords)
         ))
 
 (defun sql/init-sql ()
@@ -138,6 +140,13 @@
     :init (add-hook 'sql-mode-hook 'sqlind-minor-mode)
     :config (spacemacs|hide-lighter sqlind-minor-mode)))
 
+(defun sql/init-sqlfmt ()
+  (use-package sqlfmt
+    :commands sqlfmt-buffer
+    :init
+    (spacemacs/set-leader-keys-for-major-mode 'sql-mode
+      "=" 'sqlfmt-buffer)))
+
 (defun sql/init-sqlup-mode ()
   (use-package sqlup-mode
     :if sql-capitalize-keywords
@@ -159,3 +168,7 @@
   (spacemacs|add-company-backends
     :backends company-capf
     :modes sql-mode))
+
+(defun sql/pre-init-org ()
+  (spacemacs|use-package-add-hook org
+    :post-config (add-to-list 'org-babel-load-languages '(sql . t))))

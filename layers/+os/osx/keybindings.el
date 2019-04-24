@@ -11,14 +11,6 @@
 (when (spacemacs/system-is-mac)
   (when (display-graphic-p)
 
-    ;; `Command' key is by default bound to HYPER (H-*),
-    ;; `Option' key is by default bound to META (M-*).
-    ;; `Function' key is by default not rebound.
-    ;; `Control' key is by default not rebound.
-    ;; The right variations of the above keys can
-    ;; also be modified but are not rebound by
-    ;; default.
-
     ;; `Alist' linking the layer config variables to
     ;; the internal Emacs variables for the modifier keys.
     (setq modifier-keys '((osx-command-as       . mac-command-modifier)

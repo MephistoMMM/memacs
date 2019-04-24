@@ -77,6 +77,12 @@
       (dolist (value '(lsp go-mode))
         (add-to-list 'safe-local-variable-values
                      (cons 'go-backend value)))
+      (spacemacs|add-toggle go-test-verbose
+        :documentation "Enable verbose test output."
+        :status go-test-verbose
+        :on (setq go-test-verbose t)
+        :off (setq go-test-verbose nil)
+        :evil-leader-for-mode (go-mode . "tv"))
       ;; Change flycheck-disabled-checkers
       (with-eval-after-load 'flycheck
         (add-hook 'flycheck-mode-hook (lambda ()
