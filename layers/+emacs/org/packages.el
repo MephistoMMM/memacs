@@ -94,6 +94,7 @@
             org-default-notes-file (expand-file-name "notes.org" org-directory)
             org-log-done t
             org-startup-with-inline-images t
+            org-latex-prefer-user-labels t
             org-image-actual-width nil
             org-src-fontify-natively t
             org-src-tab-acts-natively t
@@ -125,6 +126,7 @@
           "k" 'org-edit-src-abort))
 
       (autoload #'org-clock-jump-to-current-clock "org-clock")
+      (add-hook 'org-mode-hook 'dotspacemacs//prettify-spacemacs-docs)
 
       (let ((dir (configuration-layer/get-layer-local-dir 'org)))
         (setq org-export-async-init-file (concat dir "org-async-init.el")))
@@ -527,8 +529,23 @@ Headline^^            Visit entry^^               Filter^^                    Da
     :defer t
     :init
     (progn
+      (spacemacs/declare-prefix "aoB" "org-brain")
       (spacemacs/set-leader-keys
-        "aob" 'org-brain-visualize)
+        "aoBv" 'org-brain-visualize
+        "aoBa" 'org-brain-agenda)
+      (spacemacs/declare-prefix-for-mode 'org-mode "B" "org-brain")
+      (spacemacs/declare-prefix-for-mode 'org-mode "Ba" "add")
+      (spacemacs/declare-prefix-for-mode 'org-mode "Bg" "goto")
+      (spacemacs/set-leader-keys-for-major-mode 'org-mode
+        "Bac" 'org-brain-add-child
+        "Bv" 'org-brain-visualize
+        "Bap" 'org-brain-add-parent
+        "Baf" 'org-brain-add-fiendship
+        "Bgc" 'org-brain-goto-child
+        "Bgp" 'org-brain-goto-parent
+        "Bgf" 'org-brain-goto-friend
+        "BR"  'org-brain-refile
+        "Bx"  'org-brain-delete-entry)
       (evil-set-initial-state 'org-brain-visualize-mode 'emacs))))
 
 (defun org/init-org-expiry ()

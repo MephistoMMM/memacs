@@ -26,5 +26,5 @@
       (evil-ex-define-cmd "buffers" 'ibuffer))))
 
 (defun ibuffer/init-ibuffer-projectile()
-    (use-package ibuffer-projectile
-      :defer t))
+  (use-package ibuffer-projectile
+    :defer t))

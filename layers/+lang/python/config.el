@@ -17,6 +17,14 @@
   "The backend to use for IDE features. Possible values are `anaconda'
 and `lsp'.")
 
+(defvar python-formatter 'yapf
+  "The formatter to use. Possible values are `yapf' and
+  `black'.")
+
+(defvar python-format-on-save nil
+  "If non-nil, automatically format code with formatter selected
+  via `python-formatter' on save.")
+
 (defvar python-test-runner 'nose
   "Test runner to use. Possible values are `nose' or `pytest'.")
 
