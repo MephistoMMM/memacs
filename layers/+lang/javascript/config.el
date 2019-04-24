@@ -15,3 +15,6 @@
 
 (defvar javascript-backend 'lsp
   "The backend to use for IDE features. Possible values are `tern' and `lsp'.")
+
+(defvar javascript-import-tool nil
+  "The import backend to import modules. Possible values are `import-js' and `nil' to disable.")

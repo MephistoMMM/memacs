@@ -27,8 +27,8 @@
     :mode "\\.dart\\'"
     :init
     (progn
-      (spacemacs/declare-prefix-for-mode 'dart-mode "mf" "find")
-      (spacemacs/declare-prefix-for-mode 'dart-mode "mh" "help")
+      (spacemacs/declare-prefix-for-mode 'dart-mode "f" "find")
+      (spacemacs/declare-prefix-for-mode 'dart-mode "h" "help")
       (spacemacs/set-leader-keys-for-major-mode 'dart-mode
         "=" 'dart-format
         "?" 'dart-show-hover

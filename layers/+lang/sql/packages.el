@@ -157,7 +157,7 @@
       (unless sql-capitalize-keywords-disable-interactive
         (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
       (spacemacs/set-leader-keys-for-major-mode 'sql-mode
-        "=c" 'sqlup-capitalize-keywords-in-region))
+        "c" 'sqlup-capitalize-keywords-in-region))
     :config
     (progn
       (spacemacs|hide-lighter sqlup-mode)

@@ -103,8 +103,8 @@ in spacemacs buffer along with quick buttons underneath.
         (spacemacs-buffer/message (format "Banner: %s" banner))
         (if (image-type-available-p (intern (file-name-extension banner)))
             (spacemacs-buffer//insert-image-banner banner)
-          (spacemacs-buffer//insert-ascii-banner-centered banner))
-        (spacemacs-buffer//inject-version))
+          (spacemacs-buffer//insert-ascii-banner-centered banner)))
+      (spacemacs-buffer//inject-version)
       (spacemacs-buffer//insert-buttons)
       (spacemacs//redisplay))))
 

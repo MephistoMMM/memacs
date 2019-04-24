@@ -11,6 +11,7 @@
 
 (setq python-packages
       '(
+        blacken
         company
         counsel-gtags
         eldoc
@@ -30,6 +31,7 @@
         pyvenv
         stickyfunc-enhance
         xcscope
+        yapfify
         ))
 
 (defun python/post-init-company ()
@@ -45,6 +47,17 @@
     (spacemacs|add-company-backends
       :backends company-capf
       :modes pip-requirements-mode)))
+
+(defun python/init-blacken ()
+  (use-package blacken
+    :defer t
+    :init
+    (progn
+      (spacemacs//bind-python-formatter-keys)
+      (when (and python-format-on-save
+                 (eq 'black python-formatter))
+        (add-hook 'python-mode-hook 'blacken-mode)))
+    :config (spacemacs|hide-lighter blacken-mode)))
 
 (defun python/post-init-eldoc ()
   (add-hook 'python-mode-local-vars-hook #'spacemacs//python-setup-eldoc))
@@ -184,6 +197,11 @@
       (spacemacs//python-setup-shell))
     :config
     (progn
+      ;; Set `python-indent-guess-indent-offset' to `nil' to prevent guessing `python-indent-offset
+      ;; (we call python-indent-guess-indent-offset manually so python-mode does not need to do it)
+      (setq-default python-indent-guess-indent-offset nil)
+
+      ;; add this optional key binding for Emacs user, since it is unbound
       (define-key inferior-python-mode-map
         (kbd "C-r") 'comint-history-isearch-backward)
       ;; this key binding is for recentering buffer in Emacs
@@ -196,3 +214,14 @@
   (add-hook 'python-mode-hook 'spacemacs/load-stickyfunc-enhance))
 
 (defun python/pre-init-xcscope ())
+
+(defun python/init-yapfify ()
+  (use-package yapfify
+    :defer t
+    :init
+    (progn
+      (spacemacs//bind-python-formatter-keys)
+      (when (and python-format-on-save
+                 (eq 'yapf python-formatter))
+        (add-hook 'python-mode-hook 'yapf-mode)))
+    :config (spacemacs|hide-lighter yapf-mode)))

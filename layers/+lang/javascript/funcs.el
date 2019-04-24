@@ -33,7 +33,13 @@
       (progn
         (lsp))
     (message (concat "`lsp' layer is not installed, "
-                     "please add `lsp' layer to your dotfile."))))
+                     "please add `lsp' layer to your dotfile.")))
+  (if (configuration-layer/layer-used-p 'dap)
+      (progn
+        (require 'dap-firefox)
+        (require 'dap-chrome)
+        (spacemacs/dap-bind-keys-for-mode 'js2-mode))
+    (message "`dap' layer is not installed, please add `dap' layer to your dotfile.")))
 
 (defun spacemacs//javascript-setup-lsp-company ()
   "Setup lsp auto-completion."
@@ -64,31 +70,6 @@
         (spacemacs/tern-setup-tern-company 'js2-mode))
     (message (concat "Tern was configured as the javascript backend but "
                      "the `tern' layer is not present in your `.spacemacs'!"))))
-
-
-;; import-js
-
-(defun spacemacs/import-js-set-key-bindings (mode)
-  "Setup the key bindings for `import-js' for the given MODE."
-  (spacemacs/declare-prefix-for-mode mode "mi" "import")
-  (spacemacs/set-leader-keys-for-major-mode mode
-    "if" #'spacemacs/import-js-fix
-    "ii" #'spacemacs/import-js-import
-    "gi" #'import-js-goto))
-
-(defun spacemacs/import-js-fix ()
-  (interactive)
-  (require 'import-js)
-  (import-js-fix)
-  (if (bound-and-true-p flycheck-mode)
-      (flycheck-buffer)))
-
-(defun spacemacs/import-js-import ()
-  (interactive)
-  (require 'import-js)
-  (import-js-import)
-  (if (bound-and-true-p flycheck-mode)
-      (flycheck-buffer)))
 
 
 ;; js-doc
