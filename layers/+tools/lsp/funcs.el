@@ -212,12 +212,22 @@ a find extension defined using `lsp-define-extensions'"
                (push `((,point0 . ,point1) . ,w) candidates)))
     ;; (require 'avy)
     (avy-with avy-document-symbol
-      (avy--process candidates
-                    (avy--style-fn avy-style)))))
+              (avy--process candidates
+                            (avy--style-fn avy-style)))))
 
-;; toggle lsp-ui-doc
 (defun memacs/toggle-lsp-ui-doc ()
   (interactive)
-  (when (boundp 'lsp-ui-doc-mode)
-    (lsp-ui-doc--hide-frame))
-  )
+  (if lsp-ui-doc-mode
+      (progn
+        (lsp-ui-doc-mode -1)
+        (lsp-ui-doc--hide-frame))
+    (lsp-ui-doc-mode 1)))
+
+(defun memacs/lsp-mode-hook-func ()
+  ;; delete-lsp-ui-doc frame is exists, and disable lsp-ui-doc by default
+  (lsp-ui-doc--hide-frame)
+  (lsp-ui-doc-mode -1)
+
+  ;; overwrite s-j key for toggle-lsp-ui-doc
+  (define-key evil-normal-state-map (kbd "C-q") #'memacs/toggle-lsp-ui-doc)
+  (define-key evil-hybrid-state-map (kbd "C-q") #'memacs/toggle-lsp-ui-doc))

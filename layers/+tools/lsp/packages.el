@@ -40,9 +40,12 @@
   (use-package lsp-ui
     :defer t
     :commands lsp-ui-mode
-    :init (add-hook 'lsp-mode-hook #'lsp-ui-mode)
+    :init (progn
+            (add-hook 'lsp-mode-hook #'lsp-ui-mode))
     :config
     (progn
+      (add-hook 'lsp-mode-hook #'memacs/lsp-mode-hook-func)
+
       (if lsp-remap-xref-keybindings
           (progn (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
                  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)))
