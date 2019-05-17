@@ -10,7 +10,8 @@
 ;;; License: GPLv3
 
 (setq spacemacs-visual-packages
-      '((ansi-colors :location built-in)
+      '(
+        ;; (ansi-colors :location built-in)
         desktop
         fill-column-indicator
         hl-todo
@@ -24,9 +25,9 @@
                                      :repo "tumashu/company-posframe"))
         ))
 
-(defun spacemacs-visual/init-ansi-colors ()
-  (add-hook 'compilation-filter-hook
-            'spacemacs-visual//compilation-buffer-apply-ansi-colors))
+;; (defun spacemacs-visual/init-ansi-colors ()
+;;   (add-hook 'compilation-filter-hook
+;;             'spacemacs-visual//compilation-buffer-apply-ansi-colors))
 
 (defun spacemacs-visual/init-posframe ())
 
