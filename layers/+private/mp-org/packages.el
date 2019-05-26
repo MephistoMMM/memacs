@@ -137,8 +137,8 @@ package you’ll get notifications for TODO entries.
     (load-library "find-lisp")
     (setq-default
      org-startup-with-inline-images nil
-     org-agenda-files (directory-files org-directory t "\.org$" t)
      org-default-notes-file (concat org-directory "/TODOs.org"))
+    (push (concat org-directory "/TODOs.org") org-agenda-files)
 
     (setq-default
      ;; org-log-done 'note

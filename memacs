@@ -438,6 +438,10 @@ you should place your code here."
 
   (when (configuration-layer/layer-usedp 'mp-org) (mp-org/better-default))
 
+  ;; Agenda Files
+  (push (expand-file-name "~/Documents/works/seven/TODOs.org")
+        org-agenda-files)
+
   ;; Missions
   (setq memacs-mission-starter-mission-list
         '(
