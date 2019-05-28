@@ -142,7 +142,7 @@ package you’ll get notifications for TODO entries.
 
     (setq-default
      ;; org-log-done 'note
-     org-agenda-span 'day
+     org-agenda-span 'week
      org-agenda-restore-windows-after-quit t
      org-agenda-window-setup 'other-window
      org-footnote-auto-adjust t
