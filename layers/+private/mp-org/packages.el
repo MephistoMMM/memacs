@@ -144,7 +144,7 @@ package you’ll get notifications for TODO entries.
      ;; org-log-done 'note
      org-agenda-span 'week
      org-agenda-restore-windows-after-quit t
-     org-agenda-window-setup 'other-window
+     org-agenda-window-setup 'current-window
      org-footnote-auto-adjust t
      org-footnote-auto-label 'confirm)
 
