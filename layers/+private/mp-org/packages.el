@@ -137,14 +137,14 @@ package you’ll get notifications for TODO entries.
     (load-library "find-lisp")
     (setq-default
      org-startup-with-inline-images nil
-     org-agenda-files (directory-files org-directory t "\.org$" t)
      org-default-notes-file (concat org-directory "/TODOs.org"))
+    (push (concat org-directory "/TODOs.org") org-agenda-files)
 
     (setq-default
      ;; org-log-done 'note
-     org-agenda-span 'day
+     org-agenda-span 'week
      org-agenda-restore-windows-after-quit t
-     org-agenda-window-setup 'other-window
+     org-agenda-window-setup 'current-window
      org-footnote-auto-adjust t
      org-footnote-auto-label 'confirm)
 

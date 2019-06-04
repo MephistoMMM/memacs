@@ -60,8 +60,8 @@ This function should only modify configuration layer settings."
      (python :variables
              python-test-runner 'pytest)
      ;; READY : npm install -g
-     ;;             eslint  typescript javascript-typescript-langserver flow-language-server
-     javascript
+     ;;             eslint  typescript javascript-typescript-langserver import-js
+     (javascript :variables javascript-import-tool 'import-js)
      ;; READY : brew install luarocks
      ;;         luarocks install luacheck
      lua
@@ -204,9 +204,9 @@ It should only modify the values of Spacemacs settings."
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(purifier
-                         dracula
+                         spacemacs-light
                          tao-yang
-                         spacemacs-light)
+                         dracula)
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `vim-powerline' and `vanilla'. The first three
    ;; are spaceline themes. `vanilla' is default Emacs mode-line. `custom' is a
@@ -437,6 +437,10 @@ you should place your code here."
   (setq tab-always-indent nil)
 
   (when (configuration-layer/layer-usedp 'mp-org) (mp-org/better-default))
+
+  ;; Agenda Files
+  (push (expand-file-name "~/Documents/works/seven/TODOs.org")
+        org-agenda-files)
 
   ;; Missions
   (setq memacs-mission-starter-mission-list

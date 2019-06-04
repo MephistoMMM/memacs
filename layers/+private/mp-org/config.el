@@ -9,12 +9,16 @@
 
 ;;; Code:
 
+(defvar org-agenda-files
+  '()
+  "org-agenda-files")
+
 (defvar memacs-mission-starter-mission-list
-      '(
-        ;; config new org file in dropbox
-        ("Dropbox Note Buffer" org-mode (concat org-directory "/notes") nil)
-        )
-      "Mission list. Format (buffer-name mode path file-name). if file-name is non-nil, it will set vistied file name.")
+  '(
+    ;; config new org file in dropbox
+    ("Dropbox Note Buffer" org-mode (concat org-directory "/notes") nil)
+    )
+  "Mission list. Format (buffer-name mode path file-name). if file-name is non-nil, it will set vistied file name.")
 
 (defvar memacs-mission-helper-help-list
   '(

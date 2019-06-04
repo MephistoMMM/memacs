@@ -127,7 +127,6 @@
           "k" 'org-edit-src-abort))
 
       (autoload #'org-clock-jump-to-current-clock "org-clock")
-      (add-hook 'org-mode-hook 'dotspacemacs//prettify-spacemacs-docs)
 
       (let ((dir (configuration-layer/get-layer-local-dir 'org)))
         (setq org-export-async-init-file (concat dir "org-async-init.el")))
