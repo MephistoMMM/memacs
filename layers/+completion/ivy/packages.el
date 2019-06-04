@@ -191,6 +191,10 @@
       (define-key ivy-minibuffer-map [escape] 'minibuffer-keyboard-quit)
       (define-key ivy-minibuffer-map (kbd "M-SPC") 'hydra-ivy/body)
 
+      (when ivy-ret-visits-directory
+        (define-key ivy-minibuffer-map (kbd "RET") #'ivy-alt-done)
+        (define-key ivy-minibuffer-map (kbd "C-j") #'ivy-done))
+
       (ivy-mode 1)
       ;; Occur
       (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
@@ -350,7 +354,10 @@ Current Action: %s(ivy-action-name)
   (ivy-set-actions
    'spacemacs/ivy-spacemacs-layouts
    '(("c" persp-kill-without-buffers "Close layout(s)")
-     ("k" persp-kill  "Kill layout(s)")))
+     ("k" persp-kill  "Kill layout(s)")
+     ("n" persp-copy "Copy Current Layout")
+     ("p" spacemacs//create-persp-with-current-project-buffers
+      "Create Project Layout")))
   ;; TODO: better handling of C and X bindings for ivy
   ;;       check ivy/pre-init-persp-mode
   (spacemacs/transient-state-register-remove-bindings 'layouts

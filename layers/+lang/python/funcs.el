@@ -34,10 +34,10 @@
       (lsp)
     (message "`lsp' layer is not installed, please add `lsp' layer to your dotfile."))
   (if (configuration-layer/layer-used-p 'dap)
-    (progn
-      (require 'dap-python)
-      (spacemacs/set-leader-keys-for-major-mode 'python-mode "db" nil)
-      (spacemacs/dap-bind-keys-for-mode 'python-mode))
+      (progn
+        (require 'dap-python)
+        (spacemacs/set-leader-keys-for-major-mode 'python-mode "db" nil)
+        (spacemacs/dap-bind-keys-for-mode 'python-mode))
     (message "`dap' layer is not installed, please add `dap' layer to your dotfile.")))
 
 (defun spacemacs//python-setup-lsp-company ()
@@ -60,6 +60,7 @@
   (setq mode-name "Python"
         tab-width python-tab-width
         fill-column python-fill-column)
+
   (setq-local comment-inline-offset 2)
   (spacemacs/python-annotate-pdb)
   ;; make C-j work the same way as RET
@@ -147,10 +148,10 @@ as the pyenv version then also return nil. This works around https://github.com/
   "autoflake --remove-all-unused-imports -i unused_imports.py"
   (interactive)
   (if (executable-find "autoflake")
-      (progn
-        (shell-command (format "autoflake --remove-all-unused-imports -i %s"
-                               (shell-quote-argument (buffer-file-name))))
-        (revert-buffer t t t))
+    (progn
+      (shell-command (format "autoflake --remove-all-unused-imports -i %s"
+                       (shell-quote-argument (buffer-file-name))))
+      (revert-buffer t t t))
     (message "Error: Cannot find autoflake executable.")))
 
 (defun spacemacs//pyvenv-mode-set-local-virtualenv ()

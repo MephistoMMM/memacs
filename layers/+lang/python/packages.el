@@ -32,6 +32,8 @@
         stickyfunc-enhance
         xcscope
         yapfify
+        ;; packages for Microsoft LSP backend
+        (lsp-python-ms :requires lsp-mode)
         ))
 
 (defun python/post-init-company ()
@@ -225,3 +227,18 @@
                  (eq 'yapf python-formatter))
         (add-hook 'python-mode-hook 'yapf-mode)))
     :config (spacemacs|hide-lighter yapf-mode)))
+
+(defun python/init-lsp-python-ms ()
+  (use-package lsp-python-ms
+    :if (eq python-lsp-server 'mspyls)
+    :ensure nil
+    :config
+
+    (if python-lsp-git-root
+      ;; Use dev version of language server checked out from github
+      (progn
+        (setq lsp-python-ms-dir
+          (expand-file-name (concat python-lsp-git-root "/output/bin/Release/")))
+        (message "lsp-python-ms: Using version at `%s'" lsp-python-ms-dir))
+      ;; Use a precompiled exe
+      (setq lsp-python-ms-executable "Microsoft.Python.LanguageServer"))))

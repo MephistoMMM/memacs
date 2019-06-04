@@ -72,7 +72,6 @@ Otherwise, revert to the default behavior (i.e. enable `evil-insert-state')."
   "Deactivate `evil-escape' if STYLE is `emacs' otherwise enable it."
       (evil-escape-mode t))
 
-
 (defun spacemacs/linum-relative-toggle ()
   (interactive)
   (if (not (bound-and-true-p linum-relative-mode))

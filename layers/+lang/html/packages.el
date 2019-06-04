@@ -43,9 +43,10 @@
   (add-hook 'web-mode-hook #'add-node-modules-path))
 
 (defun html/post-init-company ()
-  (spacemacs|add-company-backends
-    :backends company-css
-    :modes css-mode))
+  (unless css-enable-lsp
+    (spacemacs|add-company-backends
+      :backends company-css
+      :modes css-mode)))
 
 (defun html/init-company-web ()
   (use-package company-web
@@ -69,6 +70,10 @@
     (progn
       ;; Mark `css-indent-offset' as safe-local variable
       (put 'css-indent-offset 'safe-local-variable #'integerp)
+
+      (when css-enable-lsp
+        (add-hook 'css-mode-hook
+                  #'spacemacs//setup-lsp-for-stylesheet-buffers t))
 
       (spacemacs/declare-prefix-for-mode 'css-mode "=" "format")
       (spacemacs/declare-prefix-for-mode 'css-mode "g" "goto")
@@ -130,6 +135,10 @@
 (defun html/init-less-css-mode ()
   (use-package less-css-mode
     :defer t
+    :init
+    (when less-enable-lsp
+      (add-hook 'less-css-mode-hook
+                #'spacemacs//setup-lsp-for-stylesheet-buffers t))
     :mode ("\\.less\\'" . less-css-mode)))
 
 (defun html/init-pug-mode ()
@@ -145,6 +154,9 @@
 (defun html/init-scss-mode ()
   (use-package scss-mode
     :defer t
+    :init
+    (when scss-enable-lsp
+      (add-hook 'scss-mode-hook #'spacemacs//setup-lsp-for-stylesheet-buffers t))
     :mode ("\\.scss\\'" . scss-mode)))
 
 (defun html/init-slim-mode ()

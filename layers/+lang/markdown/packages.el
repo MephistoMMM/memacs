@@ -10,14 +10,14 @@
 ;;; License: GPLv3
 
 (setq markdown-packages
-  '(
-    company
-    company-emoji
-    emoji-cheat-sheet-plus
-    gh-md
-    markdown-mode
-    markdown-toc
-    ))
+      '(
+        company
+        company-emoji
+        emoji-cheat-sheet-plus
+        gh-md
+        markdown-mode
+        markdown-toc
+        ))
 
 (defun markdown/post-init-company ()
   (dolist (mode markdown--key-bindings-modes)
@@ -50,9 +50,6 @@
     :defer t
     :config
     (progn
-      (add-hook 'markdown-mode-hook 'orgtbl-mode)
-      (spacemacs|diminish orgtbl-mode)
-      (add-hook 'markdown-mode-hook 'spacemacs//cleanup-org-tables-on-save)
       ;; Declare prefixes and bind keys
       (dolist (prefix '(("c" . "markdown/command")
                         ("h" . "markdown/header")

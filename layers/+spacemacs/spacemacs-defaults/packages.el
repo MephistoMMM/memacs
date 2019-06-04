@@ -250,6 +250,7 @@
 (defun spacemacs-defaults/init-recentf ()
   (use-package recentf
     :defer (spacemacs/defer)
+    :commands (recentf-save-list)
     :init
     (progn
       (spacemacs|require 'recentf)

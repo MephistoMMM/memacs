@@ -10,24 +10,24 @@
 ;;; License: GPLv3
 
 (setq c-c++-packages
-  '(
-    cc-mode
-    disaster
-    flycheck
-    google-c-style
-    stickyfunc-enhance
+      '(
+        cc-mode
+        disaster
+        flycheck
+        google-c-style
+        stickyfunc-enhance
 
-    ;; normal
-    clang-format
-    company
-    (company-c-headers :requires company)
-    counsel-gtags
-    ggtags
+        ;; normal
+        clang-format
+        company
+        (company-c-headers :requires company)
+        counsel-gtags
+        ggtags
 
-    ;; lsp
-    (cquery :requires lsp-mode company-lsp)
-    projectile
-    ))
+        ;; lsp
+        (cquery :requires lsp-mode company-lsp)
+        projectile
+        ))
 
 (defun c-c++/init-cc-mode ()
   (use-package cc-mode
@@ -68,6 +68,19 @@
 (defun c-c++/post-init-counsel-gtags ()
   (dolist (mode c-c++-modes)
     (spacemacs/counsel-gtags-define-keys-for-mode mode)))
+
+(defun c-c++/init-cpp-auto-include ()
+  (use-package cpp-auto-include
+    :defer t
+    :init
+    (progn
+      (when c++-enable-organize-includes-on-save
+        (add-hook 'c++-mode-hook #'spacemacs/c++-organize-includes-on-save))
+
+      (spacemacs/declare-prefix-for-mode 'c++-mode
+        "mr" "refactor")
+      (spacemacs/set-leader-keys-for-major-mode 'c++-mode
+        "ri" #'spacemacs/c++-organize-includes))))
 
 (defun c-c++/init-disaster ()
   (use-package disaster

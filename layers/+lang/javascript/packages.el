@@ -72,12 +72,12 @@
                                   (js2-imenu-extras-mode)
                                   (modify-syntax-entry ?_ "w")
                                   (setq mode-name "JS2"))))
-      (add-hook 'js2-mode-local-vars-hook
-                #'spacemacs//javascript-setup-backend)
-      ;; safe values for backend to be used in directory file variables
-      (dolist (value '(lsp tern))
-        (add-to-list 'safe-local-variable-values
-                     (cons 'javascript-backend value)))
+    (add-hook 'js2-mode-local-vars-hook
+              #'spacemacs//javascript-setup-backend)
+    ;; safe values for backend to be used in directory file variables
+    (dolist (value '(lsp tern))
+      (add-to-list 'safe-local-variable-values
+                   (cons 'javascript-backend value)))
     :config
     (progn
       ;; these mode related variables must be in eval-after-load
@@ -103,6 +103,8 @@
        js2-highlight-external-variables t
        js2-strict-trailing-comma-warning nil)
 
+      (when javascript-fmt-on-save
+        (add-hook 'js2-mode-local-vars-hook 'spacemacs/javascript-fmt-before-save-hook))
       ;; prefixes
       (spacemacs/declare-prefix-for-mode 'js2-mode "h" "documentation")
       (spacemacs/declare-prefix-for-mode 'js2-mode "g" "goto")
@@ -186,8 +188,8 @@
       (spacemacs|diminish livid-mode " 🅻" " [l]"))))
 
 (defun javascript/pre-init-import-js ()
-  (if (eq javascript-import-tool 'import-js)
-      (add-to-list 'spacemacs--import-js-modes (cons 'js2-mode 'js2-mode-hook))))
+  (when (eq javascript-import-tool 'import-js)
+    (add-to-list 'spacemacs--import-js-modes (cons 'js2-mode 'js2-mode-hook))))
 
 (defun javascript/init-skewer-mode ()
   (use-package skewer-mode

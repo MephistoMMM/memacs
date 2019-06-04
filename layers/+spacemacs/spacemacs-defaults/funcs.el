@@ -58,7 +58,7 @@ A COUNT argument matches the indentation to the next COUNT lines."
 
 ;; from Prelude
 ;; TODO: dispatch these in the layers
-(defvar spacemacs-indent-sensitive-modes
+(defcustom spacemacs-indent-sensitive-modes
   '(asm-mode
     elm-mode
     haml-mode
@@ -70,7 +70,15 @@ A COUNT argument matches the indentation to the next COUNT lines."
     makefile-imake-mode
     python-mode
     yaml-mode)
-  "Modes for which auto-indenting is suppressed.")
+  "Modes for which auto-indenting is suppressed."
+  :type 'list
+  :group 'spacemacs)
+
+(defcustom spacemacs-yank-indent-modes '(latex-mode)
+  "Modes in which to indent regions that are yanked (or yank-popped).
+Only modes that don't derive from `prog-mode' should be listed here."
+  :type 'list
+  :group 'spacemacs)
 
 (defcustom spacemacs-yank-indent-threshold 1000
   "Threshold (# chars) over which indentation does not automatically occur."
@@ -104,16 +112,15 @@ automatically applied to."
 (defun spacemacs/indent-region-or-buffer ()
   "Indent a region if selected, otherwise the whole buffer."
   (interactive)
-  (unless (member major-mode spacemacs-indent-sensitive-modes)
-    (save-excursion
-      (if (region-active-p)
-          (progn
-            (indent-region (region-beginning) (region-end))
-            (message "Indented selected region."))
+  (save-excursion
+    (if (region-active-p)
         (progn
-          (evil-indent (point-min) (point-max))
-          (message "Indented buffer.")))
-      (whitespace-cleanup))))
+          (indent-region (region-beginning) (region-end))
+          (message "Indented selected region."))
+      (progn
+        (evil-indent (point-min) (point-max))
+        (message "Indented buffer.")))
+    (whitespace-cleanup)))
 
 ;; from https://gist.github.com/3402786
 (defun spacemacs/toggle-maximize-buffer ()
@@ -913,18 +920,6 @@ dotspacemacs-persistent-server to be t"
   (goto-line 1)
   )
 
-;; taken from Prelude: https://github.com/bbatsov/prelude
-(defmacro spacemacs|advise-commands (advice-name commands class &rest body)
-  "Apply advice named ADVICE-NAME to multiple COMMANDS.
-The body of the advice is in BODY."
-  `(progn
-     ,@(mapcar (lambda (command)
-                 `(defadvice ,command
-                      (,class ,(intern (format "%S-%s" command advice-name))
-                              activate)
-                    ,@body))
-               commands)))
-
 (defun spacemacs/safe-revert-buffer ()
   "Prompt before reverting the file."
   (interactive)
@@ -1236,21 +1231,26 @@ Compare them on count first,and in case of tie sort them alphabetically."
   (if (<= (- end beg) spacemacs-yank-indent-threshold)
       (indent-region beg end nil)))
 
-(spacemacs|advise-commands
- "indent" (yank yank-pop evil-paste-before evil-paste-after) around
- "If current mode is not one of spacemacs-indent-sensitive-modes
- indent yanked text (with universal arg don't indent)."
- (evil-start-undo-step)
- ad-do-it
- (if (and (not (equal '(4) (ad-get-arg 0)))
-          (not (member major-mode spacemacs-indent-sensitive-modes))
-          (or (derived-mode-p 'prog-mode)
-              (member major-mode spacemacs-indent-sensitive-modes)))
-     (let ((transient-mark-mode nil)
-           (save-undo buffer-undo-list))
-       (spacemacs/yank-advised-indent-function (region-beginning)
-                                               (region-end))))
- (evil-end-undo-step))
+(defun spacemacs//yank-indent-region (yank-func &rest args)
+  "If current mode is not one of spacemacs-indent-sensitive-modes
+indent yanked text (with universal arg don't indent)."
+  (evil-start-undo-step)
+  (let ((prefix (car args))
+        (enable (and (not (member major-mode spacemacs-indent-sensitive-modes))
+                     (or (derived-mode-p 'prog-mode)
+                         (member major-mode spacemacs-yank-indent-modes)))))
+    (when (and enable (equal '(4) prefix))
+      (setq args (cdr args)))
+    (apply yank-func args)
+    (when (and enable (not (equal '(4) prefix)))
+      (let ((transient-mark-mode nil)
+            (save-undo buffer-undo-list))
+        (spacemacs/yank-advised-indent-function (region-beginning)
+                                                (region-end)))))
+  (evil-end-undo-step))
+
+(dolist (func '(yank yank-pop evil-paste-before evil-paste-after))
+  (advice-add func :around #'spacemacs//yank-indent-region))
 
 ;; find file functions in split
 (defun spacemacs//display-in-split (buffer alist)
