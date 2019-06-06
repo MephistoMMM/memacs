@@ -13,9 +13,6 @@
       '(
         ;; default
         (hide-comnt :location local)
-        ;; see https://github.com/syl20bnr/spacemacs/issues/2529
-        ;; waiting for an overlay bug to be fixed
-        (hl-anything :excluded t)
         column-enforce-mode
         highlight-indentation
         highlight-numbers
@@ -47,7 +44,8 @@
         :status column-enforce-mode
         :prefix columns
         :on (column-enforce-n (or columns column-enforce-column))
-        :on-message (format "long-lines enabled for %s columns." (or columns column-enforce-column))
+        :on-message (format "long-lines enabled for %s columns."
+                            (or columns column-enforce-column))
         :off (column-enforce-mode -1)
         :documentation "Highlight the characters past the 80th column."
         :evil-leader "t8")
@@ -74,7 +72,9 @@
         :evil-leader "thi"))
     :config
     (progn
-      (spacemacs|diminish highlight-indentation-mode " ⓘ" " i"))))
+      (spacemacs|diminish highlight-indentation-mode " ⓗi" " hi")
+      (spacemacs|diminish
+       highlight-indentation-current-column-mode " ⓗc" " hc"))))
 
 (defun spacemacs-editing-visual/init-highlight-numbers ()
   (use-package highlight-numbers

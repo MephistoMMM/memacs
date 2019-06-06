@@ -10,6 +10,3 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; License: GPLv3
-
-(defvar multiple-cursors-backend 'evil-mc
-  "The package used as the backend for multiple cursors functionality.")

@@ -120,22 +120,46 @@
     :config
     (progn
       ;; key bindings
-      (dolist (prefix '(("c" . "compile")
+      (dolist (prefix '(("c" . "compile/create")
                         ("g" . "goto")
                         ("r" . "refactor")
-                        ("q" . "lsp")))
+                        ("ra" . "add/assign")
+                        ("rc" . "create/convert")
+                        ("rg" . "generate")
+                        ("re" . "extract")
+                        ("q" . "lsp")
+                        ("t" . "test")
+                        ("x" . "execute")))
         (spacemacs/declare-prefix-for-mode 'java-mode (car prefix) (cdr prefix)))
       (spacemacs/set-leader-keys-for-major-mode 'java-mode
         "pu"  'lsp-java-update-user-settings
-        "roi" 'lsp-java-organize-imports
-        "rai" 'lsp-java-add-import
-        "ram" 'lsp-java-add-unimplemented-methods
+
+        ;; refactoring
+        "ro" 'lsp-java-organize-imports
         "rcp" 'lsp-java-create-parameter
         "rcf" 'lsp-java-create-field
+        "rci" 'lsp-java-conver-to-static-import
         "rec" 'lsp-java-extract-to-constant
         "rel" 'lsp-java-extract-to-local-variable
         "rem" 'lsp-java-extract-method
+
+        ;; assign/add
+        "rai" 'lsp-java-add-import
+        "ram" 'lsp-java-add-unimplemented-methods
+        "rat" 'lsp-java-add-throws
+        "raa" 'lsp-java-assign-all
+        "raf" 'lsp-java-assign-to-field
+
+        ;; generate
+        "rgt" 'lsp-java-generate-to-string
+        "rge" 'lsp-java-generate-equals-and-hash-code
+        "rgo" 'lsp-java-generate-overrides
+        "rgg" 'lsp-java-generate-getters-and-setters
+
+        ;; create/compile
         "cc"  'lsp-java-build-project
+        "cp"  'lsp-java-spring-initializr
+
         "an"  'lsp-java-actionable-notifications
         ;; dap-mode
         ;; debug

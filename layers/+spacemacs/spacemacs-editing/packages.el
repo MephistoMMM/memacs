@@ -141,7 +141,18 @@
         "c" 'hexl-insert-octal-char
         "x" 'hexl-insert-hex-char
         "X" 'hexl-insert-hex-string
-        "g" 'hexl-goto-address))))
+        "g" 'hexl-goto-address)
+      (evil-define-key 'motion hexl-mode-map
+        "]]" 'hexl-end-of-1k-page
+        "[[" 'hexl-beginning-of-1k-page
+        "h" 'hexl-backward-char
+        "l" 'hexl-forward-char
+        "j" 'hexl-next-line
+        "k" 'hexl-previous-line
+        "$" 'hexl-end-of-line
+        "^" 'hexl-beginning-of-line
+        "0" 'hexl-beginning-of-line))))
+
 
 (defun spacemacs-editing/init-lorem-ipsum ()
   (use-package lorem-ipsum
@@ -155,9 +166,9 @@
         memacs--insert-map-keybinding-prefix "l"
         "lorem ipsum" "Insert lorem ipsum")
       (memacs/define-insert-keybinding
-        "ll" 'lorem-ipsum-insert-list
-        "lp" 'lorem-ipsum-insert-paragraphs
-        "ls" 'lorem-ipsum-insert-sentences))))
+       "ll" 'lorem-ipsum-insert-list
+       "lp" 'lorem-ipsum-insert-paragraphs
+       "ls" 'lorem-ipsum-insert-sentences))))
 
 (defun spacemacs-editing/init-move-text ()
   (use-package move-text

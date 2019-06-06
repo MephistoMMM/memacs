@@ -208,6 +208,9 @@ to boost the loading time.")
   "If non nil the frame is maximized when Emacs starts up (Emacs 24.4+ only).
 Takes effect only if `dotspacemacs-fullscreen-at-startup' is nil.")
 
+(defvar dotspacemacs-undecorated-at-startup nil
+  "If non nil the frame is undecorated when Emacs starts up.")
+
 (defvar dotspacemacs-active-transparency 90
   "A value from the range (0..100), in increasing opacity, which describes the
 transparency level of a frame when it's active or selected. Transparency
@@ -475,10 +478,14 @@ If SYMBOL value is `display-graphic-p' then return the result of
   %n -- prints Narrow if appropriate
   %z -- prints mnemonics of buffer, terminal, and keyboard coding systems
   %Z -- like %z, but including the end-of-line format"
+  ;; save-match-data to work around Emacs bug, see
+  ;; https://github.com/syl20bnr/spacemacs/issues/9700
   (save-match-data
-    ;; save-match-data to work around Emacs bug, see
-    ;; https://github.com/syl20bnr/spacemacs/issues/9700
-    (let* ((project-name (when (string-match-p "%t" title-format)
+    ;; disable buffer-list-update-hook to work around recursive invocations caused
+    ;; by the temp-buffer used by `format-spec' below, see
+    ;; https://github.com/syl20bnr/spacemacs/issues/12387
+    (let* ((buffer-list-update-hook nil)
+           (project-name (when (string-match-p "%t" title-format)
                            (if (boundp 'spacemacs--buffer-project-name)
                                spacemacs--buffer-project-name
                              (set (make-local-variable 'spacemacs--buffer-project-name)

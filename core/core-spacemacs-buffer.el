@@ -111,9 +111,9 @@ in spacemacs buffer along with quick buttons underneath.
 (defun spacemacs-buffer//choose-banner ()
   "Return the full path of a banner based on the dotfile value."
   (cond ((and spacemacs-banner-official-png
-              (image-type-available-p (intern (file-name-extension
-                                               spacemacs-banner-official-png)))
-              (display-graphic-p))
+            (image-type-available-p (intern (file-name-extension
+                                             spacemacs-banner-official-png)))
+            (display-graphic-p))
          (if (file-exists-p spacemacs-banner-official-png)
              spacemacs-banner-official-png
            (spacemacs-buffer/warning (format "could not find banner %s"

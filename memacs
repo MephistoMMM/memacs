@@ -392,10 +392,10 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; add experimental path
   ;; (add-to-list 'load-path (expand-file-name "~/Workspace/sources/awesome-tab"))
 
-  (setq configuration-layer-elpa-archives
-        '(("melpa-cn" . "https://elpa.zilongshanren.com/melpa/")
-          ("org-cn"   . "https://elpa.zilongshanren.com/org/")
-          ("gnu-cn"   . "https://elpa.zilongshanren.com/gnu/")))
+  ;; (setq configuration-layer-elpa-archives
+  ;;       '(("melpa-cn" . "https://elpa.zilongshanren.com/melpa/")
+  ;;         ("org-cn"   . "https://elpa.zilongshanren.com/org/")
+  ;;         ("gnu-cn"   . "https://elpa.zilongshanren.com/gnu/")))
 
   ;; add local/bin to exec-path for fixing not found tern
   ;; (push "/usr/local/bin" exec-path)
