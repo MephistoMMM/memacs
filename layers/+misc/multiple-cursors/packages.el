@@ -13,8 +13,8 @@
 
 (setq multiple-cursors-packages
       '(
-        (evil-mc :toggle (eq multiple-cursors-backend 'evil-mc))
-        (multiple-cursors :toggle (eq multiple-cursors-backend 'mc))))
+        evil-mc
+        ))
 
 (defun multiple-cursors/init-evil-mc ()
   (use-package evil-mc

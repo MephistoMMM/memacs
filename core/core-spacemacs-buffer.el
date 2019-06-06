@@ -95,12 +95,7 @@ FILE: the path to the file containing the banner."
 (defun spacemacs-buffer/insert-banner-and-buttons ()
   "Load a banner according to `spacemacs-banner-official-png'and insert it.
 in spacemacs buffer along with quick buttons underneath.
-Easter egg:
-Doge special text banner can be reachable via `999', `doge' or `random*'.
-Doge special text banner for dark themes can be reachable via `997',
-`doge-inverted' or `random*'.
-Cate special text banner can de reachable via `998', `cat' or `random*'.
-`random' ignore special banners whereas `random*' does not."
+"
   (let ((banner (spacemacs-buffer//choose-banner))
         (buffer-read-only nil))
     (progn
