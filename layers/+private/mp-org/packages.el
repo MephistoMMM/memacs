@@ -154,36 +154,7 @@ package you’ll get notifications for TODO entries.
      org-html-htmlize-output-type nil
      org-todo-keywords
      '((sequence "TODO(t)" "WAITING(w@/!)" "|" "SHELVING(s@)" "DONE(d!)" "CANCELED(c@)")))
-
-    (setq-default
-     org-modules
-     '(org-bbdb org-habit org-info org-irc org-w3m org-mac-link org-protocol)
-     org-capture-templates
-     '(("w" "Task" entry
-        (file+headline (lambda () (concat org-directory "/TODOs.org")) "Fighting")
-        "* TODO [#A] %^{Task}\nSCHEDULED: %t\n")
-
-       ("t" "Todo" entry
-        (file+headline (lambda () (concat org-directory "/TODOs.org")) "Play Space")
-        "* TODO [#%^{level|B|C}] %?\nSCHEDULED: %t\n%i\n"
-        :empty-lines 1)
-
-       ("l" "Links" entry
-        (file+headline (lambda () (concat org-directory "/TODOs.org")) "Play Space")
-        "* TODO [#C] %? link \t%^g\nCaptured On: %U\n"
-        :empty-lines 1)
-
-       ("b" "Books" entry
-        (file+headline (lambda () (concat org-directory "/TODOs.org")) "Books")
-        "* TODO [#B] %?"
-        :empty-lines 1)
-
-       ("n" "Temporary Notes" entry
-        (file+headline (lambda () (concat org-directory "/Temp.org")) "Temporary Notes")
-        "* %?\n  %i%a\n%U"
-        :empty-lines 1)
-       )
-     ))
+    )
   )
 
 
