@@ -441,6 +441,26 @@ you should place your code here."
   ;; Agenda Files
   (push (expand-file-name "~/Documents/works/seven/TODOs.org")
         org-agenda-files)
+  ;; Org
+  (setq working-record-directory (expand-file-name "~/Documents/works/seven"))
+  (setq org-modules '(org-bbdb org-habit org-info org-irc org-w3m org-mac-link org-protocol)
+        org-capture-templates
+        '(("w" "Task" entry
+           (file (lambda () (concat working-record-directory "/TODOs.org")))
+           "* TODO [#%^{level|A|B}] %^{Task}\nSCHEDULED: %t\n"
+           :empty-lines 1)
+
+          ("t" "Todo" entry
+           (file+headline (lambda () (concat org-directory "/TODOs.org")) "Play Space")
+           "* TODO [#%^{level|B|C}] %?\nSCHEDULED: %t\n%i\n"
+           :empty-lines 1)
+
+          ("b" "Books" entry
+           (file+headline (lambda () (concat org-directory "/TODOs.org")) "Books")
+           "* TODO [#B] %?"
+           :empty-lines 1)
+          )
+        )
 
   ;; Missions
   (setq memacs-mission-starter-mission-list

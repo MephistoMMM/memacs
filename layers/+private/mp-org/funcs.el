@@ -103,7 +103,7 @@ user-config should be defined in this function!"
 ;;;; Source Code
 
 (defconst mp-org/src-code-types
-  '("emacs-lisp" "python" "c" "shell" "java" "js" "clojure" "c++" "css" "go" "rust" "sh" "sass" "sql" "awk" "haskell" "latex" "lisp" "matlab" "org" "perl" "ruby" "scheme" "sqlite" "yaml"))
+  '("lua" "emacs-lisp" "python" "c" "shell" "java" "js" "clojure" "c++" "css" "go" "rust" "sh" "sass" "sql" "awk" "haskell" "latex" "lisp" "matlab" "org" "perl" "ruby" "scheme" "sqlite" "yaml"))
 (defvar mp-org--org-insert-src-code-block-history nil)
 
 (defun mp-org/org-insert-src-code-block (src-code-type)
