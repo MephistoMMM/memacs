@@ -131,7 +131,8 @@
       (when c-c++-adopt-subprojects
         (setq projectile-project-root-files-top-down-recurring
           (append '("compile_commands.json"
-                     ".cquery")
+                    ".cquery"
+                    ".ccls")
             projectile-project-root-files-top-down-recurring))))))
 
 ;; END LSP BACKEND PACKAGES

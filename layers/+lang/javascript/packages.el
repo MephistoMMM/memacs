@@ -30,7 +30,7 @@
 
 (defun javascript/post-init-add-node-modules-path ()
   (spacemacs/add-to-hooks #'add-node-modules-path '(css-mode-hook
-                                             js2-mode-hook)))
+                                                    js2-mode-hook)))
 
 (defun javascript/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'js2-mode))
@@ -176,47 +176,49 @@
         "xmk" 'js2r-move-line-up))))
 
 (defun javascript/init-livid-mode ()
-  (use-package livid-mode
-    :defer t
-    :init
-    (progn
-      (spacemacs/declare-prefix-for-mode 'js2-mode "T" "toggle")
-      (spacemacs|add-toggle javascript-repl-live-evaluation
-        :mode livid-mode
-        :documentation "Live evaluation of JS buffer change."
-        :evil-leader-for-mode (js2-mode . "Tl"))
-      (spacemacs|diminish livid-mode " 🅻" " [l]"))))
+  (when (eq javascript-repl 'skewer)
+    (use-package livid-mode
+      :defer t
+      :init
+      (progn
+        (spacemacs/declare-prefix-for-mode 'js2-mode "T" "toggle")
+        (spacemacs|add-toggle javascript-repl-live-evaluation
+          :mode livid-mode
+          :documentation "Live evaluation of JS buffer change."
+          :evil-leader-for-mode (js2-mode . "Tl"))
+        (spacemacs|diminish livid-mode " 🅻" " [l]")))))
 
 (defun javascript/pre-init-import-js ()
   (when (eq javascript-import-tool 'import-js)
     (add-to-list 'spacemacs--import-js-modes (cons 'js2-mode 'js2-mode-hook))))
 
 (defun javascript/init-skewer-mode ()
-  (use-package skewer-mode
-    :defer t
-    :init
-    (progn
-      (spacemacs/register-repl 'skewer-mode
-                               'spacemacs/skewer-start-repl
-                               "skewer")
-      (add-hook 'js2-mode-hook 'skewer-mode))
-    :config
-    (progn
-      (spacemacs|hide-lighter skewer-mode)
-      (spacemacs/declare-prefix-for-mode 'js2-mode "s" "skewer")
-      (spacemacs/declare-prefix-for-mode 'js2-mode "e" "eval")
-      (spacemacs/set-leader-keys-for-major-mode 'js2-mode
-        "'" 'spacemacs/skewer-start-repl
-        "ee" 'skewer-eval-last-expression
-        "eE" 'skewer-eval-print-last-expression
-        "sb" 'skewer-load-buffer
-        "sB" 'spacemacs/skewer-load-buffer-and-focus
-        "si" 'spacemacs/skewer-start-repl
-        "sf" 'skewer-eval-defun
-        "sF" 'spacemacs/skewer-eval-defun-and-focus
-        "sr" 'spacemacs/skewer-eval-region
-        "sR" 'spacemacs/skewer-eval-region-and-focus
-        "ss" 'skewer-repl))))
+  (when (eq javascript-repl 'skewer)
+    (use-package skewer-mode
+      :defer t
+      :init
+      (progn
+        (spacemacs/register-repl 'skewer-mode
+                                 'spacemacs/skewer-start-repl
+                                 "skewer")
+        (add-hook 'js2-mode-hook 'skewer-mode))
+      :config
+      (progn
+        (spacemacs|hide-lighter skewer-mode)
+        (spacemacs/declare-prefix-for-mode 'js2-mode "s" "skewer")
+        (spacemacs/declare-prefix-for-mode 'js2-mode "e" "eval")
+        (spacemacs/set-leader-keys-for-major-mode 'js2-mode
+          "'" 'spacemacs/skewer-start-repl
+          "ee" 'skewer-eval-last-expression
+          "eE" 'skewer-eval-print-last-expression
+          "sb" 'skewer-load-buffer
+          "sB" 'spacemacs/skewer-load-buffer-and-focus
+          "si" 'spacemacs/skewer-start-repl
+          "sf" 'skewer-eval-defun
+          "sF" 'spacemacs/skewer-eval-defun-and-focus
+          "sr" 'spacemacs/skewer-eval-region
+          "sR" 'spacemacs/skewer-eval-region-and-focus
+          "ss" 'skewer-repl)))))
 
 (defun javascript/post-init-tern ()
   (add-to-list 'tern--key-bindings-modes 'js2-mode))

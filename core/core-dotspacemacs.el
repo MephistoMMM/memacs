@@ -323,6 +323,9 @@ visiting README.org files of Spacemacs.")
 (defvar dotmemacs-github "https://gibhub.com/user"
   "Github of memacs user.")
 
+(defvar dotspacemacs-new-empty-buffer-major-mode nil
+  "Set the major mode for a new empty buffer.")
+
 ;; only for backward compatibility
 (defalias 'dotspacemacs-mode 'emacs-lisp-mode)
 
