@@ -34,8 +34,9 @@
                 :toggle org-enable-github-support)
         ;; (ox-reveal :toggle org-enable-reveal-js-support)
         persp-mode
-        ;; TODO research hugo
+        ;; TODO research hugo and jira
         ;; (ox-hugo :toggle org-enable-hugo-support)
+        ;; (ox-jira :toggle org-enable-jira-support)
         ))
 
 (defun org/post-init-company ()
@@ -694,3 +695,6 @@ Headline^^            Visit entry^^               Filter^^                    Da
 
 ;; (defun org/init-ox-hugo ()
 ;;   (use-package ox-hugo :after ox))
+
+;; (defun org/init-ox-jira ()
+;;   (use-package ox-jira :after ox))
