@@ -60,7 +60,7 @@ This function should only modify configuration layer settings."
      (python :variables
              python-test-runner 'pytest)
      ;; READY : npm install -g
-     ;;             eslint  typescript javascript-typescript-langserver import-js
+     ;;             eslint  typescript javascript-typescript-langserver import-js js-beautify
      (javascript :variables javascript-import-tool 'import-js)
      ;; READY : brew install luarocks
      ;;         luarocks install luacheck
