@@ -11,6 +11,8 @@
 
 
 ;;;; company-box
+(setq company-box-doc-enable nil)
+
 (defface memacs-company-box-backend-yasnippet-face
   '((t (:inherit font-lock-string-face)))
   "My company-box-backends-color for yasnippet"

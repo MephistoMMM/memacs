@@ -238,7 +238,10 @@
       ;; Use dev version of language server checked out from github
       (progn
         (setq lsp-python-ms-dir
-          (expand-file-name (concat python-lsp-git-root "/output/bin/Release/")))
+              (expand-file-name (concat python-lsp-git-root "/output/bin/Release/")))
+
+        (setq lsp-python-ms-executable
+              (concat lsp-python-ms-dir "Microsoft.Python.LanguageServer.LanguageServer"))
         (message "lsp-python-ms: Using version at `%s'" lsp-python-ms-dir))
       ;; Use a precompiled exe
       (setq lsp-python-ms-executable "Microsoft.Python.LanguageServer"))))

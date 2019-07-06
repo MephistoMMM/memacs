@@ -56,9 +56,13 @@ This function should only modify configuration layer settings."
             latex-build-command "LatexMk" ;; latexmk -pdf --synctex=1 -interaction=nonstopmode  -file-line-error  filename.tex
             latex-enable-folding t)
      shell-scripts
-     ;; READY : pip install python-language-server pyls-isort pyls-mypy pylint pytest
+     ;; READY :
+     ;;        1. ./scripts/install_lsp_python_ms.sh
+     ;;        2. pip3 install pylint pytest
      (python :variables
-             python-test-runner 'pytest)
+             python-backend 'lsp
+             python-lsp-server 'mspyls
+             python-lsp-git-root "~/.local/share/lsp_python_ms")
      ;; READY : npm install -g
      ;;             eslint  typescript javascript-typescript-langserver import-js js-beautify
      (javascript :variables javascript-import-tool 'import-js)
