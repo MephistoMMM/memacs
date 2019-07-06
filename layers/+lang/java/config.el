@@ -16,5 +16,7 @@
 (defvar java-backend 'meghanada
   "The backend to use for IDE features. Possible values are `meghanada' and `lsp'.")
 
+(setq lsp-java-server-install-dir
+      (expand-file-name "~/.local/share/eclipse.jdt.ls/server/"))
 ;; TODO: make this value different from each projection.
 (setq lsp-java--workspace-folders '("~/Workspace/java/group4"))

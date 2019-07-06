@@ -36,7 +36,7 @@ bookmarks
 tmp/
 /history
 .python-environments/
-./server/server
+./server
 /network-security.data
 *.elc
 *.pyc
@@ -55,6 +55,7 @@ eclipse.jdt.ls
 
 # Private directory
 private/
+!.gitkeep
 !private/README.md
 !private/snippets/README.md
 !private/templates/README.md
