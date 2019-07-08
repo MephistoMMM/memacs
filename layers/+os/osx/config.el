@@ -63,7 +63,7 @@
     "Path of fallback python interpreter if iTerm2 pyenv not exsiting")
 
   (defvar memacs-iterm2-scripts-path
-    (expand-file-name (concat user-emacs-directory "local/iTerm2_scripts/"))
+    (expand-file-name (concat user-emacs-directory "local/mpiterm2/"))
     "Path of directory stores scripts about iterm2")
   )
 

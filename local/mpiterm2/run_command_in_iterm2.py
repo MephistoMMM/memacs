@@ -2,6 +2,7 @@
 
 import sys
 import iterm2
+import asyncio
 
 def get_cmd():
     """

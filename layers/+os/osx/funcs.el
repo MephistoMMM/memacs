@@ -73,13 +73,21 @@ INITIAL-INPUT can be given as the initial minibuffer input."
                         "run_command_in_iterm2.py")))
     (apply 'call-process python nil "*Iterm2Log*" nil script CMD args)))
 
+(defun memacs//go-to-dir-in-iterm2 (path)
+  "Go to directory in iTerm2."
+  (let ((python (if (file-exists-p memacs-iterm2-pyenv-python-interpreter)
+                    memacs-iterm2-pyenv-python-interpreter
+                  memacs-iterm2-python-fallback-interpreter))
+        (script (concat memacs-iterm2-scripts-path
+                        "go_to_session.py")))
+    (call-process python nil "*Iterm2Log*" nil script path)))
+
 (defun memacs/switch-to-item2-on-dir-of-current-buffer()
   "Open item2 then cd into the path of the directory of
 current buffer."
   (interactive)
-  (memacs//run-command-in-iterm2
-   "cd" (shell-quote-argument
-         (or default-directory "~")))
+  (memacs//go-to-dir-in-iterm2 (shell-quote-argument
+                                (or default-directory "~")))
   )
 
 (defun memacs/switch-to-item2-on-dir-of-current-project()
@@ -88,9 +96,8 @@ current project."
   (interactive)
   (if  (boundp 'projectile-project-root)
       (let ((current-project-directory (projectile-project-root)))
-        (memacs//run-command-in-iterm2
-         "cd " (shell-quote-argument
-                (or current-project-directory "~"))))
+        (memacs//go-to-dir-in-iterm2 (shell-quote-argument
+                                      (or current-project-directory "~"))))
     (message "FUNC projectile-project-root doesn't exist, do nothing!"))
   )
 
