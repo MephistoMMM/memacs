@@ -59,6 +59,7 @@ other than the three sane values listed above."
     (global-set-key (kbd-mac-command "C-f") 'spacemacs/toggle-frame-fullscreen)
     ;; (global-set-key [(meta l)] 'hippie-expand)
     (spacemacs/set-leader-keys "f2" 'memacs/switch-to-item2-on-dir-of-current-buffer)
+    (spacemacs/set-leader-keys "p2" 'memacs/switch-to-item2-on-dir-of-current-project)
     (global-set-key (kbd "M-s-h") 'ns-do-hide-others)
     )
 

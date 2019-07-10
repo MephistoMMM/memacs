@@ -53,6 +53,18 @@
 
   (defvar memacs-autoescape-english-layout-name "ABC"
     "English layout name in your macOS system")
+
+  (defvar memacs-iterm2-pyenv-python-interpreter
+    (expand-file-name "~/Library/ApplicationSupport/iTerm2/iterm2env/versions/3.7.2/bin/python")
+    "Path of python interpreter in iTerm2 pyenv")
+
+  (defvar memacs-iterm2-python-fallback-interpreter
+    "/usr/local/bin/python"
+    "Path of fallback python interpreter if iTerm2 pyenv not exsiting")
+
+  (defvar memacs-iterm2-scripts-path
+    (expand-file-name (concat user-emacs-directory "local/mpiterm2/"))
+    "Path of directory stores scripts about iterm2")
   )
 
 ;; Use the OS X Emoji font for Emoticons

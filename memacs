@@ -1,4 +1,4 @@
-;; -*- mode: emacs-lisp -*-
+;; -*- mode: emacs-lisp; lexical-binding: t -*-
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
@@ -56,11 +56,15 @@ This function should only modify configuration layer settings."
             latex-build-command "LatexMk" ;; latexmk -pdf --synctex=1 -interaction=nonstopmode  -file-line-error  filename.tex
             latex-enable-folding t)
      shell-scripts
-     ;; READY : pip install python-language-server pyls-isort pyls-mypy pylint pytest
+     ;; READY :
+     ;;        1. ./scripts/install_lsp_python_ms.sh
+     ;;        2. pip3 install pylint pytest
      (python :variables
-             python-test-runner 'pytest)
+             python-backend 'lsp
+             python-lsp-server 'mspyls
+             python-lsp-git-root "~/.local/share/lsp_python_ms")
      ;; READY : npm install -g
-     ;;             eslint  typescript javascript-typescript-langserver import-js
+     ;;             eslint  typescript javascript-typescript-langserver import-js js-beautify
      (javascript :variables javascript-import-tool 'import-js)
      ;; READY : brew install luarocks
      ;;         luarocks install luacheck
@@ -115,11 +119,11 @@ This function should only modify configuration layer settings."
    dotspacemacs-excluded-packages '()
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
-   ;; `used-only' installs only explicitly used packages and uninstall any
-   ;; unused packages as well as their unused dependencies.
-   ;; `used-but-keep-unused' installs only the used packages but won't uninstall
-   ;; them if they become unused. `all' installs *all* packages supported by
-   ;; Spacemacs and never uninstall them. (default is `used-only')
+   ;; `used-only' installs only explicitly used packages and deletes any unused
+   ;; packages as well as their unused dependencies. `used-but-keep-unused'
+   ;; installs only the used packages but won't delete unused ones. `all'
+   ;; installs *all* packages supported by Spacemacs and never uninstalls them.
+   ;; (default is `used-only')
    dotspacemacs-install-packages 'used-only))
 
 (defun dotspacemacs/init ()
@@ -289,7 +293,10 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-show-transient-state-title t
    ;; If non-nil show the color guide hint for transient state keys. (default t)
    dotspacemacs-show-transient-state-color-guide t
-   ;; If non-nil unicode symbols are displayed in the mode line. (default t)
+
+   ;; If non-nil unicode symbols are displayed in the mode line.
+   ;; If you use Emacs as a daemon and wants unicode characters only in GUI set
+   ;; the value to quoted `display-graphic-p'. (default t)
    dotspacemacs-mode-line-unicode-symbols t
    ;; If non-nil smooth scrolling (native-scrolling) is enabled. Smooth
    ;; scrolling overrides the default behavior of Emacs which recenters point

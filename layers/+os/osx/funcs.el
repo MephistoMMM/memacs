@@ -53,34 +53,52 @@ INITIAL-INPUT can be given as the initial minibuffer input."
 
 
 ;;; Switch To Item2
-(defun memacs//switch-to-item2-run-command(CMD)
-  "Open item2 run command CMD."
-  (do-applescript
-   (format "
-          tell application \"iTerm\"
-            activate
-            try
-              select first window
-            on error
-              create window with default profile
-              select first window
-            end try
-            tell the first window
-              tell current session to write text \"%s\"
-            end tell
-          end tell" CMD))
-  )
+
+(defun memacs/send-region-to-iterm2 (start end)
+  "Send the text of the current region to iTerm2."
+  (interactive "r")
+  (let ((python (if (file-exists-p memacs-iterm2-pyenv-python-interpreter)
+                    memacs-iterm2-pyenv-python-interpreter
+                  memacs-iterm2-python-fallback-interpreter))
+        (script (concat memacs-iterm2-scripts-path
+                        "run_command_in_iterm2.py")))
+    (call-process-region start end python nil nil nil script)))
+
+(defun memacs//run-command-in-iterm2 (CMD &rest args)
+  "Send the commands to iTerm2."
+  (let ((python (if (file-exists-p memacs-iterm2-pyenv-python-interpreter)
+                    memacs-iterm2-pyenv-python-interpreter
+                  memacs-iterm2-python-fallback-interpreter))
+        (script (concat memacs-iterm2-scripts-path
+                        "run_command_in_iterm2.py")))
+    (apply 'call-process python nil "*Iterm2Log*" nil script CMD args)))
+
+(defun memacs//go-to-dir-in-iterm2 (path)
+  "Go to directory in iTerm2."
+  (let ((python (if (file-exists-p memacs-iterm2-pyenv-python-interpreter)
+                    memacs-iterm2-pyenv-python-interpreter
+                  memacs-iterm2-python-fallback-interpreter))
+        (script (concat memacs-iterm2-scripts-path
+                        "go_to_session.py")))
+    (call-process python nil "*Iterm2Log*" nil script path)))
 
 (defun memacs/switch-to-item2-on-dir-of-current-buffer()
   "Open item2 then cd into the path of the directory of
 current buffer."
   (interactive)
-  (memacs//switch-to-item2-run-command
-   (concat
-    "cd "
-    (replace-regexp-in-string "\\\\" "\\\\\\\\"
-                              (shell-quote-argument
-                               (or default-directory "~")))))
+  (memacs//go-to-dir-in-iterm2 (shell-quote-argument
+                                (or default-directory "~")))
+  )
+
+(defun memacs/switch-to-item2-on-dir-of-current-project()
+  "Open item2 then cd into the path of the root directory of
+current project."
+  (interactive)
+  (if  (boundp 'projectile-project-root)
+      (let ((current-project-directory (projectile-project-root)))
+        (memacs//go-to-dir-in-iterm2 (shell-quote-argument
+                                      (or current-project-directory "~"))))
+    (message "FUNC projectile-project-root doesn't exist, do nothing!"))
   )
 
 
