@@ -195,45 +195,44 @@
     :init
     (progn
       (cond ((spacemacs/visual-line-numbers-p)
-             (setq display-line-numbers-type 'visual))
+             (setq display-line-numbers-type 'visual)
+             (spacemacs|add-toggle visual-line-numbers
+               :status (and (featurep 'display-line-numbers)
+                          display-line-numbers-mode
+                          (eq display-line-numbers 'visual))
+               :on (prog1 (display-line-numbers-mode)
+                     (setq display-line-numbers 'visual))
+               :off (display-line-numbers-mode -1)
+               :documentation "Show relative visual line numbers."
+               :on-message "Visual line numbers enabled."
+               :off-message "Line numbers disabled."
+               :evil-leader "tn"))
             ((spacemacs/relative-line-numbers-p)
-             (setq display-line-numbers-type 'relative))
+             (setq display-line-numbers-type 'relative)
+             (spacemacs|add-toggle relative-line-numbers
+               :status (and (featurep 'display-line-numbers)
+                          display-line-numbers-mode
+                          (eq display-line-numbers 'relative))
+               :on (prog1 (display-line-numbers-mode)
+                     (setq display-line-numbers 'relative))
+               :off (display-line-numbers-mode -1)
+               :documentation "Show relative line numbers."
+               :on-message "Relative line numbers enabled."
+               :off-message "Line numbers disabled."
+               :evil-leader "tn"))
             (t
-             (setq display-line-numbers-type t)))
-
-      (spacemacs|add-toggle line-numbers
-        :status (and (featurep 'display-line-numbers)
-                   display-line-numbers-mode
-                   (eq display-line-numbers t))
-        :on (prog1 (display-line-numbers-mode)
-              (setq display-line-numbers t))
-        :off (display-line-numbers-mode -1)
-        :on-message "Absolute line numbers enabled."
-        :off-message "Line numbers disabled."
-        :documentation "Show the line numbers."
-        :evil-leader "tn")
-      (spacemacs|add-toggle relative-line-numbers
-        :status (and (featurep 'display-line-numbers)
-                   display-line-numbers-mode
-                   (eq display-line-numbers 'relative))
-        :on (prog1 (display-line-numbers-mode)
-              (setq display-line-numbers 'relative))
-        :off (display-line-numbers-mode -1)
-        :documentation "Show relative line numbers."
-        :on-message "Relative line numbers enabled."
-        :off-message "Line numbers disabled."
-        :evil-leader "tr")
-      (spacemacs|add-toggle visual-line-numbers
-        :status (and (featurep 'display-line-numbers)
-                   display-line-numbers-mode
-                   (eq display-line-numbers 'visual))
-        :on (prog1 (display-line-numbers-mode)
-              (setq display-line-numbers 'visual))
-        :off (display-line-numbers-mode -1)
-        :documentation "Show relative visual line numbers."
-        :on-message "Visual line numbers enabled."
-        :off-message "Line numbers disabled."
-        :evil-leader "tV")
+             (setq display-line-numbers-type t)
+             (spacemacs|add-toggle line-numbers
+               :status (and (featurep 'display-line-numbers)
+                          display-line-numbers-mode
+                          (eq display-line-numbers t))
+               :on (prog1 (display-line-numbers-mode)
+                     (setq display-line-numbers t))
+               :off (display-line-numbers-mode -1)
+               :on-message "Absolute line numbers enabled."
+               :off-message "Line numbers disabled."
+               :documentation "Show the line numbers."
+               :evil-leader "tn")))
 
       (when (spacemacs//linum-backward-compabitility)
         (add-hook 'prog-mode-hook 'display-line-numbers-mode)
