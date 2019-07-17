@@ -222,10 +222,10 @@ If the universal prefix argument is used then kill also the window."
   (interactive)
   (require 'avy)
   (let ((res (avy-with spacemacs/ace-buffer-links
-                       (avy--process
-                        (spacemacs//collect-spacemacs-buffer-links)
-                        #'avy--overlay-pre))))
-    (when res
+               (avy--process
+                (spacemacs//collect-spacemacs-buffer-links)
+                #'avy--overlay-pre))))
+    (when (numberp res)
       (goto-char (1+ res))
       (widget-button-press (point)))))
 

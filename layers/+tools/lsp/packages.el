@@ -15,6 +15,7 @@
     lsp-ui
     (company-lsp :requires company)
     lsp-treemacs
+    popwin
     ))
 
 (defun lsp/init-lsp-mode ()
@@ -92,3 +93,7 @@
 
 (defun lsp/init-lsp-treemacs ()
   (use-package lsp-treemacs :defer t))
+
+(defun lsp/post-init-popwin ()
+  (push '("*lsp-help*" :dedicated t :position bottom :stick t :noselect t :height 0.4)
+        popwin:special-display-config))

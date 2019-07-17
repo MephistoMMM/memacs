@@ -14,6 +14,8 @@
         company
         (company-go :requires company)
         flycheck
+        flycheck-golangci-lint
+        ggtags
         go-eldoc
         go-fill-struct
         go-gen-test
@@ -43,6 +45,14 @@
 
 (defun go/post-init-flycheck ()
   (spacemacs/enable-flycheck 'go-mode))
+
+(defun go/init-flycheck-golangci-lint ()
+  (use-package flycheck-golangci-lint
+    :defer t
+    :init (add-hook 'go-mode-hook 'spacemacs//go-enable-flycheck-extra t)))
+
+(defun go/post-init-ggtags ()
+  (add-hook 'go-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
 
 (defun go/init-go-eldoc ()
   (add-hook 'go-mode-hook 'go-eldoc-setup))

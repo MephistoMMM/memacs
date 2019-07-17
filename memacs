@@ -95,6 +95,7 @@ This function should only modify configuration layer settings."
      ;; go get -u -v github.com/cweill/gotests/...
      ;; go get -u -v github.com/davidrjenni/reftools/cmd/fillstruct
      ;; go get -v -u github.com/saibing/bingo
+     ;; go get -v -u github.com/golangci/golangci-lint/cmd/golangci-lint
      (go :variables
          gofmt-command "goimports"
          go-backend 'lsp
