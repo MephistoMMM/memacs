@@ -129,6 +129,7 @@
           (sql-send-line-and-next)))
 
       (spacemacs/declare-prefix-for-mode 'sql-mode "b" "buffer")
+      (spacemacs/declare-prefix-for-mode 'sql-mode "g" "goto")
       (spacemacs/declare-prefix-for-mode 'sql-mode "h" "dialects")
       (spacemacs/declare-prefix-for-mode 'sql-mode "s" "interactivity")
       (spacemacs/declare-prefix-for-mode 'sql-mode "l" "listing")
@@ -137,6 +138,7 @@
 
         ;; sqli buffer
         "bb" 'sql-show-sqli-buffer
+        "bc" 'sql-connect
         "bs" 'sql-set-sqli-buffer
 
         ;; dialects
