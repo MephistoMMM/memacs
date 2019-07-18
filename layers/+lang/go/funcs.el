@@ -40,8 +40,9 @@
       (progn
         ;; without setting lsp-prefer-flymake to :none
         ;; golangci-lint errors won't be reported
-        (message "[go] Setting lsp-prefer-flymake :none to enable golangci-lint support.")
-        (setq-local lsp-prefer-flymake :none)
+        ;; (when go-use-golangci-lint
+        ;;   (message "[go] Setting lsp-prefer-flymake :none to enable golangci-lint support.")
+        ;;   (setq-local lsp-prefer-flymake :none))
         (lsp))
     (message "`lsp' layer is not installed, please add `lsp' layer to your dotfile.")))
 
@@ -56,17 +57,6 @@
           :call-hooks t)
         (company-mode))
     (message "`lsp' layer is not installed, please add `lsp' layer to your dotfile.")))
-
-(defun spacemacs//go-enable-flycheck-extra ()
-  "Enable enhanced linter and disable overlapping `flycheck' linters."
-  (setq flycheck-disabled-checkers '(go-gofmt
-                                     go-golint
-                                     go-vet
-                                     go-build
-                                     go-test
-                                     go-errcheck))
-  (flycheck-golangci-lint-setup)
-  (message "go-linter: using golangci-lint"))
 
 (defun spacemacs/go-run-tests (args)
   (interactive)
