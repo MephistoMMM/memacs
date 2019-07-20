@@ -29,7 +29,7 @@
     (progn
       (setq aya-persist-snippets-dir
             (or auto-completion-private-snippets-directory
-                (concat spacemacs-start-directory "snippets/")))
+               (concat spacemacs-start-directory "snippets/")))
       )))
 
 (defun auto-completion/init-company ()
