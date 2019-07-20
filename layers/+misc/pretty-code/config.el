@@ -27,13 +27,11 @@
       '((company-yasnippet . (:all
                               memacs-company-box-backend-yasnippet-face
                               :selected
-                              memacs-company-box-backend-yasnippet-selected-face)))
-      )
+                              memacs-company-box-backend-yasnippet-selected-face))
+        ))
 
 ;; FIXME replace icons-in-terminal to all-the-icons
 (setq company-box-icons-alist 'company-box-icons-icons-in-terminal)
-
-;; (setq company-box-icons-unknown 'fa_question_circle)
 
 ;; (setq company-box-icons-elisp
 ;;       '((fa_tag        :height 1 :face font-lock-function-name-face) ;; Function
@@ -41,8 +39,6 @@
 ;;         (fa_cube       :height 1 :face font-lock-constant-face     ) ;; Feature
 ;;         (md_color_lens :height 1 :face font-lock-doc-face          ) ;; Face
 ;;         ))
-
-(setq company-box-icons-yasnippet 'fa_bookmark)
 
 (setq company-box-icons-icons-in-terminal
       '((Unknown . (fa_question_circle       :height 1                                   ))
