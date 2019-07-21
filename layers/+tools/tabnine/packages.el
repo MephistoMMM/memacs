@@ -13,6 +13,7 @@
   '(
     lsp-mode
     company-box
+    company
     (company-tabnine :requires company)
     ))
 
@@ -34,6 +35,12 @@
                                    memacs-company-box-backend-tabnine-selected-face))
       )
     )
+  )
+
+(defun tabnine/post-init-company ()
+  (unless (configuration-layer/layer-used-p 'lsp)
+    (with-eval-after-load 'company
+      (push #'company-tabnine company-backends)))
   )
 
 (defun tabnine/init-company-tabnine ()
