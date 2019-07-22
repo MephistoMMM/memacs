@@ -149,7 +149,7 @@ pressing `<leader> m`. Set it to `nil` to disable it.")
   "New official name for `dotspacemacs-command-key'")
 
 (defvar dotspacemacs-default-font '("Source Code Pro"
-                                    :size 13
+                                    :size 10.0
                                     :weight normal
                                     :width normal)
   "Default font, or prioritized list of fonts. This setting has no effect when
