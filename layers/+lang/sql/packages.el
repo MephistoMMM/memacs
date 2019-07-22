@@ -131,8 +131,8 @@
       (spacemacs/declare-prefix-for-mode 'sql-mode "b" "buffer")
       (spacemacs/declare-prefix-for-mode 'sql-mode "g" "goto")
       (spacemacs/declare-prefix-for-mode 'sql-mode "h" "dialects")
-      (spacemacs/declare-prefix-for-mode 'sql-mode "s" "interactivity")
       (spacemacs/declare-prefix-for-mode 'sql-mode "l" "listing")
+      (spacemacs/declare-prefix-for-mode 'sql-mode "s" "interactivity")
       (spacemacs/set-leader-keys-for-major-mode 'sql-mode
         "'" 'spacemacs/sql-start
 
