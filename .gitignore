@@ -70,3 +70,4 @@ spacemacs.env
 .lsp-session-*
 .mypy_cache/
 /LEETCODE
+/smex-items
