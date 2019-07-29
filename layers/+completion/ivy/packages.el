@@ -31,6 +31,8 @@
         swiper
         wgrep
         ivy-xref
+
+        (fuz :location built-in)
         ))
 
 (defun ivy/pre-init-auto-highlight-symbol ()
@@ -419,10 +421,26 @@ Current Action: %s(ivy-action-name)
     :init
     (progn
       (setq xref-prompt-for-identifier '(not xref-find-definitions
-                                             xref-find-definitions-other-window
-                                             xref-find-definitions-other-frame
-                                             xref-find-references
-                                             spacemacs/jump-to-definition))
+                                            xref-find-definitions-other-window
+                                            xref-find-definitions-other-frame
+                                            xref-find-references
+                                            spacemacs/jump-to-definition))
 
       ;; Use ivy-xref to display `xref.el' results.
       (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))))
+
+(defun ivy/pre-init-fuz ()
+  (add-to-load-path (expand-file-name "~/.local/share/fuz.el"))
+  )
+
+(defun ivy/init-fuz ()
+"fuz.el provides some fuzzy match scoring/matching functions for Emacs, they are powered by Rust so it’s fast enough."
+(use-package ivy-fuz
+  :after ivy
+  :init
+  (progn
+    (setq ivy-sort-matches-functions-alist '((t . ivy-fuz-sort-fn)))
+    (setq ivy-re-builders-alist '((t . ivy-fuz-regex-fuzzy))))
+  :config
+  (add-to-list 'ivy-highlight-functions-alist '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn)))
+)

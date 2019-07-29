@@ -62,11 +62,3 @@ than this amount.")
     ("d" memacs/projectile-delete-file-confirm "delete file")
     ("R" memacs/projectile-rename-file "rename file"))
   "Default ivy actions for projectile.")
-
-(defvar memacs--ivy-grep-actions
-  (cl-loop for j in memacs--ivy-file-actions
-           for key = (nth 0 j)
-           for func = (nth 1 j)
-           for desc = (nth 2 j)
-           collect `(,key (lambda (x) (spacemacs//counsel-with-git-grep (quote ,func) x)) ,desc))
-  "Default ivy actions to be used with git-grep output.")
