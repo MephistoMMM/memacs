@@ -426,37 +426,18 @@
 ;; we own pcre2el here, so that it's always available to ivy and helm
 ;; (necessary when using spacemacs-base distribution)
 (defun spacemacs-bootstrap/init-pcre2el ()
-  (use-package pcre2el
-    :defer t
-    :init
-    (progn
-      (spacemacs/declare-prefix "xr" "regular expressions")
-      (spacemacs/declare-prefix "xre" "elisp")
-      (spacemacs/declare-prefix "xrp" "pcre")
-      (spacemacs/set-leader-keys
-        "xr/"  'rxt-explain
-        "xr'"  'rxt-convert-to-strings
-        "xrt"  'rxt-toggle-elisp-rx
-        "xrx"  'rxt-convert-to-rx
-        "xrc"  'rxt-convert-syntax
-        "xre/" 'rxt-explain-elisp
-        "xre'" 'rxt-elisp-to-strings
-        "xrep" 'rxt-elisp-to-pcre
-        "xret" 'rxt-toggle-elisp-rx
-        "xrex" 'rxt-elisp-to-rx
-        "xrp/" 'rxt-explain-pcre
-        "xrp'" 'rxt-pcre-to-strings
-        "xrpe" 'rxt-pcre-to-elisp
-        "xrpx" 'rxt-pcre-to-rx))))
+  (use-package pcre2el :defer t))
 
 (defun spacemacs-bootstrap/init-hybrid-mode ()
-  (use-package hybrid-mode
-    :config
-    (progn
-      (hybrid-mode)
-      (setq hybrid-mode-default-state 'normal
-            hybrid-mode-enable-evilified-state t)
-      (spacemacs|diminish hybrid-mode))))
+  (spacemacs|unless-dumping-and-eval-after-loaded-dump
+   holy-mode
+   (use-package hybrid-mode
+     :config
+     (progn
+       (hybrid-mode)
+       (setq hybrid-mode-default-state 'normal
+             hybrid-mode-enable-evilified-state t)
+       (spacemacs|diminish hybrid-mode)))))
 
 (defun spacemacs-bootstrap/init-spacemacs-theme ()
   (use-package spacemacs-theme
