@@ -237,12 +237,12 @@
     (when python-lsp-git-root
       ;; Use dev version of language server checked out from github
       ;; init lsp-python-ms-extra-paths by environment variable PYTHONPATH
-      (setq lsp-python-ms-extra-paths
-            (split-string (getenv "PYTHONPATH") ":"))
-      (setq lsp-python-ms-dir
-            (expand-file-name (concat python-lsp-git-root "/output/bin/Release/")))
+      (setq
+       lsp-python-ms-extra-paths (split-string (getenv "PYTHONPATH") ":")
+       lsp-python-ms-dir (expand-file-name (concat python-lsp-git-root "/output/bin/Release/"))
+       lsp-python-executable-cmd "python"
+       lsp-python-ms-executable (concat lsp-python-ms-dir "Microsoft.Python.LanguageServer.LanguageServer")
+       )
 
-      (setq lsp-python-ms-executable
-            (concat lsp-python-ms-dir "Microsoft.Python.LanguageServer.LanguageServer"))
       (message "lsp-python-ms: Using version at `%s'" lsp-python-ms-dir))
     ))

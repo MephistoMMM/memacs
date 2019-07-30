@@ -6,15 +6,21 @@ import asyncio
 
 from mpiterm2.lib.session import get_session_by_path
 
-if len(sys.argv) < 2:
-    print("USAGE: ./go_to_session.py PATH")
-    os.exit(1)
+PATH = None
+if len(sys.argv) >= 2:
+    PATH = sys.argv[1]
 
-PATH = sys.argv[1]
+if PATH == "--help" or PATH == "-h":
+    print("USAGE: ./go_to_session.py [PATH]")
+    os.exit(1)
 
 async def go_to(connection):
     app = await iterm2.async_get_app(connection)
-    session = await get_session_by_path(app, PATH.rstrip("/"))
+    if PATH is None:
+        session = app.current_terminal_window.current_tab.current_session
+    else:
+        session = await get_session_by_path(app, PATH.rstrip("/"))
+
     await session.async_activate(True, True)
     await app.async_activate(True, True)
     print("Done")
