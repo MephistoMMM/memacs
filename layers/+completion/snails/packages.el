@@ -17,13 +17,14 @@
 
 (defun snails/init-exec-path-from-shell() )
 
-(defun snails/pre-init-snails ( )
-  (add-to-load-path (expand-file-name "~/Workspace/sources/snails"))
-  )
-
 (defun snails/init-snails ( )
   "Init snails. Details: https://github.com/manateelazycat/snails "
-  (require 'snails)
+  (let ((absolute-load-path
+         (expand-file-name "~/Workspace/sources/snails")))
+    (when (file-directory-p absolute-load-path)
+      (add-to-load-path absolute-load-path)
+      (require 'snails))
+    )
   )
 
 ;;; packages.el ends here
