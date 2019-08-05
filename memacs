@@ -103,6 +103,7 @@ This function should only modify configuration layer settings."
 
      ;; Catalogue: self layers
      ;; READY : npm install -g hexo
+     ;;         ./scripts/install_fuz.sh
      mp-org
      mp-hacking
      coding
