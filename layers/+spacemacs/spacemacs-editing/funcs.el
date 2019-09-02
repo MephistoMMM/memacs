@@ -15,7 +15,7 @@
 (defun spacemacs/avy-goto-url()
   "Use avy to go to an URL in the buffer."
   (interactive)
-  (avy--generic-jump "https?://" nil 'pre))
+  (avy-jump "https?://"))
 
 (defun spacemacs/avy-open-url ()
   "Use avy to select an URL in the buffer and open it."

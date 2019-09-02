@@ -25,8 +25,8 @@ and `mspyls'")
   "If non-nil, use a development version of the language server in this folder")
 
 (defvar python-formatter 'yapf
-  "The formatter to use. Possible values are `yapf' and
-  `black'.")
+  "The formatter to use. Possible values are `yapf',
+  `black' and 'lsp'.")
 
 (defvar python-format-on-save nil
   "If non-nil, automatically format code with formatter selected

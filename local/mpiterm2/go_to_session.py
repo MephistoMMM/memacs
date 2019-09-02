@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+#
+# https://iterm2.com/python-api/
+# https://iterm2.com/python-api/examples/index.html
 
 import sys, os
 import iterm2

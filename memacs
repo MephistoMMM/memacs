@@ -459,8 +459,7 @@ you should place your code here."
         org-agenda-files)
   ;; Org
   (setq working-record-directory (expand-file-name "~/Documents/works/seven"))
-  (setq org-modules '(org-bbdb org-habit org-info org-irc org-w3m org-mac-link org-protocol)
-        org-capture-templates
+  (setq org-capture-templates
         '(("w" "Task" entry
            (file (lambda () (concat working-record-directory "/TODOs.org")))
            "* TODO [#%^{level|A|B}] %^{Task}\nSCHEDULED: %t\n"

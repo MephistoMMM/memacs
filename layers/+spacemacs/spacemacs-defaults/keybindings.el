@@ -267,6 +267,7 @@
 (spacemacs/set-leader-keys
   "j(" 'check-parens
   "j=" 'spacemacs/indent-region-or-buffer
+  "j+" 'spacemacs/iwb-region-or-buffer
   "jo" 'open-line
   "jS" 'spacemacs/split-and-new-line
   "jk" 'spacemacs/evil-goto-next-line-and-indent)
@@ -304,7 +305,7 @@
   :status truncate-lines
   :on (toggle-truncate-lines)
   :off (toggle-truncate-lines -1)
-  :documentation "Truncate long lines (no wrap)."
+  :documentation "Toggle between line wrapping or truncation (no wrap)."
   :evil-leader "tl")
 (spacemacs|add-toggle visual-line-navigation
   :status visual-line-mode
