@@ -117,11 +117,11 @@ can be a symbol or a list with additional properties like '(all-the-icons
 
 (defvar dotspacemacs-frame-title-format "%I@%S"
   "Default format string for a frame title bar, using the
-  original format spec, and additional customizations.")
+original format spec, and additional customizations.")
 
 (defvar dotspacemacs-icon-title-format nil
   "Default format string for a icon title bar, using the
-  original format spec, and additional customizations.")
+original format spec, and additional customizations.")
 
 (defvar dotspacemacs-colorize-cursor-according-to-state t
   "If non nil the cursor color matches the state color in GUI Emacs.")
@@ -158,7 +158,7 @@ running Emacs in terminal.")
   "Code folding method. Possible values are `evil' and `origami'.")
 
 (defvar dotspacemacs-default-layout-name "Default"
-  " Name of the default layout.")
+  "Name of the default layout.")
 
 (defvar dotspacemacs-display-default-layout t
   "If non nil the default layout name is displayed in the mode-line.")
@@ -267,8 +267,8 @@ Has no effect if `dotspacemacs-enable-server' is nil.")
 
 (defvar dotspacemacs-smart-closing-parenthesis nil
   "If non-nil pressing the closing parenthesis `)' key in insert mode passes
-over any automatically added closing parenthesis, bracket, quote, etc…
-This can be temporary disabled by pressing `C-q' before `)'.")
+over any automatically added closing parenthesis, bracket, quote, etc...
+This can be temporary disabled by pressing `C-q' before `)'. (default nil)")
 
 (defvar dotspacemacs-highlight-delimiters 'current
   "Select a scope to highlight delimiters. Possible values are `any',
@@ -291,14 +291,14 @@ specified with an installed package.
 NOT USED FOR NOW :-)")
 
 (defvar dotspacemacs-startup-lists '((recents  . 5)
-                                    (projects . 7))
+                                     (projects . 7))
   "Association list of items to show in the startup buffer of the form
 `(list-type . list-size)`. If nil it is disabled.
+
 Possible values for list-type are:
 `recents' `bookmarks' `projects' `agenda' `todos'.
 List sizes may be nil, in which case
-`spacemacs--buffer-startup-lists-length' takes effect.
-")
+`spacemacs--buffer-startup-lists-length' takes effect.")
 
 (defvar dotspacemacs-startup-buffer-responsive t
   "True if the home buffer should respond to resize events.")
@@ -364,8 +364,9 @@ are caught and signaled to user in spacemacs buffer."
 changed, and issue a warning if it did."
   (unless (eq dotspacemacs-configuration-layers
               dotspacemacs--configuration-layers-saved)
-    (spacemacs-buffer/warning
-     "`dotspacemacs-configuration-layers' was changed outside of `dotspacemacs/layers'.")))
+    (spacemacs-buffer/warning (concat
+                               "`dotspacemacs-configuration-layers' was "
+                               "changed outside of `dotspacemacs/layers'."))))
 (add-hook 'spacemacs-post-user-config-hook
           'dotspacemacs//check-layers-changed)
 
@@ -375,8 +376,9 @@ Returns non nil if the layer has been effectively inserted."
   (unless (configuration-layer/layer-used-p layer-name)
     (with-current-buffer (find-file-noselect (dotspacemacs/location))
       (beginning-of-buffer)
-      (let ((insert-point (re-search-forward
-                           "[^`]dotspacemacs-configuration-layers\\s-*\n?[^(]*\\((\\)")))
+      (let ((insert-point
+             (re-search-forward
+              "[^`]dotspacemacs-configuration-layers\\s-*\n?[^(]*\\((\\)")))
         (insert (format "%S" layer-name))
         (unless (equal (point) (point-at-eol))
           (insert "\n"))
@@ -388,8 +390,7 @@ Returns non nil if the layer has been effectively inserted."
     t))
 
 (defun dotspacemacs//profile-user-config (f &rest args)
-  "Compute time taken by the `dotspacemacs/user-config' function.
-Set the variable"
+  "Compute time taken by the `dotspacemacs/user-config' function."
   (let ((stime (current-time)))
     (apply f args)
     (setq dotspacemacs--user-config-elapsed-time
@@ -447,7 +448,7 @@ Called with `C-u C-u' skips `dotspacemacs/user-config' _and_ preliminary tests."
 (defmacro dotspacemacs|symbol-value (symbol)
   "Return the value of SYMBOL corresponding to a dotspacemacs variable.
 If SYMBOL value is `display-graphic-p' then return the result of
- `(display-graphic-p)', otherwise return the value of the symbol."
+`(display-graphic-p)', otherwise return the value of the symbol."
   `(if (eq 'display-graphic-p ,symbol) (display-graphic-p) ,symbol))
 
 (defun dotspacemacs/location ()
@@ -483,23 +484,26 @@ If SYMBOL value is `display-graphic-p' then return the result of
   ;; save-match-data to work around Emacs bug, see
   ;; https://github.com/syl20bnr/spacemacs/issues/9700
   (save-match-data
-    ;; disable buffer-list-update-hook to work around recursive invocations caused
-    ;; by the temp-buffer used by `format-spec' below, see
+    ;; disable buffer-list-update-hook to work around recursive invocations
+    ;; caused by the temp-buffer used by `format-spec' below, see
     ;; https://github.com/syl20bnr/spacemacs/issues/12387
     (let* ((buffer-list-update-hook nil)
-           (project-name (when (string-match-p "%t" title-format)
-                           (if (boundp 'spacemacs--buffer-project-name)
-                               spacemacs--buffer-project-name
-                             (set (make-local-variable 'spacemacs--buffer-project-name)
-                                  (if (fboundp 'projectile-project-name)
-                                      (projectile-project-name)
-                                    "-")))))
-           (abbreviated-file-name (when (string-match-p "%a" title-format)
-                                    (if (boundp 'spacemacs--buffer-abbreviated-filename)
-                                        spacemacs--buffer-abbreviated-filename
-                                      (set (make-local-variable 'spacemacs--buffer-abbreviated-filename)
-                                           (abbreviate-file-name (or (buffer-file-name)
-                                                                     (buffer-name)))))))
+           (project-name
+            (when (string-match-p "%t" title-format)
+              (if (boundp 'spacemacs--buffer-project-name)
+                  spacemacs--buffer-project-name
+                (set (make-local-variable 'spacemacs--buffer-project-name)
+                     (if (fboundp 'projectile-project-name)
+                         (projectile-project-name)
+                       "-")))))
+           (abbreviated-file-name
+            (when (string-match-p "%a" title-format)
+              (if (boundp 'spacemacs--buffer-abbreviated-filename)
+                  spacemacs--buffer-abbreviated-filename
+                (set (make-local-variable
+                      'spacemacs--buffer-abbreviated-filename)
+                     (abbreviate-file-name (or (buffer-file-name)
+                                               (buffer-name)))))))
            (fs (format-spec-make
                 ?a abbreviated-file-name
                 ?t project-name
@@ -552,24 +556,27 @@ Return nil if no scale is defined."
                    "[[file:%s::dotspacemacs/layers][Show in File]]\n")
            dotspacemacs-filepath))
   ;; protect global values of these variables
-  (let (dotspacemacs-configuration-layer-path dotspacemacs-configuration-layers
-        dotspacemacs-additional-packages dotspacemacs-excluded-packages
+  (let (dotspacemacs-additional-packages
+        dotspacemacs-configuration-layer-path
+        dotspacemacs-configuration-layers
+        dotspacemacs-excluded-packages
         dotspacemacs-install-packages
-        (passed-tests 0) (total-tests 0))
+        (passed-tests 0)
+        (total-tests 0))
     (load dotspacemacs-filepath)
     (dotspacemacs/layers)
-    (spacemacs//test-list
-     'stringp 'dotspacemacs-configuration-layer-path
-     "is a string" "path")
-    (spacemacs//test-list
-     'file-directory-p 'dotspacemacs-configuration-layer-path
-     "exists in filesystem" "path")
+    (spacemacs//test-list 'stringp
+                          'dotspacemacs-configuration-layer-path
+                          "is a string" "path")
+    (spacemacs//test-list 'file-directory-p
+                          'dotspacemacs-configuration-layer-path
+                          "exists in filesystem" "path")
     (setq dotspacemacs-configuration-layers
           (mapcar (lambda (l) (if (listp l) (car l) l))
                   dotspacemacs-configuration-layers))
-    (spacemacs//test-list
-     'configuration-layer/get-layer-path
-     'dotspacemacs-configuration-layers  "can be found" "layer")
+    (spacemacs//test-list 'configuration-layer/get-layer-path
+                          'dotspacemacs-configuration-layers
+                          "can be found" "layer")
     (insert (format
              (concat "** RESULTS: "
                      "[[file:%s::dotspacemacs/layers][dotspacemacs/layers]] "
@@ -607,8 +614,9 @@ Return nil if no scale is defined."
             (and (listp x)
                  (memq (car x) themes)
                  ;; TODO define a function to remove several properties at once
-                 (null (spacemacs/mplist-remove (spacemacs/mplist-remove (cdr x) :separator)
-                                         :separator-scale))))))
+                 (null (spacemacs/mplist-remove
+                        (spacemacs/mplist-remove (cdr x) :separator)
+                        :separator-scale))))))
     'dotspacemacs-mode-line-theme
     (concat
      "is \'spacemacs, \'all-the-icons, \'custom, \'vim-powerline or 'vanilla "
@@ -620,15 +628,16 @@ Return nil if no scale is defined."
                                                   "\'cache or nil"))
    (spacemacs//test-var
     (lambda (x) (member x '(all any current nil)))
-    'dotspacemacs-highlight-delimiters "is one of \'all, \'any, \'current or nil")
+    'dotspacemacs-highlight-delimiters
+    "is one of \'all, \'any, \'current or nil")
    (spacemacs//test-list
     (lambda (x)
       (let ((el (or (car-safe x) x))
             (list-size (cdr-safe x)))
-      (member el '(recents bookmarks projects todos agenda))))
+        (member el '(recents bookmarks projects todos agenda))))
     'dotspacemacs-startup-lists (concat "includes \'recents, "
-                              "\'bookmarks, \'todos, "
-                              "\'agenda or \'projects"))
+                                        "\'bookmarks, \'todos, "
+                                        "\'agenda or \'projects"))
    (spacemacs//test-list
     (lambda (x)
       (let ((el (or (car-safe x) x))
@@ -653,7 +662,7 @@ Return nil if no scale is defined."
 
 (defun dotspacemacs/test-dotfile (&optional hide-buffer)
   "Test settings in dotfile for correctness.
- Return non-nil if all the tests passed."
+Return non-nil if all the tests passed."
   (interactive)
   (configuration-layer/discover-layers 'refresh-index)
   (let ((min-version "0.0"))
@@ -661,7 +670,8 @@ Return nil if no scale is defined."
     ;; (if (version< dotspacemacs-version min-version)
     (if nil
         (error (format (concat "error: dotspacemacs/test-dotfile requires "
-                               "dotspacemacs-version %s") min-version))
+                               "dotspacemacs-version %s")
+                       min-version))
       (with-current-buffer (get-buffer-create dotspacemacs-test-results-buffer)
         (unless hide-buffer
           (switch-to-buffer-other-window dotspacemacs-test-results-buffer))
@@ -675,7 +685,8 @@ Return nil if no scale is defined."
           (insert (format "* Running tests on [[file:%s][%s]] (v%s)\n"
                           dotspacemacs-filepath dotspacemacs-filepath "0.0"))
           ;; dotspacemacs-version not implemented yet
-          ;; (insert (format "* Running tests on %s (v%s)\n" dotspacemacs-filepath dotspacemacs-version))
+          ;; (insert (format "* Running tests on %s (v%s)\n"
+          ;;                 dotspacemacs-filepath dotspacemacs-version))
           (prog1
               ;; execute all tests no matter what
               (cl-reduce (lambda (x y)

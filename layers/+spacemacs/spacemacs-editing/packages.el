@@ -324,7 +324,12 @@
   (use-package undo-tree
     :defer t
     :init (setq undo-tree-visualizer-timestamps t
-                undo-tree-visualizer-diff t)
+                undo-tree-visualizer-diff t
+                ;; 10X bump of the undo limits to avoid issues with premature
+                ;; Emacs GC which truncages the undo history very aggresively
+                undo-limit 800000
+                undo-strong-limit 12000000
+                undo-outer-limit 120000000)
     :config
     (progn
       (advice-add 'undo-tree-visualizer-quit :after #'spacemacs/undo-tree-restore-default)

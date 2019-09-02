@@ -75,6 +75,10 @@ Cancels autosave on exiting perspectives mode."
   (let ((ivy-ignore-buffers (remove #'spacemacs//layout-not-contains-buffer-p ivy-ignore-buffers)))
     (ivy-switch-buffer)))
 
+(defun spacemacs-layouts//advice-with-persp-buffer-list (orig-fun &rest args)
+  "Advice to provide perp buffer list."
+  (with-persp-buffer-list () (apply orig-fun args)))
+
 
 ;; Persp transient-state
 
@@ -291,7 +295,7 @@ Available PROPS:
                                        ,binding ,already-defined? ,name)
              (setq spacemacs--custom-layout-alist
                    (delete (assoc ,binding spacemacs--custom-layout-alist)
-                     spacemacs--custom-layout-alist))
+                           spacemacs--custom-layout-alist))
              (push '(,binding . ,name) spacemacs--custom-layout-alist))
          (push '(,binding . ,name) spacemacs--custom-layout-alist)))))
 
@@ -354,9 +358,9 @@ buffers that belong to the current buffer's project."
       (message "There is already a perspective named %s" name)
     (if-let ((project (projectile-project-p)))
         (spacemacs||switch-layout name
-                                  :init
-                                  (persp-add-buffer (projectile-project-buffers project)
-                                                    (persp-get-by-name name) nil nil))
+          :init
+          (persp-add-buffer (projectile-project-buffers project)
+                            (persp-get-by-name name) nil nil))
       (message "Current buffer does not belong to a project"))))
 
 (defmacro spacemacs||switch-project-persp (name &rest body)
@@ -372,18 +376,18 @@ the new perspective will be killed."
   `(let ((projectile-after-switch-project-hook
           projectile-after-switch-project-hook))
      (spacemacs||switch-layout ,name
-                               :init
-                               (add-hook 'projectile-after-switch-project-hook
-                                         (lambda ()
-                                           (let ((persp (persp-get-by-name ,name)))
-                                             (when (persp-p persp)
-                                               (persp-add-buffer (projectile-project-buffers
-                                                                  (expand-file-name ,name))
-                                                                 persp nil nil)))))
-                               (condition-case nil
-                                   (progn
-                                     ,@body)
-                                 (quit (persp-kill-without-buffers ,name))))))
+       :init
+       (add-hook 'projectile-after-switch-project-hook
+                 (lambda ()
+                   (let ((persp (persp-get-by-name ,name)))
+                     (when (persp-p persp)
+                       (persp-add-buffer (projectile-project-buffers
+                                          (expand-file-name ,name))
+                                         persp nil nil)))))
+       (condition-case nil
+           (progn
+             ,@body)
+         (quit (persp-kill-without-buffers ,name))))))
 
 
 ;; Helm and Ivy common functions
