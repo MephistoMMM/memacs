@@ -429,18 +429,18 @@ Current Action: %s(ivy-action-name)
       ;; Use ivy-xref to display `xref.el' results.
       (setq xref-show-xrefs-function #'ivy-xref-show-xrefs))))
 
-(defun ivy/pre-init-fuz ()
-  (add-to-load-path (expand-file-name "~/.local/share/fuz.el"))
-  )
-
 (defun ivy/init-fuz ()
-"fuz.el provides some fuzzy match scoring/matching functions for Emacs, they are powered by Rust so it’s fast enough."
-(use-package ivy-fuz
-  :after ivy
-  :init
-  (progn
-    (setq ivy-sort-matches-functions-alist '((t . ivy-fuz-sort-fn)))
-    (setq ivy-re-builders-alist '((t . ivy-fuz-regex-fuzzy))))
-  :config
-  (add-to-list 'ivy-highlight-functions-alist '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn)))
-)
+  "fuz.el provides some fuzzy match scoring/matching functions for Emacs, they are powered by Rust so it’s fast enough."
+  (let ((absolute-fuz-load-path memacs-fuz-load-path))
+    (when (file-directory-p absolute-fuz-load-path)
+      (add-to-load-path absolute-fuz-load-path)
+      (use-package ivy-fuz
+        :after ivy
+        :init
+        (progn
+          (setq ivy-sort-matches-functions-alist '((t . ivy-fuz-sort-fn)))
+          (setq ivy-re-builders-alist '((t . ivy-fuz-regex-fuzzy))))
+        :config
+        (add-to-list 'ivy-highlight-functions-alist '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn))))
+    )
+  )

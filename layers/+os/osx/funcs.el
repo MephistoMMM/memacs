@@ -82,6 +82,17 @@ INITIAL-INPUT can be given as the initial minibuffer input."
                         "go_to_session.py")))
     (call-process python nil "*Iterm2Log*" nil script path)))
 
+(defun memacs/switch-to-item2 ()
+  "Open item2."
+  (interactive)
+  (let ((python (if (file-exists-p memacs-iterm2-pyenv-python-interpreter)
+                    memacs-iterm2-pyenv-python-interpreter
+                  memacs-iterm2-python-fallback-interpreter))
+        (script (concat memacs-iterm2-scripts-path
+                        "go_to_session.py")))
+    (call-process python nil "*Iterm2Log*" nil script))
+  )
+
 (defun memacs/switch-to-item2-on-dir-of-current-buffer()
   "Open item2 then cd into the path of the directory of
 current buffer."

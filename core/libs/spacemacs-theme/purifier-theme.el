@@ -464,6 +464,11 @@
    `(whitespace-space-before-tab ((,class (:background nil :foreground ,rainbow-7))))
    `(whitespace-tab ((,class (:background nil :foreground ,builtin))))
    `(whitespace-trailing ((,class (:background ,err :foreground ,fg2))))
+;;;;; snails
+
+   `(snails-header-line-face ((,class (:inherit font-lock-function-name-face :underline t :height 1.2))))
+   `(snails-header-index-face ((,class (:inherit font-lock-function-name-face :underline t))))
+   `(snails-input-buffer-face ((,class (:height 300))))
 
 ;;;;; other, need more work
    `(undo-tree-visualizer-current-face ((,class :foreground ,keyword)))

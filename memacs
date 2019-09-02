@@ -64,7 +64,7 @@ This function should only modify configuration layer settings."
              python-lsp-server 'mspyls
              python-lsp-git-root "~/.local/share/lsp_python_ms")
      ;; READY : npm install -g
-     ;;             eslint  typescript javascript-typescript-langserver import-js js-beautify
+     ;;             eslint  typescript javascript-typescript-langserver import-js js-beautifyeslint  typescript javascript-typescript-langserver import-js js-beautify
      (javascript :variables javascript-import-tool 'import-js)
      ;; READY : brew install luarocks
      ;;         luarocks install luacheck
@@ -103,11 +103,14 @@ This function should only modify configuration layer settings."
 
      ;; Catalogue: self layers
      ;; READY : npm install -g hexo
+     ;;         ./scripts/install_fuz.sh
      mp-org
      mp-hacking
      coding
      osx
      tabnine
+     ;; READY : git clone https://github.com/manateelazycat/snails.git ~/Workspace/sources/snails
+     snails
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -405,10 +408,10 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; add experimental path
   ;; (add-to-list 'load-path (expand-file-name "~/Workspace/sources/awesome-tab"))
 
-  ;; (setq configuration-layer-elpa-archives
-  ;;       '(("melpa-cn" . "https://elpa.zilongshanren.com/melpa/")
-  ;;         ("org-cn"   . "https://elpa.zilongshanren.com/org/")
-  ;;         ("gnu-cn"   . "https://elpa.zilongshanren.com/gnu/")))
+  (setq configuration-layer--elpa-archives
+        '(("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+          ("org-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")
+          ("gnu-cn"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")))
 
   ;; add local/bin to exec-path for fixing not found tern
   ;; (push "/usr/local/bin" exec-path)
@@ -456,8 +459,7 @@ you should place your code here."
         org-agenda-files)
   ;; Org
   (setq working-record-directory (expand-file-name "~/Documents/works/seven"))
-  (setq org-modules '(org-bbdb org-habit org-info org-irc org-w3m org-mac-link org-protocol)
-        org-capture-templates
+  (setq org-capture-templates
         '(("w" "Task" entry
            (file (lambda () (concat working-record-directory "/TODOs.org")))
            "* TODO [#%^{level|A|B}] %^{Task}\nSCHEDULED: %t\n"

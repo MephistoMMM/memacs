@@ -62,3 +62,6 @@ than this amount.")
     ("d" memacs/projectile-delete-file-confirm "delete file")
     ("R" memacs/projectile-rename-file "rename file"))
   "Default ivy actions for projectile.")
+
+(defvar memacs-fuz-load-path "~/.local/share/fuz.el"
+  "Default load path of fuz.el")

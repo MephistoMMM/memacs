@@ -29,7 +29,6 @@
    spacemacs-visual
    multiple-cursors
 
-
    (auto-completion :variables
                     auto-completion-enable-sort-by-usage nil
                     auto-completion-return-key-behavior 'complete
