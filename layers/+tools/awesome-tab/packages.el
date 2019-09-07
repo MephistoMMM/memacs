@@ -25,11 +25,11 @@
       (spacemacs|define-transient-state awesometab
         :title "Awesome-tab Transient State"
         :doc "
- Fast Move^^              Tab^^                  Search^^      Misc^^
- ───────^^────────────  ─────^^────────────────  ──────^^───── ─────^^──────────────
- [_p_/_n_] switch group [_C-a_/_C-e_] first/last [_b_] buffer  [_C-k_] kill buffer
- [_h_/_l_] switch tab   [_C-j_]^^ ace jump       [_g_] group   [_C-S-k_] kill others in group
- [_H_/_L_] switch other [_C-h_/_C-l_] move       ^^            ^^           [_q_] quit
+ Fast Move^^^^           Tab^^^^                   Search^^      Misc^^
+ ───────^^^^──────────── ─────^^^^──────────────── ──────^^───── ─────^^──────────────
+ [_p_/_n_] switch group  [_C-a_/_C-e_] first/last  [_b_] buffer  [_C-k_] kill buffer
+ [_h_/_l_] switch tab    [_C-j_]^^ ace jump        [_g_] group   [_C-S-k_] kill others in group
+ [_H_/_L_] switch other  [_C-h_/_C-l_] move        ^^            [_q_] quit
 "
         :on-enter (awesome-tab-mode t)
         :on-exit (awesome-tab-mode -1)
