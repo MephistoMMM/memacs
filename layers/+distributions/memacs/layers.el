@@ -25,6 +25,7 @@
    spacemacs-modeline
    spacemacs-misc
    spacemacs-navigation
+   awesome-tab
    spacemacs-org
    spacemacs-visual
    multiple-cursors

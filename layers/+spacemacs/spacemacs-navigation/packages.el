@@ -20,60 +20,7 @@
         (info+ :location local)
         paradox
         restart-emacs
-        (awesome-tab :location (recipe
-                                :fetcher github
-                                :repo "MephistoMMM/awesome-tab"))
         (smooth-scrolling :location built-in)))
-
-(defun spacemacs-navigation/init-awesome-tab ()
-  (use-package awesome-tab
-    :commands (awesome-tab-toggle-tabbar-mode-on awesome-tab-toggle-tabbar-mode-off)
-    :defer t
-    :init
-    (progn
-      (spacemacs|define-transient-state awesometab
-        :title "Awesome-tab Transient State"
-        :doc "
- Tab^^                    Group^^                   Other^^
- ───────^^────────────  ─────^^───────────────  ─────^^──────────────
- [_h_/_l_] pre/next       [_p_/_n_] pre/next group  [_H_/_L_] other pre/next
- [_b_/_e_] beginning/end  [_s_] switch            [_d_/_K_] delete/Kill all    [_q_] quit"
-        :on-enter (awesome-tab-toggle-tabbar-mode-on)
-        :on-exit (awesome-tab-toggle-tabbar-mode-off)
-        :bindings
-        ;; Tab
-        ("h" awesome-tab-backward)
-        ("l" awesome-tab-forward)
-        ("b" awesome-tab-select-beg-tab)
-        ("e" awesome-tab-select-end-tab)
-        ;; Group
-        ("p" awesome-tab-backward-group)
-        ("n" awesome-tab-forward-group)
-        ("s" awesome-tab-switch-group)
-        ;; Other
-        ("d" spacemacs/kill-this-buffer)
-        ("K" awesome-tab-kill-all-buffers-in-current-group)
-        ("H" awesome-tab-forward-tab-other-window)
-        ("L" awesome-tab-backward-tab-other-window)
-        ("q" nil :exit t))
-      (memacs/define-evil-normal-keybinding "C-t" 'spacemacs/awesometab-transient-state/body))
-      :config
-      (progn
-        (setq awesome-tab-active-color
-              (face-attribute 'spacemacs-normal-face :background)
-              awesome-tab-inactive-color
-              (face-attribute 'font-lock-comment-face :foreground))
-        (set-face-attribute 'awesome-tab-selected nil
-                            :foreground awesome-tab-active-color
-                            :underline nil
-                            :overline awesome-tab-active-color
-                            )
-        (set-face-attribute 'awesome-tab-unselected nil
-                            :foreground awesome-tab-inactive-color
-                            :underline awesome-tab-inactive-color
-                            :overline nil
-                            ))
-      ))
 
 (defun spacemacs-navigation/init-ace-link ()
   (use-package ace-link
