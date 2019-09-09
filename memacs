@@ -64,7 +64,7 @@ This function should only modify configuration layer settings."
              python-lsp-server 'mspyls
              python-lsp-git-root "~/.local/share/lsp_python_ms")
      ;; READY : npm install -g
-     ;;             eslint  typescript javascript-typescript-langserver import-js js-beautifyeslint  typescript javascript-typescript-langserver import-js js-beautify
+     ;;             eslint  typescript javascript-typescript-langserver import-js js-beautify
      (javascript :variables javascript-import-tool 'import-js)
      ;; READY : brew install luarocks
      ;;         luarocks install luacheck

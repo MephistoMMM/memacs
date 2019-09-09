@@ -32,7 +32,7 @@
         wgrep
         ivy-xref
 
-        (fuz :location built-in)
+        ;; (fuz :location built-in)
         ))
 
 (defun ivy/pre-init-auto-highlight-symbol ()
