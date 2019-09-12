@@ -93,5 +93,9 @@
 (global-set-key (kbd "C-h") 'delete-backward-char)
 (global-set-key (kbd "M-h") 'backward-kill-word)
 (define-key ivy-minibuffer-map (kbd "M-r") 'evil-replace)
+(memacs/define-evil-normal-keybinding
+ "C-<tab>" 'ivy-switch-buffer)
+(memacs/define-evil-normal-keybinding
+ "C-b" 'ivy-switch-buffer)
 
 ;;; keybindings.el ends here
