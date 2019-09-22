@@ -10,3 +10,7 @@
 ;;; License: GPLv3
 
 (configuration-layer/declare-layers '(json node tern web-beautify import-js))
+
+(when (and (boundp 'javascript-backend)
+         (eq javascript-backend 'lsp))
+  (configuration-layer/declare-layers '(lsp dap)))

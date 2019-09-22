@@ -31,7 +31,7 @@
 
 (require 'evil)
 
-
+;;;###autoload
 (defcustom hybrid-style-default-state
   (spacemacs|dotspacemacs-backward-compatibility
    hybrid-mode-default-state normal)
@@ -39,7 +39,10 @@
   :group 'spacemacs
   :type 'symbol)
 
-(defcustom hybrid-mode-enable-evilified-state t
+;;;###autoload
+(defcustom hybrid-style-enable-evilified-state
+  (spacemacs|dotspacemacs-backward-compatibility
+   hybrid-mode-enable-evilified-state t)
   "If non-nil then evilified states is enabled in buffer supporting it."
   :group 'spacemacs
   :type 'boolean)

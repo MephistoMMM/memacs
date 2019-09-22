@@ -31,7 +31,10 @@
 (defun spacemacs//python-setup-lsp ()
   "Setup lsp backend."
   (if (configuration-layer/layer-used-p 'lsp)
-      (lsp)
+      (progn
+        (when (eq python-lsp-server 'mspyls)
+          (require 'lsp-python-ms))
+        (lsp))
     (message "`lsp' layer is not installed, please add `lsp' layer to your dotfile."))
   (if (configuration-layer/layer-used-p 'dap)
       (progn

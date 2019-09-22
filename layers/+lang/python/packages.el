@@ -232,6 +232,7 @@
   (use-package lsp-python-ms
     :if (eq python-lsp-server 'mspyls)
     :ensure nil
+    :defer t
     :config
 
     (when python-lsp-git-root

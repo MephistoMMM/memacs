@@ -14,6 +14,8 @@
         company
         eldoc
         flycheck
+        ggtags
+        counsel-gtags
         (java-mode :location built-in)
         maven-test-mode
         meghanada
@@ -25,20 +27,26 @@
 (defun java/post-init-company ()
   (add-hook 'java-mode-local-vars-hook #'spacemacs//java-setup-company))
 
-(defun java/post-init-eldoc ()
-  (add-hook 'java-mode-local-vars-hook #'spacemacs//java-setup-eldoc))
-
 (defun java/post-init-flycheck ()
   (add-hook 'java-mode-local-vars-hook #'spacemacs//java-setup-flycheck))
+
+(defun java/post-init-ggtags ()
+  (add-hook 'java-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
+
+(defun java/post-init-counsel-gtags ()
+  (spacemacs/counsel-gtags-define-keys-for-mode 'java-mode))
 
 (defun java/pre-init-org ()
   (spacemacs|use-package-add-hook org
     :post-config (add-to-list 'org-babel-load-languages '(java . t))))
 
 (defun java/init-java-mode ()
-  (add-hook 'java-mode-local-vars-hook #'spacemacs//java-setup-backend)
-  (put 'java-backend 'safe-local-variable 'symbolp)
-  (spacemacs//java-define-command-prefixes))
+  (use-package java-mode
+    :defer t
+    :init
+    (progn
+      (add-hook 'java-mode-local-vars-hook #'spacemacs//java-setup-backend)
+      (put 'java-backend 'safe-local-variable 'symbolp))))
 
 (defun java/init-maven-test-mode ()
   (use-package maven-test-mode
@@ -127,12 +135,13 @@
                         ("rc" . "create/convert")
                         ("rg" . "generate")
                         ("re" . "extract")
+                        ("p" . "project")
                         ("q" . "lsp")
                         ("t" . "test")
                         ("x" . "execute")))
         (spacemacs/declare-prefix-for-mode 'java-mode (car prefix) (cdr prefix)))
       (spacemacs/set-leader-keys-for-major-mode 'java-mode
-        "pu"  'lsp-java-update-user-settings
+        "pu"  'lsp-java-update-project-configuration
 
         ;; refactoring
         "ro" 'lsp-java-organize-imports
