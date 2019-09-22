@@ -58,7 +58,7 @@
   "Forces Hybrid state."
   (if (equal -1 (ad-get-arg 0))
       ad-do-it
-    (if hybrid-mode-enable-evilified-state
+    (if hybrid-style-enable-evilified-state
         ad-do-it
       ;; seems better to set the emacs state instead of hybrid for evilified
       ;; buffers
