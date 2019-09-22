@@ -188,8 +188,7 @@ automatically applied to."
 
 (defun spacemacs/swap-windows (window1 window2)
   "Swap two windows.
-WINDOW1 and WINDOW2 must be valid windows. They may contain child
-windows."
+WINDOW1 and WINDOW2 must be valid windows. They may contain child windows."
   (let ((state1 (window-state-get window1))
         (state2 (window-state-get window2)))
     ;; to put state into dedicated windows, we must undedicate them first (not
@@ -285,7 +284,7 @@ projectile cache and updates recentf list."
 
       ;; Invalidate projectile cache.
       (when (and (configuration-layer/package-used-p 'projectile)
-                 (projectile-project-p))
+               (projectile-project-p))
         (call-interactively #'projectile-invalidate-cache))
 
       ;; Inform user about tremendous success.
@@ -491,8 +490,8 @@ If the universal prefix argument is used then will the windows too."
 ;; from http://dfan.org/blog/2009/02/19/emacs-dedicated-windows/
 (defun spacemacs/toggle-current-window-dedication ()
   "Toggle dedication state of a window. Commands that change the buffer that a
-  window is displaying will not typically change the buffer displayed by
-  a dedicated window."
+window is displaying will not typically change the buffer displayed by
+a dedicated window."
  (interactive)
  (let* ((window    (selected-window))
         (dedicated (window-dedicated-p window)))
@@ -507,9 +506,9 @@ If the universal prefix argument is used then will the windows too."
 (defun spacemacs--directory-path ()
   "Retrieve the directory path of the current buffer.
 
-If the buffer is not visiting a file, use the `list-buffers-directory'
-variable as a fallback to display the directory, useful in buffers like the
-ones created by `magit' and `dired'.
+If the buffer is not visiting a file, use the `list-buffers-directory' variable
+as a fallback to display the directory, useful in buffers like the ones created
+by `magit' and `dired'.
 
 Returns:
   - A string containing the directory path in case of success.
@@ -538,7 +537,8 @@ Returns:
     (concat file-path ":" (number-to-string (line-number-at-pos)))))
 
 (defun spacemacs--file-path-with-line-column ()
-  "Retrieve the file path of the current buffer, including line and column number.
+  "Retrieve the file path of the current buffer,
+including line and column number.
 
 Returns:
   - A string containing the file path in case of success.
@@ -548,8 +548,8 @@ Returns:
       file-path
       ":"
       (number-to-string (if (and
-                              ;; Emacs 26 introduced this variable.
-                              ;; Remove this check once 26 becomes the minimum version.
+                             ;; Emacs 26 introduced this variable. Remove this
+                             ;; check once 26 becomes the minimum version.
                               (boundp column-number-indicator-zero-based)
                               (not column-number-indicator-zero-based))
                             (1+ (current-column))
@@ -606,7 +606,8 @@ buffer."
     (message "WARNING: Current buffer is not attached to a file!")))
 
 (defun spacemacs/copy-file-path-with-line-column ()
-  "Copy and show the file path of the current buffer, including line and column number.
+  "Copy and show the file path of the current buffer,
+including line and column number.
 
 This function respects the value of the `column-number-indicator-zero-based'
 variable."
@@ -733,9 +734,10 @@ in a new frame."
   "Prefixes for windows that are not deleted when changing split layout.
 
 You can add an entry here by using the following:
-  (add-to-list 'spacemacs-window-split-ignore-prefixes \"Buffer prefix\")")
+(add-to-list 'spacemacs-window-split-ignore-prefixes \"Buffer prefix\")")
 
-(defvar spacemacs-window-split-delete-function 'spacemacs/window-split-default-delete
+(defvar spacemacs-window-split-delete-function
+  'spacemacs/window-split-default-delete
   "Function used to delete other windows when changing layout.
 
 Used as a callback by the following functions:
@@ -756,11 +758,12 @@ Possible values:
 (defun spacemacs/window-split-grid (&optional purge)
   "Set the layout to a 2x2 grid.
 
-Uses the funcion defined in `spacemacs-window-split-delete-function' as a means to
-remove windows.
+Uses the funcion defined in `spacemacs-window-split-delete-function'
+as a means to remove windows.
 
-When called with a prefix argument, it uses `delete-other-windows' as a means
-to remove windows, regardless of the value in `spacemacs-window-split-delete-function'."
+When called with a prefix argument, it uses `delete-other-windows'
+as a means to remove windows, regardless of the value in
+`spacemacs-window-split-delete-function'."
   (interactive "P")
   (if purge
       (let ((ignore-window-parameters t))
@@ -781,11 +784,12 @@ to remove windows, regardless of the value in `spacemacs-window-split-delete-fun
 (defun spacemacs/window-split-triple-columns (&optional purge)
   "Set the layout to triple columns.
 
-Uses the funcion defined in `spacemacs-window-split-delete-function' as a means to
-remove windows.
+Uses the funcion defined in `spacemacs-window-split-delete-function'
+as a means to remove windows.
 
-When called with a prefix argument, it uses `delete-other-windows' as a means
-to remove windows, regardless of the value in `spacemacs-window-split-delete-function'."
+When called with a prefix argument, it uses `delete-other-windows'
+as a means to remove windows, regardless of the value in
+`spacemacs-window-split-delete-function'."
   (interactive "P")
   (if purge
       (let ((ignore-window-parameters t))
@@ -804,11 +808,12 @@ to remove windows, regardless of the value in `spacemacs-window-split-delete-fun
 (defun spacemacs/window-split-double-columns (&optional purge)
   "Set the layout to double columns.
 
-Uses the funcion defined in `spacemacs-window-split-delete-function' as a means to
-remove windows.
+Uses the funcion defined in `spacemacs-window-split-delete-function'
+as a means to remove windows.
 
-When called with a prefix argument, it uses `delete-other-windows' as a means
-to remove windows, regardless of the value in `spacemacs-window-split-delete-function'."
+When called with a prefix argument, it uses `delete-other-windows'
+as a means to remove windows, regardless of the value in
+`spacemacs-window-split-delete-function'."
   (interactive "P")
   (if purge
       (let ((ignore-window-parameters t))
@@ -816,19 +821,21 @@ to remove windows, regardless of the value in `spacemacs-window-split-delete-fun
     (funcall spacemacs-window-split-delete-function))
   (if (spacemacs--window-split-splittable-windows)
       (let* ((previous-files (seq-filter #'buffer-file-name
-                               (delq (current-buffer) (buffer-list)))))
-        (set-window-buffer (split-window-right) (or (car previous-files) "*scratch*"))
+                                         (delq (current-buffer) (buffer-list)))))
+        (set-window-buffer (split-window-right)
+                           (or (car previous-files) "*scratch*"))
         (balance-windows))
     (message "There are no main windows available to split!")))
 
 (defun spacemacs/window-split-single-column (&optional purge)
   "Set the layout to single column.
 
-Uses the funcion defined in `spacemacs-window-split-delete-function' as a means to
-remove windows.
+Uses the funcion defined in `spacemacs-window-split-delete-function'
+as a means to remove windows.
 
-When called with a prefix argument, it uses `delete-other-windows' as a means
-to remove windows, regardless of the value in `spacemacs-window-split-delete-function'."
+When called with a prefix argument, it uses `delete-other-windows'
+as a means to remove windows, regardless of the value in
+`spacemacs-window-split-delete-function'."
   (interactive "P")
   (if purge
       (let ((ignore-window-parameters t))
@@ -1109,13 +1116,14 @@ With negative N, comment out original line and use the absolute value."
                       (buffer-substring (region-beginning) (region-end))
                     (prog1 (thing-at-point 'line)
                       (end-of-line)
-                      (if (< 0 (forward-line 1)) ; Go to beginning of next line, or make a new one
+                      ;; Go to beginning of next line, or make a new one
+                      (if (< 0 (forward-line 1))
                           (newline))))))
-        (dotimes (i (abs (or n 1)))     ; Insert N times, or once if not specified
+        (dotimes (i (abs (or n 1)))   ; Insert N times, or once if not specified
           (insert text))))
-    (if use-region nil                  ; Only if we're working with a line (not a region)
+    (if use-region nil        ; Only if we're working with a line (not a region)
       (let ((pos (- (point) (line-beginning-position)))) ; Save column
-        (if (> 0 n)                             ; Comment out original with negative arg
+        (if (> 0 n)                     ; Comment out original with negative arg
             (comment-region (line-beginning-position) (line-end-position)))
         (forward-line 1)
         (forward-char pos)))))
@@ -1160,7 +1168,8 @@ A non-nil argument sorts in REVERSE order."
        (>= (1+ (- (line-number-at-pos (region-end))
                   (line-number-at-pos (region-beginning)))) 2))
       (sort-columns reverse (region-beginning) (region-end))
-    (error "Sorting by column requires a block/rect selection on 2 or more lines.")))
+    (error
+     "Sorting by column requires a block/rect selection on 2 or more lines.")))
 
 (defun spacemacs/sort-lines-by-column-reverse ()
 "Sort lines by the selected column in reverse order,
@@ -1385,7 +1394,8 @@ Decision is based on `dotspacemacs-line-numbers'."
 Decision is based on `dotspacemacs-line-numbers'."
   (or (eq dotspacemacs-line-numbers 'relative)
       (and (listp dotspacemacs-line-numbers)
-           (car (spacemacs/mplist-get-values dotspacemacs-line-numbers :relative)))))
+           (car (spacemacs/mplist-get-values dotspacemacs-line-numbers
+                                             :relative)))))
 
 (defun spacemacs/visual-line-numbers-p ()
   "Return non-nil if line numbers should be visual.
@@ -1430,19 +1440,23 @@ Decision is based on `dotspacemacs-line-numbers'."
 (defun spacemacs//linum-curent-buffer-is-not-too-big ()
   "Return non-nil if buffer size is not too big."
   (not (and (listp dotspacemacs-line-numbers)
-            (spacemacs/mplist-get-values dotspacemacs-line-numbers :size-limit-kb)
+            (spacemacs/mplist-get-values dotspacemacs-line-numbers
+                                         :size-limit-kb)
             (> (buffer-size)
-               (* 1000 (car (spacemacs/mplist-get-values dotspacemacs-line-numbers
-                                                  :size-limit-kb)))))))
+               (* 1000
+                  (car (spacemacs/mplist-get-values dotspacemacs-line-numbers
+                                                    :size-limit-kb)))))))
 
 ;; see tests in tests/layers/+distribution/spacemacs-base/line-numbers-utest.el
 ;; for the different possible cases
 (defun spacemacs//linum-enabled-for-current-major-mode ()
   "Return non-nil if line number is enabled for current major-mode."
-  (let* ((disabled-for-modes (spacemacs/mplist-get-values dotspacemacs-line-numbers
-                                                          :disabled-for-modes))
-         (user-enabled-for-modes (spacemacs/mplist-get-values dotspacemacs-line-numbers
-                                                              :enabled-for-modes))
+  (let* ((disabled-for-modes
+          (spacemacs/mplist-get-values dotspacemacs-line-numbers
+                                       :disabled-for-modes))
+         (user-enabled-for-modes
+          (spacemacs/mplist-get-values dotspacemacs-line-numbers
+                                       :enabled-for-modes))
          ;; default `enabled-for-modes' to '(prog-mode text-mode), because it is
          ;; a more sensible default than enabling in all buffers - including
          ;; Magit buffers, terminal buffers, etc. But don't include prog-mode or

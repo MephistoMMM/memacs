@@ -9,21 +9,6 @@
 ;;
 ;;; License: GPLv3
 
-(defun spacemacs//java-define-command-prefixes ()
-  "Define command prefixes for java-mode."
-  (setq java/key-binding-prefixes '(("d" . "eclimd")
-                                    ("E" . "errors")
-                                    ("f" . "find")
-                                    ("g" . "goto")
-                                    ("r" . "refactor")
-                                    ("h" . "documentation")
-                                    ("a" . "ant")
-                                    ("p" . "project")
-                                    ("t" . "test")))
-  (mapc (lambda(x) (spacemacs/declare-prefix-for-mode
-                    'java-mode (car x) (cdr x)))
-        java/key-binding-prefixes))
-
 (defun spacemacs//java-setup-backend ()
   "Conditionally setup java backend."
   (pcase java-backend
@@ -42,9 +27,6 @@
     (`meghanada (spacemacs//java-setup-meghanada-flycheck))
     (`lsp (spacemacs//java-setup-lsp-flycheck))))
 
-(defun spacemacs//java-setup-eldoc ()
-  "Conditionally setup eldoc based on backend."
-  )
 
 ;; meghanada
 

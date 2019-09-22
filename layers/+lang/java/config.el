@@ -13,8 +13,8 @@
 
 (spacemacs|define-jump-handlers java-mode)
 
-(defvar java-backend 'meghanada
-  "The backend to use for IDE features. Possible values are `meghanada' and `lsp'.")
+(defvar java-backend 'lsp
+  "The backend to use for IDE features. Possible values are `lsp' and `meghanada'.")
 
 (setq lsp-java-server-install-dir
       (expand-file-name "~/.local/share/eclipse.jdt.ls/server/"))
