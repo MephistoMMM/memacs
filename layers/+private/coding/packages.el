@@ -30,13 +30,11 @@
     :commands (leetcode)
     :defer t
     :init
-    (progn
-      (setq leetcode-prefer-language "golang")
-      (let ((accountfile (concat user-emacs-directory "LEETCODE")))
-        (if (file-exists-p accountfile)
-            (load accountfile)
-          (message (format "WARNING: leetcode account file doesn't exist."))))
-      ))
+    (setq leetcode-prefer-language "golang")
+    :config
+    (define-key leetcode--problems-mode-map (kbd "TAB") 'leetcode-show-current-problem)
+    (define-key leetcode--problems-mode-map (kbd "<return>") 'leetcode-show-current-problem)
+    )
   )
 
 
