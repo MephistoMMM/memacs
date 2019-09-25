@@ -45,6 +45,9 @@
     :init
     (progn
       (add-hook 'java-mode-local-vars-hook #'spacemacs//java-setup-backend)
+      (add-hook 'java-mode-hook (lambda ()
+                                  (setq c-basic-offset 4
+                                        tab-width 4)))
       (put 'java-backend 'safe-local-variable 'symbolp))))
 
 (defun java/init-maven-test-mode ()
@@ -126,6 +129,9 @@
     :defer t
     :config
     (progn
+      ;; lombok
+      (when (file-exists-p java-lombok-jar-path)
+        (add-to-list 'lsp-java-vmargs (concat "-javaagent:" java-lombok-jar-path)))
       ;; key bindings
       (dolist (prefix '(("c" . "compile/create")
                         ("g" . "goto")

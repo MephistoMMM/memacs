@@ -15,7 +15,6 @@
     (font-lock+ :step pre
                 :location (recipe :fetcher github
                                   :repo emacsmirror/font-lock-plus))
-    (icons-in-terminal :location local)
     all-the-icons
     all-the-icons-ivy
 
@@ -47,9 +46,6 @@
 
 (defun pretty-code/init-font-lock+()
   "Init font-lock+.")
-
-(defun pretty-code/init-icons-in-terminal()
-  "Init icons-in-terminal.")
 
 (defun pretty-code/init-company-box ()
   "Init company-box
