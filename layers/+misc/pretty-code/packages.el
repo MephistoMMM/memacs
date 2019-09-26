@@ -19,6 +19,7 @@
     all-the-icons-ivy
 
     (company-box :requires company)
+    unicode-fonts
     ))
 
 (defun pretty-code/init-all-the-icons ()
@@ -30,15 +31,18 @@
     (unless (member "all-the-icons" (font-family-list))
       (all-the-icons-install-fonts t))
     :config
-    (progn
+    ;; is linux, there is a bug in linux
+    ;;   do noting
+    ;; is mac
+    (unless (spacemacs/system-is-linux)
       (require 'cl)
       (setq company-box-icons-all-the-icons
             (cl-loop
              for aicon in memacs-company-box-icons-all-the-icons-org-list
              collect (cons
                       (car aicon)
-                      (apply (car (cdr aicon)) (cdr (cdr aicon))))))
-      ))
+                      (apply (car (cdr aicon)) (cdr (cdr aicon)))))))
+    )
   )
 
 (defun pretty-code/init-all-the-icons-ivy ()
@@ -56,6 +60,12 @@
 
 (defun pretty-code/init-font-lock+()
   "Init font-lock+.")
+
+(defun pretty-code/init-unicode-fonts()
+  "Init unicode-fonts."
+  (setq-default bidi-display-reordering t)
+  (add-hook 'after-make-frame-functions #'pretty-code//unicode-setup-fonts-h)
+  )
 
 (defun pretty-code/init-company-box ()
   "Init company-box
