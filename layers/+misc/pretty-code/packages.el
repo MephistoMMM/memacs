@@ -29,7 +29,17 @@
     :init
     (unless (member "all-the-icons" (font-family-list))
       (all-the-icons-install-fonts t))
-    ))
+    :config
+    (progn
+      (require 'cl)
+      (setq company-box-icons-all-the-icons
+            (cl-loop
+             for aicon in memacs-company-box-icons-all-the-icons-org-list
+             collect (cons
+                      (car aicon)
+                      (apply (car (cdr aicon)) (cdr (cdr aicon))))))
+      ))
+  )
 
 (defun pretty-code/init-all-the-icons-ivy ()
   "Init all the icons for ivy. "
