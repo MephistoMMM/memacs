@@ -17,10 +17,8 @@
         counsel-gtags
         (java-mode :location built-in)
         maven-test-mode
-        meghanada
         mvn
         (lsp-java :requires lsp-mode lsp-ui company-lsp dap-mode)
-        org
         ))
 
 (defun java/post-init-company ()
@@ -35,10 +33,6 @@
 (defun java/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'java-mode))
 
-(defun java/pre-init-org ()
-  (spacemacs|use-package-add-hook org
-    :post-config (add-to-list 'org-babel-load-languages '(java . t))))
-
 (defun java/init-java-mode ()
   (use-package java-mode
     :defer t
@@ -48,7 +42,10 @@
       (add-hook 'java-mode-hook (lambda ()
                                   (setq c-basic-offset 4
                                         tab-width 4)))
-      (put 'java-backend 'safe-local-variable 'symbolp))))
+      (put 'java-backend 'safe-local-variable 'symbolp)))
+  (spacemacs|use-package-add-hook org
+    :post-config (add-to-list 'org-babel-load-languages '(java . t)))
+  )
 
 (defun java/init-maven-test-mode ()
   (use-package maven-test-mode
@@ -70,59 +67,6 @@
         "mtb"   'maven-test-file
         "mti"   'maven-test-install
         "mtt"   'maven-test-method))))
-
-(defun java/init-meghanada ()
-  (use-package meghanada
-    :defer t
-    :init
-    (progn
-      (setq meghanada-server-install-dir (concat spacemacs-cache-directory
-                                                 "meghanada/")
-            company-meghanada-prefix-length 1
-            ;; let spacemacs handle company and flycheck itself
-            meghanada-use-company nil
-            meghanada-use-flycheck nil))
-    :config
-    (progn
-      ;; key bindings
-      (dolist (prefix '(("c" . "compile")
-                        ("D" . "daemon")
-                        ("g" . "goto")
-                        ("r" . "refactor")
-                        ("t" . "test")
-                        ("x" . "execute")))
-        (spacemacs/declare-prefix-for-mode
-         'java-mode (car prefix) (cdr prefix)))
-      (spacemacs/set-leader-keys-for-major-mode 'java-mode
-        "cb" 'meghanada-compile-file
-        "cc" 'meghanada-compile-project
-
-        "Dc" 'meghanada-client-direct-connect
-        "Dd" 'meghanada-client-disconnect
-        "Di" 'meghanada-install-server
-        "Dk" 'meghanada-server-kill
-        "Dl" 'meghanada-clear-cache
-        "Dp" 'meghanada-ping
-        "Dr" 'meghanada-restart
-        "Ds" 'meghanada-client-connect
-        "Du" 'meghanada-update-server
-        "Dv" 'meghanada-version
-
-        "gb" 'meghanada-back-jump
-
-        "=" 'meghanada-code-beautify
-        "ri" 'meghanada-optimize-import
-        "rI" 'meghanada-import-all
-
-        "ta" 'meghanada--run-junit
-        "tc" 'meghanada-run-junit-class
-        "tl" 'meghanada-run-junit-recent
-        "tt" 'meghanada-run-junit-test-case
-
-        ;; meghanada-switch-testcase
-        ;; meghanada-local-variable
-
-        "x:" 'meghanada-run-task))))
 
 (defun java/init-lsp-java ()
   (use-package lsp-java

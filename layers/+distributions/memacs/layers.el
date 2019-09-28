@@ -25,10 +25,8 @@
    spacemacs-modeline
    spacemacs-misc
    spacemacs-navigation
-   awesome-tab
    spacemacs-org
    spacemacs-visual
-   multiple-cursors
 
    (auto-completion :variables
                     auto-completion-enable-sort-by-usage nil

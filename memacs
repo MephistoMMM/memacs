@@ -25,16 +25,24 @@ This function should only modify configuration layer settings."
      ;; READY : brew install ripgrep the_silver_searcher
 
      ;; ui
-     ;; https://github.com/tonsky/FiraCode
      pretty-code
+     awesome-tab
      colors
+
+     ;; edit
+     multiple-cursors
 
      ;; Catalogue: tools
      markdown
+     yaml
      ;; protobuf
      ;; docker
      (restclient :variables ;; https://github.com/zweifisch/ob-http
                  restclient-use-org t)
+     ;; TODO adjust following two package
+     ;; READY : brew install cquery clang-format
+     ;;         brew install global
+     gtags
      (ibuffer :variables ibuffer-group-buffers-by 'projects)
      (dired :variables ranger-show-preview t)
      ;; copy-as-format
@@ -71,9 +79,7 @@ This function should only modify configuration layer settings."
      ;; lua
      ;; READY : see readme in java layer
      (java :variables java-backend 'lsp)
-     ;; READY : brew install cquery clang-format
-     ;;         brew install global --with-pygments --with-ctags
-     gtags
+     clojure
      ;; (c-c++ :variables
      ;;        gtags-enable-by-default t
      ;;        c-c++-enable-auto-newline nil)
@@ -82,7 +88,6 @@ This function should only modify configuration layer settings."
      ;;          haskell-completion-backend 'intero
      ;;          haskell-enable-hindent-style "gibiansky")
      sql
-     yaml
      ;; READY :
      ;; go get -u -v github.com/mdempsky/gocode
      ;; go get -u -v golang.org/x/tools/cmd/guru
