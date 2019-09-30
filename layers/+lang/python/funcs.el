@@ -103,7 +103,7 @@ as the pyenv version then also return nil. This works around https://github.com/
 (defun spacemacs//python-setup-shell (&rest args)
   (if (spacemacs/pyenv-executable-find "ipython")
       (progn (setq python-shell-interpreter "ipython")
-             (if (version< (replace-regexp-in-string "[\r\n|\n]$" "" (shell-command-to-string (format "%s --version" (string-trim (spacemacs/pyenv-executable-find "ipython"))))) "5")
+             (if (version< (replace-regexp-in-string "[\r\n|\n]$" "" (shell-command-to-string (format "\"%s\" --version" (string-trim (spacemacs/pyenv-executable-find "ipython"))))) "5")
                  (setq python-shell-interpreter-args "-i")
                (setq python-shell-interpreter-args "--simple-prompt -i")))
     (progn
@@ -294,10 +294,6 @@ Bind formatter to '==' for LSP and '='for all other backends."
 
 ;; REPL
 
-(defun spacemacs//inferior-python-setup-hook ()
-  "Setup REPL for python inferior process buffer."
-  (setq indent-tabs-mode t))
-
 (defun spacemacs/python-shell-send-buffer-switch ()
   "Send buffer content to shell and switch to it in insert mode."
   (interactive)
@@ -383,3 +379,11 @@ Bind formatter to '==' for LSP and '='for all other backends."
   (switch-to-buffer-other-window "*compilation*")
   (end-of-buffer)
   (evil-insert-state))
+
+(defun spacemacs//bind-python-repl-keys ()
+  "Bind the keys for testing in Python."
+  (spacemacs/declare-prefix-for-mode 'inferior-python-mode "v" "virtualenv")
+  (spacemacs/set-leader-keys-for-major-mode 'inferior-python-mode
+    "c" 'comint-clear-buffer
+    "r" 'pyvenv-restart-python
+    "vw" 'pyvenv-workon))

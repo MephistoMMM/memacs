@@ -260,6 +260,7 @@
      ("\\.eco\\'"        . web-mode)
      ("\\.vue\\'"        . web-mode)
      ("\\.ejs\\'"        . web-mode)
+     ("\\.svelte\\'"     . web-mode)
      ("\\.djhtml\\'"     . web-mode))))
 
 (defun html/post-init-yasnippet ()
