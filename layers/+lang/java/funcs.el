@@ -11,53 +11,15 @@
 
 (defun spacemacs//java-setup-backend ()
   "Conditionally setup java backend."
-  (pcase java-backend
-    (`meghanada (spacemacs//java-setup-meghanada))
-    (`lsp (spacemacs//java-setup-lsp))))
+  (spacemacs//java-setup-lsp))
 
 (defun spacemacs//java-setup-company ()
   "Conditionally setup company based on backend."
-  (pcase java-backend
-    (`meghanada (spacemacs//java-setup-meghanada-company))
-    (`lsp (spacemacs//java-setup-lsp-company))))
+  (spacemacs//java-setup-lsp-company))
 
 (defun spacemacs//java-setup-flycheck ()
   "Conditionally setup flycheck based on backend."
-  (pcase java-backend
-    (`meghanada (spacemacs//java-setup-meghanada-flycheck))
-    (`lsp (spacemacs//java-setup-lsp-flycheck))))
-
-
-;; meghanada
-
-(defun spacemacs//java-setup-meghanada ()
-  "Setup Meghanada."
-  (require 'meghanada)
-  ;; jump handler
-  (add-to-list 'spacemacs-jump-handlers
-               '(meghanada-jump-declaration
-                 :async spacemacs//java-meghanada-server-livep))
-  ;; auto-install meghanada server
-  (let ((dest-jar (meghanada--locate-server-jar)))
-    (unless dest-jar
-      (meghanada-install-server)))
-  ;; enable meghanada
-  (meghanada-mode))
-
-(defun spacemacs//java-setup-meghanada-company ()
-  "Setup Meghanada auto-completion."
-  (meghanada-company-enable))
-
-(defun spacemacs//java-setup-meghanada-flycheck ()
-  "Setup Meghanada syntax checking."
-  (when (spacemacs/enable-flycheck 'java-mode)
-    (require 'flycheck-meghanada)
-    (add-to-list 'flycheck-checkers 'meghanada)
-    (flycheck-mode)))
-
-(defun spacemacs//java-meghanada-server-livep ()
-  "Return non-nil if the Meghanada server is up."
-  (and meghanada--client-process (process-live-p meghanada--client-process)))
+  (spacemacs//java-setup-lsp-flycheck))
 
 
 ;; Maven

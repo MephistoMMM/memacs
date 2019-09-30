@@ -8,5 +8,5 @@
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; License: GPLv3
-(setq dap-utils-extension-path
-      (concat user-home-directory ".local/share"))
+(setq dap-utils-extension-path (concat user-home-directory ".local/share")
+      dap-breakpoints-file (concat spacemacs-cache-directory ".dap-breakpoints"))

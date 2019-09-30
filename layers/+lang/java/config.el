@@ -14,9 +14,10 @@
 (spacemacs|define-jump-handlers java-mode)
 
 (defvar java-backend 'lsp
-  "The backend to use for IDE features. Possible values are `lsp' and `meghanada'.")
+  "The backend to use for IDE features. Possible values are `lsp'")
+
+(defvar java-lombok-jar-path (expand-file-name "~/.local/share/lombok-1.18.10.jar")
+  "The path of lombok.jar")
 
 (setq lsp-java-server-install-dir
       (expand-file-name "~/.local/share/eclipse.jdt.ls/server/"))
-;; TODO: make this value different from each projection.
-(setq lsp-java--workspace-folders '("~/Workspace/java/group4"))

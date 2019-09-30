@@ -195,6 +195,8 @@
       ;; mappings to quit minibuffer or enter transient state
       (define-key ivy-minibuffer-map [escape] 'minibuffer-keyboard-quit)
       (define-key ivy-minibuffer-map (kbd "M-SPC") 'hydra-ivy/body)
+      (when (spacemacs/system-is-linux)
+        (define-key ivy-minibuffer-map (kbd "C-v") 'yank))
 
       (when ivy-ret-visits-directory
         (define-key ivy-minibuffer-map (kbd "RET") #'ivy-alt-done)

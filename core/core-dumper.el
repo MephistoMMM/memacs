@@ -22,7 +22,7 @@
   "Variable to backup the `load-path' variable built during the dump creation.")
 
 (defconst spacemacs-dump-directory
-  (concat spacemacs-cache-directory "dumps/"))
+  (concat spacemacs-cache-directory ".dumps/"))
 
 (defconst spacemacs-dump-buffer-name "*spacemacs-dumper*")
 
