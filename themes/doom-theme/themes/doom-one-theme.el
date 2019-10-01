@@ -60,12 +60,14 @@ determine the exact padding."
    (cyan       '("#46D9FF" "#46D9FF" "brightcyan"   ))
    (dark-cyan  '("#5699AF" "#5699AF" "cyan"         ))
 
+   (memacs-ext5 '("#626A73" nil nil))
+
    ;; face categories -- required for all themes
    (highlight      blue)
    (vertical-bar   (doom-darken base1 0.1))
    (selection      dark-blue)
    (builtin        magenta)
-   (comments       (if doom-one-brighter-comments dark-cyan base5))
+   (comments       (if doom-one-brighter-comments dark-cyan memacs-ext5))
    (doc-comments   (doom-lighten (if doom-one-brighter-comments dark-cyan base5) 0.25))
    (constants      violet)
    (functions      magenta)
