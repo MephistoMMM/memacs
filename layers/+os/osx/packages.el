@@ -23,7 +23,7 @@
   (setq mac-pass-command-to-system nil)
 
   ;; Title
-  (setq frame-title-format '("Centaur Emacs - %b")
+  (setq frame-title-format '("Memacs Emacs - %b")
         icon-title-format frame-title-format)
 
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
