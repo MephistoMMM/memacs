@@ -27,6 +27,7 @@
             doom-modeline-minor-modes nil
             doom-modeline-mu4e nil
             doom-modeline-buffer-file-name-style 'buffer-name
-            ))
+            )
+      (size-indication-mode))
     ;; custom doom-line: https://github.com/seagle0128/doom-modeline
     ))

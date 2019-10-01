@@ -71,7 +71,7 @@
 (defun auto-completion/pre-init-counsel ()
     (spacemacs|use-package-add-hook company
       :post-config
-      (define-key company-active-map (kbd "C-/") 'counsel-company)))
+      (define-key company-active-map (kbd "C-s") 'counsel-company)))
 
 (defun auto-completion/init-fuzzy ()
   (use-package fuzzy :defer t))
