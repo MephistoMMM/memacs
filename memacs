@@ -216,7 +216,8 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(purifier
+   dotspacemacs-themes '(doom-one
+                         purifier
                          spacemacs-light
                          tao-yang
                          dracula)
@@ -412,6 +413,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   ;; add experimental path
   ;; (add-to-list 'load-path (expand-file-name "~/Workspace/sources/awesome-tab"))
+
+  (add-to-load-path (concat spacemacs-start-directory "themes"))
+  (require 'memacs-theme "init.el")
 
   (setq configuration-layer--elpa-archives
         '(("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")

@@ -31,17 +31,22 @@
     (unless (member "all-the-icons" (font-family-list))
       (all-the-icons-install-fonts t))
     :config
-    ;; is linux, there is a bug in linux
-    ;;   do noting
-    ;; is mac
-    (unless (spacemacs/system-is-linux)
+    (progn
       (require 'cl)
-      (setq company-box-icons-all-the-icons
-            (cl-loop
-             for aicon in memacs-company-box-icons-all-the-icons-org-list
-             collect (cons
-                      (car aicon)
-                      (apply (car (cdr aicon)) (cdr (cdr aicon)))))))
+      (cl-loop
+       for item in memacs-all-the-icons-alist
+       do  (add-to-list (car item) (cdr item)))
+      ;; is linux, there is a bug in linux
+      ;;   do noting
+      ;; is mac
+      (unless (spacemacs/system-is-linux)
+        (setq company-box-icons-all-the-icons
+              (cl-loop
+               for aicon in memacs-company-box-icons-all-the-icons-org-list
+               collect (cons
+                        (car aicon)
+                        (apply (car (cdr aicon)) (cdr (cdr aicon)))))))
+      )
     )
   )
 
