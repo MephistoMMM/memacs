@@ -19,20 +19,11 @@
 
 ;;; company
 (with-eval-after-load 'company
+  (define-key evil-hybrid-state-map (kbd "C-l") 'company-manual-begin)
   (let ((map company-active-map))
     (define-key map (kbd "C-n") 'company-select-next)
     (define-key map (kbd "C-p") 'company-select-previous)
-    (define-key map (kbd "C-s") 'company-filter-candidates)
-    (define-key map (kbd "C-d") 'company-show-doc-buffer))
-  (let ((map company-search-map))
-    (define-key map [escape] 'memacs/company-escape)
-    (define-key map (kbd "C-[") 'memacs/company-escape)
-    (define-key map (kbd "C-n") 'company-select-next)
-    (define-key map (kbd "C-p") 'company-select-previous)))
-
-
-;;; hippie-exp
-(define-key evil-hybrid-state-map (kbd "TAB")   'memacs/tab-indent-or-hippie-expand)
+    (define-key map (kbd "C-d") 'company-show-doc-buffer)))
 
 
 ;;; ivy-yasnippet
@@ -51,6 +42,7 @@
   "sd" 'memacs/describe-yasnippets)
 (spacemacs/defer-until-after-user-config
  (lambda ()
-   (define-key yas-keymap [tab] 'memacs/tab-complete-or-next-field)
-   (define-key yas-keymap (kbd "TAB") 'memacs/tab-complete-or-next-field)
+   (define-key yas-keymap [tab] nil)
+   (define-key yas-keymap (kbd "TAB") nil)
+   (define-key yas-keymap (kbd "C-l") 'yas-next-field-or-maybe-expand)
    ))

@@ -216,7 +216,8 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(purifier
+   dotspacemacs-themes '(doom-one
+                         purifier
                          spacemacs-light
                          tao-yang
                          dracula)
@@ -227,7 +228,7 @@ It should only modify the values of Spacemacs settings."
    ;; to create your own spaceline theme. Value can be a symbol or list with\
    ;; additional properties.
    ;; (default '(memacs :separator wave :separator-scale 1.5))
-   dotspacemacs-mode-line-theme '(memacs :separator wave :separator-scale 1.4)
+   dotspacemacs-mode-line-theme '(doom)
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
    dotspacemacs-colorize-cursor-according-to-state t
@@ -412,6 +413,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   ;; add experimental path
   ;; (add-to-list 'load-path (expand-file-name "~/Workspace/sources/awesome-tab"))
+
+  (add-to-load-path (concat spacemacs-start-directory "themes"))
+  (require 'memacs-theme "init.el")
 
   (setq configuration-layer--elpa-archives
         '(("melpa-cn" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")

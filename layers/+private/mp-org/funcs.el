@@ -251,7 +251,7 @@ please use it like `(advice-add 'fun
 
 (defun mp-org//linkp (linkstr)
   "Test for link line."
-  (string-match "^\\(http\\|file\\|https\\|img\\):" (substring-no-properties linkstr)))
+  (string-match "^\\(http\\|file\\|https\\|img\\|ftp\\|ftps\\):" (substring-no-properties linkstr)))
 
 (defun mp-org//link-switch ()
   "Filter link lines in counsel kills, if used ivy layer,

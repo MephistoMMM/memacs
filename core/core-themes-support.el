@@ -9,7 +9,7 @@
 ;;
 ;;; License: GPLv3
 
-(defvar spacemacs--fallback-theme 'dracula
+(defvar spacemacs--fallback-theme 'spacemacs-dark
   "Fallback theme if user theme cannot be applied.")
 
 (defvar spacemacs--delayed-user-theme nil
@@ -24,12 +24,8 @@
   "Face for displaying key bindings in Spacemacs documents."
   :group 'org-faces)
 
-(defconst spacemacs-theme-name-to-package
+(defvar spacemacs-theme-name-to-package
   '(
-    (tao-yang        . spacemacs-theme)
-    (tao-yin         . spacemacs-theme)
-    (purifier        . spacemacs-theme)
-    (dracula         . spacemacs-theme)
     (spacemacs-dark  . spacemacs-theme)
     (spacemacs-light . spacemacs-theme)
     )
@@ -76,6 +72,19 @@ If FALLBACK-THEME is non-nil it must be a package name which will be loaded if
 THEME cannot be applied."
   (spacemacs/load-theme (car dotspacemacs-themes) fallback-theme disable))
 
+(defun memacs//default-theme-package-init-func (theme)
+  "Default package init function,
+ extracted from origin `spacemacs/load-theme'."
+  (let ((pkg-dir (spacemacs//get-theme-package-directory theme))
+        (pkg-name (spacemacs/get-theme-package-name theme-name)))
+    (when pkg-dir
+      ;; package activate should be enough, but not all themes
+      ;; have add themselves to `custom-theme-load-path' in autoload.
+      ;; (for example, moe-theme).
+      (add-to-list 'custom-theme-load-path pkg-dir)
+      (package-activate pkg-name)))
+  )
+
 (defun spacemacs/load-theme (theme &optional fallback-theme disable)
   "Apply user theme.
 If FALLBACK-THEME is non-nil it must be a package name which will be loaded if
@@ -87,15 +96,16 @@ THEME."
         (progn
           ;; Load theme
           (unless (or (memq theme-name (custom-available-themes))
-                      (eq 'default theme-name))
-            (let ((pkg-dir (spacemacs//get-theme-package-directory theme))
-                  (pkg-name (spacemacs/get-theme-package-name theme-name)))
-              (when pkg-dir
-                ;; package activate should be enough, but not all themes
-                ;; have add themselves to `custom-theme-load-path' in autoload.
-                ;; (for example, moe-theme).
-                (add-to-list 'custom-theme-load-path pkg-dir)
-                (package-activate pkg-name))))
+                     (eq 'default theme-name))
+            (let ((theme-args
+                   (cdr (assq theme-name spacemacs-theme-name-to-package))))
+              (cond
+               ((functionp theme-args)
+                (funcall theme-args theme))
+               ((listp theme-args)
+                (apply (car theme-args) (cdr theme-args)))
+               (t (memacs//default-theme-package-init-func theme)))
+              ))
           (when disable
             (mapc 'disable-theme custom-enabled-themes))
           (unless (eq 'default theme-name)
@@ -176,19 +186,19 @@ has been changed to THEME."
   (interactive)
   (run-hooks 'spacemacs-post-theme-change-hook))
 
-(defun spacemacs//add-theme-packages-to-additional-packages ()
-  "Add all theme packages from `dotspacemacs-themes' to packages to install."
-  (setq dotspacemacs--additional-theme-packages nil)
-  (dolist (theme dotspacemacs-themes)
-    (let* ((theme-name (spacemacs//get-theme-name theme))
-           (pkg-name (spacemacs/get-theme-package-name theme-name))
-           (theme2 (copy-tree theme)))
-      (when pkg-name
-        (if (listp theme2)
-            (setcar theme2 pkg-name)
-          (setq theme2 pkg-name))
-        (add-to-list 'dotspacemacs--additional-theme-packages theme2)))))
-(add-hook 'configuration-layer-pre-load-hook
-          'spacemacs//add-theme-packages-to-additional-packages)
+;; (defun spacemacs//add-theme-packages-to-additional-packages ()
+;;   "Add all theme packages from `dotspacemacs-themes' to packages to install."
+;;   (setq dotspacemacs--additional-theme-packages nil)
+;;   (dolist (theme dotspacemacs-themes)
+;;     (let* ((theme-name (spacemacs//get-theme-name theme))
+;;            (pkg-name (spacemacs/get-theme-package-name theme-name))
+;;            (theme2 (copy-tree theme)))
+;;       (when pkg-name
+;;         (if (listp theme2)
+;;             (setcar theme2 pkg-name)
+;;           (setq theme2 pkg-name))
+;;         (add-to-list 'dotspacemacs--additional-theme-packages theme2)))))
+;; (add-hook 'configuration-layer-pre-load-hook
+;;           'spacemacs//add-theme-packages-to-additional-packages)
 
 (provide 'core-themes-support)

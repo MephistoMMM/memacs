@@ -90,12 +90,14 @@
        "C-j c"   'evil-avy-goto-char
        "C-j C"   'evil-avy-goto-char-2
        "C-j l"   'evil-avy-goto-line
-       "C-l"     'evil-avy-goto-line
        "C-j u"   'spacemacs/avy-goto-url
        "C-j C-u" 'spacemacs/avy-open-url
        "C-j w"   'evil-avy-goto-word-or-subword-1
        "C-j W"   'evil-avy-goto-word-0
-       "C-j j"   'evil-avy-goto-char-timer))
+       "C-j j"   'evil-avy-goto-char-timer)
+      (memacs/define-evil-normal-keybinding
+       "C-l" 'evil-avy-goto-line)
+      )
     ))
 
 (defun spacemacs-editing/init-clean-aindent-mode ()

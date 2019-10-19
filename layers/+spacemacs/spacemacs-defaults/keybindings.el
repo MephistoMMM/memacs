@@ -62,6 +62,7 @@
                                        ("tC"  "colors")
                                        ("th"  "highlight")
                                        ("tm"  "modeline")
+                                       ("tM"  "hide modeline toggle")
                                        ("T"   "UI toggles/themes")
                                        ("C-t" "other toggles")
                                        ("u"   "universal arg")
@@ -363,11 +364,7 @@
   :on (hidden-mode-line-mode -1)
   :off (hidden-mode-line-mode)
   :documentation "Toggle the visibility of modeline."
-  :evil-leader "tmT")
-(spacemacs|add-toggle display-time
-  :mode display-time-mode
-  :documentation "Display time in modeline."
-  :evil-leader "tmt")
+  :evil-leader "tM")
 (spacemacs|add-toggle syntax-highlighting
   :mode font-lock-mode
   :documentation "Toggle syntax highlighting."

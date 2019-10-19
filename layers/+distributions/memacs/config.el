@@ -10,6 +10,7 @@
 (defconst memacs-recompile-list
   '(
     "core"
+    "themes"
     "layers/+checkers"
     "layers/+completion"
     "layers/+distributions"
