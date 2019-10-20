@@ -14,6 +14,7 @@
         blacken
         company
         counsel-gtags
+        dap-mode
         eldoc
         evil-matchit
         flycheck
@@ -60,6 +61,10 @@
                  (eq 'black python-formatter))
         (add-hook 'python-mode-hook 'blacken-mode)))
     :config (spacemacs|hide-lighter blacken-mode)))
+
+(defun python/pre-init-dap-mode ()
+  (add-to-list 'spacemacs--dap-supported-modes 'python-mode)
+  (add-hook 'python-mode-local-vars-hook #'spacemacs//python-setup-dap))
 
 (defun python/post-init-eldoc ()
   (add-hook 'python-mode-local-vars-hook #'spacemacs//python-setup-eldoc))

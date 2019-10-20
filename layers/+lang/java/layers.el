@@ -10,4 +10,4 @@
 ;;; License: GPLv3
 (when (and (boundp 'java-backend)
          (eq java-backend 'lsp))
-  (configuration-layer/declare-layers '(lsp dap)))
+  (configuration-layer/declare-layer-dependencies '(lsp)))

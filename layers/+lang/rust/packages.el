@@ -10,17 +10,18 @@
 ;;; License: GPLv3
 
 (setq rust-packages
-  '(
-    cargo
-    company
-    counsel-gtags
-    racer
-    flycheck
-    (flycheck-rust :requires flycheck)
-    ggtags
-    rust-mode
-    toml-mode
-    ))
+      '(
+        cargo
+        company
+        counsel-gtags
+        dap-mode
+        flycheck
+        (flycheck-rust :requires flycheck)
+        ggtags
+        racer
+        rust-mode
+        toml-mode
+        ))
 
 (defun rust/init-cargo ()
   (use-package cargo
@@ -48,22 +49,30 @@
         "cv" 'cargo-process-check
         "t" 'cargo-process-test))))
 
-(defun rust/init-rust-mode ()
-  (use-package rust-mode
-    :defer t
-    :init
-    (progn
-      (spacemacs/add-to-hook 'rust-mode-hook '(spacemacs//rust-setup-backend))
-      (spacemacs/declare-prefix-for-mode 'rust-mode "g" "goto")
-      (spacemacs/declare-prefix-for-mode 'rust-mode "h" "help")
-      (spacemacs/declare-prefix-for-mode 'rust-mode "=" "format")
-      (spacemacs/set-leader-keys-for-major-mode 'rust-mode
-        "==" 'rust-format-buffer
-        "q" 'spacemacs/rust-quick-run))))
+(defun rust/post-init-company ()
+  ;; backend specific
+  (spacemacs//rust-setup-company))
 
-(defun rust/init-toml-mode ()
-  (use-package toml-mode
-    :mode "/\\(Cargo.lock\\|\\.cargo/config\\)\\'"))
+(defun rust/post-init-counsel-gtags ()
+  (spacemacs/counsel-gtags-define-keys-for-mode 'rust-mode))
+
+(defun rust/pre-init-dap-mode ()
+  (add-to-list 'spacemacs--dap-supported-modes 'rust-mode)
+  (add-hook 'rust-mode-local-vars-hook #'spacemacs//rust-setup-dap))
+
+(defun rust/post-init-flycheck ()
+  (spacemacs/enable-flycheck 'rust-mode))
+
+(defun rust/init-flycheck-rust ()
+  (use-package flycheck-rust
+    :defer t
+    :init (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
+
+(defun rust/post-init-ggtags ()
+  (add-hook 'rust-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
+
+(defun rust/post-init-helm-gtags ()
+  (spacemacs/helm-gtags-define-keys-for-mode 'rust-mode))
 
 (defun rust/init-racer ()
   (use-package racer
@@ -80,20 +89,19 @@
       (evilified-state-evilify-map racer-help-mode-map
         :mode racer-help-mode))))
 
-(defun rust/init-flycheck-rust ()
-  (use-package flycheck-rust
+(defun rust/init-rust-mode ()
+  (use-package rust-mode
     :defer t
-    :init (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
+    :init
+    (progn
+      (spacemacs/add-to-hook 'rust-mode-hook '(spacemacs//rust-setup-backend))
+      (spacemacs/declare-prefix-for-mode 'rust-mode "mg" "goto")
+      (spacemacs/declare-prefix-for-mode 'rust-mode "mh" "help")
+      (spacemacs/declare-prefix-for-mode 'rust-mode "m=" "format")
+      (spacemacs/set-leader-keys-for-major-mode 'rust-mode
+        "==" 'rust-format-buffer
+        "q" 'spacemacs/rust-quick-run))))
 
-(defun rust/post-init-company ()
-  ;; backend specific
-  (spacemacs//rust-setup-company))
-
-(defun rust/post-init-flycheck ()
-  (spacemacs/enable-flycheck 'rust-mode))
-
-(defun rust/post-init-ggtags ()
-  (add-hook 'rust-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
-
-(defun rust/post-init-counsel-gtags ()
-  (spacemacs/counsel-gtags-define-keys-for-mode 'rust-mode))
+(defun rust/init-toml-mode ()
+  (use-package toml-mode
+    :mode "/\\(Cargo.lock\\|\\.cargo/config\\)\\'"))

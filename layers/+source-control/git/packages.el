@@ -54,10 +54,13 @@
     (progn
       (spacemacs/declare-prefix "gl" "links")
       (spacemacs/set-leader-keys
-        "gll" 'spacemacs/git-link
+        "glc" 'git-link-commit
+        "glC" 'spacemacs/git-link-commit-copy-url-only
+        "gll" 'git-link
         "glL" 'spacemacs/git-link-copy-url-only
-        "glc" 'spacemacs/git-link-commit
-        "glC" 'spacemacs/git-link-commit-copy-url-only)
+        "glp" 'spacemacs/git-permalink
+        "glP" 'spacemacs/git-permalink-copy-url-only)
+
       ;; default is to open the generated link
       (setq git-link-open-in-browser t))))
 
@@ -137,7 +140,7 @@
       (spacemacs/set-leader-keys
         "gb"  'spacemacs/git-blame-micro-state
         "gc"  'magit-clone
-        "gff" 'magit-find-file
+        "gfF" 'magit-find-file
         "gfl" 'magit-log-buffer-file
         "gfd" 'magit-diff
         "gi"  'magit-init

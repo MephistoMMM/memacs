@@ -73,7 +73,7 @@
 
       (when css-enable-lsp
         (add-hook 'css-mode-hook
-                  #'spacemacs//setup-lsp-for-stylesheet-buffers t))
+                  #'spacemacs//setup-lsp-for-web-mode-buffers t))
 
       (spacemacs/declare-prefix-for-mode 'css-mode "=" "format")
       (spacemacs/declare-prefix-for-mode 'css-mode "g" "goto")
@@ -120,9 +120,9 @@
   (use-package counsel-css
     :defer t
     :init (cl-loop for (mode . mode-hook) in '((css-mode . css-mode-hook)
-                                            (scss-mode . scss-mode-hook))
-                do (add-hook mode-hook 'counsel-css-imenu-setup)
-                (spacemacs/set-leader-keys-for-major-mode mode "gh" 'counsel-css))))
+                                               (scss-mode . scss-mode-hook))
+                   do (add-hook mode-hook 'counsel-css-imenu-setup)
+                   (spacemacs/set-leader-keys-for-major-mode mode "gh" 'counsel-css))))
 
 (defun html/init-impatient-mode ()
   (use-package impatient-mode
@@ -138,7 +138,7 @@
     :init
     (when less-enable-lsp
       (add-hook 'less-css-mode-hook
-                #'spacemacs//setup-lsp-for-stylesheet-buffers t))
+                #'spacemacs//setup-lsp-for-web-mode-buffers t))
     :mode ("\\.less\\'" . less-css-mode)))
 
 (defun html/init-pug-mode ()
@@ -156,7 +156,7 @@
     :defer t
     :init
     (when scss-enable-lsp
-      (add-hook 'scss-mode-hook #'spacemacs//setup-lsp-for-stylesheet-buffers t))
+      (add-hook 'scss-mode-hook #'spacemacs//setup-lsp-for-web-mode-buffers t))
     :mode ("\\.scss\\'" . scss-mode)))
 
 (defun html/init-slim-mode ()
@@ -261,7 +261,10 @@
      ("\\.vue\\'"        . web-mode)
      ("\\.ejs\\'"        . web-mode)
      ("\\.svelte\\'"     . web-mode)
-     ("\\.djhtml\\'"     . web-mode))))
+     ("\\.djhtml\\'"     . web-mode))
+    :init
+    (when html-enable-lsp
+      (add-hook 'web-mode-hook #'spacemacs//setup-lsp-for-html-buffer t))))
 
 (defun html/post-init-yasnippet ()
   (spacemacs/add-to-hooks 'spacemacs/load-yasnippet '(css-mode-hook

@@ -12,6 +12,7 @@
 (setq javascript-packages
       '(
         add-node-modules-path
+        dap-mode
         evil-matchit
         flycheck
         counsel-gtags
@@ -32,14 +33,18 @@
   (spacemacs/add-to-hooks #'add-node-modules-path '(css-mode-hook
                                                     js2-mode-hook)))
 
+(defun javascript/post-init-company ()
+  (add-hook 'js2-mode-local-vars-hook #'spacemacs//javascript-setup-company))
+
 (defun javascript/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'js2-mode))
 
+(defun javascript/pre-init-dap-mode ()
+  (add-to-list 'spacemacs--dap-supported-modes 'js2-mode)
+  (add-hook 'js2-mode-local-vars-hook #'spacemacs//javascript-setup-dap))
+
 (defun javascript/post-init-evil-matchit ()
   (add-hook `js2-mode-hook `turn-on-evil-matchit-mode))
-
-(defun javascript/post-init-company ()
-  (add-hook 'js2-mode-local-vars-hook #'spacemacs//javascript-setup-company))
 
 (defun javascript/post-init-flycheck ()
   (spacemacs/enable-flycheck 'js2-mode))
@@ -51,9 +56,9 @@
   (spacemacs/set-leader-keys-for-major-mode 'js2-mode
     "I" 'spacemacs/impatient-mode))
 
-(defun javascript/pre-init-org ()
-  (spacemacs|use-package-add-hook org
-    :post-config (add-to-list 'org-babel-load-languages '(js . t))))
+(defun javascript/pre-init-import-js ()
+  (when (eq javascript-import-tool 'import-js)
+    (add-to-list 'spacemacs--import-js-modes (cons 'js2-mode 'js2-mode-hook))))
 
 (defun javascript/init-js-doc ()
   (use-package js-doc
@@ -190,9 +195,13 @@
           :evil-leader-for-mode (js2-mode . "Tl"))
         (spacemacs|diminish livid-mode " 🅻" " [l]")))))
 
-(defun javascript/pre-init-import-js ()
-  (when (eq javascript-import-tool 'import-js)
-    (add-to-list 'spacemacs--import-js-modes (cons 'js2-mode 'js2-mode-hook))))
+(defun javascript/pre-init-org ()
+  (spacemacs|use-package-add-hook org
+    :post-config (add-to-list 'org-babel-load-languages '(js . t))))
+
+(defun javascript/pre-init-prettier-js ()
+  (when (eq javascript-fmt-tool 'prettier)
+    (add-to-list 'spacemacs--prettier-modes 'js2-mode)))
 
 (defun javascript/init-skewer-mode ()
   (when (eq javascript-repl 'skewer)

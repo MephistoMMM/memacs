@@ -10,3 +10,10 @@
 ;;; License: GPLv3
 (setq dap-utils-extension-path (concat user-home-directory ".local/share")
       dap-breakpoints-file (concat spacemacs-cache-directory ".dap-breakpoints"))
+
+
+(defvar spacemacs--dap-supported-modes nil
+  "List of modes supported by DAP.")
+
+(defvar dap-enable-mouse-support t
+  "If non-nil, enable `dap-mode''s mouse support.")

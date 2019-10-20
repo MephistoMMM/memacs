@@ -9,21 +9,27 @@
 ;;
 ;;; License: GPLv3
 
-(defun spacemacs//go-set-tab-width ()
-  "Set the tab width."
-  (when go-tab-width
-    (setq-local tab-width go-tab-width)))
+(defun spacemacs//go-backend ()
+  "Returns selected backend."
+  (if go-backend
+      go-backend
+    (cond
+     ((configuration-layer/layer-used-p 'lsp) 'lsp)
+     (t 'go-mode))))
 
 (defun spacemacs//go-setup-backend ()
   "Conditionally setup go backend"
-  (pcase go-backend
+  (pcase (spacemacs//go-backend)
     ('lsp (spacemacs//go-setup-backend-lsp))))
 
 (defun spacemacs//go-setup-company ()
   "Conditionally setup go company based on backend"
-  (pcase go-backend
+  (pcase (spacemacs//go-backend)
     ('go-mode (spacemacs//go-setup-company-go))
     ('lsp (spacemacs//go-setup-company-lsp))))
+
+
+;; go-mode
 
 (defun spacemacs//go-setup-company-go ()
   (spacemacs|add-company-backends
@@ -33,6 +39,9 @@
     :append-hooks nil
     :call-hooks t)
   (company-mode))
+
+
+;; lsp
 
 (defun spacemacs//go-setup-backend-lsp ()
   "Setup lsp backend"
@@ -57,6 +66,9 @@
           :call-hooks t)
         (company-mode))
     (message "`lsp' layer is not installed, please add `lsp' layer to your dotfile.")))
+
+
+;; run
 
 (defun spacemacs/go-run-tests (args)
   (interactive)
@@ -107,6 +119,14 @@
   "Set the tab width."
   (setq-local tab-width go-tab-width))
 
+
+;; misc
+
 (defun spacemacs/go-packages-gopkgs ()
   "Return a list of all Go packages, using `gopkgs'."
   (sort (process-lines "gopkgs") #'string<))
+
+(defun spacemacs//go-set-tab-width ()
+  "Set the tab width."
+  (when go-tab-width
+    (setq-local tab-width go-tab-width)))

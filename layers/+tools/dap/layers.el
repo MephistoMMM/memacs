@@ -1,4 +1,4 @@
-;;; layers.el --- HTML Layer layers File for Spacemacs
+;;; layers.el --- DAP mode layer layers File for Spacemacs
 ;;
 ;; Copyright (c) 2012-2018 Sylvain Benner & Contributors
 ;;
@@ -9,4 +9,4 @@
 ;;
 ;;; License: GPLv3
 
-(configuration-layer/declare-layer-dependencies '(node web-beautify))
+(configuration-layer/declare-layer-dependencies '(lsp))

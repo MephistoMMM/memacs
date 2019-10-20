@@ -31,27 +31,35 @@
                  (setf (symbol-value internal-var) key-value))))
 
     (defun kbd-mac-command (keys)
-      "Wraps `kbd' function with Mac OSX compatible Command-key (⌘).
-KEYS should be a string such as \"f\" which will be turned into values
-such as \"H-f\", \"s-f\", or \"A-f\" depending on the value of
-`mac-commmand-modifier' which could be `hyper', `super', or `alt'.
-KEYS with a string of \"C-f\" are also valid and will be turned into
-values such as \"H-C-f\".
-Returns nil if `mac-command-modifier' is set to `none' or something
-other than the three sane values listed above."
+      "Call `kbd' with a macOS-compatible Command-key (⌘) prefixed.
+KEYS should be a string suitable as input to `kbd'.
+`mac-commmand-modifier' determines which prefix will be added; it
+should be set to one of `hyper', `meta', `super', or `alt'.  For example,
+if KEYS is the string `f', it will be prefixed as `H-f', `s-f',
+or `A-f' accordingly.  If KEYS is of the form `C-f', it likewise
+will be prefixed as `H-C-f', `s-C-f', or `A-C-f'.
+
+If `mac-command-modifier' is set to `none' or something other
+than the three values listed above, `H-' will be used as the
+default."
       (let ((found (assoc mac-command-modifier
                           '((hyper . "H-")
                             (meta  . "M-")
                             (super . "s-")
                             (alt   . "A-")))))
-        (when found (kbd (concat (cdr found) keys)))))
+        (if found
+            (kbd (concat (cdr found) keys))
+          (kbd (concat "H-" keys)))))
 
     (global-set-key (kbd-mac-command "a") 'mark-whole-buffer)
     (global-set-key (kbd-mac-command "q") 'save-buffers-kill-terminal)
     (global-set-key (kbd-mac-command "v") 'yank)
     (global-set-key (kbd-mac-command "c") 'evil-yank)
     (global-set-key (kbd-mac-command "x") 'kill-region)
-    (global-set-key (kbd-mac-command "s") 'save-buffer)
+    (global-set-key (kbd-mac-command "s")
+                    (lambda ()
+                      (interactive)
+                      (call-interactively (key-binding "\C-x\C-s"))))
     (global-set-key (kbd-mac-command "w") 'delete-window)
     (global-set-key (kbd-mac-command "W") 'delete-frame)
     (global-set-key (kbd-mac-command "n") 'make-frame)
