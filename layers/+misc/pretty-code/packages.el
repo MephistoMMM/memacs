@@ -77,10 +77,17 @@
 https://github.com/sebastiencs/company-box"
   (use-package company-box
     :defer t
-    :hook (company-mode . company-box-mode)
+    :hook '(company-mode . company-box-mode)
+    :commands 'company-box-doc-manually
+    :init (setq company-box-icons-alist 'company-box-icons-all-the-icons)
     :config
     (progn
-      (spacemacs|diminish company-box-mode))
+      (spacemacs|hide-lighter company-box-mode)
+      (setq company-box-backends-colors nil
+            company-box-max-candidates 1000
+            company-box-doc-enable t)
+      (add-hook 'company-box-selection-hook
+                (lambda (selection frame) (company-box-doc--hide frame))))
     )
   )
 

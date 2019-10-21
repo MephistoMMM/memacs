@@ -62,6 +62,35 @@
   "Origin list of company-box-icons-all-the-icons,
 used to be compiled to company-box-icons-all-the-icons.")
 
+(setq company-box-icons-all-the-icons
+      `((Unknown . ,(meamcs/company-box-icon 'octicon "file-text"))
+        (Text . ,(meamcs/company-box-icon 'faicon "file-text-o"))
+        (Method . ,(meamcs/company-box-icon 'faicon "cube"))
+        (Function . ,(meamcs/company-box-icon 'faicon "cube"))
+        (Constructor . ,(meamcs/company-box-icon 'faicon "cube"))
+        (Field . ,(meamcs/company-box-icon 'faicon "tag"))
+        (Variable . ,(meamcs/company-box-icon 'faicon "tag"))
+        (Class . ,(meamcs/company-box-icon 'faicon "cog"))
+        (Interface . ,(meamcs/company-box-icon 'faicon "cogs"))
+        (Module . ,(meamcs/company-box-icon 'alltheicon "less"))
+        (Property . ,(meamcs/company-box-icon 'faicon "wrench"))
+        (Unit . ,(meamcs/company-box-icon 'faicon "tag"))
+        (Value . ,(meamcs/company-box-icon 'faicon "tag"))
+        (Enum . ,(meamcs/company-box-icon 'faicon "file-text-o"))
+        (Keyword . ,(meamcs/company-box-icon 'material "format_align_center"))
+        (Snippet . ,(meamcs/company-box-icon 'material "content_paste"))
+        (Color . ,(meamcs/company-box-icon 'material "palette"))
+        (File . ,(meamcs/company-box-icon 'faicon "file"))
+        (Reference . ,(meamcs/company-box-icon 'faicon "tag"))
+        (Folder . ,(meamcs/company-box-icon 'faicon "folder"))
+        (EnumMember . ,(meamcs/company-box-icon 'faicon "tag"))
+        (Constant . ,(meamcs/company-box-icon 'faicon "tag"))
+        (Struct . ,(meamcs/company-box-icon 'faicon "cog"))
+        (Event . ,(meamcs/company-box-icon 'faicon "bolt"))
+        (Operator . ,(meamcs/company-box-icon 'faicon "tag"))
+        (TypeParameter . ,(meamcs/company-box-icon 'faicon "cog"))
+        (Template . ,(meamcs/company-box-icon 'octicon "file-code"))))
+
 (defvar memacs-all-the-icons-alist
   '(
     (all-the-icons-mode-icon-alist . (vterm-mode all-the-icons-octicon "terminal" :v-adjust 0.2))

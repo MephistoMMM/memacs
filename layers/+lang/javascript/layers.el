@@ -9,8 +9,8 @@
 ;;
 ;;; License: GPLv3
 
-(configuration-layer/declare-layers '(json node tern web-beautify import-js))
+(configuration-layer/declare-layer-dependencies '(json node tern web-beautify))
 
 (when (and (boundp 'javascript-backend)
          (eq javascript-backend 'lsp))
-  (configuration-layer/declare-layers '(lsp dap)))
+  (configuration-layer/declare-layer-dependencies '(lsp)))
