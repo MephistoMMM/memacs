@@ -126,14 +126,6 @@ package you’ll get notifications for TODO entries.
      org-download-link-format "[[img:%s]]"
      org-download-heading-lvl nil)
 
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((emacs-lisp . t)
-       (python . t)
-       (http . t)
-       (dot . t)
-       (C . t)))
-
     (load-library "find-lisp")
     (setq-default
      org-startup-with-inline-images nil
