@@ -13,9 +13,7 @@
   "Returns selected backend."
   (if java-backend
       java-backend
-    (cond
-     ((configuration-layer/layer-used-p 'lsp) 'lsp)
-     (t 'meghanada))))
+    (when (configuration-layer/layer-used-p 'lsp) 'lsp)))
 
 (defun spacemacs//java-setup-backend ()
   "Conditionally setup java backend."

@@ -39,13 +39,5 @@ Possible values are `complete', `cycle' or `nil'.")
 (defvar auto-completion-enable-sort-by-usage nil
   "If non nil suggestions are sorted by how often they are used.")
 
-(defvar company-mode-completion-cancel-keywords
-  '("do"
-    "then"
-    "begin"
-    "case")
-  "Keywords on which to cancel completion so that you can use RET
-to complet without blocking common line endings.")
-
 (defvar auto-completion-private-snippets-directory nil
   "Configurable private snippets directory.")

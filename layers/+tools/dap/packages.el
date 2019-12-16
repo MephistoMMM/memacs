@@ -39,14 +39,14 @@
         ;; avoid clash with other debug key bindings
         (spacemacs/set-leader-keys-for-major-mode mode "db" nil)
 
-        (spacemacs/declare-prefix-for-mode mode "md" "debug")
-        (spacemacs/declare-prefix-for-mode mode "mdb" "breakpoints")
-        (spacemacs/declare-prefix-for-mode mode "mdd" "debugging")
-        (spacemacs/declare-prefix-for-mode mode "mde" "eval")
-        (spacemacs/declare-prefix-for-mode mode "mdI" "inspect")
-        (spacemacs/declare-prefix-for-mode mode "mdS" "switch")
-        (spacemacs/declare-prefix-for-mode mode "mdT" "toggles")
-        (spacemacs/declare-prefix-for-mode mode "mdw" "debug windows")
+        (spacemacs/declare-prefix-for-mode mode "d" "debug")
+        (spacemacs/declare-prefix-for-mode mode "db" "breakpoints")
+        (spacemacs/declare-prefix-for-mode mode "dd" "debugging")
+        (spacemacs/declare-prefix-for-mode mode "de" "eval")
+        (spacemacs/declare-prefix-for-mode mode "dI" "inspect")
+        (spacemacs/declare-prefix-for-mode mode "dS" "switch")
+        (spacemacs/declare-prefix-for-mode mode "dT" "toggles")
+        (spacemacs/declare-prefix-for-mode mode "dw" "debug windows")
 
         (spacemacs/set-leader-keys-for-major-mode mode
           ;; transient state

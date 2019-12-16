@@ -13,9 +13,8 @@
   "Returns selected backend."
   (if python-backend
       python-backend
-    (cond
-     ((configuration-layer/layer-used-p 'lsp) 'lsp)
-     (t 'anaconda))))
+    (when (configuration-layer/layer-used-p 'lsp) 'lsp)
+    ))
 
 (defun spacemacs//python-setup-backend ()
   "Conditionally setup python backend."

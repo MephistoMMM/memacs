@@ -71,9 +71,6 @@
 (defun rust/post-init-ggtags ()
   (add-hook 'rust-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
 
-(defun rust/post-init-helm-gtags ()
-  (spacemacs/helm-gtags-define-keys-for-mode 'rust-mode))
-
 (defun rust/init-racer ()
   (use-package racer
     :defer t
@@ -95,9 +92,9 @@
     :init
     (progn
       (spacemacs/add-to-hook 'rust-mode-hook '(spacemacs//rust-setup-backend))
-      (spacemacs/declare-prefix-for-mode 'rust-mode "mg" "goto")
-      (spacemacs/declare-prefix-for-mode 'rust-mode "mh" "help")
-      (spacemacs/declare-prefix-for-mode 'rust-mode "m=" "format")
+      (spacemacs/declare-prefix-for-mode 'rust-mode "g" "goto")
+      (spacemacs/declare-prefix-for-mode 'rust-mode "h" "help")
+      (spacemacs/declare-prefix-for-mode 'rust-mode "=" "format")
       (spacemacs/set-leader-keys-for-major-mode 'rust-mode
         "==" 'rust-format-buffer
         "q" 'spacemacs/rust-quick-run))))

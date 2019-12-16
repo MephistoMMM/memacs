@@ -56,7 +56,8 @@
   (interactive "P")
   (let ((dest (read-directory-name "Export to Directory: "
                                    nil default-directory nil)))
-    (setq memacs--org-export-directory dest
+    (setq memacs--org-export-directory (if (string-suffix-p "/" dest)
+                                           dest (concat dest "/"))
           memacs-img/before-export-aspect
           #'memacs-img//copy-to-destination-statics-dir)
     (org-export-dispatch))
