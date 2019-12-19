@@ -13,6 +13,8 @@
       '(
         company
         (company-go :requires company)
+        counsel-gtags
+        eldoc
         flycheck
         ggtags
         go-eldoc
@@ -42,6 +44,12 @@
 (defun go/post-init-company ()
   (add-hook 'go-mode-local-vars-hook #'spacemacs//go-setup-company))
 
+(defun go/post-init-counsel-gtags ()
+  (spacemacs/counsel-gtags-define-keys-for-mode 'go-mode))
+
+(defun go/post-init-eldoc ()
+  (add-hook 'go-mode-hook #'spacemacs//go-setup-eldoc))
+
 (defun go/post-init-flycheck ()
   (spacemacs/enable-flycheck 'go-mode))
 
@@ -49,7 +57,7 @@
   (add-hook 'go-mode-local-vars-hook #'spacemacs/ggtags-mode-enable))
 
 (defun go/init-go-eldoc ()
-  (add-hook 'go-mode-hook 'go-eldoc-setup))
+  (use-package go-eldoc :defer t))
 
 (defun go/init-go-fill-struct ()
   (use-package go-fill-struct

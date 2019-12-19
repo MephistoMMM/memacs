@@ -1,6 +1,6 @@
 ;;; funcs.el --- Python Layer functions File for Spacemacs
 ;;
-;; Copyright (c) 2012-2018 Sylvain Benner & Contributors
+;; Copyright (c) 2012-2019 Sylvain Benner & Contributors
 ;;
 ;; Author: Sylvain Benner <sylvain.benner@gmail.com>
 ;; URL: https://github.com/syl20bnr/spacemacs
@@ -9,12 +9,10 @@
 ;;
 ;;; License: GPLv3
 
-(defun spacemacs//python-backend ()
-  "Returns selected backend."
-  (if python-backend
-      python-backend
-    (when (configuration-layer/layer-used-p 'lsp) 'lsp)
-    ))
+(defun spacemacs//python-formatter ()
+  "Returns selected python-formatter."
+  (or python-formatter (pcase python-backend
+                         ('lsp 'lsp))))
 
 (defun spacemacs//python-setup-backend ()
   "Conditionally setup python backend."
@@ -23,18 +21,18 @@
 
 (defun spacemacs//python-setup-company ()
   "Conditionally setup company based on backend."
-  (pcase (spacemacs//python-backend)
+  (pcase python-backend
     (`lsp (spacemacs//python-setup-lsp-company))))
 
 (defun spacemacs//python-setup-dap ()
   "Conditionally setup elixir DAP integration."
   ;; currently DAP is only available using LSP
-  (pcase (spacemacs//python-backend)
+  (pcase python-backend
     (`lsp (spacemacs//python-setup-lsp-dap))))
 
 (defun spacemacs//python-setup-eldoc ()
   "Conditionally setup eldoc based on backend."
-  (pcase (spacemacs//python-backend)
+  (pcase python-backend
     ;; lsp setup eldoc on its own
     (`lsp (message "lsp setup eldoc on its own."))))
 
@@ -162,29 +160,35 @@ as the pyenv version then also return nil. This works around https://github.com/
   "autoflake --remove-all-unused-imports -i unused_imports.py"
   (interactive)
   (if (executable-find "autoflake")
-    (progn
-      (shell-command (format "autoflake --remove-all-unused-imports -i %s"
-                       (shell-quote-argument (buffer-file-name))))
-      (revert-buffer t t t))
+      (progn
+        (shell-command (format "autoflake --remove-all-unused-imports -i %s"
+                               (shell-quote-argument (buffer-file-name))))
+        (revert-buffer t t t))
     (message "Error: Cannot find autoflake executable.")))
 
 (defun spacemacs//pyvenv-mode-set-local-virtualenv ()
-  "Set pyvenv virtualenv from \".venv\" by looking in parent directories. handle directory or file"
+  "Set pyvenv virtualenv from \".venv\" by looking in parent directories.
+Handle \".venv\" being a virtualenv directory or a file specifying either
+absolute or relative virtualenv path. Relative path is checked relative to
+location of \".venv\" file, then relative to pyvenv-workon-home()."
   (interactive)
-  (let ((root-path (locate-dominating-file default-directory
-                                           ".venv")))
+  (let ((root-path (locate-dominating-file default-directory ".venv")))
     (when root-path
-      (let* ((file-path (expand-file-name ".venv" root-path))
-             (virtualenv
-              (if (file-directory-p file-path)
-                  file-path
-                (with-temp-buffer
-                  (insert-file-contents-literally file-path)
-                  (buffer-substring-no-properties (line-beginning-position)
-                                                  (line-end-position))))))
-        (if (file-directory-p virtualenv)
-            (pyvenv-activate virtualenv)
-          (pyvenv-workon virtualenv))))))
+      (let ((file-path (expand-file-name ".venv" root-path)))
+        (if (file-directory-p file-path)
+            (pyvenv-activate file-path)
+          (let* ((virtualenv-path-in-file
+                  (with-temp-buffer
+                    (insert-file-contents-literally file-path)
+                    (buffer-substring-no-properties (line-beginning-position)
+                                                    (line-end-position))))
+                 (virtualenv-abs-path
+                  (if (file-name-absolute-p virtualenv-path-in-file)
+                      virtualenv-path-in-file
+                    (format "%s/%s" root-path virtualenv-path-in-file))))
+            (if (file-directory-p virtualenv-abs-path)
+                (pyvenv-activate virtualenv-abs-path)
+              (pyvenv-workon virtualenv-path-in-file))))))))
 
 
 ;; Tests
@@ -204,7 +208,7 @@ as the pyenv version then also return nil. This works around https://github.com/
 (defun spacemacs//python-get-secondary-testrunner ()
   "Get the secondary test runner"
   (cdr (assoc (spacemacs//python-get-main-testrunner) '((pytest . nose)
-                                             (nose . pytest)))))
+                                                        (nose . pytest)))))
 
 (defun spacemacs//python-call-correct-test-function (arg funcalist)
   "Call a test function based on the chosen test framework.
@@ -212,7 +216,7 @@ ARG is the universal-argument which chooses between the main and
 the secondary test runner. FUNCALIST is an alist of the function
 to be called for each testrunner. "
   (when python-save-before-test
-      (save-buffer))
+    (save-buffer))
   (let* ((test-runner (if arg
                           (spacemacs//python-get-secondary-testrunner)
                         (spacemacs//python-get-main-testrunner)))
@@ -231,19 +235,19 @@ to be called for each testrunner. "
   "Run all tests."
   (interactive "P")
   (spacemacs//python-call-correct-test-function arg '((pytest . pytest-all)
-                                           (nose . nosetests-all))))
+                                                      (nose . nosetests-all))))
 
 (defun spacemacs/python-test-pdb-all (arg)
   "Run all tests in debug mode."
   (interactive "P")
   (spacemacs//python-call-correct-test-function arg '((pytest . pytest-pdb-all)
-                                           (nose . nosetests-pdb-all))))
+                                                      (nose . nosetests-pdb-all))))
 
 (defun spacemacs/python-test-module (arg)
   "Run all tests in the current module."
   (interactive "P")
   (spacemacs//python-call-correct-test-function arg '((pytest . pytest-module)
-                                           (nose . nosetests-module))))
+                                                      (nose . nosetests-module))))
 
 (defun spacemacs/python-test-pdb-module (arg)
   "Run all tests in the current module in debug mode."
@@ -267,13 +271,13 @@ to be called for each testrunner. "
   "Run current test."
   (interactive "P")
   (spacemacs//python-call-correct-test-function arg '((pytest . pytest-one)
-                                           (nose . nosetests-one))))
+                                                      (nose . nosetests-one))))
 
 (defun spacemacs/python-test-pdb-one (arg)
   "Run current test in debug mode."
   (interactive "P")
   (spacemacs//python-call-correct-test-function arg '((pytest . pytest-pdb-one)
-                                           (nose . nosetests-pdb-one))))
+                                                      (nose . nosetests-pdb-one))))
 
 (defun spacemacs//python-sort-imports ()
   ;; py-isort-before-save checks the major mode as well, however we can prevent
@@ -289,14 +293,14 @@ to be called for each testrunner. "
   "Bind the python formatter keys.
 Bind formatter to '==' for LSP and '='for all other backends."
   (spacemacs/set-leader-keys-for-major-mode 'python-mode
-    (if (eq (spacemacs//python-backend) 'lsp)
+    (if (eq python-backend 'lsp)
         "=="
       "=") 'spacemacs/python-format-buffer))
 
 (defun spacemacs/python-format-buffer ()
   "Bind possible python formatters."
   (interactive)
-  (pcase python-formatter
+  (pcase (spacemacs//python-formatter)
     (`yapf (yapfify-buffer))
     (`black (blacken-buffer))
     (`lsp (lsp-format-buffer))

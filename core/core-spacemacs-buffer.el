@@ -89,7 +89,8 @@ FILE: the path to the file containing the banner."
                                          banner-width) 2)))))
          (while (not (eobp))
            (insert (make-string margin ?\s))
-           (forward-line 1))))
+           (forward-line 1)))
+       (insert "\n"))
      (buffer-string))))
 
 (defun spacemacs-buffer/insert-banner-and-buttons ()
@@ -104,7 +105,6 @@ in spacemacs buffer along with quick buttons underneath.
         (if (image-type-available-p (intern (file-name-extension banner)))
             (spacemacs-buffer//insert-image-banner banner)
           (spacemacs-buffer//insert-ascii-banner-centered banner)))
-      (spacemacs-buffer//inject-version)
       (spacemacs-buffer//insert-buttons)
       (spacemacs//redisplay))))
 
@@ -130,8 +130,6 @@ BANNER: the path to an ascii banner file."
            (size (image-size spec))
            (width (car size))
            (left-margin (max 0 (floor (- spacemacs-buffer--window-width width) 2))))
-      (goto-char (point-min))
-      (insert "\n")
       (insert (make-string left-margin ?\s))
       (insert-image spec)
       (insert "\n\n")
@@ -139,24 +137,22 @@ BANNER: the path to an ascii banner file."
                                                (+ (length title) 1)) 2))) ?\s))
       (insert (format "%s\n\n" title)))))
 
-(defun spacemacs-buffer//inject-version ()
-  "Inject the current version of spacemacs.
-Insert it in the first line of the buffer, right justified."
+(defun spacemacs-buffer//insert-version ()
+  "Insert the current version of Spacemacs and Emacs.
+Right justified, based on the Spacemacs buffers window width."
   (with-current-buffer (get-buffer-create spacemacs-buffer-name)
-    (save-excursion
-      (let ((version (format "%s@%s (%s)"
-                             spacemacs-version
-                             emacs-version
-                             dotspacemacs-distribution))
-            (buffer-read-only nil))
-        (goto-char (point-min))
-        (delete-region (point) (progn (end-of-line) (point)))
-        (insert (format (format "%%%ds"
-                                (if (display-graphic-p)
-                                    spacemacs-buffer--window-width
-                                  ;; terminal needs one less char
-                                  (1- spacemacs-buffer--window-width)))
-                        version))))))
+    (let ((version (format "%s@%s (%s)"
+                           spacemacs-version
+                           emacs-version
+                           dotspacemacs-distribution))
+          (buffer-read-only nil))
+      (insert (format (format "%%%ds"
+                              (if (display-graphic-p)
+                                  spacemacs-buffer--window-width
+                                ;; terminal needs one less char
+                                (1- spacemacs-buffer--window-width)))
+                      version))
+      (insert "\n\n"))))
 
 (defun spacemacs-buffer//insert-footer ()
   "Insert the footer of the home buffer."
@@ -324,7 +320,7 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
                  (propertize "Rollback Package Update"
                              'face 'font-lock-reference-face))
   (spacemacs-buffer//center-line)
-  (insert "\n\n"))
+  (insert "\n"))
 
 (defun spacemacs-buffer//insert-string-list (list-display-name list)
   "Insert a non-interactive startup list in the home buffer.
@@ -652,6 +648,7 @@ REFRESH if the buffer should be redrawn."
             (let ((inhibit-read-only t))
               (erase-buffer)))
           (spacemacs-buffer/set-mode-line "")
+          (spacemacs-buffer//insert-version)
           (spacemacs-buffer/insert-banner-and-buttons)
           (when (bound-and-true-p spacemacs-initialized)
             (configuration-layer/display-summary emacs-start-time)
@@ -677,13 +674,22 @@ REFRESH if the buffer should be redrawn."
 
 (defun spacemacs-buffer//resize-on-hook ()
   "Hook run on window resize events to redisplay the home buffer."
-  (let ((home-buffer (get-buffer-window spacemacs-buffer-name))
-        (frame-win (frame-selected-window)))
-    (when (and dotspacemacs-startup-buffer-responsive
-               home-buffer
-               (not (window-minibuffer-p frame-win)))
-      (with-selected-window home-buffer
-        (spacemacs-buffer/goto-buffer)))))
+  ;; prevent spacemacs buffer redisplay in the filetree window
+  (unless (memq this-command '(neotree-find-project-root
+                               neotree-show
+                               neotree-toggle
+                               spacemacs/treemacs-project-toggle
+                               treemacs
+                               treemacs-bookmark
+                               treemacs-find-file
+                               treemacs-select-window))
+   (let ((home-buffer (get-buffer-window spacemacs-buffer-name))
+         (frame-win (frame-selected-window)))
+     (when (and dotspacemacs-startup-buffer-responsive
+                home-buffer
+                (not (window-minibuffer-p frame-win)))
+       (with-selected-window home-buffer
+         (spacemacs-buffer/goto-buffer))))))
 
 (defun spacemacs-buffer/refresh ()
   "Force recreation of the spacemacs buffer."

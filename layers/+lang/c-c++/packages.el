@@ -19,21 +19,37 @@
 
         ;; normal
         clang-format
-        company
         (company-c-headers :requires company)
         counsel-gtags
         ggtags
 
         ;; lsp
-        (cquery :requires lsp-mode company-lsp)
+        (cquery :requires lsp-mode)
         projectile
-        ))
+
+        (cpp-auto-include
+         :location (recipe :fetcher github
+                           :repo "syohex/emacs-cpp-auto-include"))
+        eldoc
+        org
+        realgud
+        srefactor
+        ;; lsp
+        (ccls :requires lsp-mode)
+        dap-mode
+        ;; ycmd
+        (company-ycmd :requires company)
+        (flycheck-ycmd :requires flycheck)
+        ycmd))
 
 (defun c-c++/init-cc-mode ()
   (use-package cc-mode
     :defer t
     :init
     (progn
+      (add-hook 'c-mode-local-vars-hook #'spacemacs//c-c++-setup-backend)
+      (add-hook 'c++-mode-local-vars-hook #'spacemacs//c-c++-setup-backend)
+      (put 'c-c++-backend 'safe-local-variable 'symbolp)
       (when c-c++-default-mode-for-headers
         (add-to-list 'auto-mode-alist
                      `("\\.h\\'" . ,c-c++-default-mode-for-headers)))
@@ -41,24 +57,17 @@
         (add-hook 'c-mode-common-hook 'spacemacs//c-toggle-auto-newline)))
     :config (require 'compile)))
 
+(defun c-c++/init-ccls ()
+  (use-package ccls
+    :defer t))
+
 (defun c-c++/init-clang-format ()
   (use-package clang-format
-    :if (or c-c++-enable-clang-support (spacemacs//c-c++-lsp-enabled))
-    :init
-    (progn
-      (when c-c++-enable-clang-format-on-save
-        (spacemacs/add-to-hooks 'spacemacs/clang-format-on-save c-c++-mode-hooks))
-      )))
+    :init (spacemacs//c-c++-setup-clang-format)))
 
 (defun c-c++/post-init-company ()
-  (when c-c++-enable-clang-support
-    (if (spacemacs//c-c++-lsp-enabled)
-      (display-warning :error "`c-c++-enable-clang-support' ignored when using lsp backend")
-      (progn
-        (spacemacs|add-company-backends :backends company-clang :modes c-mode-common)
-        (setq company-clang-prefix-guesser 'spacemacs/company-more-than-prefix-guesser)
-        (spacemacs/add-to-hooks 'spacemacs/c-c++-load-clang-args c-c++-mode-hooks)
-        ()))))
+  (add-hook 'c-mode-local-vars-hook #'spacemacs//c-c++-setup-company)
+  (add-hook 'c++-mode-local-vars-hook #'spacemacs//c-c++-setup-company))
 
 (defun c-c++/init-company-c-headers ()
   (use-package company-c-headers
@@ -66,6 +75,11 @@
     :init (spacemacs|add-company-backends
             :backends company-c-headers
             :modes c-mode-common)))
+
+(defun c-c++/init-company-ycmd ()
+  (use-package company-ycmd
+    :defer t
+    :commands company-ycmd))
 
 (defun c-c++/post-init-counsel-gtags ()
   (dolist (mode c-c++-modes)
@@ -84,16 +98,32 @@
       (spacemacs/set-leader-keys-for-major-mode 'c++-mode
         "ri" #'spacemacs/c++-organize-includes))))
 
+(defun c-c++/init-cquery ()
+  (use-package cquery
+    :defer t))
+
+(defun c-c++/pre-init-dap-mode ()
+  (add-to-list 'spacemacs--dap-supported-modes 'c-mode)
+  (add-to-list 'spacemacs--dap-supported-modes 'c++-mode)
+  (add-hook 'c-mode-local-vars-hook #'spacemacs//c-c++-setup-dap)
+  (add-hook 'c++-mode-local-vars-hook #'spacemacs//c-c++-setup-dap))
+
 (defun c-c++/init-disaster ()
   (use-package disaster
     :defer t
     :commands (disaster)))
 
+(defun c-c++/post-init-eldoc ()
+  (add-hook 'c-mode-local-vars-hook #'spacemacs//c-c++-setup-eldoc)
+  (add-hook 'c++-mode-local-vars-hook #'spacemacs//c-c++-setup-eldoc))
+
 (defun c-c++/post-init-flycheck ()
-  (dolist (mode c-c++-modes)
-    (spacemacs/enable-flycheck mode))
-  (when c-c++-enable-clang-support
-    (spacemacs/add-to-hooks 'spacemacs/c-c++-load-clang-args c-c++-mode-hooks)))
+  (add-hook 'c-mode-local-vars-hook #'spacemacs//c-c++-setup-flycheck)
+  (add-hook 'c++-mode-local-vars-hook #'spacemacs//c-c++-setup-flycheck))
+
+(defun c-c++/init-flycheck-ycmd ()
+  (use-package flycheck-ycmd
+    :defer t))
 
 (defun c-c++/post-init-ggtags ()
   (add-hook 'c-mode-local-vars-hook #'spacemacs/ggtags-mode-enable)
@@ -102,39 +132,53 @@
 
 (defun c-c++/init-google-c-style ()
   (use-package google-c-style
-    :defer
-    :if (or 'c-c++-enable-google-style 'c-c++-enable-google-newline)
-    :init (progn
-            (when c-c++-enable-google-style (add-hook 'c-mode-common-hook 'google-set-c-style))
-            (when c-c++-enable-google-newline (add-hook 'c-mode-common-hook 'google-make-newline-indent)))))
+    :defer t
+    :init
+    (progn
+      (when c-c++-enable-google-style
+        (add-hook 'c-mode-common-hook 'google-set-c-style))
+      (when c-c++-enable-google-newline
+        (add-hook 'c-mode-common-hook 'google-make-newline-indent)))))
 
-(defun c-c++/post-init-stickyfunc-enhance ()
-  (spacemacs/add-to-hooks 'spacemacs/load-stickyfunc-enhance c-c++-mode-hooks))
+(defun c-c++/pre-init-org ()
+  (spacemacs|use-package-add-hook org
+    :post-config (add-to-list 'org-babel-load-languages '(C . t))))
 
-;; BEGIN LSP BACKEND PACKAGES
-;; See also https://github.com/cquery-project/cquery/wiki/Emacs
-(defun c-c++/init-cquery ()
-  (use-package cquery
-    :if (eq c-c++-backend 'lsp-cquery)
-    :config
-    (spacemacs//c-c++-lsp-config)
-    :hook ((c-mode c++-mode) .
-            (lambda () (cl-pushnew #'company-lsp company-backends) (require 'cquery) (remhash 'clangd lsp-clients) (lsp)))))
-
-;;Intentionally adding both cquery and ccls cache dirs to ignore list, to facilitate switching between
-;;two without multiple caches polluting projectile find file results
 (defun c-c++/pre-init-projectile ()
   (spacemacs|use-package-add-hook projectile
     :post-config
     (progn
-      (add-to-list 'projectile-globally-ignored-directories ".cquery_cached_index")
-      (when c-c++-lsp-cache-dir
-        (add-to-list 'projectile-globally-ignored-directories c-c++-lsp-cache-dir))
+      (when c-c++-lsp-cquery-cache-directory
+        ;; Ignore lsp cache dir, in case user has opted for cache within project
+        ;; source tree
+        (add-to-list 'projectile-globally-ignored-directories
+                     c-c++-lsp-cquery-cache-directory))
       (when c-c++-adopt-subprojects
         (setq projectile-project-root-files-top-down-recurring
-          (append '("compile_commands.json"
-                    ".cquery"
-                    ".ccls")
-            projectile-project-root-files-top-down-recurring))))))
+              (append '("compile_commands.json"
+                        ".cquery"
+                        ".ccls")
+                      projectile-project-root-files-top-down-recurring))))))
 
-;; END LSP BACKEND PACKAGES
+(defun c-c++/post-init-realgud()
+  (dolist (mode c-c++-modes)
+    (spacemacs/add-realgud-debugger mode "gdb")))
+
+(defun c-c++/post-init-srefactor ()
+  (dolist (mode c-c++-modes)
+    (spacemacs/set-leader-keys-for-major-mode mode "r." 'srefactor-refactor-at-point))
+  (spacemacs/add-to-hooks 'spacemacs/load-srefactor c-c++-mode-hooks))
+
+(defun c-c++/post-init-stickyfunc-enhance ()
+  (spacemacs/add-to-hooks 'spacemacs/load-stickyfunc-enhance c-c++-mode-hooks))
+
+(defun c-c++/init-ycmd ()
+  (use-package ycmd
+    :defer t
+    :init
+    (progn
+      (unless (boundp 'ycmd-global-config)
+        (setq-default ycmd-global-config
+                      (concat (configuration-layer/get-layer-path 'ycmd)
+                              "global_conf.py")))
+      (setq-default ycmd-parse-conditions '(save mode-enabled)))))

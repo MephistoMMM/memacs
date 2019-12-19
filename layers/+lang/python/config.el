@@ -1,6 +1,6 @@
 ;;; config.el --- Python Layer Configuration File for Spacemacs
 ;;
-;; Copyright (c) 2012-2018 Sylvain Benner & Contributors
+;; Copyright (c) 2012-2019 Sylvain Benner & Contributors
 ;;
 ;; Author: Sylvain Benner <sylvain.benner@gmail.com>
 ;; URL: https://github.com/syl20bnr/spacemacs
@@ -14,8 +14,8 @@
 (spacemacs|define-jump-handlers python-mode)
 
 (defvar python-backend 'lsp
-  "The backend to use for IDE features. Possible values are `anaconda'
-and `lsp'.")
+  "The backend to use for IDE features.
+Possible values are `anaconda' and `lsp'.")
 
 (defvar python-lsp-server 'mspyls
   "Language server to use for lsp backend. Possible values are `pyls'
@@ -26,7 +26,7 @@ and `mspyls'")
 
 (defvar python-formatter 'yapf
   "The formatter to use. Possible values are `yapf',
-  `black' and 'lsp'.")
+  `black' and `lsp'. If left empty a default will be selected based on the backend.")
 
 (defvar python-format-on-save nil
   "If non-nil, automatically format code with formatter selected

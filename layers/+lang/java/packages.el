@@ -19,7 +19,7 @@
         (java-mode :location built-in)
         maven-test-mode
         mvn
-        (lsp-java :requires lsp-mode lsp-ui company-lsp dap-mode)
+        (lsp-java :requires lsp-mode)
         ))
 
 (defun java/post-init-company ()

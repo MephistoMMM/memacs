@@ -258,23 +258,29 @@ result, incrementing passed-tests and total-tests."
              "Use M-x hidden-mode-line-mode to make the mode-line appear."))))
 
 ;; https://github.com/syl20bnr/spacemacs/issues/8414
-(defun spacemacs/recompile-elpa (arg)
-  "Compile or recompile packages in elpa directory, if needed, that is
-    if the corresponding .elc file is either missing or outdated.
+(defun spacemacs/recompile-elpa (arg &optional dir)
+  "Compile or recompile packages in elpa or given directory.
+This function compiles all `.el' files in the elpa directory
+if it's corresponding `.elc' file is missing or outdated.
 
-      If ARG is non-nil, also recompile every `.el' file, regardless of date.
+This is useful if you switch Emacs versions or there
+are issues with a local package which require a recompile.
 
-      Useful if you switch Emacs versions."
+If ARG is non-nil, force recompile of all found `.el' files.
+If DIR is non-nil, use a given directory for recompilation instead of elpa."
   (interactive "P")
-  ;; First argument must be 0 (not nil) to get missing .elc files rebuilt.
-  ;; Bonus: Optionally force recompilation with universal ARG
-  (when arg
-    (seq-do
-     (lambda (fname)
-       (when (file-exists-p fname)
-         (delete-file fname)))
-     (directory-files-recursively user-emacs-directory "\\.elc$" t)))
-  (byte-recompile-directory package-user-dir 0 arg))
+  ;; Replace default directories if dir parameter is filled
+  (let ((user-emacs-dir (or dir user-emacs-directory))
+        (package-user-dir (or dir package-user-dir)))
+    ;; First argument must be 0 (not nil) to get missing .elc files rebuilt.
+    ;; Bonus: Optionally force recompilation with universal ARG
+    (when arg
+      (seq-do
+       (lambda (fname)
+         (when (file-exists-p fname)
+           (delete-file fname)))
+       (directory-files-recursively user-emacs-directory "\\.elc$" t)))
+    (byte-recompile-directory package-user-dir 0 arg)))
 
 (defun spacemacs/register-repl (feature repl-func &optional tag)
   "Register REPL-FUNC to the global list of REPLs SPACEMACS-REPL-LIST.
@@ -316,7 +322,7 @@ If `spacemacs-layouts-restrict-spc-tab' is `t' then this only switches between
 the current layouts buffers."
   (interactive)
   (destructuring-bind (buf start pos)
-      (if spacemacs-layouts-restrict-spc-tab
+      (if (bound-and-true-p spacemacs-layouts-restrict-spc-tab)
           (let ((buffer-list (persp-buffer-list))
                 (my-buffer (window-buffer window)))
             ;; find buffer of the same persp in window
@@ -368,6 +374,13 @@ is not visible. Otherwise delegates to regular Emacs next-error."
     (cond
      ((eq 'flycheck sys) (call-interactively 'flycheck-next-error))
      ((eq 'emacs sys) (call-interactively 'next-error)))))
+
+(defun spacemacs/last-error ()
+  "Go to last flycheck or standard emacs error."
+  (interactive)
+  (when (save-excursion (spacemacs/next-error))
+    (evil-goto-line)
+    (spacemacs/previous-error)))
 
 (defun spacemacs/previous-error (&optional n reset)
   "Dispatch to flycheck or standard emacs error."

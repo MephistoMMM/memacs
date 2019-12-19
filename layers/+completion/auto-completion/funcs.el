@@ -1,4 +1,4 @@
-;;; funcs.el --- Auto-completion functions File
+;;; funcs.el --- Auto-completion functions File -*- lexical-binding: t; -*-
 ;;
 ;; Copyright (c) 2012-2018 Sylvain Benner & Contributors
 ;;
@@ -187,6 +187,15 @@ MODE parameter must match the :modes values used in the call to
         (define-key map (kbd "TAB") nil)
         (define-key map (kbd "<tab>") nil)))))
    (t (message "Not yet implemented for package %S" package))))
+
+
+;; Transformers
+
+(defun spacemacs//company-transformer-cancel (candidates)
+  "Cancel completion if prefix is in the list
+`company-mode-completion-cancel-keywords'"
+  (unless (member company-prefix company-mode-completion-cancel-keywords)
+    candidates))
 
 
 
