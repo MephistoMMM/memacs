@@ -129,14 +129,19 @@
       (add-hook 'emacs-lisp-mode-hook 'elisp-slime-nav-mode)
       (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))
         (spacemacs/declare-prefix-for-mode mode "g" "find-symbol")
-        (spacemacs/declare-prefix-for-mode mode "h" "help")
         (spacemacs/set-leader-keys-for-major-mode mode
-          "hh" 'elisp-slime-nav-describe-elisp-thing-at-point)
+          "gb" 'xref-pop-marker-stack)
+        (spacemacs/declare-prefix-for-mode mode "h" "help")
+
+        ;; Load better help mode if helpful is installed
+        (if (configuration-layer/layer-used-p 'helpful)
+            (spacemacs/set-leader-keys-for-major-mode mode
+              "hh" 'helpful-at-point)
+          (spacemacs/set-leader-keys-for-major-mode mode
+            "hh" 'elisp-slime-nav-describe-elisp-thing-at-point))
         (let ((jumpl (intern (format "spacemacs-jump-handlers-%S" mode))))
           (add-to-list jumpl 'elisp-slime-nav-find-elisp-thing-at-point))))
-    :config (spacemacs|hide-lighter elisp-slime-nav-mode)
-
-    ))
+    :config (spacemacs|hide-lighter elisp-slime-nav-mode)))
 
 (defun emacs-lisp/init-emacs-lisp ()
   (dolist (mode '(emacs-lisp-mode lisp-interaction-mode))

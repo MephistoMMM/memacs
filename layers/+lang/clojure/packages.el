@@ -52,16 +52,16 @@
       ;; TODO: having this work for cider-macroexpansion-mode would be nice,
       ;;       but the problem is that it uses clojure-mode as its major-mode
       (let ((cider--key-binding-prefixes
-             '(("md" . "debug")
-               ("me" . "evaluation")
-               ("mf" . "format")
-               ("mg" . "goto")
-               ("mh" . "documentation")
-               ("mp" . "profile")
-               ("ms" . "repl")
-               ("msj" . "jack-in")
-               ("mt" . "test")
-               ("mT" . "toggle")
+             '(("d" . "debug")
+               ("e" . "evaluation")
+               ("f" . "format")
+               ("g" . "goto")
+               ("h" . "documentation")
+               ("p" . "profile")
+               ("s" . "repl")
+               ("sj" . "jack-in")
+               ("t" . "test")
+               ("T" . "toggle")
                )))
         (spacemacs|forall-clojure-modes m
                                         (mapc (lambda (x) (spacemacs/declare-prefix-for-mode
@@ -169,9 +169,6 @@
       ;; add support for golden-ratio
       (with-eval-after-load 'golden-ratio
         (add-to-list 'golden-ratio-extra-commands 'cider-popup-buffer-quit-function))
-      ;; setup linters. NOTE: It must be done after both CIDER and Flycheck are loaded.
-      (when (eq clojure-enable-linters 'squiggly)
-        (with-eval-after-load 'flycheck (flycheck-clojure-setup)))
       ;; add support for evil
       (evil-set-initial-state 'cider-stacktrace-mode 'motion)
       (evil-set-initial-state 'cider-popup-buffer-mode 'motion)
@@ -276,46 +273,46 @@
       (add-to-list 'magic-mode-alist '("#!.*boot\\s-*$" . clojure-mode))
       ;; Define all the prefixes here, although most of them apply only to bindings in clj-refactor
       (let ((clj-refactor--key-binding-prefixes
-             '(("mr" . "refactor")
-               ("mra" . "add")
-               ("mrc" . "cycle/clean/convert")
-               ("mrd" . "destructure")
-               ("mre" . "extract/expand")
-               ("mrf" . "find/function")
-               ("mrh" . "hotload")
-               ("mri" . "introduce/inline")
-               ("mrm" . "move")
-               ("mrp" . "project/promote")
-               ("mrr" . "remove/rename/replace")
-               ("mrs" . "show/sort/stop")
-               ("mrt" . "thread")
-               ("mru" . "unwind/update"))))
+             '(("r" . "refactor")
+               ("ra" . "add")
+               ("rc" . "cycle/clean/convert")
+               ("rd" . "destructure")
+               ("re" . "extract/expand")
+               ("rf" . "find/function")
+               ("rh" . "hotload")
+               ("ri" . "introduce/inline")
+               ("rm" . "move")
+               ("rp" . "project/promote")
+               ("rr" . "remove/rename/replace")
+               ("rs" . "show/sort/stop")
+               ("rt" . "thread")
+               ("ru" . "unwind/update"))))
         (spacemacs|forall-clojure-modes m
-                                        (mapc (lambda (x) (spacemacs/declare-prefix-for-mode
-                                                       m (car x) (cdr x)))
-                                              clj-refactor--key-binding-prefixes)
-                                        (spacemacs/set-leader-keys-for-major-mode m
-                                          "fl" 'clojure-align
-                                          "rci" 'clojure-cycle-if
-                                          "rcp" 'clojure-cycle-privacy
-                                          "rc#" 'clojure-convert-collection-to-set
-                                          "rc'" 'clojure-convert-collection-to-quoted-list
-                                          "rc(" 'clojure-convert-collection-to-list
-                                          "rc[" 'clojure-convert-collection-to-vector
-                                          "rc{" 'clojure-convert-collection-to-map
-                                          "rc:" 'clojure-toggle-keyword-string
-                                          "rtf" 'clojure-thread-first-all
-                                          "rth" 'clojure-thread
-                                          "rtl" 'clojure-thread-last-all
-                                          "rua" 'clojure-unwind-all
-                                          "ruw" 'clojure-unwind)
-                                        (unless clojure-enable-clj-refactor
-                                          (spacemacs/set-leader-keys-for-major-mode m
-                                            "r?" 'spacemacs/clj-describe-missing-refactorings)))))
+          (mapc (lambda (x) (spacemacs/declare-prefix-for-mode
+                         m (car x) (cdr x)))
+                clj-refactor--key-binding-prefixes)
+          (spacemacs/set-leader-keys-for-major-mode m
+            "fl" 'clojure-align
+            "rci" 'clojure-cycle-if
+            "rcp" 'clojure-cycle-privacy
+            "rc#" 'clojure-convert-collection-to-set
+            "rc'" 'clojure-convert-collection-to-quoted-list
+            "rc(" 'clojure-convert-collection-to-list
+            "rc[" 'clojure-convert-collection-to-vector
+            "rc{" 'clojure-convert-collection-to-map
+            "rc:" 'clojure-toggle-keyword-string
+            "rtf" 'clojure-thread-first-all
+            "rth" 'clojure-thread
+            "rtl" 'clojure-thread-last-all
+            "rua" 'clojure-unwind-all
+            "ruw" 'clojure-unwind)
+          (unless clojure-enable-clj-refactor
+            (spacemacs/set-leader-keys-for-major-mode m
+              "r?" 'spacemacs/clj-describe-missing-refactorings)))))
     :config
     (when clojure-enable-fancify-symbols
       (spacemacs|forall-clojure-modes m
-                                      (clojure/fancify-symbols m))))
+        (clojure/fancify-symbols m))))
 
   (spacemacs|use-package-add-hook org
     :post-config (add-to-list 'org-babel-load-languages '(clojure . t))
@@ -422,12 +419,65 @@
   (add-hook 'clojure-mode-hook 'parinfer-mode))
 
 (defun clojure/post-init-flycheck ()
+  ;; When user has chosen to use multiple linters.
+  (when (> (safe-length clojure-enable-linters) 1)
+    ;; If adding a linter, you must add to checkers-per-mode for each mode
+    ;; it can support the mapping from the linter name in clojure-enable-linters
+    ;; to the flycheck checker to use to add to flycheck.
+    (let* ((checkers-per-mode '((clj . ((clj-kondo . clj-kondo-clj)
+                                        (joker . clojure-joker)
+                                        (squiggly . clojure-cider-eastwood)))
+                                (cljc . ((clj-kondo . clj-kondo-cljc)
+                                         (joker . clojure-joker)))
+                                (cljs . ((clj-kondo . clj-kondo-cljs)
+                                         (joker . clojurescript-joker)))
+                                (edn . ((clj-kondo . clj-kondo-edn)
+                                        (joker . edn-joker))))))
+      ;; For each checker mode
+      (dolist (mode-checkers checkers-per-mode)
+        ;; We find the first checker in order from the user configured linters which
+        ;; the mode supports and make it the primary-linter. All other linters after that
+        ;; the mode support is made a next-linter. Finally, we extract the checkers of the
+        ;; primary linter and the next linters.
+        (let* ((checkers (cdr mode-checkers))
+               (primary-linter (seq-find (lambda (l)
+                                           (assq l checkers))
+                                         clojure-enable-linters))
+               (primary-checker (cdr (assq primary-linter checkers)))
+               (next-linters (seq-filter (lambda (l)
+                                           (and (not (eq l primary-linter))
+                                                (assq l checkers)))
+                                         clojure-enable-linters))
+               (next-checkers (mapcar (lambda (l)
+                                        (cdr (assq l checkers)))
+                                      next-linters)))
+          ;; Move primary checker to the front of flycheck lists of checkers so that
+          ;; it is used as the primary checker, because flycheck picks the first one
+          ;; it finds.
+          (delq primary-checker flycheck-checkers)
+          (push primary-checker flycheck-checkers)
+          ;; For every checker, set their next checkers, starting with the primary
+          ;; checker which has all others has a next-checker, and then the next
+          ;; one has all the ones after it, and so on, until the last one which
+          ;; has no next-checker to be added. This is because flycheck next-checkers
+          ;; must be nested if we want more than two to run. It will pick the first
+          ;; available next-checker from next-checkers and run that after. If we want
+          ;; a checker after that one, it must also have next-checkers configured.
+          (let ((checkers-to-add next-checkers))
+            (dolist (checker (cons primary-checker next-checkers))
+              (dolist (next-checker checkers-to-add)
+                (flycheck-add-next-checker checker next-checker t))
+              (setq checkers-to-add (cdr checkers-to-add))))))))
   (spacemacs|forall-clojure-modes m
                                   (spacemacs/enable-flycheck m)))
 
 (defun clojure/init-flycheck-clojure ()
   (use-package flycheck-clojure
-    :if (configuration-layer/package-usedp 'flycheck)))
+    :if (configuration-layer/package-usedp 'flycheck)
+    :config (progn
+              (flycheck-clojure-setup)
+              (with-eval-after-load 'cider
+                (flycheck-clojure-inject-jack-in-dependencies)))))
 
 (defun clojure/init-flycheck-clj-kondo ()
   (use-package flycheck-clj-kondo

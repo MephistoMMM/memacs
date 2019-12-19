@@ -1,6 +1,6 @@
 ;;; keybindings.el --- Spacemacs Defaults Layer key-bindings File
 ;;
-;; Copyright (c) 2012-2018 Sylvain Benner & Contributors
+;; Copyright (c) 2012-2019 Sylvain Benner & Contributors
 ;;
 ;; Author: Sylvain Benner <sylvain.benner@gmail.com>
 ;; URL: https://github.com/syl20bnr/spacemacs
@@ -29,6 +29,17 @@
                                        ("C"   "capture/colors")
                                        ("d"   "diff")
                                        ("e"   "errors")
+                                       ("E"   "ediff")
+                                       ("Eb"  "buffers")
+                                       ("Ed"  "directories")
+                                       ("Ef"  "files")
+                                       ("Em"  "merge")
+                                       ("Emb" "buffers")
+                                       ("Emd" "directories")
+                                       ("Emf" "files")
+                                       ("Emr" "revisions")
+                                       ("Er"  "regions")
+                                       ("Ew"  "windows")
                                        ("f"   "files")
                                        ("fB"  "bookmarks")
                                        ("fC"  "files/convert")
@@ -49,6 +60,10 @@
                                        ("k"   "lisp")
                                        ("kd"  "delete")
                                        ("kD"  "delete-backward")
+                                       ("K"   "kmacros")
+                                       ("K2"  "ring")
+                                       ("Ke"  "edit")
+                                       ("Ks"  "set/swap")
                                        ("k`"  "hybrid")
                                        ("L"   "lisp")
                                        ("m"   "mine")
@@ -57,12 +72,14 @@
                                        ("p"   "projects")
                                        ("q"   "quit")
                                        ("r"   "registers/rings/resume")
+                                       ("R"   "rectangles")
                                        ("s"   "snippets")
                                        ("t"   "toggles")
                                        ("tC"  "colors")
                                        ("th"  "highlight")
                                        ("tm"  "modeline")
                                        ("tM"  "hide modeline toggle")
+                                       ("tt"  "timeclock")
                                        ("T"   "UI toggles/themes")
                                        ("C-t" "other toggles")
                                        ("u"   "universal arg")
@@ -111,6 +128,52 @@
   'universal-argument-more)
 ;; shell command  -------------------------------------------------------------
 (spacemacs/set-leader-keys "!" 'shell-command)
+;; kmacros --------------------------------------------------------------------
+(spacemacs/set-leader-keys
+  "K("  'kmacro-start-macro-or-insert-counter
+  "K)"  'kmacro-end-or-call-macro-repeat
+  "K2c" 'kmacro-call-ring-2nd
+  "K2C" 'kmacro-call-ring-2nd-repeat
+  "K2v" 'kmacro-view-ring-2nd
+  "Ka"  'kmacro-add-counter
+  "Kb"  'kmacro-bind-to-key
+  "Kc"  'kmacro-call-macro
+  "Kd"  'kmacro-delete-ring-head
+  "Kel" 'kmacro-edit-lossage
+  "Kem" 'kmacro-edit-macro
+  "Ker" 'kmacro-edit-macro-repeat
+  "Ket" 'kmacro-step-edit-macro
+  "Ki"  'kmacro-insert-counter
+  "Km"  'kmacro-end-call-mouse
+  "Kn"  'kmacro-cycle-ring-next
+  "KN"  'kmacro-name-last-macro
+  "Kp"  'kmacro-cycle-ring-previous
+  "Kr"  'helm-register
+  "Ksc" 'kmacro-set-counter
+  "Ksf" 'kmacro-set-format
+  "Ksr" 'kmacro-swap-ring
+  "Kv"  'kmacro-view-macro
+  "KV"  'kmacro-view-macro-repeat
+  "Kw"  'kmacro-to-register
+  "Ky"  'jump-to-register)
+;; rectangles ------------------------------------------------------------------
+(spacemacs/set-leader-keys
+  "R!" 'clear-rectangle
+  "Rc" 'close-rectangle
+  "Rd" 'delete-rectangle
+  "Re" 'rectangle-exchange-point-and-mark
+  "Ri" 'copy-rectangle-to-register
+  "Rk" 'kill-rectangle
+  "Rl" 'rectangle-left-char
+  "Rm" 'rectangle-mark-mode
+  "Rn" 'rectangle-next-line
+  "RN" 'rectangle-number-lines
+  "Ro" 'open-rectangle
+  "Rp" 'rectangle-previous-line
+  "Rr" 'rectangle-right-char
+  "Rs" 'string-rectangle
+  "Rt" 'transpose-regions
+  "Ry" 'yank-rectangle)
 ;; applications ---------------------------------------------------------------
 (spacemacs/set-leader-keys
   "ac"  'calc-dispatch
@@ -161,11 +224,12 @@
   'spacemacs/theme-transient-state/spacemacs/cycle-spacemacs-theme-backward)
 ;; errors ---------------------------------------------------------------------
 (spacemacs/set-leader-keys
+  "ez" 'spacemacs/last-error
   "en" 'spacemacs/next-error
   "eN" 'spacemacs/previous-error
   "ep" 'spacemacs/previous-error)
 (spacemacs|define-transient-state error
-  :title "Error transient state"
+  :title "Error Transient State"
   :hint-is-doc t
   :dynamic-hint
   (let ((sys (spacemacs/error-delegate)))
@@ -195,11 +259,40 @@
   ("y" flycheck-copy-errors-as-kill "copy")
   ("q" nil "quit" :exit t)
   :evil-leader "e.")
+;; ediff ----------------------------------------------------------------------
+(spacemacs/set-leader-keys
+  "Eb3"  'ediff-buffers3
+  "Ebb"  'ediff-buffers
+  "Ebp"  'ediff-patch-buffer
+  "EB"   'ediff-backup
+  "Ed3"  'ediff-directories3
+  "Edd"  'ediff-directories
+  "Edr"  'ediff-directory-revisions
+  "Ef."  'spacemacs/ediff-dotfile-and-template
+  "Ef3"  'ediff-files3
+  "Eff"  'ediff-files
+  "Efp"  'ediff-patch-file
+  "Eh"   'ediff-documentation
+  "Emb3" 'ediff-merge-buffers-with-ancestor
+  "Embb" 'ediff-merge-buffers
+  "Emd3" 'ediff-merge-directories-with-ancestor
+  "Emdd" 'ediff-merge-directories
+  "Emf3" 'ediff-merge-files-with-ancestor
+  "Emff" 'ediff-merge-files
+  "Emr3" 'ediff-merge-revisions-with-ancestor
+  "Emrr" 'ediff-merge-revisions
+  "Erl"  'ediff-regions-linewise
+  "Erw"  'ediff-regions-wordwise
+  "Es"   'ediff-show-registry
+  "Ev"   'ediff-revision
+  "Ewl"  'ediff-windows-linewise
+  "Eww"  'ediff-windows-wordwise)
 ;; file -----------------------------------------------------------------------
 (spacemacs/set-leader-keys
   "fA" 'spacemacs/find-file-and-replace-buffer
   "fc" 'spacemacs/copy-file
   "fD" 'spacemacs/delete-current-buffer-file
+  "fec" 'spacemacs/recompile-elpa
   "fei" 'spacemacs/find-user-init-file
   "fed" 'spacemacs/find-dotfile
   "feD" 'spacemacs/ediff-dotfile-and-template
@@ -263,7 +356,8 @@
  "J" 'spacemacs/insert-line-below-no-indent
  "K" 'spacemacs/insert-line-above-no-indent
  "k" 'spacemacs/evil-insert-line-above
- "j" 'spacemacs/evil-insert-line-below)
+ "j" 'spacemacs/evil-insert-line-below
+ "b" 'insert-buffer)
 ;; format ---------------------------------------------------------------------
 (spacemacs/set-leader-keys
   "j(" 'check-parens
@@ -313,14 +407,7 @@
   :on
   (progn
     (visual-line-mode)
-    (evil-define-minor-mode-key 'motion 'visual-line-mode "j" 'evil-next-visual-line)
-    (evil-define-minor-mode-key 'motion 'visual-line-mode "k" 'evil-previous-visual-line)
-    (when (bound-and-true-p evil-escape-mode)
-      (evil-escape-mode -1)
-      (setq evil-escape-motion-state-shadowed-func nil)
-      (evil-define-minor-mode-key 'motion 'visual-line-mode "j" 'evil-next-visual-line)
-      (evil-define-minor-mode-key 'motion 'visual-line-mode "k" 'evil-previous-visual-line)
-      (evil-escape-mode))
+    (spacemacs//init-visual-line-keys)
     (evil-normalize-keymaps))
   :off
   (progn
@@ -328,6 +415,19 @@
     (evil-normalize-keymaps))
   :documentation "Move point according to visual lines."
   :evil-leader "tL")
+(spacemacs|add-toggle visual-line-navigation-globally
+  :status global-visual-line-mode
+  :on
+  (progn
+    (global-visual-line-mode)
+    (spacemacs//init-visual-line-keys)
+    (evil-normalize-keymaps))
+  :off
+  (progn
+    (global-visual-line-mode -1)
+    (evil-normalize-keymaps))
+  :documentation "Move point according to visual lines globally."
+  :evil-leader "t C-S-l")
 (spacemacs|add-toggle auto-fill-mode
   :status auto-fill-function
   :on (auto-fill-mode)
@@ -380,13 +480,13 @@ respond to this toggle."
   :on (setq column-number-indicator-zero-based t)
   :off (setq column-number-indicator-zero-based nil)
   :on-message (concat
-                "Column indexing starts at 0 (current column is "
-                (number-to-string (current-column))
-                ")")
+               "Column indexing starts at 0 (current column is "
+               (number-to-string (current-column))
+               ")")
   :off-message (concat
-                 "Column indexing starts at 1 (current column is "
-                 (number-to-string (1+ (current-column)))
-                 ")")
+                "Column indexing starts at 1 (current column is "
+                (number-to-string (1+ (current-column)))
+                ")")
   :evil-leader "tz")
 
 (spacemacs|add-toggle transparent-frame
@@ -400,6 +500,20 @@ respond to this toggle."
   "qq" 'spacemacs/prompt-kill-emacs
   "qQ" 'spacemacs/kill-emacs
   "qf" 'spacemacs/frame-killer)
+;; timeclock ------------------------------------------------------------------
+(spacemacs/set-leader-keys
+  "ttc" 'timeclock-change
+  "tte" 'timeclock-workday-elapsed-string
+  "ttg" 'timeclock-workday-remaining-string
+  "tti" 'timeclock-in
+  "ttl" 'timeclock-when-to-leave-string
+  "ttm" 'timeclock-modeline-display
+  "tto" 'timeclock-out
+  "ttr" 'timeclock-reread-log
+  "tts" 'timeclock-status-string
+  "ttu" 'timeclock-update-mode-line
+  "ttv" 'timeclock-visit-timelog
+  "ttw" 'timeclock-when-to-leave-string)
 ;; window ---------------------------------------------------------------------
 (defun split-window-below-and-focus ()
   "Split the window vertically and focus the new window."
@@ -528,9 +642,9 @@ respond to this toggle."
   )
 (spacemacs/set-leader-keys "b." 'spacemacs/buffer-transient-state/body)
 
-;; end of Buffer transient state
+;; end of Buffer Transient State
 
-;; Window Manipulation Transient State
+;; Window Transient State
 
 (defun spacemacs/shrink-window-horizontally (delta)
   "Wrap `spacemacs/shrink-window-horizontally'."
@@ -552,90 +666,100 @@ respond to this toggle."
   (interactive "p")
   (enlarge-window delta t))
 
-(defvar spacemacs--window-manipulation-ts-full-hint-toggle nil
-  "Display window-manipulation transient-state documentation.")
+(defvar spacemacs--window-ts-full-hint-toggle nil
+  "Display window transient state documentation.")
 
-(defun spacemacs//window-manipulation-ts-toggle-hint ()
-  "Toggle the full hint docstring for the window manipulation transient-state."
+(defun spacemacs//window-ts-toggle-hint ()
+  "Toggle the full hint docstring for the window transient state."
   (interactive)
-  (setq spacemacs--window-manipulation-ts-full-hint-toggle
-        (not spacemacs--window-manipulation-ts-full-hint-toggle)))
+  (setq spacemacs--window-ts-full-hint-toggle
+        (not spacemacs--window-ts-full-hint-toggle)))
 
-(defun spacemacs//window-manipulation-ts-hint ()
-  "Return a condensed/full hint for the window manipulation transient state"
+(defun spacemacs//window-ts-hint ()
+  "Return a condensed/full hint for the window transient state"
   (concat
    " "
-   (if spacemacs--window-manipulation-ts-full-hint-toggle
-       spacemacs--window-manipulation-ts-full-hint
-     (concat spacemacs--window-manipulation-ts-minified-hint
-             "  ([" (propertize "?" 'face 'hydra-face-red) "] help)"))))
+  (if spacemacs--window-ts-full-hint-toggle
+      spacemacs--window-ts-full-hint
+    (concat "[" (propertize "?" 'face 'hydra-face-red) "] help"
+            spacemacs--window-ts-minified-hint))))
 
-(spacemacs|transient-state-format-hint window-manipulation
-  spacemacs--window-manipulation-ts-minified-hint "
-Select: _w_ _h_ _j_ _k_ _l_ Move: _H_ _J_ _K_ _L_ _r_ _R_ Split: _s_ _v_ Resize: _[_ _]_ _{_ _}_ _m_ _|_ ___")
+(spacemacs|transient-state-format-hint window
+  spacemacs--window-ts-minified-hint "\n
+Select: _a_ _h_ _j_ _k_ _l_ _w_ Move: _H_ _J_ _K_ _L_ _r_ _R_ Split: _s_ _v_ Resize: _[_ _]_ _{_ _}_ _m_ _|_ ___")
 
-(spacemacs|transient-state-format-hint window-manipulation
-  spacemacs--window-manipulation-ts-full-hint
-  (format "\n [_?_] toggle help
+(spacemacs|transient-state-format-hint window
+  spacemacs--window-ts-full-hint
+  (format "\n[_?_] toggle help
  Select^^^^               Move^^^^              Split^^^^^^               Resize^^             Other^^
  ──────^^^^─────────────  ────^^^^────────────  ─────^^^^^^─────────────  ──────^^───────────  ─────^^──────────────────
- [_j_/_k_]  down/up       [_J_/_K_] down/up     [_s_]^^^^ horizontal      [_[_] shrink horiz   [_u_] restore prev layout
- [_h_/_l_]  left/right    [_H_/_L_] left/right  [_S_]^^^^ horiz & follow  [_]_] enlarge horiz  [_U_] restore next layout
- ^^^^                     [_r_]^^   rotate fwd  [_v_]^^^^ vertical        [_{_] shrink verti   [_d_] close current
- [_w_]^^    other window  [_R_]^^   rotate bwd  [_V_]^^^^ verti & follow  [_}_] enlarge verti  [_D_] close other
- [_o_]^^    other frame   ^^^^                  [_m_/_|_/___] maximize    %s^^^^^^^^^^^^^^^^^^ [_q_] quit"
-          "^^^^                  "))
+ [_j_/_k_]  down/up       [_J_/_K_] down/up     [_s_]^^^^ horizontal      [_[_] shrink horiz   [_d_] close current
+ [_h_/_l_]  left/right    [_H_/_L_] left/right  [_S_]^^^^ horiz & follow  [_]_] enlarge horiz  [_D_] close other
+ ^^^^                     [_r_]^^   rotate fwd  [_v_]^^^^ vertical        [_{_] shrink verti   [_u_] restore prev layout
+ [_a_]^^    ace-window    [_R_]^^   rotate bwd  [_V_]^^^^ verti & follow  [_}_] enlarge verti  [_U_] restore next layout
+ [_o_]^^    other frame   ^^^^                  [_m_/_|_/___] maximize    %s^^^^^^^^^^^^^^^^^  [_q_] quit
+ [_w_]^^    other window" "^^^^                 "))
 
-(spacemacs|define-transient-state window-manipulation
-  :title "Window Manipulation TS"
+(spacemacs|define-transient-state window
+  :title "Window Transient State"
   :hint-is-doc t
-  :dynamic-hint (spacemacs//window-manipulation-ts-hint)
+  :dynamic-hint (spacemacs//window-ts-hint)
   :bindings
-  ("q" nil :exit t)
-  ("?" spacemacs//window-manipulation-ts-toggle-hint)
-  ("-" split-window-below-and-focus)
-  ("/" split-window-right-and-focus)
-  ("[" spacemacs/shrink-window-horizontally)
-  ("]" spacemacs/enlarge-window-horizontally)
-  ("{" spacemacs/shrink-window)
-  ("}" spacemacs/enlarge-window)
-  ("d" delete-window)
-  ("D" delete-other-windows)
-  ("h" evil-window-left)
-  ("<left>" evil-window-left)
+  ("?" spacemacs//window-ts-toggle-hint)
+  ;; Select
   ("j" evil-window-down)
   ("<down>" evil-window-down)
   ("k" evil-window-up)
   ("<up>" evil-window-up)
+  ("h" evil-window-left)
+  ("<left>" evil-window-left)
   ("l" evil-window-right)
   ("<right>" evil-window-right)
-  ("H" evil-window-move-far-left)
-  ("<S-left>" evil-window-move-far-left)
+  ("a" ace-window)
+  ("o" other-frame)
+  ("w" other-window)
+  ;; Move
   ("J" evil-window-move-very-bottom)
   ("<S-down>" evil-window-move-very-bottom)
   ("K" evil-window-move-very-top)
   ("<S-up>" evil-window-move-very-top)
+  ("H" evil-window-move-far-left)
+  ("<S-left>" evil-window-move-far-left)
   ("L" evil-window-move-far-right)
   ("<S-right>" evil-window-move-far-right)
-  ("o" other-frame)
   ("r" spacemacs/rotate-windows-forward)
   ("R" spacemacs/rotate-windows-backward)
+  ;; Split
   ("s" split-window-below)
   ("S" split-window-below-and-focus)
-  ("u" winner-undo)
-  ("U" winner-redo)
+  ("-" split-window-below-and-focus)
   ("v" split-window-right)
   ("V" split-window-right-and-focus)
+  ("/" split-window-right-and-focus)
   ("m" spacemacs/toggle-maximize-buffer)
-  ("_" spacemacs/maximize-horizontally)
   ("|" spacemacs/maximize-vertically)
-  ("w" 'ace-window))
-(memacs/define-evil-normal-keybinding "C-w ."
-                                      'spacemacs/window-manipulation-transient-state/body)
+  ("_" spacemacs/maximize-horizontally)
+  ;; Resize
+  ("[" spacemacs/shrink-window-horizontally)
+  ("]" spacemacs/enlarge-window-horizontally)
+  ("{" spacemacs/shrink-window)
+  ("}" spacemacs/enlarge-window)
+  ;; Other
+  ("d" delete-window)
+  ("D" delete-other-windows)
+  ("u" winner-undo)
+  ("U" winner-redo)
+  ("q" nil :exit t))
+(memacs/define-evil-normal-keybinding
+  "C-w ." 'spacemacs/window-transient-state/body
+  "C-w [" 'spacemacs/window-transient-state/spacemacs/shrink-window-horizontally
+  "C-w ]" 'spacemacs/window-transient-state/spacemacs/enlarge-window-horizontally
+  "C-w {" 'spacemacs/window-transient-state/spacemacs/shrink-window
+  "C-w }" 'spacemacs/window-transient-state/spacemacs/enlarge-window)
 
-;; end of Window Manipulation Transient State
+;; end of Window Transient State
 
-;; text Manipulation Transient State
+;; Text Transient State
 
 (defun spacemacs/scale-up-or-down-font-size (direction)
   "Scale the font. If DIRECTION is positive or zero the font is scaled up,
@@ -678,7 +802,7 @@ otherwise it is scaled down."
 
 (spacemacs/set-leader-keys "zx" 'spacemacs/scale-font-transient-state/body)
 
-;; end of Text Manipulation Transient State
+;; end of Text Transient State
 
 ;; Transparency transient-state
 

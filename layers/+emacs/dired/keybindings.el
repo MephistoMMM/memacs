@@ -22,7 +22,15 @@
                       "C-j" 'memacs/dired-find-alternate-file
                       "^"   'memacs/dired-backward
                       "C-h" 'memacs/dired-backward
+                      "n"   'evil-ex-search-next
+                      "N"   'evil-search-previous
                       ))
+
+(spacemacs/set-leader-keys
+  "ad" 'spacemacs/dired
+  "fj" 'dired-jump
+  "jd" 'dired-jump
+  "jD" 'dired-jump-other-window)
 
 
 ;; ranger

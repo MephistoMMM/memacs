@@ -22,23 +22,21 @@
     :init
     (progn
       (setq-default evil-mc-one-cursor-show-mode-line-text nil)
-      (setq evil-mc-enable-bar-cursor nil)
 
       ;; evil-mc is not compatible with the paste transient state
-      (define-key evil-normal-state-map "p" 'spacemacs/evil-mc-paste-after)
-      (define-key evil-normal-state-map "P" 'spacemacs/evil-mc-paste-before)
+      (evil-define-key 'normal evil-mc-key-map
+        "p" #'spacemacs/evil-mc-paste-after
+        "P" #'spacemacs/evil-mc-paste-before)
 
-      (dolist (state-map `(,evil-normal-state-map ,evil-insert-state-map))
-        (dolist (keybinding `((,(kbd "C-M-j") . evil-mc-make-cursor-move-next-line)
-                              (,(kbd "C-M-k") . evil-mc-make-cursor-move-prev-line)))
-          (define-key state-map (car keybinding) (cdr keybinding))))
+      (evil-define-key '(normal insert) evil-mc-key-map
+        (kbd "C-M-j") #'evil-mc-make-cursor-move-next-line
+        (kbd "C-M-k") #'evil-mc-make-cursor-move-prev-line)
 
       (add-hook 'prog-mode-hook 'turn-on-evil-mc-mode)
       (add-hook 'text-mode-hook 'turn-on-evil-mc-mode))
     :config
     (progn
       (spacemacs|diminish evil-mc-mode)
-      (setq evil-mc-one-cursor-show-mode-line-text nil)
       (when (spacemacs/system-is-mac)
         (setq evil-mc-enable-bar-cursor nil))
 

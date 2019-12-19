@@ -30,7 +30,7 @@
         evil-visualstar
         (hs-minor-mode :location built-in)
         vi-tilde-fringe
-        ))
+        eldoc))
 
 (defun spacemacs-evil/init-evil-anzu ()
   (use-package evil-anzu
@@ -42,6 +42,12 @@
       (setq anzu-search-threshold 1000
             anzu-cons-mode-line-p nil)
       )))
+
+(defun spacemacs-evil/post-init-eldoc ()
+  (eldoc-add-command #'evil-cp-insert)
+  (eldoc-add-command #'evil-cp-insert-at-end-of-form)
+  (eldoc-add-command #'evil-cp-insert-at-beginning-of-form)
+  (eldoc-add-command #'evil-cp-append))
 
 (defun spacemacs-evil/init-evil-args ()
   (use-package evil-args

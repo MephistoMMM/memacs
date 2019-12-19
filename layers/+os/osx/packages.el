@@ -9,8 +9,12 @@
 ;;
 ;;; License: GPLv3
 
-(setq osx-packages
-      '(osx-trash))
+(defconst osx-packages
+  '(
+    exec-path-from-shell
+    launchctl
+    osx-trash
+    ))
 
 (when (spacemacs/system-is-mac)
   ;; clean env error while starting
@@ -52,6 +56,53 @@
    (lambda ()
      (add-hook 'focus-in-hook 'memacs/autoescape-use-english-layout)))
   )
+
+(defun osx/init-exec-path-from-shell ()
+  (use-package exec-path-from-shell
+    :if (spacemacs/system-is-mac)
+    :config
+    (progn
+      (exec-path-from-shell-initialize)
+      ;; Use GNU ls as `gls' from `coreutils' if available.  Add `(setq
+      ;; dired-use-ls-dired nil)' to your config to suppress the Dired warning when
+      ;; not using GNU ls.  We must look for `gls' after `exec-path-from-shell' was
+      ;; initialized to make sure that `gls' is in `exec-path'
+      (let ((gls (executable-find "gls")))
+        (when gls
+          (setq insert-directory-program gls
+                dired-listing-switches "-aBhl --group-directories-first"))))))
+
+(defun osx/init-launchctl ()
+  (use-package launchctl
+    :if (spacemacs/system-is-mac)
+    :defer t
+    :init
+    (progn
+      (add-to-list 'auto-mode-alist '("\\.plist\\'" . nxml-mode))
+      (spacemacs/set-leader-keys "al" 'launchctl))
+    :config
+    (progn
+      (evilified-state-evilify launchctl-mode launchctl-mode-map
+        (kbd "q") 'quit-window
+        (kbd "s") 'tabulated-list-sort
+        (kbd "g") 'launchctl-refresh
+        (kbd "n") 'launchctl-new
+        (kbd "e") 'launchctl-edit
+        (kbd "v") 'launchctl-view
+        (kbd "l") 'launchctl-load
+        (kbd "u") 'launchctl-unload
+        (kbd "r") 'launchctl-reload
+        (kbd "S") 'launchctl-start
+        (kbd "K") 'launchctl-stop
+        (kbd "R") 'launchctl-restart
+        (kbd "D") 'launchctl-remove
+        (kbd "d") 'launchctl-disable
+        (kbd "E") 'launchctl-enable
+        (kbd "i") 'launchctl-info
+        (kbd "f") 'launchctl-filter
+        (kbd "=") 'launchctl-setenv
+        (kbd "#") 'launchctl-unsetenv
+        (kbd "h") 'launchctl-help))))
 
 (defun osx/init-osx-trash ()
   (use-package osx-trash
