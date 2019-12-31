@@ -27,6 +27,7 @@
  run `M-x all-the-icons-install-fonts' automatically"
   (use-package all-the-icons
     :if (display-graphic-p)
+    :after company
     :init
     (unless (member "all-the-icons" (font-family-list))
       (all-the-icons-install-fonts t))

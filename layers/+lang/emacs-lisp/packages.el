@@ -22,6 +22,7 @@
         evil-cleverparens
         eval-sexp-fu
         flycheck
+        flycheck-elsa
         flycheck-package
         counsel-gtags
         (ielm :location built-in)
@@ -256,6 +257,10 @@
 (defun emacs-lisp/init-flycheck-package ()
   (use-package flycheck-package
     :hook (emacs-lisp-mode . flycheck-package-setup)))
+
+(defun emacs-lisp/init-flycheck-elsa ()
+  (use-package flycheck-elsa
+    :hook (emacs-lisp-mode . flycheck-elsa-setup)))
 
 (defun emacs-lisp/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'emacs-lisp-mode))
