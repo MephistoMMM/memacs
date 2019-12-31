@@ -19,16 +19,6 @@
   (insert "\n")
   )
 
-(defun mp-hacking/terminal-here ()
-  "Open iTerm2 then go to path of current buffer."
-  (interactive)
-  (cond
-   ((spacemacs/system-is-mac)
-    (dired-smart-shell-command "open -a iTerm $PWD" nil nil))
-   (t
-    (message "terminal-here: Not Support For This System.")))
-  )
-
 (defun mp-hacking//user-bufferp (bufname)
   "Test for hidden buffer."
   (not (string-match "\\`[[:space:]]*\\*" bufname)))

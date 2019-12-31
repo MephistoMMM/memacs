@@ -13,6 +13,7 @@
       '(
         evil-anzu
         evil-args
+        evil-cleverparens
         evil-ediff
         evil-escape
         evil-exchange
@@ -57,6 +58,20 @@
       ;; bind evil-args text objects
       (define-key evil-inner-text-objects-map "a" 'evil-inner-arg)
       (define-key evil-outer-text-objects-map "a" 'evil-outer-arg))))
+
+(defun spacemacs-evil/init-evil-cleverparens ()
+  (use-package evil-cleverparens
+    :defer t
+    :init
+    (progn
+      (setq evil-cleverparens-use-regular-insert t)
+      (eval `(spacemacs|add-toggle evil-safe-lisp-structural-editing
+               :mode evil-cleverparens-mode
+               :documentation "Enable evil-cleverparens."
+               :evil-leader-for-mode
+               ,@(mapcar (lambda (x) (cons x "Ts"))
+                         evil-lisp-safe-structural-editing-modes)))
+      (spacemacs|diminish evil-cleverparens-mode " 🆂" " [s]"))))
 
 (defun spacemacs-evil/init-evil-ediff ()
   (use-package evil-ediff
