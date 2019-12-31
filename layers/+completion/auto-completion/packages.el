@@ -131,11 +131,11 @@
       (let* ((spacemacs--auto-completion-dir
               (configuration-layer/get-layer-local-dir 'auto-completion))
              (emacs-directory-snippets-dir (concat
-                                          spacemacs-start-directory
-                                          "snippets/"))
+                                            spacemacs-start-directory
+                                            "snippets/"))
              (spacemacs-layer-snippets-dir (expand-file-name
-                                      "snippets"
-                                      spacemacs--auto-completion-dir)))
+                                            "snippets"
+                                            spacemacs--auto-completion-dir)))
         (setq yas-snippet-dirs nil)
         ;; ~/.emacs.d/layers/auto-completion/snippets
         (add-to-list 'yas-snippet-dirs spacemacs-layer-snippets-dir)
@@ -157,7 +157,7 @@
       (spacemacs|require 'yasnippet)
       (spacemacs/add-to-hooks 'spacemacs/load-yasnippet '(prog-mode-hook
                                                           markdown-mode-hook
-                                                        org-mode-hook)))
+                                                          org-mode-hook)))
     :config
     (progn
       (spacemacs|diminish yas-minor-mode " ⓨ" " y")

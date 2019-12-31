@@ -87,7 +87,8 @@ This function should only modify configuration layer settings."
      ;; lua
      ;; READY : see readme in java layer
      (java :variables java-backend 'lsp)
-     clojure
+     ;; READY : brew install leiningen
+     (clojure :variables clojure-enable-fancify-symbols t)
      ;; (c-c++ :variables
      ;;        gtags-enable-by-default t
      ;;        c-c++-enable-auto-newline nil)

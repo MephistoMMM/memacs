@@ -19,8 +19,10 @@
         elisp-slime-nav
         (emacs-lisp :location built-in)
         evil
+        evil-cleverparens
         eval-sexp-fu
         flycheck
+        flycheck-elsa
         flycheck-package
         counsel-gtags
         (ielm :location built-in)
@@ -235,6 +237,11 @@
 (defun emacs-lisp/post-init-evil ()
   (add-hook 'emacs-lisp-mode-hook #'spacemacs//define-elisp-comment-text-object))
 
+(defun emacs-lisp/pre-init-evil-cleverparens ()
+  (spacemacs|use-package-add-hook evil-cleverparens
+    :pre-init
+    (add-to-list 'evil-lisp-safe-structural-editing-modes 'emacs-lisp-mode)))
+
 (defun emacs-lisp/post-init-eval-sexp-fu ()
   (add-hook 'emacs-lisp-mode-hook 'eval-sexp-fu-flash-mode))
 
@@ -250,6 +257,10 @@
 (defun emacs-lisp/init-flycheck-package ()
   (use-package flycheck-package
     :hook (emacs-lisp-mode . flycheck-package-setup)))
+
+(defun emacs-lisp/init-flycheck-elsa ()
+  (use-package flycheck-elsa
+    :hook (emacs-lisp-mode . flycheck-elsa-setup)))
 
 (defun emacs-lisp/post-init-counsel-gtags ()
   (spacemacs/counsel-gtags-define-keys-for-mode 'emacs-lisp-mode))
