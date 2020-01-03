@@ -14,6 +14,7 @@
     exec-path-from-shell
     launchctl
     osx-trash
+    (spotlight :location local)
     ))
 
 (when (spacemacs/system-is-mac)
@@ -109,3 +110,9 @@
     :if (and (spacemacs/system-is-mac)
            (not (boundp 'mac-system-move-file-to-trash-use-finder)))
     :init (osx-trash-setup)))
+
+(defun osx/init-spotlight ()
+  (use-package spotlight
+    :if (spacemacs/system-is-mac)
+    :commands (spotlight-fast spotlight)
+    :defer t))

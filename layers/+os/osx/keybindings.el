@@ -76,5 +76,5 @@ default."
   ;; C-v in ivy minibuffer
   (with-eval-after-load 'ivy
     (define-key ivy-minibuffer-map (kbd "M-v") 'yank))
-  (memacs/define-search-keybinding "s" 'memacs/counsel-spotlight)
+  (memacs/define-search-keybinding "s" 'memacs/spotlight-fast-in-home)
   )
