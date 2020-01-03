@@ -38,22 +38,6 @@
 ;; Insert FF
 (memacs/define-insert-keybinding "f" 'mp-hacking/insert-form-feed)
 
-;; Buffer
-;; (memacs/define-evil-normal-keybinding
-;;  "C-n" 'next-buffer
-;;  "C-p" 'previous-buffer)
-;; keymap used in the popup menu
-(setq switch-keymap (make-sparse-keymap))
-(define-key switch-keymap (kbd "<tab>") 'popup-next)
-(define-key switch-keymap (kbd "C-n") 'popup-next)
-(define-key switch-keymap (kbd "j") 'popup-next)
-(define-key switch-keymap (kbd "C-p") 'popup-previous)
-(define-key switch-keymap (kbd "k") 'popup-previous)
-(define-key switch-keymap (kbd "C-j") 'popup-select)
-(define-key switch-keymap (kbd "<return>") 'popup-select)
-(define-key evil-normal-state-map (kbd "C-p") 'mp-hacking/buffer-switch)
-(define-key evil-normal-state-map (kbd "C-n") 'mp-hacking/buffer-switch)
-
 ;; terminal here
 (spacemacs/set-leader-keys
   "jt" 'mp-hacking/terminal-here)

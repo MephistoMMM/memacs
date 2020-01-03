@@ -15,12 +15,19 @@
                                     :fetcher github
                                     :repo "MephistoMMM/leave-delimited"))
         (beacon :location (recipe
-                                    :fetcher github
-                                    :repo "Malabarba/beacon"))
+                           :fetcher github
+                           :repo "Malabarba/beacon"))
+        ivy
         ;; haskell-mode
         outshine
         (outline-ivy :location local)
         ))
+
+(defun mp-hacking/post-init-ivy ()
+  ;; Buffer
+  (define-key evil-normal-state-map (kbd "C-p") 'mp-hacking/buffer-switch)
+  (define-key evil-normal-state-map (kbd "C-n") 'mp-hacking/buffer-switch)
+  )
 
 (defun mp-hacking/init-beacon ()
   "Init beacon."
@@ -45,6 +52,7 @@
 
 (defun mp-hacking/init-outline-ivy ()
   (use-package outline-ivy
+    :defer t
     :after ivy outshine))
 
 ;; (defun mp-hacking/post-init-haskell-mode ()

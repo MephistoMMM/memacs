@@ -19,33 +19,25 @@
   (insert "\n")
   )
 
-(defun mp-hacking//user-bufferp (bufname)
+(defun mp-hacking//user-bufferp (buftuple)
   "Test for hidden buffer."
-  (not (string-match "\\`[[:space:]]*\\*" bufname)))
+  (not (string-match "\\`[[:space:]]*\\*" (car buftuple))))
 
 (defun mp-hacking/buffer-switch ()
   (interactive)
-  ;; all the buffers
-  (setq full-buffer-list (seq-filter 'mp-hacking//user-bufferp
-                                     (mapcar (function buffer-name) (buffer-list))))
-  (if mp-hacking-buffer-switch-max
-      (progn
-        ;; if max specified, only take n buffers
-        (setq buffer-select-list (subseq full-buffer-list
-                                         1
-                                         (min
-                                          (length full-buffer-list)
-                                          (+ mp-hacking-buffer-switch-max 1))))
-        )
-    ;; if not specified, take all
-    (setq buffer-select-list full-buffer-list)
-    )
-  (if (> (length buffer-select-list) 0)
-    (progn
-      (setq dest-buffer (popup-menu* buffer-select-list :keymap switch-keymap))
-      (switch-to-buffer dest-buffer))
-    (message "Non Other User's Buffer.")
-    )
+  (ivy-read "Switch to buffer: " #'internal-complete-buffer
+            :predicate #'mp-hacking//user-bufferp
+            :keymap ivy-switch-buffer-map
+            :preselect (buffer-name (other-buffer (current-buffer)))
+            :action #'ivy--switch-buffer-action
+            :matcher #'ivy--switch-buffer-matcher
+            :caller 'ivy-switch-buffer)
+  )
+
+(with-eval-after-load 'ivy
+  (ivy-configure 'mp-hacking/buffer-switch
+    :display-transformer-fn #'ivy-switch-buffer-transformer)
+  ;; TODO add current buffer to tmp var before window changing and transform it after window changing
   )
 
 
