@@ -25,8 +25,8 @@
 
 (defun mp-hacking/post-init-ivy ()
   ;; Buffer
-  (define-key evil-normal-state-map (kbd "C-p") 'mp-hacking/buffer-switch)
   (define-key evil-normal-state-map (kbd "C-n") 'mp-hacking/buffer-switch)
+  (define-key messages-buffer-mode-map (kbd "C-n") 'mp-hacking/buffer-switch)
   )
 
 (defun mp-hacking/init-beacon ()
