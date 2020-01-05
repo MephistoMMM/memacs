@@ -42,6 +42,10 @@
 (spacemacs/set-leader-keys
   "jt" 'mp-hacking/terminal-here)
 
+;; buffer
+(define-key evil-normal-state-map (kbd "C-n") 'mp-hacking/buffer-switch)
+(define-key messages-buffer-mode-map (kbd "C-n") 'mp-hacking/buffer-switch)
+
 
 ;;;; Outshine
 (spacemacs/set-leader-keys-for-minor-mode outline-minor-mode

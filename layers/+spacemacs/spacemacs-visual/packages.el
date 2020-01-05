@@ -26,6 +26,9 @@
         (company-posframe :location (recipe
                                      :fetcher github
                                      :repo "tumashu/company-posframe"))
+        ;; (ivy-posframe :location (recipe
+        ;;                          :fetcher github
+        ;;                          :repo "tumashu/ivy-posframe"))
         ))
 
 ;; (defun spacemacs-visual/init-ansi-colors ()
@@ -38,6 +41,23 @@
   (use-package company-posframe
     :defer t
     :config (spacemacs|diminish company-posframe-mode)))
+
+;; FIXME:
+;;     1. focus to selected buffer
+;;     2. hidden while focus out
+;;     3. center the posframe
+;; (defun spacemacs-visual/init-ivy-posframe ()
+;;   (use-package ivy-posframe
+;;     :after ivy
+;;     :init
+;;     (progn
+;;       (setq ivy-posframe-display-functions-alist
+;;             '((ivy-switch-buffer . ivy-posframe-display-at-window-center)
+;;               (t               . nil)))
+;;       )
+;;     :config
+;;     (ivy-posframe-mode 1))
+;;   )
 
 (defun spacemacs-visual/init-desktop ()
   (use-package desktop

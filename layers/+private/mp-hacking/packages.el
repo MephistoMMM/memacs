@@ -17,17 +17,10 @@
         (beacon :location (recipe
                            :fetcher github
                            :repo "Malabarba/beacon"))
-        ivy
         ;; haskell-mode
         outshine
         (outline-ivy :location local)
         ))
-
-(defun mp-hacking/post-init-ivy ()
-  ;; Buffer
-  (define-key evil-normal-state-map (kbd "C-n") 'mp-hacking/buffer-switch)
-  (define-key messages-buffer-mode-map (kbd "C-n") 'mp-hacking/buffer-switch)
-  )
 
 (defun mp-hacking/init-beacon ()
   "Init beacon."
