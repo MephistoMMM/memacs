@@ -228,9 +228,11 @@ The point of this is to avoid Emacs locking up indexing massive file trees."
   ;; commands aren't as well configured or are empty.
   (let ((this-command 'counsel-find-file))
     (call-interactively
-     (cond ((or (file-equal-p default-directory "~")
-                (when-let (proot (doom-project-root))
-                  (file-equal-p proot "~")))
+     (cond ((or
+             (string= +doom-dashboard-name (buffer-name (current-buffer)))
+             (file-equal-p default-directory "~")
+             (when-let (proot (doom-project-root))
+               (file-equal-p proot "~")))
             #'counsel-find-file)
 
            ((doom-project-p)

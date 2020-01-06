@@ -124,6 +124,9 @@ which is loaded at startup (if it exists). This is helpful if Emacs can't
 \(easily) be launched from the correct shell session (particularly for MacOS
 users).")
 
+;; HACK add user home dir
+(defconst memacs-user-home-dir (expand-file-name "~"))
+
 ;;; Custom error types
 (define-error 'doom-error "Error in Doom Emacs core")
 (define-error 'doom-hook-error "Error in a Doom startup hook" 'doom-error)
