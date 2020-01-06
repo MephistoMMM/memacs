@@ -55,3 +55,14 @@ If ARG (universal argument), runs `compile' from the current directory."
   (while (server-running-p)
     (sit-for 1))
   (server-start))
+
+;;;###autoload
+(defun +evil/avy ()
+  "Invoke and lazy-load `avy' without compromising which-key
+integration."
+  (interactive)
+  (require 'avy)
+  (require 'evil-integration)
+  (setq prefix-arg current-prefix-arg)
+  ;; TODO to use myself event, not easymotion's
+  (push '(t . easymotion) unread-command-events))

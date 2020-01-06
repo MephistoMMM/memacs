@@ -3,7 +3,6 @@
 
 (package! evil)
 (package! evil-args)
-(package! evil-easymotion)
 (package! evil-embrace)
 (package! evil-escape)
 (package! evil-exchange)

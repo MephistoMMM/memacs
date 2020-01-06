@@ -207,20 +207,7 @@ directives. By default, this only recognizes C directives.")
 ;;
 ;;; Packages
 
-(use-package! evil-easymotion
-  :commands evilem-create evilem-default-keybindings
-  :config
-  (evilem-default-keybindings "<easymotion>")
-  ;; Use evil-search backend, instead of isearch
-  (evilem-make-motion evilem-motion-search-next #'evil-ex-search-next
-                      :bind ((evil-ex-search-highlight-all nil)))
-  (evilem-make-motion evilem-motion-search-previous #'evil-ex-search-previous
-                      :bind ((evil-ex-search-highlight-all nil)))
 
-  (evilem-make-motion evilem-motion-search-word-forward #'evil-ex-search-word-forward
-                      :bind ((evil-ex-search-highlight-all nil)))
-  (evilem-make-motion evilem-motion-search-word-backward #'evil-ex-search-word-backward
-                      :bind ((evil-ex-search-highlight-all nil))))
 
 
 (use-package! evil-embrace
@@ -557,21 +544,7 @@ To change these keys see `+evil-repeat-keys'."
       :textobj "k" #'evil-indent-plus-i-indent-up      #'evil-indent-plus-a-indent-up
       :textobj "x" #'evil-inner-xml-attr               #'evil-outer-xml-attr
 
-      ;; evil-easymotion
-      (:after evil-easymotion
-        (:prefix "<easymotion>" ; see `+evil/easymotion'
-          "a" (evilem-create #'evil-forward-arg)
-          "A" (evilem-create #'evil-backward-arg)
-          "s" #'evil-avy-goto-char-2
-          "w" (evilem-create #'evil-snipe-repeat
-                             :pre-hook (save-excursion (call-interactively #'evil-snipe-f))
-                             :bind ((evil-snipe-scope 'visible)
-                                    (evil-snipe-enable-highlight)
-                                    (evil-snipe-enable-incremental-highlight)))
-          "SPC" (λ!! #'evil-avy-goto-char-timer t)
-          "/" #'evil-avy-goto-char-timer))
-
-        ;; evil-snipe
+      ;; evil-snipe
       (:after evil-snipe
         :map evil-snipe-parent-transient-map
         "C-;" (λ! (require 'evil-easymotion)

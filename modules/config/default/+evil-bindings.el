@@ -76,7 +76,7 @@
       (:after man :map Man-mode-map
         :n "q"    #'kill-current-buffer)
 
-      :m "gs"     #'+evil/easymotion  ; lazy-load `evil-easymotion'
+      :nevim "C-j"     #'+evil/avy  ; lazy-load `avy'
       (:after org
         :map org-mode-map
         :prefix "<easymotion>"

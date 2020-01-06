@@ -21,11 +21,25 @@
 ;;; Reasonable defaults
 
 ;;;###package avy
-(setq avy-all-windows nil
-      avy-all-windows-alt t
+(setq avy-all-windows t
+      avy-all-windows-alt nil
       avy-background t
       ;; the unpredictability of this (when enabled) makes it a poor default
       avy-single-candidate-jump nil)
+
+(map!
+ (:after avy
+   (:prefix "<easymotion>"
+     "b" #'avy-pop-mark
+     "c" #'evil-avy-goto-char
+     "C" #'evil-avy-goto-char-2
+     "l" #'evil-avy-goto-line
+     "w" #'evil-avy-goto-word-or-subword-1
+     "W" #'evil-avy-goto-word-0
+     "t" #'evil-avy-goto-char-timer
+     "T" (λ!! #'evil-avy-goto-char-timer t)
+     "r" #'avy-resume
+     )))
 
 
 (after! epa
