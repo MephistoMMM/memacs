@@ -12,11 +12,12 @@
   "An alternative leader prefix key, used for Insert and Emacs states, and for
 non-evil users.")
 
-(defvar doom-localleader-key "SPC m"
+;; HACK modify localleader-key to "," and "M ," from "SPC M" and "M-SPC M"
+(defvar doom-localleader-key ","
   "The localleader prefix key, for major-mode specific commands.")
 
-(defvar doom-localleader-alt-key "M-SPC m"
-  "The localleader prefix key, for major-mode specific commands. Used for Insert
+(defvar doom-localleader-alt-key "M ,"
+  "the localleader prefix key, for major-mode specific commands. used for insert
 and Emacs states, and for non-evil users.")
 
 (defvar doom-leader-map (make-sparse-keymap)
