@@ -301,9 +301,19 @@ directives. By default, this only recognizes C directives.")
   (setq evil-snipe-smart-case t
         evil-snipe-scope 'line
         evil-snipe-repeat-scope 'visible
-        evil-snipe-char-fold t)
+        evil-snipe-enable-highlight t
+        evil-snipe-enable-incremental-highlight t
+        evil-snipe-auto-disable-substitute t
+        evil-snipe-show-prompt nil
+        evil-snipe-char-fold t
+        evil-snipe-repeat-keys nil)
   :config
-  (pushnew! evil-snipe-disabled-modes 'Info-mode 'calc-mode)
+  (pushnew! evil-snipe-disabled-modes
+            'Info-mode
+            'calc-mode
+            'magit-mode
+            'ranger-mode
+            'git-rebase-mode)
   (evil-snipe-mode +1)
   (evil-snipe-override-mode +1))
 
@@ -541,16 +551,6 @@ To change these keys see `+evil-repeat-keys'."
       :textobj "j" #'evil-indent-plus-i-indent-up-down #'evil-indent-plus-a-indent-up-down
       :textobj "k" #'evil-indent-plus-i-indent-up      #'evil-indent-plus-a-indent-up
       :textobj "x" #'evil-inner-xml-attr               #'evil-outer-xml-attr
-
-      ;; evil-snipe
-      (:after evil-snipe
-        :map evil-snipe-parent-transient-map
-        "C-;" (λ! (require 'evil-easymotion)
-                  (call-interactively
-                   (evilem-create #'evil-snipe-repeat
-                                  :bind ((evil-snipe-scope 'whole-buffer)
-                                         (evil-snipe-enable-highlight)
-                                         (evil-snipe-enable-incremental-highlight))))))
 
       ;; evil-surround
       :v "S" #'evil-surround-region
