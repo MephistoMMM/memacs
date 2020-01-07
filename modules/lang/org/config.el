@@ -796,12 +796,15 @@ compelling reason, so..."
 
 
 (use-package! org-bullets ; "prettier" bullets
-  :hook (org-mode . org-bullets-mode))
+  :hook (org-mode . org-bullets-mode)
+  :config (setq org-bullets-bullet-list '("✾" "✿" "❀" "❖" "✧")))
+;; ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
 
 
 (use-package! org-fancy-priorities ; priority icons
   :hook (org-mode . org-fancy-priorities-mode)
-  :config (setq org-fancy-priorities-list '("■" "■" "■")))
+  :config (setq org-fancy-priorities-list '("☢" "☕" "■")))
+;; ("❗" "⬆" "⬇" "☕")
 
 
 (use-package! org-crypt ; built-in
