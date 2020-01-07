@@ -12,6 +12,7 @@
   :config
   (setq org-download-image-dir org-attach-id-dir
         org-download-method 'attach
+        org-download-image-html-width 600
         org-download-heading-lvl nil
         org-download-timestamp "_%Y%m%d_%H%M%S"
         org-download-screenshot-method

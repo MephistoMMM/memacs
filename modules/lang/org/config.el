@@ -30,7 +30,7 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 Is relative to `org-directory' unless it is absolute. Is used in Doom's default
 `org-capture-templates'.")
 
-(defvar +org-capture-notes-file "notes.org"
+(defvar +org-capture-notes-file "TODOs.org"
   "Default target for storing notes.
 
 Used as a fall back file for org-capture.el, for templates that do not specify a
@@ -938,7 +938,7 @@ compelling reason, so..."
   :preface
   ;; Change org defaults (should be set before org loads)
   (setq org-directory "~/org/"
-        org-attach-id-dir ".attach/"
+        org-attach-id-dir "statics/"
         org-publish-timestamp-directory (concat doom-cache-dir "org-timestamps/")
         org-preview-latex-image-directory (concat doom-cache-dir "org-latex/"))
 
