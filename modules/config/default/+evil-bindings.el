@@ -262,6 +262,8 @@
 ;;
 ;;; <leader>
 
+;; HACK delete keybindings to evil-window-map
+;;      replace "w" to bind workspace
 (map! :leader
       :desc "Eval expression"       ";"    #'pp-eval-expression
       :desc "M-x"                   ":"    #'execute-extended-command
@@ -270,7 +272,7 @@
 
       ;; C-u is used by evil
       :desc "Universal argument"    "u"    #'universal-argument
-      :desc "window"                "w"    evil-window-map
+      ;; :desc "window"                "w"    evil-window-map
       :desc "help"                  "h"    help-map
 
       (:when (featurep! :ui popup)
@@ -292,10 +294,10 @@
       :desc "Find file in project"  "SPC"  #'projectile-find-file
       :desc "Jump to bookmark"      "RET"  #'bookmark-jump
 
-      ;;; <leader> TAB --- workspace
+      ;;; <leader> w --- workspace
       (:when (featurep! :ui workspaces)
-        (:prefix-map ("TAB" . "workspace")
-          :desc "Display tab bar"           "TAB" #'+workspace/display
+        (:prefix-map ("w" . "workspace")
+          :desc "Display tab bar"           "w" #'+workspace/display
           :desc "Switch workspace"          "."   #'+workspace/switch-to
           :desc "Switch to last workspace"  "`"   #'+workspace/other
           :desc "New workspace"             "n"   #'+workspace/new

@@ -208,8 +208,6 @@ directives. By default, this only recognizes C directives.")
 ;;; Packages
 
 
-
-
 (use-package! evil-embrace
   :commands embrace-add-pair embrace-add-pair-regexp
   :hook (LaTeX-mode . embrace-LaTeX-mode-hook)
