@@ -518,6 +518,10 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 ;;
 ;;; Line numbers
 
+;; Display line numbers by default
+(defvar memacs-display-line-numbers-by-default nil
+  "By default, hide line numbers.")
+
 ;; Explicitly define a width to reduce computation
 (setq-default display-line-numbers-width 3)
 
@@ -528,8 +532,15 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 ;; Enable line numbers in most text-editing modes. We avoid
 ;; `global-display-line-numbers-mode' because there are many special and
 ;; temporary modes where we don't need/want them.
+
+(defun memacs-display-line-numbers ()
+  "If memacs-display-line-numbers-by-default is non-nil, start
+display-line-numbers-mode."
+  (when memacs-display-line-numbers-by-default
+    (display-line-numbers-mode)))
+
 (add-hook! '(prog-mode-hook text-mode-hook conf-mode-hook)
-           #'display-line-numbers-mode)
+           #'memacs-display-line-numbers)
 
 
 ;;
