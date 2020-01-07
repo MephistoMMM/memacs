@@ -38,8 +38,9 @@
      "W" #'evil-avy-goto-word-0
      "t" #'evil-avy-goto-char-timer
      "T" (λ!! #'evil-avy-goto-char-timer t)
-     "r" #'avy-resume
-     )))
+     "r" #'avy-resume)
+   :nmeiv "M-l" #'avy-goto-line
+   ))
 
 
 (after! epa
