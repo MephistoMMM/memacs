@@ -263,7 +263,7 @@
 ;;; <leader>
 
 ;; HACK delete keybindings to evil-window-map
-;;      replace "w" to bind workspace
+;;      replace "l" to bind workspace(layout)
 (map! :leader
       :desc "Eval expression"       ";"    #'pp-eval-expression
       :desc "M-x"                   ":"    #'execute-extended-command
@@ -294,9 +294,9 @@
       :desc "Find file in project"  "SPC"  #'projectile-find-file
       :desc "Jump to bookmark"      "RET"  #'bookmark-jump
 
-      ;;; <leader> w --- workspace
+      ;;; <leader> l --- workspace (layout)
       (:when (featurep! :ui workspaces)
-        (:prefix-map ("w" . "workspace")
+        (:prefix-map ("l" . "workspace")
           :desc "Display tab bar"           "w" #'+workspace/display
           :desc "Switch workspace"          "."   #'+workspace/switch-to
           :desc "Switch to last workspace"  "`"   #'+workspace/other
@@ -581,29 +581,6 @@
           :desc "Browse remote files"        "." #'ssh-deploy-browse-remote-handler
           :desc "Detect remote changes"      ">" #'ssh-deploy-remote-changes-handler))
 
-      ;;; <leader> s --- search
-      (:prefix-map ("s" . "search")
-        :desc "Search buffer"                "b" #'swiper
-        :desc "Search current directory"     "d" #'+default/search-cwd
-        :desc "Search other directory"       "D" #'+default/search-other-cwd
-        :desc "Locate file"                  "f" #'locate
-        :desc "Jump to symbol"               "i" #'imenu
-        :desc "Jump to visible link"         "l" #'link-hint-open-link
-        :desc "Jump to link"                 "L" #'ffap-menu
-        :desc "Jump list"                    "j" #'evil-show-jumps
-        :desc "Jump to bookmark"             "m" #'bookmark-jump
-        :desc "Look up online"               "o" #'+lookup/online
-        :desc "Look up online (w/ prompt)"   "O" #'+lookup/online-select
-        :desc "Look up in local docsets"     "k" #'+lookup/in-docsets
-        :desc "Look up in all docsets"       "K" #'+lookup/in-all-docsets
-        :desc "Search project"               "p" #'+default/search-project
-        :desc "Search other project"         "P" #'+default/search-other-project
-        :desc "Jump to mark"                 "r" #'evil-show-marks
-        :desc "Search buffer"                "s" #'swiper-isearch
-        :desc "Search buffer for thing at point" "S" #'swiper-isearch-thing-at-point
-        :desc "Dictionary"                   "t" #'+lookup/dictionary-definition
-        :desc "Thesaurus"                    "T" #'+lookup/synonyms)
-
       ;;; <leader> t --- toggle
       (:prefix-map ("t" . "toggle")
         :desc "Big mode"                     "b" #'doom-big-font-mode
@@ -625,6 +602,28 @@
           :desc "Pomodoro timer"             "t" #'org-pomodoro)
         :desc "Word-wrap mode"               "w" #'+word-wrap-mode
         :desc "Zen mode"                     "z" #'writeroom-mode))
+
+;;
+;;; Global & plugin keybinds
+
+;; HACK modify search map from "s" to "C-s"
+(map!
+  ;;; C-s --- search
+ (:prefix-map ("C-s" . "search")
+   :desc "Search buffer"                "b" #'swiper
+   :desc "Search current directory"     "d" #'+default/search-cwd
+   :desc "Search other directory"       "D" #'+default/search-other-cwd
+   :desc "Locate file"                  "f" #'locate
+   :desc "Jump to symbol"               "i" #'imenu
+   :desc "Jump to visible link"         "l" #'link-hint-open-link
+   :desc "Jump to link"                 "L" #'ffap-menu
+   :desc "Jump list"                    "j" #'evil-show-jumps
+   :desc "Jump to mark"                 "m" #'evil-show-marks
+   :desc "Search project"               "/" #'+default/search-project
+   :desc "Search project for thing at point" "?" #'+default/search-project-for-symbol-at-point
+   :desc "Search other project"         "o" #'+default/search-other-project
+   :desc "Search buffer"                "s" #'swiper-isearch
+   :desc "Search buffer for thing at point" "S" #'swiper-isearch-thing-at-point))
 
 (after! which-key
   (let ((prefix-re (regexp-opt (list doom-leader-key doom-leader-alt-key))))
