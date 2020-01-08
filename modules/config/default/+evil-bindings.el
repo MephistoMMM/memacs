@@ -254,11 +254,6 @@
         :i  [C-tab] #'aya-expand
         :nv [C-tab] #'aya-create))
 
-;;; :tools
-(when (featurep! :tools eval)
-  (map! "M-r" #'+eval/buffer))
-
-
 ;;
 ;;; <leader>
 
@@ -623,7 +618,13 @@
    :desc "Search project for thing at point" "?" #'+default/search-project-for-symbol-at-point
    :desc "Search other project"         "o" #'+default/search-other-project
    :desc "Search buffer"                "s" #'swiper-isearch
-   :desc "Search buffer for thing at point" "S" #'swiper-isearch-thing-at-point))
+   :desc "Search buffer for thing at point" "S" #'swiper-isearch-thing-at-point)
+
+ ;;; M-y --- yank
+ :nmei "M-y" #'counsel-yank-pop
+ ;;; M-e --- register
+ :nmei "M-e" #'counsel-evil-registers
+ )
 
 (after! which-key
   (let ((prefix-re (regexp-opt (list doom-leader-key doom-leader-alt-key))))

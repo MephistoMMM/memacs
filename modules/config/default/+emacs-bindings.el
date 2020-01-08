@@ -376,8 +376,7 @@
         (:after counsel
           :map counsel-ag-map
           "C-SPC" #'ivy-call-and-recenter ; preview
-          "M-RET" #'+ivy/git-grep-other-window-action)
-        "C-M-y"   #'counsel-yank-pop)
+          "M-RET" #'+ivy/git-grep-other-window-action))
 
       ;;; neotree
       (:when (featurep! :ui neotree)

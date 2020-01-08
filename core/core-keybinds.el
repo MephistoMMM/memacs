@@ -8,7 +8,7 @@
 (defvar doom-leader-key "SPC"
   "The leader prefix key for Evil users.")
 
-(defvar doom-leader-alt-key "M-SPC"
+(defvar doom-leader-alt-key "M-m"
   "An alternative leader prefix key, used for Insert and Emacs states, and for
 non-evil users.")
 
@@ -16,7 +16,7 @@ non-evil users.")
 (defvar doom-localleader-key ","
   "The localleader prefix key, for major-mode specific commands.")
 
-(defvar doom-localleader-alt-key "M ,"
+(defvar doom-localleader-alt-key "M-,"
   "the localleader prefix key, for major-mode specific commands. used for insert
 and Emacs states, and for non-evil users.")
 
