@@ -484,12 +484,13 @@ To change these keys see `+evil-repeat-keys'."
       (:when (featurep! :tools lookup)
         :nv "K"   #'+lookup/documentation
         :nv "gd"  #'+lookup/definition
-        :nv "gD"  #'+lookup/references
+        :nv "gD"  #'+lookup/definition-other-window
+        :nv "gr"  #'+lookup/references
         :nv "gf"  #'+lookup/file)
       (:when (featurep! :tools eval)
-        :nv "gr"  #'+eval:region
-        :n  "gR"  #'+eval/buffer
-        :v  "gR"  #'+eval:replace-region
+        :nv "ge"  #'+eval:region
+        :n  "gE"  #'+eval/buffer
+        :v  "gE"  #'+eval:replace-region
         ;; Restore these keybinds, since the blacklisted/overwritten gr/gR will
         ;; undo them:
         (:after dired
