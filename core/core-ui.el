@@ -41,6 +41,15 @@ Expects either a `font-spec', font object, a XFT font string or XLFD string. See
 It is recommended you don't set specify a font-size, as to inherit `doom-font's
 size.")
 
+(defvar doom-chinese-font nil
+  "The font to use for chinese text.
+
+Expects either a `font-spec', font object, a XFT font string or XLFD string. See
+`doom-font' for examples.
+
+It is recommended you don't set specify a font-size, as to inherit `doom-font's
+size.")
+
 (defvar doom-unicode-font
   (if IS-MAC
       (font-spec :family "Apple Color Emoji")
@@ -580,6 +589,11 @@ behavior). Do not set this directly, this is let-bound in `doom-init-theme-h'.")
           (set-face-attribute 'fixed-pitch-serif nil :font doom-serif-font))
         (when doom-variable-pitch-font
           (set-face-attribute 'variable-pitch nil :font doom-variable-pitch-font))
+        (when doom-chinese-font
+          (dolist (charset '(kana han symbol cjk-misc bopomofo))
+            (set-fontset-font (frame-parameter nil 'font)
+                              charset
+                              doom-chinese-font)))
         (when (and doom-unicode-font (fboundp 'set-fontset-font))
           (set-fontset-font t 'unicode doom-unicode-font nil 'prepend)))
     ((debug error)
