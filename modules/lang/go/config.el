@@ -19,6 +19,16 @@
                 "gofmt"
               "goimports"))))
 
+  (set-pretty-symbols! 'go-mode
+    :null "nil"
+    :def  "func"
+    :true "true"
+    :false "false"
+    :bool  "bool"
+    :and "&&"
+    :or "||"
+    :not "!")
+
   (if (featurep! +lsp)
       (add-hook 'go-mode-local-vars-hook #'lsp!)
     (add-hook 'go-mode-hook #'go-eldoc-setup))

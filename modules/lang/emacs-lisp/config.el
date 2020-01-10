@@ -25,7 +25,14 @@ This marks a foldable marker for `outline-minor-mode' in elisp buffers.")
     :definition    #'+emacs-lisp-lookup-definition
     :documentation #'+emacs-lisp-lookup-documentation)
   (set-docsets! '(emacs-lisp-mode lisp-interaction-mode) "Emacs Lisp")
-  (set-pretty-symbols! 'emacs-lisp-mode :lambda "lambda")
+  (set-pretty-symbols! 'emacs-lisp-mode
+    :lambda "lambda"
+    :true "t"
+    :false "nil"
+    :def "defun"
+    :and "and"
+    :or "or"
+    :not "not")
   (set-rotate-patterns! 'emacs-lisp-mode
     :symbols '(("t" "nil")
                ("let" "let*")
