@@ -39,7 +39,7 @@
      "t" #'evil-avy-goto-char-timer
      "T" (λ!! #'evil-avy-goto-char-timer t)
      "r" #'avy-resume)
-   :nmeiv "M-l" #'avy-goto-line
+   :nmeiv "M-l" #'evil-avy-goto-line
    ))
 
 

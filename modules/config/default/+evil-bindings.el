@@ -58,7 +58,6 @@
 
       ;; Smarter newlines
       :i [remap newline] #'newline-and-indent  ; auto-indent on newline
-      :i "C-j"           #'+default/newline    ; default behavior
 
       (:after help :map help-mode-map
         :n "o"       #'link-hint-open-link)
@@ -76,9 +75,12 @@
       (:after man :map Man-mode-map
         :n "q"    #'kill-current-buffer)
 
+      ;; HACK don't add :i to org-mode-map for "C-j", it is configed in
+      ;; org modules;
       :nevim "C-j"     #'+evil/avy  ; lazy-load `avy'
       (:after org
         :map org-mode-map
+        :nevm "C-j"    #'+evil/avy
         :prefix "<easymotion>"
         "h" #'+org/goto-visible)
 

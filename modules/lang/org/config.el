@@ -870,15 +870,21 @@ compelling reason, so..."
                    (org-at-table-p) 'org-table-next-field)
         :i "C-h" (general-predicate-dispatch 'org-beginning-of-line
                    (org-at-table-p) 'org-table-previous-field)
-        :i "C-k" (general-predicate-dispatch 'org-up-element
+        :i "C-k" (general-predicate-dispatch 'evil-insert-digraph
                    (org-at-table-p) '+org/table-previous-row)
-        :i "C-j" (general-predicate-dispatch 'org-down-element
+        :i "C-j" (general-predicate-dispatch '+evil/avy
                    (org-at-table-p) 'org-table-next-row)
+        :nevmi "M-l"   #'evil-avy-goto-line
         ;; moving/(de|pro)moting subtress & expanding tables (prepend/append columns/rows)
         :ni "C-S-l" #'org-shiftright
         :ni "C-S-h" #'org-shiftleft
         :ni "C-S-k" #'org-shiftup
         :ni "C-S-j" #'org-shiftdown
+        ;; level change & line change
+        :nei "M-p" #'org-metaup
+        :nei "M-n" #'org-metadown
+        :nei "M-]" #'org-metaright
+        :nei "M-[" #'org-metaleft
         ;; more intuitive RET keybinds
         :i [return] #'org-return-indent
         :i "RET"    #'org-return-indent
