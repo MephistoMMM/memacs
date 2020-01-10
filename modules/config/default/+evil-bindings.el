@@ -26,8 +26,8 @@
     "C-S-k"  #'scroll-down-command)
 
   (define-key! read-expression-map
-    "C-j" #'next-line-or-history-element
-    "C-k" #'previous-line-or-history-element))
+    "C-n" #'next-line-or-history-element
+    "C-p" #'previous-line-or-history-element))
 
 
 ;;
