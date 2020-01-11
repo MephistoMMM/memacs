@@ -24,12 +24,10 @@
   (setq projectile-dynamic-mode-line nil)
   ;; Set these early so they don't trigger variable watchers
   (setq doom-modeline-bar-width 3
-        doom-modeline-github nil
         doom-modeline-mu4e nil
-        doom-modeline-persp-name nil
         doom-modeline-minor-modes nil
-        doom-modeline-major-mode-icon nil
-        doom-modeline-buffer-file-name-style 'relative-from-project)
+        doom-modeline-major-mode-icon t
+        doom-modeline-buffer-file-name-style 'buffer-name)
 
   ;; Fix modeline icons in daemon-spawned graphical frames. We have our own
   ;; mechanism for disabling all-the-icons, so we don't need doom-modeline to do
@@ -60,15 +58,15 @@
 
   ;; Remove unused segments & extra padding
   (doom-modeline-def-modeline 'main
-    '(bar window-number matches buffer-info remote-host buffer-position selection-info)
+    '(bar workspace-name window-number modals matches buffer-info remote-host buffer-position selection-info)
     '(objed-state misc-info persp-name irc mu4e github debug input-method buffer-encoding lsp major-mode process vcs checker))
 
   (doom-modeline-def-modeline 'special
-    '(bar window-number matches buffer-info-simple buffer-position selection-info)
+    '(bar window-number modals matches buffer-info-simple buffer-position selection-info)
     '(objed-state misc-info persp-name debug input-method irc-buffers buffer-encoding lsp major-mode process checker))
 
   (doom-modeline-def-modeline 'project
-    '(bar window-number buffer-default-directory)
+    '(bar window-number modals buffer-default-directory)
     '(misc-info mu4e github debug battery " " major-mode process))
 
   ;; Some functions modify the buffer, causing the modeline to show a false
