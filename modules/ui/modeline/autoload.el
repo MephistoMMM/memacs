@@ -46,3 +46,15 @@ Meant for `doom-change-font-size-hook'."
       (setq doom-modeline-env--version
             (bound-and-true-p doom-modeline-load-string))))
   (force-mode-line-update t))
+
+;;;###autoload
+(defun +modeline-cancel-redisplay ()
+  "Prevent doom modeline to redisplay."
+  (setq +modeline--redisplayed-p t
+        doom-modeline--size-hacked-p t))
+
+;;;###autoload
+(defun +modeline-recover-redisplay ()
+  "Allow doom modeline to redisplay."
+  (setq +modeline--redisplayed-p nil
+        doom-modeline--size-hacked-p nil))

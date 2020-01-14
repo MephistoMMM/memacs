@@ -10,7 +10,10 @@
   ("0" doom/reset-font-size "reset"))
 
 ;;;###autoload (autoload '+hydra/window-nav/body "ui/hydra/autoload/windows" nil t)
-(defhydra +hydra/window-nav (:hint nil)
+(defhydra +hydra/window-nav
+  (:hint nil
+   :body-pre (+modeline-cancel-redisplay)
+   :before-exit (+modeline-recover-redisplay))
   "
           Split: _v_ert  _s_:horz
          Delete: _c_lose  _o_nly
