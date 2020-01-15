@@ -1,19 +1,21 @@
 ;;; ui/hydra/autoload/windows.el -*- lexical-binding: t; -*-
 
-;;;###autoload (autoload '+hydra/text-zoom/body "ui/hydra/autoload/windows" nil t)
-(defhydra +hydra/text-zoom (:hint nil :color red)
+;;;###autoload (autoload 'doom/zoom-ts/body "ui/hydra/autoload/windows" nil t)
+(define-transient-state! zoom
+  :hint nil
+  :doc
   "
       Text zoom: _j_:zoom in, _k_:zoom out, _0_:reset
 "
+  :bindings
   ("j" doom/increase-font-size "in")
   ("k" doom/decrease-font-size "out")
   ("0" doom/reset-font-size "reset"))
 
-;;;###autoload (autoload '+hydra/window-nav/body "ui/hydra/autoload/windows" nil t)
-(defhydra +hydra/window-nav
-  (:hint nil
-   :body-pre (+modeline-cancel-redisplay)
-   :before-exit (+modeline-recover-redisplay))
+;;;###autoload (autoload 'doom/window-nav-ts/body "ui/hydra/autoload/windows" nil t)
+(define-transient-state! window-nav
+  :hint nil
+  :doc
   "
           Split: _v_ert  _s_:horz
          Delete: _c_lose  _o_nly
@@ -22,6 +24,7 @@
          Resize: _H_:splitter left  _J_:splitter down  _K_:splitter up  _L_:splitter right
            Move: _a_:up  _z_:down  _i_menu
 "
+  :bindings
   ("z" scroll-up-line)
   ("a" scroll-down-line)
   ("i" idomenu)

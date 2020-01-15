@@ -13,3 +13,8 @@
   :around #'lv-window
   (let ((doom-inhibit-switch-window-hooks t))
     (funcall orig-fn)))
+
+;; Prevent doom modeline to flash while open
+(unless (featurep! modeline +light)
+  (add-hook! doom-transient-state-enter #'+modeline-cancel-redisplay)
+  (add-hook! doom-transient-state-exit #'+modeline-recover-redisplay))
