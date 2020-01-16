@@ -95,7 +95,7 @@
 (evil-ex-define-cmd "tabn[ext]"   #'+workspace:switch-next)
 (evil-ex-define-cmd "tabp[rev]"   #'+workspace:switch-previous)
 (evil-ex-define-cmd "tabr[ename]" #'+workspace:rename)
-(evil-ex-define-cmd "tabs"        #'+workspace/display)
+;; (evil-ex-define-cmd "tabs"        #'+workspace/display)
 (evil-ex-define-cmd "tabsave"     #'+workspace:save)
 
 ;;; Org-mode

@@ -374,3 +374,32 @@ current project."
        interactive "Killed %d project buffers"
        (- (length buffer-list)
           (length (cl-remove-if-not #'buffer-live-p buffer-list)))))))
+
+;;;###autoload
+(defun doom/switch-to-base-scratch-buffer (&optional arg)
+  "Switch to the `*scratch*' buffer, creating it first if needed.
+if prefix argument ARG is given, switch to it in an other, possibly new window."
+  (interactive "P")
+  (let ((exists (get-buffer "*scratch*")))
+    (if arg
+        (switch-to-buffer-other-window (get-buffer-create "*scratch*"))
+      (switch-to-buffer (get-buffer-create "*scratch*")))
+    (when (not exists) (prog-mode))))
+
+;;;###autoload
+(defun doom/switch-to-dashboard-or-scratch (&optional arg)
+  "Switch to dashboard buffer. If dashboard doesn't exist, switch
+to scratch."
+  (interactive "P")
+  (if (and (boundp '+doom-dashboard-name)
+         (get-buffer +doom-dashboard-name))
+      (switch-to-buffer +doom-dashboard-name)
+    (doom/switch-to-base-scratch-buffer arg))
+  )
+
+;;;###autoload
+(defun doom/dashboard-delete-other-windows (&optional arg)
+  "Switch to dashboard buffer and delete other windows."
+  (interactive "P")
+  (doom/switch-to-dashboard-or-scratch arg)
+  (delete-other-windows))

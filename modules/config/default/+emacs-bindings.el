@@ -202,7 +202,7 @@
       ;;; <leader> w --- workspaces/windows
       (:prefix-map ("w" . "workspaces/windows")
         :desc "Autosave session"             "a" #'doom/quicksave-session
-        :desc "Display workspaces"           "d" #'+workspace/display
+        ;; :desc "Display workspaces"           "d" #'+workspace/display
         :desc "Rename workspace"             "r" #'+workspace/rename
         :desc "Create workspace"             "c" #'+workspace/new
         :desc "Delete workspace"             "k" #'+workspace/delete
