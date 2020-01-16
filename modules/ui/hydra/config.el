@@ -16,5 +16,5 @@
 
 ;; Prevent doom modeline to flash while open
 (unless (featurep! modeline +light)
-  (add-hook! doom-transient-state-enter #'+modeline-cancel-redisplay)
-  (add-hook! doom-transient-state-exit #'+modeline-recover-redisplay))
+  (add-hook! doom-ts-enter #'+modeline-cancel-redisplay)
+  (add-hook! doom-ts-exit #'+modeline-recover-redisplay))

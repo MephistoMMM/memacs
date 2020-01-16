@@ -1,73 +1,73 @@
 ;;; ui/hydra/autoload/transient.el -*- lexical-binding: t; -*-
 
-(defvar doom-transient-state-color-guide nil)
-(defvar doom-transient-state-title nil)
+(defvar doom-ts-color-guide nil)
+(defvar doom-ts-title nil)
 
-(defvar doom-transient-state-enter-hook nil
+(defvar doom-ts-enter-hook nil
   "A list of hooks to run when enter hydra.")
 
-(defvar doom-transient-state-exit-hook nil
+(defvar doom-ts-exit-hook nil
   "A list of hooks to run when exit hydra.")
 
-(defun doom/ts-run-enter-hooks ()
+(defun doom--ts-run-enter-hooks ()
   "Run functions in `doom-ts-enter-hook'"
-  (run-hooks 'doom-transient-state-enter-hook))
+  (run-hooks 'doom-ts-enter-hook))
 
-(defun doom/ts-run-exit-hooks ()
+(defun doom--ts-run-exit-hooks ()
   "Run functions in `doom-ts-exit-hook'"
-  (run-hooks 'doom-transient-state-exit-hook))
+  (run-hooks 'doom-ts-exit-hook))
 
-(defun doom/ts-func-name (name)
+(defun doom--ts-func-name (name)
   "Return the name of the transient state function."
-  (intern (format "doom/%S-ts" name)))
+  (intern (format "doom-ts/%S" name)))
 
-(defun doom/ts-props-var-name (name)
+(defun doom--ts-props-var-name (name)
   "Return the name of the variable use to store the transient state properties."
-  (intern (format "doom--%S-ts-props" name)))
+  (intern (format "doom-ts--%S-props" name)))
 
-(defun doom/ts-body-func-name (name)
+(defun doom--ts-body-func-name (name)
   "Return the name of the transient state function."
-  (intern (format "doom/%S-ts/body" name)))
+  (intern (format "doom-ts/%S/body" name)))
 
-(defun doom/ts-heads-name (name)
+(defun doom--ts-heads-name (name)
   "Return the name of the transient state heads variable which
 holds the key bindings."
-  (intern (format "doom/%S-ts/heads" name)))
+  (intern (format "doom-ts/%S/heads" name)))
 
-(defun doom/ts-full-hint-toggle-name (name)
+(defun doom--ts-full-hint-toggle-name (name)
   "Return the name of the transient state full hint toggle variable which
 holds the key bindings."
-  (intern (format "doom--%S-ts-full-hint-toggle" name)))
+  (intern (format "doom-ts--%S-full-hint-toggle" name)))
 
-(defun doom/ts-toggle-hint-func-name (name)
+(defun doom--ts-toggle-hint-func-name (name)
   "Return the name of the transient state toggle hint func which
 holds the key bindings."
-  (intern (format "doom/%S-ts-toggle-hint" name)))
+  (intern (format "doom-ts/%S-toggle-hint" name)))
 
-(defun doom/ts-hint-func-name (name)
+(defun doom--ts-hint-func-name (name)
   "Return the name of the transient state hint func which
 holds the key bindings."
-  (intern (format "doom/%S-ts-hint" name)))
+  (intern (format "doom-ts/%S-hint" name)))
 
-(defun doom/ts-inner-full-hint-name (name)
+(defun doom--ts-inner-full-hint-name (name)
   "Return the name of the transient state inner full hint variable which
 holds the key bindings."
-  (intern (format "doom--%S-ts-full-hint" name)))
+  (intern (format "doom-ts--%S-full-hint" name)))
 
-(defun doom/ts-add-bindings-name (name)
+(defun doom--ts-add-bindings-name (name)
   "Return the name of the transient state add-bindings variable which
 may hold the additional key bindings. The variable may be unbound."
-  (intern (format "doom-%s-ts-add-bindings" name)))
+  (intern (format "doom-ts--%s-add-bindings" name)))
 
-(defun doom/ts-remove-bindings-name (name)
+(defun doom--ts-remove-bindings-name (name)
   "Return the name of the transient state remove-bindings variable which
 may hold the keys to be removed. The variable may be unbound."
-  (intern (format "doom-%s-ts-remove-bindings" name)))
+  (intern (format "doom-ts--%s-remove-bindings" name)))
 
-(defun doom/ts-action-func (name action)
-  (intern (format "doom/%S-ts/%S" name action)))
+(defun doom--ts-action-func (name action)
+  (intern (format "doom-ts/%S/%S" name action)))
 
-(defun doom/ts-adjust-bindings (bindings to-remove to-add)
+(defun doom--ts-adjust-bindings (bindings to-remove to-add)
   (append
    (cl-remove-if
     (lambda (bnd)
@@ -79,16 +79,16 @@ may hold the keys to be removed. The variable may be unbound."
             (listp (symbol-value to-add)))
      (symbol-value to-add))))
 
-(defun doom/ts-make-doc
+(defun doom--ts-make-doc
     (ts docstring &optional body)
   "Use `hydra' internal function to format and apply DOCSTRING."
-  (let ((heads (doom/ts-heads-name ts)))
+  (let ((heads (doom--ts-heads-name ts)))
     (setq body (if body body '(nil nil :hint nil :foreign-keys nil)))
     (eval
      (hydra--format nil body docstring (symbol-value heads)))))
 
 ;;;###autoload
-(defun doom/ts-register-add-bindings (name bindings)
+(defun doom-ts-register-add-bindings (name bindings)
   "Register additional BINDINGS for the transient state NAME.
 
 BINDINGS should be a list of Hydra head definitions. See `defhydra'.
@@ -97,13 +97,13 @@ Since a transient state initializes its Hydra right after
 the `doom/user-config', this function will have no
 effect if called after that point."
   (declare (indent defun))
-  (let ((var-name (doom/ts-add-bindings-name name)))
+  (let ((var-name (doom--ts-add-bindings-name name)))
     (or (boundp var-name)
        (set var-name '()))
     (set var-name (append (symbol-value var-name) bindings))))
 
 ;;;###autoload
-(defun doom/ts-register-remove-bindings (name keys)
+(defun doom-ts-register-remove-bindings (name keys)
   "Register KEYS to be removed from the transient state NAME.
 
 KEYS should be a list of strings.
@@ -112,7 +112,7 @@ Since a transient state initializes its Hydra right after
 the `doom/user-config', this function will have no
 effect if called after that point."
   (declare (indent defun))
-  (let ((var-name (doom/ts-remove-bindings-name name)))
+  (let ((var-name (doom--ts-remove-bindings-name name)))
     (or (boundp var-name)
        (set var-name '()))
     (set var-name (append (symbol-value var-name) keys))))
@@ -120,14 +120,14 @@ effect if called after that point."
 (defmacro ts-format-hint! (name var hint)
   "Format HINT and store the result in VAR for transient state NAME."
   (declare (indent 1))
-  `(let* ((props-var ,(doom/ts-props-var-name
+  `(let* ((props-var ,(doom--ts-props-var-name
                       name))
          (prop-hint (cadr (assq 'hint props-var)))
          (prop-columns (cadr (assq 'columns props-var)))
          (prop-foreign-keys (cadr (assq 'foreign-keys props-var)))
          (prop-entry-sexp (cadr (assq 'entry-sexp props-var)))
          (prop-exit-sexp (cadr (assq 'exit-sexp props-var))))
-    (setq ,var (doom/ts-make-doc
+    (setq ,var (doom--ts-make-doc
                 ',name
                 ,hint
                 `(nil
@@ -139,7 +139,7 @@ effect if called after that point."
                   :before-exit ,prop-exit-sexp)))
     ))
 
-(defface doom-transient-state-title-face
+(defface doom-ts-title-face
   `((t :inherit mode-line))
   "Face for title of transient states.")
 
@@ -184,13 +184,13 @@ Available PROPS:
       Important note: due to inner working of transient-maps in Emacs
       the `:exit' keyword is evaluate *before* the actual execution
       of the bound command.
-All properties supported by `doom/create-key-binding-form' can be
+All properties supported by `spacemacs//create-key-binding-form' can be
 used.
 "
-  (let ((full-hint-toggle (doom/ts-full-hint-toggle-name name))
-        (inner-full-hint (doom/ts-inner-full-hint-name name))
-        (toggle-hint-func (doom/ts-toggle-hint-func-name name))
-        (hint-func (doom/ts-hint-func-name name))
+  (let ((full-hint-toggle (doom--ts-full-hint-toggle-name name))
+        (inner-full-hint (doom--ts-inner-full-hint-name name))
+        (toggle-hint-func (doom--ts-toggle-hint-func-name name))
+        (hint-func (doom--ts-hint-func-name name))
         (brief-format-func (plist-get props :brief-format)))
     `(progn
        (defvar ,full-hint-toggle nil
@@ -267,14 +267,14 @@ Available PROPS:
       Important note: due to inner working of transient-maps in Emacs
       the `:exit' keyword is evaluate *before* the actual execution
       of the bound command.
-All properties supported by `doom/create-key-binding-form' can be
+All properties supported by `spacemacs//create-key-binding-form' can be
 used."
   (declare (indent 1))
-  (let* ((func (doom/ts-func-name name))
-         (props-var (doom/ts-props-var-name name))
-         (body-func (doom/ts-body-func-name name))
-         (add-bindings (doom/ts-add-bindings-name name))
-         (remove-bindings (doom/ts-remove-bindings-name name))
+  (let* ((func (doom--ts-func-name name))
+         (props-var (doom--ts-props-var-name name))
+         (body-func (doom--ts-body-func-name name))
+         (add-bindings (doom--ts-add-bindings-name name))
+         (remove-bindings (doom--ts-remove-bindings-name name))
          (bindings (spacemacs/mplist-get-values props :bindings))
          (doc (or (plist-get props :doc) "\n"))
          (title (plist-get props :title))
@@ -307,10 +307,10 @@ used."
                :columns ,columns
                :foreign-keys ,foreign-keys
                ;; custom action at beginning/end of hydra body
-               :body-pre (progn (doom/ts-run-enter-hooks) ,entry-sexp)
-               :before-exit (progn (doom/ts-run-exit-hooks) ,exit-sexp))
+               :body-pre (progn (doom--ts-run-enter-hooks) ,entry-sexp)
+               :before-exit (progn (doom--ts-run-exit-hooks) ,exit-sexp))
             ,doc)
-         (doom/ts-adjust-bindings
+         (doom--ts-adjust-bindings
           ',bindings ',remove-bindings ',add-bindings)))
        (when ,title
          (let ((guide (concat "[" (propertize "KEY" 'face 'hydra-face-blue)
@@ -323,14 +323,14 @@ used."
            (add-face-text-property 0 (length guide) 'italic t guide)
            (setq ,hint-var
                  (list 'concat
-                       (when doom-transient-state-title
+                       (when doom-ts-title
                          (concat
                           (propertize
                            ,title
-                           'face 'doom-transient-state-title-face)
+                           'face 'doom-ts-title-face)
                           (if ,hint-doc-p " " "\n"))) ,hint-var
                        ',dyn-hint
-                       (when doom-transient-state-color-guide
+                       (when doom-ts-color-guide
                          (concat "\n" guide))))))
        ,@bindkeys)))
 
@@ -338,10 +338,10 @@ used."
 ;;;###autoload
 (defmacro open-ts-and-do! (name action &optional interactive-arg)
   "Create a function wapper the active"
-  `(defun ,(doom/ts-action-func name action) (&rest args)
+  `(defun ,(doom--ts-action-func name action) (&rest args)
      "Open transient then do action"
      ,(if interactive-arg
           `(interactive ,interactive-arg)
         `(interactive))
-     (,(doom/ts-body-func-name name))
+     (,(doom--ts-body-func-name name))
      (apply ',action args)))

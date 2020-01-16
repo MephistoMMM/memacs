@@ -1,6 +1,6 @@
 ;;; ui/hydra/autoload/windows.el -*- lexical-binding: t; -*-
 
-;;;###autoload (autoload 'doom/zoom-ts/body "ui/hydra/autoload/windows" nil t)
+;;;###autoload (autoload 'doom-ts/zoom/body "ui/hydra/autoload/windows" nil t)
 (define-transient-state! zoom
   :hint nil
   :doc
@@ -12,7 +12,7 @@
   ("k" doom/decrease-font-size "out")
   ("0" doom/reset-font-size "reset"))
 
-;;;###autoload (autoload 'doom/window-nav-ts/body "ui/hydra/autoload/windows" nil t)
+;;;###autoload (autoload 'doom-ts/window-nav/body "ui/hydra/autoload/windows" nil t)
 (define-transient-state! window-nav
   :hint nil
   :doc
