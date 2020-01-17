@@ -155,6 +155,7 @@
           :map ivy-minibuffer-map
           "C-SPC" #'ivy-call-and-recenter  ; preview file
           "C-l"   #'ivy-alt-done
+          "M-l"   #'ivy-avy
           "C-v"   #'yank)
         (:after counsel
           :map counsel-ag-map
@@ -351,6 +352,12 @@
         :desc "List errors"                           "x"   #'flymake-show-diagnostics-buffer
         (:when (featurep! :tools flycheck)
           :desc "List errors"                         "x"   #'flycheck-list-errors))
+
+
+      ;;; <leader> d --- diff
+      (:prefix-map ("d" . "diff")
+        :desc "Diff two files"         "d" #'ediff
+        :desc "Diff three files"       "D" #'ediff)
 
       ;;; <leader> f --- file
       (:prefix-map ("f" . "file")
