@@ -165,10 +165,14 @@ read-only or not file-visiting."
 ;; Simpler confirmation prompt when killing Emacs
 (setq confirm-kill-emacs #'doom-quit-p)
 
-(setq uniquify-buffer-name-style 'forward
-      ;; no beeping or blinking please
-      ring-bell-function #'ignore
-      visible-bell nil)
+(setq
+ uniquify-buffer-name-style 'post-forward-angle-brackets
+ ;; don't screw special buffers
+ uniquify-ignore-buffers-re "^\\*"
+
+ ;; no beeping or blinking please
+ ring-bell-function #'ignore
+ visible-bell nil)
 
 ;; middle-click paste at point, not at click
 (setq mouse-yank-at-point t)

@@ -10,6 +10,7 @@
           ("HACK"       font-lock-constant-face bold)
           ("REVIEW"     font-lock-keyword-face bold)
           ("NOTE"       success bold)
+          ("BASE"       font-lock-constant-face bold)
           ("DEPRECATED" font-lock-doc-face bold)))
 
   ;; Use a more primitive todo-keyword detection method in major modes that
