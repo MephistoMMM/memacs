@@ -13,8 +13,8 @@
 
 (defconst doom-obsolete-modules
   '((:feature (version-control (:emacs vc) (:ui vc-gutter))
-              (spellcheck (:tools flyspell))
-              (syntax-checker (:tools flycheck))
+              (spellcheck (:checkers spell))
+              (syntax-checker (:checkers syntax))
               (evil (:editor evil))
               (snippets (:editor snippets))
               (file-templates (:editor file-templates))
@@ -24,7 +24,9 @@
               (debugger (:tools debugger)))
     (:tools (rotate-text (:editor rotate-text))
             (vterm (:term vterm))
-            (password-store (:tools pass)))
+            (password-store (:tools pass))
+            (flycheck (:checkers syntax))
+            (flyspell (:checkers spell)))
     (:emacs (electric-indent (:emacs electric))
             (hideshow (:editor fold))
             (eshell (:term eshell))
@@ -40,7 +42,7 @@
 Each entry is a three-level tree. For example:
 
   (:feature (version-control (:emacs vc) (:ui vc-gutter))
-            (spellcheck (:tools flyspell))
+            (spellcheck (:checkers spell))
             (syntax-checker (:tools flycheck)))
 
 This marks :feature version-control, :feature spellcheck and :feature
@@ -102,11 +104,10 @@ non-nil."
 (defun doom-module-p (category module &optional flag)
   "Returns t if CATEGORY MODULE is enabled (ie. present in `doom-modules')."
   (declare (pure t) (side-effect-free t))
-  (let ((plist (gethash (cons category module) doom-modules)))
-    (and plist
-         (or (null flag)
-             (memq flag (plist-get plist :flags)))
-         t)))
+  (when-let (plist (gethash (cons category module) doom-modules))
+    (or (null flag)
+        (and (memq flag (plist-get plist :flags))
+             t))))
 
 (defun doom-module-get (category module &optional property)
   "Returns the plist for CATEGORY MODULE. Gets PROPERTY, specifically, if set."

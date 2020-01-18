@@ -124,76 +124,6 @@ missing) and shouldn't be deleted.")
       ;; We handle it ourselves
       straight-fix-org nil)
 
-;;; Getting straight to behave in batch mode
-(when noninteractive
-  ;; HACK Remove dired & magit options from prompt, since they're inaccessible
-  ;;      in noninteractive sessions.
-  (advice-add #'straight-vc-git--popup-raw :override #'straight--popup-raw))
-
-;; HACK Replace GUI popup prompts (which hang indefinitely in tty Emacs) with
-;;      simple prompts.
-(defadvice! doom--straight-fallback-to-y-or-n-prompt-a (orig-fn &optional prompt)
-  :around #'straight-are-you-sure
-  (if noninteractive
-      (y-or-n-p (format! "%s" (or prompt "")))
-    (funcall orig-fn prompt)))
-
-(defadvice! doom--straight-fallback-to-tty-prompt-a (orig-fn prompt actions)
-  "Modifies straight to prompt on the terminal when in noninteractive sessions."
-  :around #'straight--popup-raw
-  (if (not noninteractive)
-      (funcall orig-fn prompt actions)
-    ;; We can't intercept C-g, so no point displaying any options for this key
-    ;; Just use C-c
-    (delq! "C-g" actions 'assoc)
-    ;; HACK These are associated with opening dired or magit, which isn't
-    ;;      possible in tty Emacs, so...
-    (delq! "e" actions 'assoc)
-    (delq! "g" actions 'assoc)
-    (let ((options (list (lambda ()
-                           (let ((doom-format-indent 0))
-                             (terpri)
-                             (print! (error "Aborted")))
-                           (kill-emacs)))))
-      (print! (start "%s") (red prompt))
-      (terpri)
-      (print-group!
-       (print-group!
-        (print! " 1) Abort")
-        (dolist (action actions)
-          (cl-destructuring-bind (_key desc func) action
-            (when desc
-              (push func options)
-              (print! "%2s) %s" (length options) desc)))))
-       (terpri)
-       (let ((options (nreverse options))
-             answer fn)
-         (while
-             (not
-              (setq
-               fn (ignore-errors
-                    (nth (1- (setq answer
-                                   (read-number
-                                    (format! "How to proceed? (%s) "
-                                             (mapconcat #'number-to-string
-                                                        (number-sequence 1 (length options))
-                                                        ", ")))))
-                         options))))
-           (print! (warn "%s is not a valid answer, try again.") answer))
-         (funcall fn))))))
-
-(defadvice! doom--straight-respect-print-indent-a (args)
-  :filter-args #'straight-use-package
-  (cl-destructuring-bind
-      (melpa-style-recipe &optional no-clone no-build cause interactive)
-      args
-    (list melpa-style-recipe no-clone no-build
-          (if (and (not cause)
-                   (boundp 'doom-format-indent)
-                   (> doom-format-indent 0))
-              (make-string (1- (or doom-format-indent 1)) 32)
-            cause)
-          interactive)))
 
 
 ;;
@@ -239,11 +169,6 @@ necessary package metadata is initialized and available for them."
         (with-plist! (cdr package) (recipe modules disable ignore pin)
           (if ignore
               (doom-log "Ignoring package %S" name)
-            (when pin
-              (doom-log "Pinning package %S to %S" name pin)
-              (setf (alist-get (symbol-name name) doom-pinned-packages
-                               nil nil #'equal)
-                    pin))
             (if (not disable)
                 (with-demoted-errors "Package error: %s"
                   (when recipe
@@ -256,7 +181,17 @@ necessary package metadata is initialized and available for them."
                 (print! (warn "%s\n%s")
                         (format "You've disabled %S" name)
                         (indent 2 (concat "This is a core package. Disabling it will cause errors, as Doom assumes\n"
-                                          "core packages are always available. Disable their minor-modes or hooks instead.")))))))))))
+                                          "core packages are always available. Disable their minor-modes or hooks instead.")))))
+            (when pin
+              (let ((realname
+                     (if-let* ((recipe (cdr (straight-recipes-retrieve name)))
+                               (repo (straight-vc-local-repo-name recipe)))
+                         repo
+                       (symbol-name name))))
+                (doom-log "Pinning package %S to %S" realname pin)
+                (setf (alist-get realname doom-pinned-packages
+                                 nil nil #'equal)
+                      pin)))))))))
 
 (defun doom-ensure-straight ()
   "Ensure `straight' is installed and was compiled with this version of Emacs."
@@ -344,7 +279,8 @@ elsewhere."
      (condition-case e
          (when-let (recipe (plist-get plist :recipe))
            (cl-destructuring-bind
-               (&key local-repo _files _flavor _no-build
+               (&key local-repo _files _flavor
+                     _no-build _no-byte-compile _no-autoloads
                      _type _repo _host _branch _remote _nonrecursive _fork _depth)
                recipe
              ;; Expand :local-repo from current directory
@@ -367,6 +303,37 @@ Only use this macro in a module's (or your private) packages.el file."
   (macroexp-progn
    (cl-loop for p in packages
             collect `(package! ,p :disable t))))
+
+(defmacro unpin! (&rest targets)
+  "Unpin packages in TARGETS.
+
+This unpins packages, so that 'doom upgrade' downloads their latest version. It
+can be used one of five ways:
+
++ To disable pinning wholesale: (unpin! t)
++ To unpin individual packages: (unpin! packageA packageB ...)
++ To unpin all packages in a group of modules: (unpin! :lang :tools ...)
++ To unpin packages in individual modules:
+    (unpin! (:lang python javascript) (:tools docker))
+
+Or any combination of the above."
+  `(dolist (target ',targets)
+     (cond
+      ((eq target t)
+       (setq doom-pinned-packages nil))
+      ((or (keywordp target)
+           (listp target))
+       (cl-destructuring-bind (category . modules) (doom-enlist target)
+         (dolist (pkg doom-packages)
+           (let ((pkg-modules (plist-get (cdr pkg) :modules)))
+             (and (assq category pkg-modules)
+                  (or (null modules)
+                      (cl-loop for module in modules
+                               if (member (cons category module) pkg-modules)
+                               return t))
+                  (assq-delete-all (car pkg) doom-pinned-packages))))))
+      ((symbolp target)
+       (assq-delete-all target doom-pinned-packages)))))
 
 (provide 'core-packages)
 ;;; core-packages.el ends here

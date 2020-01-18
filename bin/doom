@@ -52,7 +52,8 @@ with a different private module."
       (setq doom-auto-accept t)
       (print! (info "Auto-yes on")))
     (when help-p
-      (push command args)
+      (when command
+        (push command args))
       (setq command "help"))
 
     (when (equal (user-real-uid) 0)
@@ -98,7 +99,11 @@ with a different private module."
                 (if (cdr e)
                     (dolist (item (cdr e))
                       (print! "%S" item))
-                  (print! "n/a"))))
+                  (print! "n/a")))
+               (when (string-match-p (regexp-quote straight-process-buffer)
+                                     (error-message-string e))
+                 (print! (bold "Straight output:"))
+                 (print-group! (print! "%s" (straight--process-get-output)))))
               (unless debug-on-error
                 (terpri)
                 (print!

@@ -78,8 +78,6 @@ path too.")
   (setq-default
    ;; Don't monopolize the whole frame just for the agenda
    org-agenda-window-setup 'current-window
-   ;; Hide blocked tasks in the agenda view.
-   org-agenda-dim-blocked-tasks 'invisible
    org-agenda-inhibit-startup t
    org-agenda-skip-unavailable-files t
    ;; Move the agenda to show the previous 3 days and the next 7 days for a bit
@@ -124,18 +122,12 @@ path too.")
         org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil)
 
-  ;; Scale up LaTeX previews a bit (default is too small)
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5))
-  ;; ...and fix their background w/ themes
-  (add-hook! 'doom-load-theme-hook
-    (defun +org-refresh-latex-background ()
-      "Previews are usually rendered with light backgrounds, so ensure their
-background (and foreground) match the current theme."
-      (plist-put! org-format-latex-options
-                  :background
-                  (face-attribute (or (cadr (assq 'default face-remapping-alist))
-                                      'default)
-                                  :background nil t))))
+  ;; Fontify latex blocks and entities natively
+  (setq org-highlight-latex-and-related '(native script entities))
+  (plist-put! org-format-latex-options
+              :scale 1.5         ; larger previews
+              :foreground 'auto  ; match the theme foreground
+              :background 'auto) ; ... and its background
 
   ;; HACK Face specs fed directly to `org-todo-keyword-faces' don't respect
   ;;      underlying faces like the `org-todo' face does, so we define our own
@@ -226,6 +218,7 @@ background (and foreground) match the current theme."
     (or (cdr (assoc lang org-src-lang-modes))
         (+org--babel-lazy-load lang)))
 
+  ;; This also works for tangling and exporting
   (defadvice! +org--babel-lazy-load-library-a (info)
     "Load babel libraries lazily when babel blocks are executed."
     :after-while #'org-babel-confirm-evaluate
@@ -593,6 +586,11 @@ between the two."
         ;; textmate-esque newline insertion
         [C-return]   #'+org/insert-item-below
         [C-S-return] #'+org/insert-item-above
+        [C-M-return] #'org-insert-subheading
+        (:when IS-MAC
+          [s-return]   #'+org/insert-item-below
+          [s-S-return] #'+org/insert-item-above
+          [s-M-return] #'org-insert-subheading)
         ;; Org-aware C-a/C-e
         [remap doom/backward-to-bol-or-indent]          #'org-beginning-of-line
         [remap doom/forward-to-last-non-comment-or-eol] #'org-end-of-line
@@ -684,8 +682,9 @@ between the two."
           "." #'+org/refile-to-current-file
           "c" #'+org/refile-to-running-clock
           "l" #'+org/refile-to-last-location
+          "f" #'+org/refile-to-file
           "o" #'+org/refile-to-other-window
-          "O" #'+org/refile-to-other-buffers
+          "O" #'+org/refile-to-other-buffer
           "v" #'+org/refile-to-visible
           "r" #'org-refile)) ; to all `org-refile-targets'
 

@@ -11,7 +11,7 @@ This can be a single company backend or a list thereof. It can be anything
 ;;; Packages
 
 (use-package! lsp-mode
-  :defer t
+  :commands lsp-install-server
   :init
   (setq lsp-session-file (concat doom-etc-dir "lsp-session"))
   ;; Don't prompt the user for the project root every time we open a new
@@ -22,11 +22,14 @@ This can be a single company backend or a list thereof. It can be anything
   (setq lsp-keep-workspace-alive nil)
 
   ;; For `lsp-clients'
-  (setq lsp-fsharp-server-install-dir (concat doom-etc-dir "lsp-fsharp/")
-        lsp-groovy-server-install-dir (concat doom-etc-dir "lsp-groovy/")
+  (setq lsp-server-install-dir (concat doom-etc-dir "lsp/")
+        lsp-groovy-server-install-dir (concat lsp-server-install-dir "lsp-groovy/")
         lsp-intelephense-storage-path (concat doom-cache-dir "lsp-intelephense/"))
 
   :config
+  (when (and lsp-auto-configure lsp-auto-require-clients)
+    (require 'lsp-clients))
+
   (set-lookup-handlers! 'lsp-mode :async t
     :documentation 'lsp-describe-thing-at-point
     :definition 'lsp-find-definition
@@ -67,19 +70,21 @@ auto-killed (which is usually an expensive process)."
   (defadvice! +lsp-init-a (&optional arg)
     "Enable `lsp-mode' in the current buffer.
 
-Meant to be a lighter alternative to `lsp', which is too eager about
-initializing lsp-ui-mode, company, yasnippet and flycheck. Instead, these have
-been moved out to their respective modules, or these hooks:
+Meant to gimp `lsp', which is too eager about installing LSP servers, or
+prompting to do so, or complaining about no LSP servers, or initializing
+lsp-ui-mode, company, yasnippet and flycheck. We want LSP to work only if the
+server is present, and for server installation to be a deliberate act by the
+end-user. Also, setting up these other packages are handled by their respective
+modules.
 
+Also see:
 + `+lsp-init-company-h' (on `lsp-mode-hook')
 + `+lsp-init-ui-flycheck-or-flymake-h' (on `lsp-ui-mode-hook')
 
-Also logs the resolved project root, if found."
+This also logs the resolved project root, if found, so we know where we are."
     :override #'lsp
     (interactive "P")
     (require 'lsp-mode)
-    (when lsp-auto-configure
-      (require 'lsp-clients))
     (and (buffer-file-name)
          (setq-local
           lsp--buffer-workspaces
@@ -88,6 +93,7 @@ Also logs the resolved project root, if found."
                (equal arg '(4))
                (and arg (not (equal arg 1))))))
          (prog1 (lsp-mode 1)
+           (setq-local lsp-buffer-uri (lsp--buffer-uri))
            ;; Announce what project root we're using, for diagnostic purposes
            (if-let (root (lsp--calculate-root (lsp-session) (buffer-file-name)))
                (lsp--info "Guessed project root is %s" (abbreviate-file-name root))
@@ -149,9 +155,11 @@ Also logs the resolved project root, if found."
   :config
   (setq company-lsp-cache-candidates 'auto)) ;; cache candidates for better performance
 
+
 (use-package! helm-lsp
   :when (featurep! :completion helm)
   :commands helm-lsp-workspace-symbol helm-lsp-global-workspace-symbol)
+
 
 (use-package! lsp-ivy
   :when (featurep! :completion ivy)

@@ -350,7 +350,7 @@
         :desc "Delete trailing whitespace"            "w"   #'delete-trailing-whitespace
         :desc "Delete trailing newlines"              "W"   #'doom/delete-trailing-newlines
         :desc "List errors"                           "x"   #'flymake-show-diagnostics-buffer
-        (:when (featurep! :tools flycheck)
+        (:when (featurep! :checkers syntax)
           :desc "List errors"                         "x"   #'flycheck-list-errors))
 
 
@@ -567,7 +567,7 @@
       (:prefix-map ("t" . "toggle")
         :desc "Big mode"                     "b" #'doom-big-font-mode
         :desc "Flymake"                      "f" #'flymake-mode
-        (:when (featurep! :tools flycheck)
+        (:when (featurep! :checkers syntax)
           :desc "Flycheck"                   "f" #'flycheck-mode)
         :desc "Frame fullscreen"             "F" #'toggle-frame-fullscreen
         :desc "Evil goggles"                 "g" #'evil-goggles-mode
@@ -578,7 +578,7 @@
         (:when (featurep! :lang org +present)
           :desc "org-tree-slide mode"        "p" #'+org-present/start)
         :desc "Read-only mode"               "r" #'read-only-mode
-        (:when (featurep! :tools flyspell)
+        (:when (featurep! :checkers spell)
           :desc "Flyspell"                   "s" #'flyspell-mode)
         (:when (featurep! :lang org +pomodoro)
           :desc "Pomodoro timer"             "t" #'org-pomodoro)

@@ -54,7 +54,9 @@ directives. By default, this only recognizes C directives.")
         evil-want-keybinding (not (featurep! +everywhere))
         ;; Only do highlighting in selected window so that Emacs has less work
         ;; to do highlighting them all.
-        evil-ex-interactive-search-highlight 'selected-window)
+        ;; TODO Revert this to `selected-windows' once emacs-evil/evil#1233 is
+        ;;      resolved, otherwise we get no highlights on */#
+        evil-ex-interactive-search-highlight 'all-windows)
 
   ;; Slow this down from 0.02 to prevent blocking in large or folded buffers
   ;; like magit while incrementally highlighting matches.
@@ -161,6 +163,15 @@ directives. By default, this only recognizes C directives.")
   (advice-add #'evil-open-above :around #'+evil--insert-newline-above-and-respect-comments-a)
   (advice-add #'evil-open-below :around #'+evil--insert-newline-below-and-respect-comments-a)
 
+  ;; Fix backspace/DEL commands not respecting `delete-selection-mode',
+  ;; smartparens pairs (in some cases), and ignoring
+  ;; `+default--delete-backward-char-a' on `delete-char-backward'
+  (defadvice! +evil-delete-region-if-mark-a (orig-fn &rest args)
+    :override #'evil-delete-backward-char-and-join
+    (if (or evil-backspace-join-lines (not (bolp)))
+        (call-interactively #'backward-delete-char-untabify)
+      (user-error "Beginning of line")))
+
   ;; Recenter screen after most searches
   (dolist (fn '(evil-visualstar/begin-search-forward
                 evil-visualstar/begin-search-backward
@@ -217,7 +228,7 @@ directives. By default, this only recognizes C directives.")
   :hook ((lisp-mode emacs-lisp-mode clojure-mode racket-mode)
          . +evil-embrace-lisp-mode-hook-h)
   :hook ((org-mode LaTeX-mode) . +evil-embrace-latex-mode-hook-h)
-  :hook ((c++-mode rust-mode rustic-mode csharp-mode java-mode swift-mode typescript-mode)
+  :hook ((c++-mode rustic-mode csharp-mode java-mode swift-mode typescript-mode)
          . +evil-embrace-angle-bracket-modes-hook-h)
   :init
   (after! evil-surround
@@ -229,6 +240,8 @@ directives. By default, this only recognizes C directives.")
     (embrace-add-pair-regexp ?l "\\[a-z]+{" "}" #'+evil--embrace-latex))
 
   (defun +evil-embrace-lisp-mode-hook-h ()
+    ;; Avoid `embrace-add-pair-regexp' because it would overwrite the default
+    ;; `f' rule, which we want for other modes
     (push (cons ?f (make-embrace-pair-struct
                     :key ?f
                     :read-function #'+evil--embrace-elisp-fn
@@ -237,14 +250,11 @@ directives. By default, this only recognizes C directives.")
           embrace--pairs-list))
 
   (defun +evil-embrace-angle-bracket-modes-hook-h ()
-    (set (make-local-variable 'evil-embrace-evil-surround-keys)
-         (delq ?< evil-embrace-evil-surround-keys))
-    (push (cons ?< (make-embrace-pair-struct
-                    :key ?<
-                    :read-function #'+evil--embrace-angle-brackets
-                    :left-regexp "\\[a-z]+<"
-                    :right-regexp ">"))
-          embrace--pairs-list))
+    (let ((var (make-local-variable 'evil-embrace-evil-surround-keys)))
+      (set var (delq ?< evil-embrace-evil-surround-keys))
+      (set var (delq ?> evil-embrace-evil-surround-keys)))
+    (embrace-add-pair-regexp ?< "\\_<[a-z0-9-_]+<" ">" #'+evil--embrace-angle-brackets)
+    (embrace-add-pair ?> "<" ">"))
 
   ;; Add escaped-sequence support to embrace
   (setf (alist-get ?\\ (default-value 'embrace--pairs-list))

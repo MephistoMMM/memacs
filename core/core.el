@@ -268,6 +268,10 @@ users).")
 (unless IS-MAC   (setq command-line-ns-option-alist nil))
 (unless IS-LINUX (setq command-line-x-option-alist nil))
 
+;; Delete files to trash on macOS, as an extra layer of precaution against
+;; accidentally deleting wanted files.
+(setq delete-by-moving-to-trash IS-MAC)
+
 ;; Adopt a sneaky garbage collection strategy of waiting until idle time to
 ;; collect; staving off the collector while the user is working.
 (when doom-interactive-mode
@@ -450,7 +454,7 @@ unreadable. Returns the names of envvars that were changed."
               (append (nreverse environment) process-environment)
               exec-path
               (if (member "PATH" envvars)
-                  (append (parse-colon-path (getenv "PATH"))
+                  (append (split-string (getenv "PATH") path-separator t)
                           (list exec-directory))
                 exec-path)
               shell-file-name

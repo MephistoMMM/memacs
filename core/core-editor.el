@@ -132,11 +132,12 @@ possible."
 
 ;; Fixes the clipboard in tty Emacs by piping clipboard I/O through xclip, xsel,
 ;; pb{copy,paste}, wl-copy, termux-clipboard-get, or getclip (cygwin).
-(add-hook! 'tty-setup-hook
-  (defun doom-init-clipboard-in-tty-emacs-h ()
-    (and (not (getenv "SSH_CONNECTION"))
-         (require 'xclip nil t)
-         (xclip-mode +1))))
+(unless IS-WINDOWS
+  (add-hook! 'tty-setup-hook
+    (defun doom-init-clipboard-in-tty-emacs-h ()
+      (and (not (getenv "SSH_CONNECTION"))
+           (require 'xclip nil t)
+           (xclip-mode +1)))))
 
 
 ;;
@@ -388,7 +389,7 @@ files, so we replace calls to `pp' with the much faster `prin1'."
   (global-set-key [remap describe-command]  #'helpful-command)
   (global-set-key [remap describe-variable] #'helpful-variable)
   (global-set-key [remap describe-key]      #'helpful-key)
-  (global-set-key [remap describe-symbol]   #'doom/describe-symbol)
+  (global-set-key [remap describe-symbol]   #'helpful-symbol)
 
   (defun doom-use-helpful-a (orig-fn &rest args)
     "Force ORIG-FN to use helpful instead of the old describe-* commands."
@@ -438,11 +439,11 @@ files, so we replace calls to `pp' with the much faster `prin1'."
     (setq sp-cancel-autoskip-on-backward-movement nil))
 
   ;; The default is 100, because smartparen's scans are relatively expensive
-  ;; (especially with large pair lists for somoe modes), we halve it, as a
+  ;; (especially with large pair lists for some modes), we reduce it, as a
   ;; better compromise between performance and accuracy.
-  (setq sp-max-prefix-length 50)
-  ;; This speeds up smartparens. No pair has any business being longer than 4
-  ;; characters; if they must, set it buffer-locally.
+  (setq sp-max-prefix-length 25)
+  ;; No pair has any business being longer than 4 characters; if they must, set
+  ;; it buffer-locally. It's less work for smartparens.
   (setq sp-max-pair-length 4)
   ;; This isn't always smart enough to determine when we're in a string or not.
   ;; See https://github.com/Fuco1/smartparens/issues/783.
@@ -512,12 +513,15 @@ files, so we replace calls to `pp' with the much faster `prin1'."
               undo-tree-mode
               highlight-indent-guides-mode
               hl-fill-column-mode))
-  ;; HACK Fix #2183: `so-long-detected-long-line-p' tries to parse comment
-  ;;      syntax, but in some buffers comment state isn't initialized, leading
-  ;;      to a wrong-type-argument: stringp error.
   (defun doom-buffer-has-long-lines-p ()
+    ;; HACK Fix #2183: `so-long-detected-long-line-p' tries to parse comment
+    ;;      syntax, but in some buffers comment state isn't initialized, leading
+    ;;      to a wrong-type-argument: stringp error.
     (let ((so-long-skip-leading-comments (bound-and-true-p comment-use-syntax)))
-      (so-long-detected-long-line-p)))
+      ;; HACK If visual-line-mode is on in a text-mode, then long lines are
+      ;;      normal and can be ignored.
+      (unless (and visual-line-mode (derived-mode-p 'text-mode))
+        (so-long-detected-long-line-p))))
   (setq so-long-predicate #'doom-buffer-has-long-lines-p))
 
 
@@ -527,6 +531,7 @@ files, so we replace calls to `pp' with the much faster `prin1'."
   :config
   (setq undo-tree-visualizer-diff t
         undo-tree-auto-save-history t
+        undo-tree-enable-undo-in-region t
         ;; Increase undo-limits by a factor of ten to avoid emacs prematurely
         ;; truncating the undo history and corrupting the tree. See
         ;; https://github.com/syl20bnr/spacemacs/issues/12110
@@ -556,6 +561,11 @@ files, so we replace calls to `pp' with the much faster `prin1'."
       (and (consp item)
            (stringp (car item))
            (setcar item (substring-no-properties (car item))))))
+
+  ;; Undo-tree is too chatty about saving its history files. This doesn't
+  ;; totally suppress it logging to *Messages*, it only stops it from appearing
+  ;; in the echo-area.
+  (advice-add #'undo-tree-save-history :around #'doom-shut-up-a)
 
   (global-undo-tree-mode +1))
 

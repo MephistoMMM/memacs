@@ -1,7 +1,8 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; core/cli/packages.el
 
-(defcli! (update u) ()
+(defcli! (update u)
+  ((discard-p ["--discard"] "All local changes to packages are discarded"))
   "Updates packages.
 
 This works by fetching all installed package repos and checking the distance
@@ -10,10 +11,11 @@ between HEAD and FETCH_HEAD. This can take a while.
 This excludes packages whose `package!' declaration contains a non-nil :freeze
 or :ignore property."
   (straight-check-all)
-  (doom-cli-reload-core-autoloads)
-  (when (doom-cli-packages-update)
-    (doom-cli-reload-package-autoloads))
-  t)
+  (let ((doom-auto-discard discard-p))
+    (doom-cli-reload-core-autoloads)
+    (when (doom-cli-packages-update)
+      (doom-cli-reload-package-autoloads))
+    t))
 
 (defcli! (build b)
     ((rebuild-p ["-r"] "Only rebuild packages that need rebuilding"))
@@ -67,7 +69,7 @@ declaration) or dependency thereof that hasn't already been."
   (straight--transaction-finalize)
   (print! (start "Installing & building packages..."))
   (print-group!
-   (let ((versions-alist doom-pinned-packages)
+   (let ((versions-alist nil) ; FIXME
          (n 0))
      (dolist (recipe (hash-table-values straight--recipe-cache))
        (straight--with-plist recipe
@@ -76,10 +78,10 @@ declaration) or dependency thereof that hasn't already been."
            (condition-case-unless-debug e
                (and (straight-use-package (intern package))
                     (not existed-p)
-                    (file-directory-p (straight--repos-dir package))
-                    (if-let (commit (cdr (assoc package versions-alist)))
+                    (file-directory-p (straight--repos-dir (or local-repo package)))
+                    (if-let (commit (cdr (assoc (or local-repo package) versions-alist)))
                         (progn
-                          (print! "Checking out %s commit %s"
+                          (print! (start "Checking out %s commit %s")
                                   package (substring commit 0 7))
                           (unless (straight-vc-commit-present-p recipe commit)
                             (straight-vc-fetch-from-remote recipe))
@@ -89,7 +91,7 @@ declaration) or dependency thereof that hasn't already been."
                     (cl-incf n))
              (error
               (signal 'doom-package-error
-                      (list e (straight--process-get-output))))))))
+                      (list package e (straight--process-get-output))))))))
      (if (= n 0)
          (ignore (print! (success "No packages need to be installed")))
        (print! (success "Installed & built %d packages") n)
@@ -105,7 +107,10 @@ declaration) or dependency thereof that hasn't already been."
           (straight-check-for-modifications
            (when (file-directory-p (straight--modified-dir))
              '(find-when-checking)))
-          (straight--allow-find (and straight-check-for-modifications t))
+          (straight--allow-find
+           (and straight-check-for-modifications
+                (executable-find straight-find-executable)
+                t))
           (straight--packages-not-to-rebuild
            (or straight--packages-not-to-rebuild (make-hash-table :test #'equal)))
           (straight--packages-to-rebuild
@@ -131,7 +136,7 @@ declaration) or dependency thereof that hasn't already been."
   (let ((straight--repos-dir (straight--repos-dir))
         (straight--packages-to-rebuild (make-hash-table :test #'equal))
         (total (hash-table-count straight--repo-cache))
-        (versions-alist doom-pinned-packages)
+        (versions-alist nil) ; FIXME
         (i 1)
         errors)
     ;; TODO Log this somewhere?
@@ -149,26 +154,32 @@ declaration) or dependency thereof that hasn't already been."
                (throw 'skip t))
              (condition-case-unless-debug e
                  (let ((commit (straight-vc-get-commit type local-repo))
-                       (newcommit (cdr (assoc package versions-alist)))
+                       (newcommit (cdr (assoc (or local-repo package) versions-alist)))
                        fetch-p)
+                   (when (and (stringp newcommit)
+                              (string-match-p (concat "^" (regexp-quote newcommit)) commit))
+                     (print! (start "\033[K(%d/%d) %s is up-to-date...\033[1A")
+                             i total package)
+                     (throw 'skip t))
                    (unless (or (and (stringp newcommit)
                                     (straight-vc-commit-present-p recipe newcommit)
-                                    (print! (start "\033[K(%d/%d) Checking out %s for %s...\033[1A")
-                                            i total newcommit package))
+                                    (print! (start "\033[K(%d/%d) Checking out %s (%s)...\033[1A")
+                                            i total package (substring newcommit 0 7)))
                                (and (print! (start "\033[K(%d/%d) Fetching %s...\033[1A")
                                             i total package)
                                     (straight-vc-fetch-from-remote recipe)
                                     (setq fetch t)))
-                     (print! (warn "\033[K(%d/%d) Failed to fetch %s" i total package))
+                     (print! (warn "\033[K(%d/%d) Failed to fetch %s")
+                             i total (or local-repo package))
                      (throw 'skip t))
                    (let ((output (straight--process-get-output)))
-                     (if newcommit
+                     (if (and (stringp newcommit) (straight-vc-commit-present-p recipe newcommit))
                          (straight-vc-check-out-commit recipe newcommit)
                        (straight-merge-package package)
                        (setq newcommit (straight-vc-get-commit type local-repo)))
-                     (when (string= commit newcommit)
+                     (when (string-match-p (concat "^" newcommit) commit)
                        (throw 'skip t))
-                     (print! (info "\033[K(%d/%d) Updating %s...") i total package)
+                     (print! (info "\033[K(%d/%d) Updating %s...") i total local-repo)
                      (puthash package t straight--packages-to-rebuild)
                      (ignore-errors
                        (delete-directory (straight--build-dir package) 'recursive))
@@ -180,7 +191,8 @@ declaration) or dependency thereof that hasn't already been."
                         (straight--call "git" "log" "--oneline" newcommit (concat "^" commit))
                         (print-group!
                          (print! "%s" (straight--process-get-output)))))
-                     (print! (success "(%d/%d) %s updated (%s -> %s)") i total package
+                     (print! (success "(%d/%d) %s updated (%s -> %s)") i total
+                             (or local-repo package)
                              (substring commit 0 7)
                              (substring newcommit 0 7))))
                (user-error

@@ -112,7 +112,7 @@
             (:prefix ("r" . "repl")
               "n" #'cider-repl-set-ns
               "q" #'cider-quit
-              "r" #'cider-refresh
+              "r" #'cider-ns-refresh
               "R" #'cider-restart
               "b" #'cider-switch-to-repl-buffer
               "B" #'+clojure/cider-switch-to-repl-buffer-and-switch-ns
@@ -158,5 +158,5 @@
 
 
 (use-package! flycheck-joker
-  :when (featurep! :tools flycheck)
+  :when (featurep! :checkers syntax)
   :after flycheck)

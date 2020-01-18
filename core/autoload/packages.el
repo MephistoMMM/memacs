@@ -155,6 +155,7 @@ was installed with."
       ((debug error)
        (signal 'doom-package-error
                (list (doom-module-from-path file)
+                     file
                      e))))))
 
 ;;;###autoload
@@ -200,3 +201,40 @@ ones."
   (message "Reloading packages")
   (doom-initialize-packages t)
   (message "Reloading packages...DONE"))
+
+;;;###autoload
+(defun doom/update-pinned-package-declaration ()
+  "Inserts or updates a `:pin' for the `package!' statement at point.
+
+Grabs the latest commit id of the package using 'git'."
+  (interactive)
+  ;; REVIEW Better error handling
+  ;; TODO Insert a new `package!' if no `package!' at poin
+  (require 'straight)
+  (ignore-errors
+    (while (and (atom (sexp-at-point))
+                (not (bolp)))
+      (forward-sexp -1)))
+  (if (not (eq (sexp-at-point) 'package!))
+      (user-error "Not on a `package!' call")
+    (backward-char)
+    (let* ((recipe (cdr (sexp-at-point)))
+           (name (car recipe))
+           (id
+            (cdr (doom-call-process
+                  "git" "ls-remote"
+                  (straight-vc-git--destructure
+                      (doom-plist-merge
+                       (plist-get (cdr recipe) :recipe)
+                       (or (cdr (straight-recipes-retrieve name))
+                           (plist-get (cdr (assq name doom-packages)) :recipe)))
+                      (upstream-repo upstream-host)
+                    (straight-vc-git--encode-url upstream-repo upstream-host))))))
+      (unless id
+        (user-error "No id for %S package" name))
+      (let ((id (car (split-string id))))
+        (if (re-search-forward ":pin +\"\\([^\"]+\\)\"" (cdr (bounds-of-thing-at-point 'sexp)) t)
+            (replace-match id t t nil 1)
+          (thing-at-point--end-of-sexp)
+          (backward-char)
+          (insert " :pin " (prin1-to-string id)))))))
