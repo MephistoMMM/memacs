@@ -307,6 +307,8 @@
         (:unless (featurep! :ui workspaces)
           :desc "Switch buffer"           "b" #'switch-to-buffer)
         :desc "Kill buffer"                 "d"   #'kill-current-buffer
+        (:when (featurep! :ui doom-dashboard)
+        :desc "Dashbord"                    "h"   #'doom/switch-to-dashboard-or-scratch)
         :desc "ibuffer"                     "i"   #'ibuffer
         :desc "Kill buffer"                 "k"   #'kill-current-buffer
         :desc "Kill all buffers"            "K"   #'doom/kill-all-buffers
