@@ -92,15 +92,6 @@ the only window, use evil-window-move-* (e.g. `evil-window-move-far-left')."
   "Swap windows downward."
   (interactive) (+evil--window-swap 'down))
 
-;;;###autoload
-(defun +evil/easymotion ()
-  "Invoke and lazy-load `evil-easymotion' without compromising which-key
-integration."
-  (interactive)
-  (require 'evil-easymotion)
-  (setq prefix-arg current-prefix-arg)
-  (push '(t . easymotion) unread-command-events))
-
 ;;;###autoload (autoload '+evil:apply-macro "editor/evil/autoload/evil" nil t)
 (evil-define-operator +evil:apply-macro (beg end)
   "Apply macro to each line."

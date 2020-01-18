@@ -3,7 +3,6 @@
 
 (package! evil :pin "d14e9e2cac539f388a1f4699eb3ffab0834aa3e4")
 (package! evil-args :pin "758ad5ae54ad34202064fec192c88151c08cb387")
-(package! evil-easymotion :pin "79c13ed3bce018ac09d358e642e5bd7025e93603")
 (package! evil-embrace :pin "4379adea032b25e359d01a36301b4a5afdd0d1b7")
 (package! evil-escape :pin "f4e9116bfbaac8c9d210c17ad488e0982291245f")
 (package! evil-exchange :pin "35dd0f0662789f043bd89a9f9801ffaf4318123f")
