@@ -1,0 +1,23 @@
+#+TITLE: :lang sh
+
+This module adds support for shell scripting languages.
+
++ Code completion (company-shell)
++ Syntax Checking (flycheck)
++ Added variable interpolation fontification
+
+* Table of Contents :TOC:
+- [[#install][Install]]
+  - [[#dependencies][Dependencies]]
+  - [[#module-flags][Module Flags]]
+
+* Install
+** Dependencies
+This module has several soft dependencies:
+
++ ~shellcheck~ Enables shell script linting.
++ ~bashdb~ Enables debugging for bash scripts.
++ ~zshdb~ Enables debugging for zsh scripts.
++ ~bash-language-server~ Enables LSP support.
+** Module Flags
++ ~+lsp~ to add support Language server protocol.

@@ -1,7 +1,7 @@
 <hr/>
 
 <p align="center">
-<a href="./core/banners/img/banner.png"><img src="./core/banners/img/banner.png" alt="wing cat"></a>
+<a href="./modules/ui/doom-dashboard/banners/default.png"><img src="./modules/ui/doom-dashboard/banners/default.png" alt="wing cat"></a>
 </p>
 
 # Memacs
@@ -41,10 +41,6 @@ Ubuntu:
 ```shell
 ./scripts/link_memacs.sh
 ```
-
-## Cut Plan
-
-[cut plan](./SPACEMACS_CUT_PLAN.org)
 
 ## License
 

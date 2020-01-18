@@ -1,36 +1,22 @@
-;;; early-init.el --- Spacemacs Early Init File
-;;
-;; Copyright (c) 2018 Sylvain Benner & Contributors
-;;
-;; Author: Miciah Dashiel Butler Masters <miciah.masters@gmail.com>
-;; URL: https://github.com/syl20bnr/spacemacs
-;;
-;; This file is not part of GNU Emacs.
-;;
-;;; License: GPLv3
+;;; early-init.el -*- lexical-binding: t; -*-
 
-;; Before Emacs 27, the init file was responsible for initializing the package
-;; manager by calling `package-initialize'. Emacs 27 changed the default
-;; behavior: It now calls `package-initialize' before loading the init file.
-;; This behavior would prevent Spacemacs's own package initialization from
-;; running. However, Emacs 27 also loads the "early init" file (this file)
-;; before it initializes the package manager, and Spacemacs can use this early
-;; init file to prevent Emacs from initializing the package manager. (See
-;; <http://git.savannah.gnu.org/cgit/emacs.git/commit/?id=24acb31c04b4048b85311d794e600ecd7ce60d3b>.)
-;;
-;; Earlier Emacs versions do not load the early init file and do not initialize
-;; Avoid garbage collection during startup.
-;; see `SPC h . dotspacemacs-gc-cons' for more info
-(setq gc-cons-threshold 402653184 gc-cons-percentage 0.6)
+;; Emacs HEAD (27+) introduces early-init.el, which is run before init.el,
+;; before package and UI initialization happens.
 
-;; the package manager before loading the init file, so this file is neither
-;; needed nor loaded on those versions.
+;; Defer garbage collection further back in the startup process
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; In Emacs 27+, package initialization occurs before `user-init-file' is
+;; loaded, but after `early-init-file'. Doom handles package initialization, so
+;; we must prevent Emacs from doing it early!
 (setq package-enable-at-startup nil)
+(advice-add #'package--ensure-init-file :override #'ignore)
 
 ;; Prevent the glimpse of un-styled Emacs by disabling these UI elements early.
-(push '(menu-bar-lines . 0) default-frame-alist)
-(push '(tool-bar-lines . 0) default-frame-alist)
-(push '(vertical-scroll-bars) default-frame-alist)
+(setq tool-bar-mode nil
+      menu-bar-mode nil)
+(when (fboundp 'set-scroll-bar-mode)
+  (set-scroll-bar-mode nil))
 
 ;; Resizing the Emacs frame can be a terribly expensive part of changing the
 ;; font. By inhibiting this, we easily halve startup times with fonts that are

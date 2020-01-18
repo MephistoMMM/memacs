@@ -1,0 +1,95 @@
+#+TITLE:   lang/rust
+#+DATE:    June 5, 2019
+#+SINCE:   v3.0.0
+#+STARTUP: inlineimages
+
+* Table of Contents :TOC_3:noexport:
+- [[#description][Description]]
+  - [[#module-flags][Module Flags]]
+  - [[#plugins][Plugins]]
+  - [[#hacks][Hacks]]
+- [[#prerequisites][Prerequisites]]
+- [[#features][Features]]
+  - [[#keybinds][Keybinds]]
+- [[#configuration][Configuration]]
+  - [[#enable-rust-analyzer][Enable rust-analyzer]]
+  - [[#enabling-elgot-support-for-rust][Enabling elgot support for Rust]]
+- [[#troubleshooting][Troubleshooting]]
+
+* Description
+This module adds support for the Rust language and integration for its tools,
+e.g. ~cargo~.
+
++ Code completion (~racer~)
++ Syntax checking (~flycheck~)
++ LSP support (for rls and rust-analyzer) (~rustic~)
++ Snippets
+
+** Module Flags
++ ~+lsp~ to add support Language server protocol.
+
+** Plugins
++ [[https://github.com/brotzeit/rustic][rustic]]
++ [[https://github.com/racer-rust/emacs-racer][racer]]* (unless =+lsp=)
+
+** Hacks
++ rustic has been modified /not/ to automatically install lsp-mode or elgot if
+  they're missing. Doom expects you to enable the =:tools lsp= module yourself.
++ rustic's LSP integration has been disabled in favor of the rls/rust-analyzer
+  support provider by the lsp-mode package.
+
+* Prerequisites
+This module only requires ~rust~, which can be acquired through =rustup=:
+
+~curl https://sh.rustup.rs -sSf | sh~
+
+Optionally, this module also uses the following programs:
+
++ =racer= (if not using LSP): ~cargo +nightly install racer~ (requires rust nightly)
++ =RLS= or =rust-analyzer= (for LSP users)
++ =rustfmt= for ~:editor format~: ~rustup component add rustfmt-preview~
++ The following commands require:
+  + ~cargo-process-check~: ~cargo install cargo-check~
+  + ~cargo-process-clippy~: ~rustup component add clippy-preview~
+
+* Features
+This module also supports LSP, if you have [[https://github.com/rust-lang/rls][the Rust Language Server]] or
+[[https://github.com/rust-analyzer/rust-analyzer][rust-analyzer]] installed. To enable it, you must enable the =:tools lsp= module
+and the ~+lsp~ flag on this module.
+
+** Keybinds
+| Binding             | Description                 |
+|---------------------+-----------------------------|
+| ~<localleader> b a~ | ~cargo audit~               |
+| ~<localleader> b b~ | ~cargo build~               |
+| ~<localleader> b B~ | ~cargo bench~               |
+| ~<localleader> b c~ | ~cargo check~               |
+| ~<localleader> b C~ | ~cargo clippy~              |
+| ~<localleader> b d~ | ~cargo doc~                 |
+| ~<localleader> b n~ | ~cargo update~              |
+| ~<localleader> b o~ | ~cargo outdated~            |
+| ~<localleader> b r~ | ~cargo run~                 |
+| ~<localleader> t a~ | ~cargo test~                |
+| ~<localleader> t t~ | ~run current test~          |
+
+* TODO Configuration
+** Enable rust-analyzer
+You'll need [[https://github.com/rust-analyzer/rust-analyzer][rust-analyzer]] installed on your system, then use the following:
+
+#+BEGIN_SRC elisp
+;; in $DOOMDIR/config.el
+(setq lsp-rust-server 'rust-analyzer)
+#+END_SRC
+
+** Enabling elgot support for Rust
+Doom doesn't have eglot support (yet), but if you've installed it yourself and
+want rust to use eglot instead of LSP, use the following:
+
+#+BEGIN_SRC elisp
+;; in $DOOMDIR/config.el
+(after! rustic
+  (setq rustic-lsp-server 'rust-analyzer ; optional
+        rustic-lsp-client 'eglot))
+#+END_SRC
+
+* TODO Troubleshooting

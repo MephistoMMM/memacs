@@ -1,0 +1,120 @@
+#!/usr/bin/env sh
+:; ( echo "$EMACS" | grep -q "term" ) && EMACS=emacs || EMACS=${EMACS:-emacs} # -*-emacs-lisp-*-
+:; command -v $EMACS >/dev/null || { >&2 echo "Can't find emacs in your PATH"; exit 1; }
+:; VERSION=$($EMACS --version | head -n1)
+:; case "$VERSION" in *\ 2[0-5].[0-9]) echo "Detected Emacs $VERSION"; echo "Doom only supports Emacs 26.1 and newer"; echo; exit 2 ;; esac
+:; DOOMBASE="$(dirname "$0")/.."
+:; [ "$1" = -d ] || [ "$1" = --debug ] && { shift; export DEBUG=1; }
+:; [ "$1" = run ] && { cd "$DOOMBASE"; shift; exec $EMACS -q --no-splash -l bin/doom "$@"; exit 0; }
+:; exec $EMACS --script "$0" -- "$@"
+:; exit 0
+
+(let* ((load-prefer-newer t)
+       (loaddir (file-name-directory (file-truename load-file-name)))
+       (emacsdir (getenv "EMACSDIR"))
+       (user-emacs-directory
+        (abbreviate-file-name (or emacsdir (expand-file-name "../" loaddir)))))
+
+  (push (expand-file-name "core" user-emacs-directory) load-path)
+  (require 'core)
+  (require 'core-cli)
+
+  (defcli! :main
+      ((help-p   ["-h" "--help"]    "Same as help command")
+       (debug-p  ["-d" "--debug"]   "Turns on doom-debug-mode (and debug-on-error)")
+       (yes-p    ["-y" "--yes"]     "Auto-accept all confirmation prompts")
+       (emacsdir ["--emacsdir" dir] "Use the emacs config at DIR (e.g. ~/.emacs.d)")
+       (doomdir  ["--doomdir"  dir] "Use the private module at DIR (e.g. ~/.doom.d)")
+       (localdir ["--localdir" dir] "Use DIR as your local storage directory")
+       &optional command &rest args)
+    "A command line interface for managing Doom Emacs.
+
+Includes package management, diagnostics, unit tests, and byte-compilation.
+
+This tool also makes it trivial to launch Emacs out of a different folder or
+with a different private module."
+    :bare t
+    (when emacsdir
+      (setq user-emacs-directory (file-name-as-directory emacsdir))
+      (print! (info "EMACSDIR=%s") localdir))
+    (when doomdir
+      (setenv "DOOMDIR" doomdir)
+      (print! (info "DOOMDIR=%s") localdir))
+    (when localdir
+      (setenv "DOOMLOCALDIR" localdir)
+      (print! (info "DOOMLOCALDIR=%s") localdir))
+    (when debug-p
+      (setenv "DEBUG" "1")
+      (setq doom-debug-mode t)
+      (print! (info "Debug mode on")))
+    (when yes-p
+      (setenv "YES" "1")
+      (setq doom-auto-accept t)
+      (print! (info "Auto-yes on")))
+    (when help-p
+      (when command
+        (push command args))
+      (setq command "help"))
+
+    (when (equal (user-real-uid) 0)
+      (message
+       (concat "WARNING: This script is running as root. This isn't necessary and is likely\n"
+               "unintentional. It will cause file permissions errors later if you use this\n"
+               "Doom installation on a non-root account.\n"))
+      (unless (or doom-auto-accept (y-or-n-p "Continue anyway?"))
+        (user-error "Aborted")))
+
+    ;; Reload core in case any of the directories were changed.
+    (when (or emacsdir doomdir localdir)
+      (load! "core/core.el" user-emacs-directory))
+
+    (cond ((not noninteractive)
+           (print! "Doom launched out of %s (test mode)" (path user-emacs-directory))
+           (load! "init.el" user-emacs-directory)
+           (doom-run-all-startup-hooks-h))
+
+          ((null command)
+           (doom-cli-execute "help"))
+
+          ((condition-case e
+               (let ((start-time (current-time)))
+                 (and (doom-cli-execute command args)
+                      (print! (success "Finished! (%.4fs)")
+                              (float-time
+                               (time-subtract (current-time)
+                                              start-time)))))
+             (user-error
+              (print! (error "%s\n") (error-message-string e))
+              (print! (yellow "See 'doom help %s' for documentation on this command.") (car args))
+              (error "")) ; Ensure non-zero exit code
+             ((debug error)
+              (print! (error "There was an unexpected error:"))
+              (print-group!
+               (print! "%s %s" (bold "Type:") (car e))
+               (print! (bold "Message:"))
+               (print-group!
+                (print! "%s" (get (car e) 'error-message)))
+               (print! (bold "Data:"))
+               (print-group!
+                (if (cdr e)
+                    (dolist (item (cdr e))
+                      (print! "%S" item))
+                  (print! "n/a")))
+               (when (string-match-p (regexp-quote straight-process-buffer)
+                                     (error-message-string e))
+                 (print! (bold "Straight output:"))
+                 (print-group! (print! "%s" (straight--process-get-output)))))
+              (unless debug-on-error
+                (terpri)
+                (print!
+                 (concat "Run the command again with the -d (or --debug) switch to enable debug\n"
+                         "mode and (hopefully) generate a backtrace from this error:\n"
+                         "\n  %s\n\n"
+                         "If you file a bug report, please include it!")
+                 (string-join (append (list (file-name-nondirectory load-file-name) "-d" command)
+                                      args)
+                              " "))
+                (error ""))))))) ; Ensure non-zero exit code
+
+  (doom-cli-execute :main (cdr (member "--" argv)))
+  (setq argv nil))

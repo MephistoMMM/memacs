@@ -1,0 +1,123 @@
+#+TITLE:   email/mu4e
+#+DATE:    April 8, 2017
+#+SINCE:   v2.0
+#+STARTUP: inlineimages
+
+* Table of Contents :TOC:
+- [[#description][Description]]
+  - [[#module-flags][Module Flags]]
+  - [[#plugins][Plugins]]
+- [[#prerequisites][Prerequisites]]
+  - [[#macos][MacOS]]
+  - [[#arch-linux][Arch Linux]]
+  - [[#nixos][NixOS]]
+  - [[#opensuse][openSUSE]]
+- [[#features][Features]]
+- [[#configuration][Configuration]]
+  - [[#offlineimap][offlineimap]]
+  - [[#mbsync][mbsync]]
+
+* Description
+This module makes Emacs an email client, using ~mu4e~.
+
+#+begin_quote
+I want to live in Emacs, but as we all know, living is incomplete without email.
+So I prayed to the text editor gods and they (I) answered. Emacs+evil's editing
+combined with org-mode for writing emails? /Yes please./
+
+It uses ~mu4e~ to read my email, but depends on ~offlineimap~ (to sync my email
+via IMAP) and ~mu~ (to index my mail into a format ~mu4e~ can understand).
+#+end_quote
+
+** Module Flags
++ ~+gmail~ Enables gmail-specific configuration.
+
+** Plugins
++ [[https://github.com/agpchil/mu4e-maildirs-extension][mu4e-maildirs-extension]]
+
+* Prerequisites
+This module requires:
+
++ Either ~mbsync~ (default) or ~offlineimap~ (to sync mail with)
++ ~mu~ (to index your downloaded messages)
+
+** MacOS
+#+BEGIN_SRC sh
+brew install mu --with-emacs
+# And one of the following
+brew install isync  # mbsync
+brew install offlineimap
+#+END_SRC
+
+** Arch Linux
+Run one of the following commands.
+
+#+BEGIN_SRC sh
+sudo pacman -S isync  # mbsync
+sudo pacman -S offlineimap
+#+END_SRC
+
+Install ~mu~, which is not available in the main repositories but in the AUR, by
+using for example the AUR helper ~yay~.
+
+#+BEGIN_SRC sh
+yay -S mu
+#+END_SRC
+
+** NixOS
+#+BEGIN_SRC nix
+environment.systemPackages = with pkgs; [
+    mu
+    # And one of the following
+    isync
+    offlineimap
+];
+#+END_SRC
+
+[[https://github.com/Emiller88/dotfiles/blob/master/modules/shell/mail.nix][An example of setting up mbsync with home-manager]]
+
+** openSUSE
+Remove ~#~ in ~#sync_program=offlineimap~ to choose ~offlineimap~ instead of
+~mbsync~.
+
+#+BEGIN_SRC sh :dir /sudo::
+sync_program=isync # mbsync
+#sync_program=offlineimap
+
+sudo zypper install maildir-utils $sync_programm
+#+END_SRC
+
+* TODO Features
+
+* Configuration
+** offlineimap
+This module uses =mbsync= by default. To change this, change ~+mu4e-backend~:
+
+#+BEGIN_SRC emacs-lisp
+(setq +mu4e-backend 'offlineimap)
+#+END_SRC
+
+Then you must set up offlineimap and index your mail:
+
+1. Write a ~\~/.offlineimaprc~. Mine can be found [[https://github.com/hlissner/dotfiles/tree/master/shell/mu][in my dotfiles repository]]. It
+   is configured to download mail to ~\~/.mail~. I use [[https://www.passwordstore.org/][unix pass]] to securely
+   store my login credentials.
+2. Download your email: ~offlineimap -o~ (may take a while)
+3. Index it with mu: ~mu index --maildir ~/.mail~
+
+Then configure Emacs to use your email address:
+
+#+BEGIN_SRC emacs-lisp :tangle no
+;; Each path is relative to `+mu4e-mu4e-mail-path', which is ~/.mail by default
+(set-email-account! "Lissner.net"
+  '((mu4e-sent-folder       . "/Lissner.net/Sent Mail")
+    (mu4e-drafts-folder     . "/Lissner.net/Drafts")
+    (mu4e-trash-folder      . "/Lissner.net/Trash")
+    (mu4e-refile-folder     . "/Lissner.net/All Mail")
+    (smtpmail-smtp-user     . "henrik@lissner.net")
+    (user-mail-address      . "henrik@lissner.net")
+    (mu4e-compose-signature . "---\nHenrik Lissner"))
+  t)
+#+END_SRC
+
+** TODO mbsync
