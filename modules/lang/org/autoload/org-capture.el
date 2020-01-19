@@ -161,3 +161,8 @@ project."
   "TODO"
   (+org--capture-central-file
    +org-capture-projects-file (projectile-project-name)))
+
+;;;###autoload
+(defun +org-capture-work-todo-file ()
+  "Return filename of tode.org in work directory."
+  (expand-file-name +org-capture-todo-file +org-capture-work-directory))

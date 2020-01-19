@@ -30,7 +30,7 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 Is relative to `org-directory' unless it is absolute. Is used in Doom's default
 `org-capture-templates'.")
 
-(defvar +org-capture-notes-file "TODOs.org"
+(defvar +org-capture-notes-file "notes.org"
   "Default target for storing notes.
 
 Used as a fall back file for org-capture.el, for templates that do not specify a
@@ -47,6 +47,9 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 
 (defvar +org-capture-projects-file "projects.org"
   "Default, centralized target for org-capture templates.")
+
+(defvar +org-capture-work-directory "~/Desktop"
+  "Default, work directory for org-capture.")
 
 (defvar +org-initial-fold-level 2
   "The initial fold level of org files when no #+STARTUP options for it.")
@@ -272,14 +275,19 @@ I like:
            (file+olp+datetree +org-capture-journal-file "Inbox")
            "* %U %?\n%i\n%a" :prepend t)
 
+          ("w" "Work task" entry
+           (file +org-capture-work-todo-file)
+           "* TODO [#%^{level|A|B}] %^{Task}\nSCHEDULED: %t\n%a"
+           :empty-lines 1)
+
           ;; Will use {project-root}/{todo,notes,changelog}.org, unless a
           ;; {todo,notes,changelog}.org file is found in a parent directory.
           ;; Uses the basename from `+org-capture-todo-file',
           ;; `+org-capture-changelog-file' and `+org-capture-notes-file'.
           ("p" "Templates for projects")
           ("pt" "Project-local todo" entry  ; {project-root}/todo.org
-           (file+headline +org-capture-project-todo-file "Inbox")
-           "* TODO %?\n%i\n%a" :prepend t)
+           (file +org-capture-project-todo-file)
+           "* TODO [#%^{level|A|B}] %?\n%i\n%a" :prepend t)
           ("pn" "Project-local notes" entry  ; {project-root}/notes.org
            (file+headline +org-capture-project-notes-file "Inbox")
            "* %U %?\n%i\n%a" :prepend t)
