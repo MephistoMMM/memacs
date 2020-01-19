@@ -7,3 +7,6 @@
 
 (unless (featurep! :editor evil)
   (package! expand-region :pin "0fa7c2d349e40c0e1de0965acf0f0b77b7070451"))
+
+(package! leave-delimited
+  :recipe (:host github :repo "MephistoMMM/leave-delimited"))

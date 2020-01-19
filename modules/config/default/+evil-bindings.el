@@ -78,9 +78,11 @@
       ;; HACK don't add :i to org-mode-map for "C-j", it is configed in
       ;; org modules;
       :nevim "C-j"     #'+evil/avy  ; lazy-load `avy'
+      :ei "C-'"      #'ar-leave-delimited-forward
       (:after org
         :map org-mode-map
         :nevm "C-j"    #'+evil/avy
+        :ei "C-'"      #'ar-leave-delimited-forward
         :prefix "<easymotion>"
         "h" #'+org/goto-visible)
 
