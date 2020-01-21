@@ -361,8 +361,26 @@
 
       ;;; <leader> d --- diff
       (:prefix-map ("d" . "diff")
-        :desc "Diff two files"         "d" #'ediff
-        :desc "Diff three files"       "D" #'ediff)
+        :desc "Diff two buffers"       "b" #'ediff-buffers
+        :desc "Diff three buffers"     "B" #'ediff-buffers3
+        :desc "Diff two directories"   "d" #'ediff-directories
+        :desc "Diff three directories" "D" #'ediff-directories3
+        :desc "Diff two files"         "f" #'ediff
+        :desc "Diff three files"       "F" #'ediff3
+        :desc "Diff backup"            "." #'ediff-backup
+        :desc "Help documents"         "h" #'ediff-documentation
+        (:prefix-map ("p" . "patch")
+          "b" #'ediff-patch-buffer
+          "f" #'ediff-patch-file)
+        (:prefix-map ("r" . "regions")
+          "l"  #'ediff-regions-linewise
+          "w"  #'ediff-regions-wordwise)
+        (:prefix-map ("w" . "windows")
+          "l"  #'ediff-windows-linewise
+          "w"  #'ediff-windows-wordwise)
+        :desc "Show registry"          "s" #'ediff-show-registry
+        :desc "Revision"               "v" #'ediff-revision
+        :desc "Directory revision"     "V" #'ediff-directory-revisions)
 
       ;;; <leader> f --- file
       (:prefix-map ("f" . "file")
