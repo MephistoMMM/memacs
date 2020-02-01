@@ -564,22 +564,23 @@ behavior). Do not set this directly, this is let-bound in `doom-init-theme-h'.")
 
 (defun doom-init-fonts-h ()
   "Loads `doom-font'."
-  (cond (doom-font
-         (cl-pushnew
-          ;; Avoiding `set-frame-font' because it does a lot of extra, expensive
-          ;; work we can avoid by setting the font frame parameter instead.
-          (cons 'font
-                (cond ((stringp doom-font) doom-font)
-                      ((fontp doom-font) (font-xlfd-name doom-font))
-                      ((signal 'wrong-type-argument (list '(fontp stringp)
-                                                          doom-font)))))
-          default-frame-alist
-          :key #'car :test #'eq))
-        ((display-graphic-p)
-         ;; We try our best to record your system font, so `doom-big-font-mode'
-         ;; can still use it to compute a larger font size with.
-         (setq font-use-system-font t
-               doom-font (face-attribute 'default :font)))))
+  (cond
+   (doom-font
+    (cl-pushnew
+     ;; Avoiding `set-frame-font' because it does a lot of extra, expensive
+     ;; work we can avoid by setting the font frame parameter instead.
+     (cons 'font
+           (cond ((stringp doom-font) doom-font)
+                 ((fontp doom-font) (font-xlfd-name doom-font))
+                 ((signal 'wrong-type-argument (list '(fontp stringp)
+                                                     doom-font)))))
+     default-frame-alist
+     :key #'car :test #'eq))
+   ((display-graphic-p)
+    ;; We try our best to record your system font, so `doom-big-font-mode'
+    ;; can still use it to compute a larger font size with.
+    (setq font-use-system-font t
+          doom-font (face-attribute 'default :font)))))
 
 (defun doom-init-extra-fonts-h (&optional frame)
   "Loads `doom-variable-pitch-font',`doom-serif-font' and `doom-unicode-font'."
@@ -670,9 +671,16 @@ startup (or theme switch) time, so long as `doom--prefer-theme-elc' is non-nil."
 ;;; Fixes/hacks
 
 ;; Doom doesn't support `customize' and it never will. It's a clumsy interface
-;; for something that should be configured from only one place ($DOOMDIR), so we
-;; disable them.
-(put 'customize 'disabled "Doom doesn't support `customize', configure Emacs from $DOOMDIR/config.el instead")
+;; that sets variables at a time where it can be easily and unpredictably
+;; overwritten. Configure things from your $DOOMDIR instead.
+(dolist (sym '(customize-option customize-browse customize-group customize-face
+               customize-rogue customize-saved customize-apropos
+               customize-changed customize-unsaved customize-variable
+               customize-set-value customize-customized customize-set-variable
+               customize-apropos-faces customize-save-variable
+               customize-apropos-groups customize-apropos-options
+               customize-changed-options customize-save-customized))
+  (put sym 'disabled "Doom doesn't support `customize', configure Emacs from $DOOMDIR/config.el instead"))
 (put 'customize-themes 'disabled "Set `doom-theme' or use `load-theme' in $DOOMDIR/config.el instead")
 
 ;; Doesn't exist in terminal Emacs, so we define it to prevent void-function

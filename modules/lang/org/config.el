@@ -125,8 +125,8 @@ path too.")
         org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil)
 
-  ;; Fontify latex blocks and entities natively
-  (setq org-highlight-latex-and-related '(native script entities))
+  ;; Fontify latex blocks and entities, but not natively -- that's too slow
+  (setq org-highlight-latex-and-related '(latex script entities))
   (plist-put! org-format-latex-options
               :scale 1.5         ; larger previews
               :foreground 'auto  ; match the theme foreground
@@ -264,6 +264,8 @@ I like:
    vimperator, dmenu or a global keybinding."
   (setq org-default-notes-file
         (expand-file-name +org-capture-notes-file org-directory)
+        +org-capture-journal-file
+        (expand-file-name +org-capture-journal-file org-directory)
         org-capture-templates
         '(("t" "Personal todo" entry
            (file+headline +org-capture-todo-file "Inbox")
@@ -272,7 +274,7 @@ I like:
            (file+headline +org-capture-notes-file "Inbox")
            "* %u %?\n%i\n%a" :prepend t)
           ("j" "Journal" entry
-           (file+olp+datetree +org-capture-journal-file "Inbox")
+           (file+olp+datetree +org-capture-journal-file)
            "* %U %?\n%i\n%a" :prepend t)
 
           ("w" "Work task" entry
@@ -393,21 +395,6 @@ file isn't in `org-directory'."
 
 
 (defun +org-init-custom-links-h ()
-  (defun +org--relpath (path root)
-    (if (and buffer-file-name (file-in-directory-p buffer-file-name root))
-        (file-relative-name path)
-      path))
-
-  (defun +org-def-link (key dir)
-    (org-link-set-parameters
-     key
-     :complete (lambda () (+org--relpath (+org-link-read-file key dir) dir))
-     :follow   (lambda (link) (find-file (expand-file-name link dir)))
-     :face     (lambda (link)
-                 (if (file-exists-p (expand-file-name link dir))
-                     'org-link
-                   'error))))
-
   ;; Highlight broken file links
   (org-link-set-parameters
    "file"
@@ -642,6 +629,7 @@ between the two."
           "s" #'org-attach-set-directory
           "S" #'org-attach-sync
           (:when (featurep! +dragndrop)
+            "c" #'org-download-screenshot
             "y" #'org-download-yank))
         (:prefix ("b" . "tables")
           "-" #'org-table-insert-hline
@@ -806,12 +794,6 @@ compelling reason, so..."
   :hook (org-mode . org-bullets-mode)
   :config (setq org-bullets-bullet-list '("✾" "✿" "❀" "❖" "✧")))
 ;; ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
-
-
-(use-package! org-fancy-priorities ; priority icons
-  :hook (org-mode . org-fancy-priorities-mode)
-  :config (setq org-fancy-priorities-list '("☢" "☕" "■")))
-;; ("❗" "⬆" "⬇" "☕")
 
 
 (use-package! org-crypt ; built-in

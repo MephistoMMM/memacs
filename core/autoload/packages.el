@@ -14,6 +14,13 @@
       plist)))
 
 ;;;###autoload
+(defun doom-package-set (package prop value)
+  "Set PROPERTY in PACKAGE's recipe to VALUE."
+  (setf (alist-get package doom-packages)
+        (plist-put (alist-get package doom-packages)
+                   prop value)))
+
+;;;###autoload
 (defun doom-package-recipe (package &optional prop nil-value)
   "Returns the `straight' recipe PACKAGE was registered with."
   (let ((plist (gethash (symbol-name package) straight--recipe-cache)))
@@ -22,6 +29,14 @@
             (plist-get plist prop)
           nil-value)
       plist)))
+
+;;;###autoload
+(defun doom-package-recipe-repo (package)
+  "Resolve and return PACKAGE's (symbol) local-repo property."
+  (if-let* ((recipe (cdr (straight-recipes-retrieve package)))
+            (repo (straight-vc-local-repo-name recipe)))
+      repo
+    (symbol-name package)))
 
 ;;;###autoload
 (defun doom-package-build-recipe (package &optional prop nil-value)
@@ -47,6 +62,7 @@
                             deps))
       deps)))
 
+;;;###autoload
 (defun doom-package-depending-on (package &optional noerror)
   "Return a list of packages that depend on the package named NAME."
   (cl-check-type name symbol)
@@ -189,6 +205,61 @@ ones."
       (doom--read-module-packages-file private-packages all-p t))
     (nreverse doom-packages)))
 
+;;;###autoload
+(defun doom-package-pinned-list ()
+  "Return an alist mapping package names (strings) to pinned commits (strings)."
+  (let (alist)
+    (dolist (package doom-packages alist)
+      (with-plist! (cdr package) (recipe modules disable ignore pin unpin)
+        (when (and (not ignore)
+                   (not disable)
+                   (or pin unpin))
+          (setf (alist-get (doom-package-recipe-repo (car package)) alist
+                           nil 'remove #'equal)
+                (unless unpin pin)))))))
+
+;;;###autoload
+(defun doom-package-unpinned-list ()
+  "Return an alist mapping package names (strings) to pinned commits (strings)."
+  (let (alist)
+    (dolist (package doom-packages alist)
+      (with-plist! (cdr package) (recipe modules disable ignore pin unpin)
+        (when (and (not ignore)
+                   (not disable)
+                   (or unpin
+                       (and (plist-member recipe :pin)
+                            (null pin))))
+          (cl-pushnew (doom-package-recipe-repo (car package)) alist
+                      :test #'equal))))))
+
+;;;###autoload
+(defun doom-package-recipe-list ()
+  "Return straight recipes for non-builtin packages with a local-repo."
+  (let (recipes)
+    (dolist (recipe (hash-table-values straight--recipe-cache))
+      (with-plist! recipe (local-repo type)
+        (when (and local-repo (not (eq type 'built-in)))
+          (push recipe recipes))))
+    (nreverse recipes)))
+
+;;;###autoload
+(defmacro doom-with-package-recipes (recipes binds &rest body)
+  "TODO"
+  (declare (indent 2))
+  (let ((recipe-var  (make-symbol "recipe"))
+        (recipes-var (make-symbol "recipes")))
+    `(let* ((,recipes-var ,recipes)
+            (built ())
+            (straight-use-package-pre-build-functions
+             (cons (lambda (pkg) (cl-pushnew pkg built :test #'equal))
+                   straight-use-package-pre-build-functions)))
+       (dolist (,recipe-var ,recipes-var)
+         (cl-block nil
+           (straight--with-plist (append (list :recipe ,recipe-var) ,recipe-var)
+               ,(doom-enlist binds)
+             ,@body)))
+       (nreverse built))))
+
 
 ;;
 ;;; Main functions
@@ -203,11 +274,11 @@ ones."
   (message "Reloading packages...DONE"))
 
 ;;;###autoload
-(defun doom/update-pinned-package-declaration ()
+(defun doom/update-pinned-package-form (&optional select)
   "Inserts or updates a `:pin' for the `package!' statement at point.
 
 Grabs the latest commit id of the package using 'git'."
-  (interactive)
+  (interactive "P")
   ;; REVIEW Better error handling
   ;; TODO Insert a new `package!' if no `package!' at poin
   (require 'straight)
@@ -215,26 +286,30 @@ Grabs the latest commit id of the package using 'git'."
     (while (and (atom (sexp-at-point))
                 (not (bolp)))
       (forward-sexp -1)))
-  (if (not (eq (sexp-at-point) 'package!))
-      (user-error "Not on a `package!' call")
-    (backward-char)
-    (let* ((recipe (cdr (sexp-at-point)))
-           (name (car recipe))
-           (id
-            (cdr (doom-call-process
-                  "git" "ls-remote"
-                  (straight-vc-git--destructure
-                      (doom-plist-merge
-                       (plist-get (cdr recipe) :recipe)
-                       (or (cdr (straight-recipes-retrieve name))
-                           (plist-get (cdr (assq name doom-packages)) :recipe)))
-                      (upstream-repo upstream-host)
-                    (straight-vc-git--encode-url upstream-repo upstream-host))))))
-      (unless id
-        (user-error "No id for %S package" name))
-      (let ((id (car (split-string id))))
-        (if (re-search-forward ":pin +\"\\([^\"]+\\)\"" (cdr (bounds-of-thing-at-point 'sexp)) t)
-            (replace-match id t t nil 1)
-          (thing-at-point--end-of-sexp)
-          (backward-char)
-          (insert " :pin " (prin1-to-string id)))))))
+  (save-excursion
+    (if (not (eq (sexp-at-point) 'package!))
+        (user-error "Not on a `package!' call")
+      (backward-char)
+      (let* ((recipe (cdr (sexp-at-point)))
+             (name (car recipe))
+             (id
+              (cdr (doom-call-process
+                    "git" "ls-remote"
+                    (straight-vc-git--destructure
+                        (doom-plist-merge
+                         (plist-get (cdr recipe) :recipe)
+                         (or (cdr (straight-recipes-retrieve name))
+                             (plist-get (cdr (assq name doom-packages)) :recipe)))
+                        (upstream-repo upstream-host)
+                      (straight-vc-git--encode-url upstream-repo upstream-host))))))
+        (unless id
+          (user-error "No id for %S package" name))
+        (let* ((id (if select
+                       (car (split-string (completing-read "Commit: " (split-string id "\n" t))))
+                     (car (split-string id))))
+               (id (substring id 0 10)))
+          (if (re-search-forward ":pin +\"\\([^\"]+\\)\"" (cdr (bounds-of-thing-at-point 'sexp)) t)
+              (replace-match id t t nil 1)
+            (thing-at-point--end-of-sexp)
+            (backward-char)
+            (insert " :pin " (prin1-to-string id))))))))

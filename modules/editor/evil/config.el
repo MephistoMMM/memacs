@@ -27,20 +27,15 @@ directives. By default, this only recognizes C directives.")
 (defvar evil-want-C-w-delete t)
 (defvar evil-want-Y-yank-to-eol t)
 (defvar evil-want-abbrev-expand-on-insert-exit nil)
-(defvar evil-respect-visual-line-mode t)
 
 (use-package! evil
   :hook (doom-init-modules . evil-mode)
   :demand t
   :preface
   (setq evil-want-visual-char-semi-exclusive t
-        evil-magic t
-        evil-echo-state t
-        evil-indent-convert-tabs t
         evil-ex-search-vim-style-regexp t
         evil-ex-substitute-global t
         evil-ex-visual-char-range t  ; column range for ex commands
-        evil-insert-skip-empty-lines t
         evil-mode-line-format 'nil
         ;; more vim-like behavior
         evil-symbol-word-search t
@@ -54,9 +49,7 @@ directives. By default, this only recognizes C directives.")
         evil-want-keybinding (not (featurep! +everywhere))
         ;; Only do highlighting in selected window so that Emacs has less work
         ;; to do highlighting them all.
-        ;; TODO Revert this to `selected-windows' once emacs-evil/evil#1233 is
-        ;;      resolved, otherwise we get no highlights on */#
-        evil-ex-interactive-search-highlight 'all-windows)
+        evil-ex-interactive-search-highlight 'selected-window)
 
   ;; Slow this down from 0.02 to prevent blocking in large or folded buffers
   ;; like magit while incrementally highlighting matches.
@@ -140,7 +133,7 @@ directives. By default, this only recognizes C directives.")
     (save-excursion (apply orig-fn args)))
 
   ;; In evil, registers 2-9 are buffer-local. In vim, they're global, so...
-  (defadvice! +evil--make-numbered-markers-global-a (_arg)
+  (defadvice! +evil--make-numbered-markers-global-a (char)
     :after-until #'evil-global-marker-p
     (and (>= char ?2) (<= char ?9)))
 
@@ -162,15 +155,6 @@ directives. By default, this only recognizes C directives.")
   ;; Make o/O continue comments (see `+evil-want-o/O-to-continue-comments')
   (advice-add #'evil-open-above :around #'+evil--insert-newline-above-and-respect-comments-a)
   (advice-add #'evil-open-below :around #'+evil--insert-newline-below-and-respect-comments-a)
-
-  ;; Fix backspace/DEL commands not respecting `delete-selection-mode',
-  ;; smartparens pairs (in some cases), and ignoring
-  ;; `+default--delete-backward-char-a' on `delete-char-backward'
-  (defadvice! +evil-delete-region-if-mark-a (orig-fn &rest args)
-    :override #'evil-delete-backward-char-and-join
-    (if (or evil-backspace-join-lines (not (bolp)))
-        (call-interactively #'backward-delete-char-untabify)
-      (user-error "Beginning of line")))
 
   ;; Recenter screen after most searches
   (dolist (fn '(evil-visualstar/begin-search-forward

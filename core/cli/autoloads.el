@@ -27,7 +27,8 @@ one wants that.")
 (defun doom-cli-reload-core-autoloads (&optional file)
   (print! (start "(Re)generating core autoloads..."))
   (print-group!
-   (let ((file (or file doom-autoload-file)))
+   (let ((file (or file doom-autoload-file))
+         doom-autoload-cached-vars)
      (cl-check-type file string)
      (and (print! (start "Generating core autoloads..."))
           (doom-cli--write-autoloads
@@ -133,10 +134,8 @@ one wants that.")
           (form))))
 
 (defun doom-cli--generate-autoloads-autodefs (file buffer module &optional module-enabled-p)
-  (with-current-buffer
-      (or (get-file-buffer file)
-          (autoload-find-file file))
-    (goto-char (point-min))
+  (with-temp-buffer
+    (insert-file-contents file)
     (while (re-search-forward "^;;;###autodef *\\([^\n]+\\)?\n" nil t)
       (let* ((standard-output buffer)
              (form    (read (current-buffer)))
