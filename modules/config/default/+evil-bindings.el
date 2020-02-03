@@ -369,13 +369,13 @@
         :desc "Diff three files"       "F" #'ediff3
         :desc "Diff backup"            "." #'ediff-backup
         :desc "Help documents"         "h" #'ediff-documentation
-        (:prefix-map ("p" . "patch")
+        (:prefix ("p" . "patch")
           "b" #'ediff-patch-buffer
           "f" #'ediff-patch-file)
-        (:prefix-map ("r" . "regions")
+        (:prefix ("r" . "regions")
           "l"  #'ediff-regions-linewise
           "w"  #'ediff-regions-wordwise)
-        (:prefix-map ("w" . "windows")
+        (:prefix ("w" . "windows")
           "l"  #'ediff-windows-linewise
           "w"  #'ediff-windows-wordwise)
         :desc "Show registry"          "s" #'ediff-show-registry

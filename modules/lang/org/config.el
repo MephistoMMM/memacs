@@ -683,7 +683,14 @@ between the two."
           "o" #'+org/refile-to-other-window
           "O" #'+org/refile-to-other-buffer
           "v" #'+org/refile-to-visible
-          "r" #'org-refile)) ; to all `org-refile-targets'
+          "r" #'org-refile) ; to all `org-refile-targets'
+        (:prefix ("w" . "wrapper")
+          "r" '+org/wrap-resume
+          "q" '+org/wrap-quote
+          "l" '+org/wrap-link
+          "o" '+org/wrap-ordered-list
+          "u" '+org/wrap-unordered-list
+          "s" '+org/wrap-source-code))
 
   (map! :after org-agenda
         :map org-agenda-mode-map
