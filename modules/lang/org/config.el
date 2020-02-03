@@ -77,7 +77,8 @@ path too.")
 
 (defun +org-init-agenda-h ()
   (unless org-agenda-files
-    (setq org-agenda-files (list org-directory)))
+    (setq org-agenda-files (list org-directory
+                                 +org-capture-work-directory)))
   (setq-default
    ;; Don't monopolize the whole frame just for the agenda
    org-agenda-window-setup 'current-window
