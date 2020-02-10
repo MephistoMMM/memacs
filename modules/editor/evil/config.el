@@ -126,7 +126,7 @@ directives. By default, this only recognizes C directives.")
                  (count-lines (point-min) (point-max))
                  (buffer-size)))))
 
-  ;; 'gq' moves the cursor to the beginning of selection. Disable this, since
+  ;; '=' moves the cursor to the beginning of selection. Disable this, since
   ;; it's more disruptive than helpful.
   (defadvice! +evil--dont-move-cursor-a (orig-fn &rest args)
     :around #'evil-indent
@@ -155,6 +155,14 @@ directives. By default, this only recognizes C directives.")
   ;; Make o/O continue comments (see `+evil-want-o/O-to-continue-comments')
   (advice-add #'evil-open-above :around #'+evil--insert-newline-above-and-respect-comments-a)
   (advice-add #'evil-open-below :around #'+evil--insert-newline-below-and-respect-comments-a)
+
+  ;; REVIEW Fix #2493: dir-locals cannot target fundamental-mode when evil-mode
+  ;;        is active. See https://github.com/hlissner/doom-emacs/issues/2493.
+  ;;        Revert this if this is ever fixed upstream.
+  (defadvice! fix-local-vars (&rest _)
+    :before #'turn-on-evil-mode
+    (when (eq major-mode 'fundamental-mode)
+      (hack-local-variables)))
 
   ;; Recenter screen after most searches
   (dolist (fn '(evil-visualstar/begin-search-forward
@@ -406,7 +414,7 @@ To change these keys see `+evil-repeat-keys'."
   (defadvice! +evil-collection-disable-blacklist-a (orig-fn)
     :around #'evil-collection-vterm-toggle-send-escape  ; allow binding to ESC
     (let (evil-collection-key-blacklist)
-      (apply orig-fn))))
+      (funcall-interactively orig-fn))))
 
 ;; Keybinds that have no Emacs+evil analogues (i.e. don't exist):
 ;;   zq - mark word at point as good word
@@ -545,6 +553,7 @@ To change these keys see `+evil-repeat-keys'."
       :textobj "i" #'evil-indent-plus-i-indent         #'evil-indent-plus-a-indent
       :textobj "j" #'evil-indent-plus-i-indent-up-down #'evil-indent-plus-a-indent-up-down
       :textobj "k" #'evil-indent-plus-i-indent-up      #'evil-indent-plus-a-indent-up
+      :textobj "u" #'+evil:inner-url-txtobj            #'+evil:outer-url-txtobj
       :textobj "x" #'evil-inner-xml-attr               #'evil-outer-xml-attr
 
       ;; evil-surround
