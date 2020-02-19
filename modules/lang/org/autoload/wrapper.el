@@ -119,7 +119,7 @@ set `+org--wrap-call-from-resume' to t."
 (defun +org--link-switch ()
   "Filter link lines in counsel kills, if used ivy layer,
 otherwise in kill-rang."
-  (if (configuration-layer/layer-usedp 'ivy)
+  (if (featurep! :completion ivy)
       (seq-filter '+org--linkp (counsel--yank-pop-kills))
       (seq-filter '+org--linkp kill-ring))
   )
