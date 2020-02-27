@@ -968,7 +968,8 @@ compelling reason, so..."
              #'doom-disable-show-trailing-whitespace-h
              #'+org-enable-auto-reformat-tables-h
              #'+org-enable-auto-update-cookies-h
-             #'+org-unfold-to-2nd-level-or-point-h)
+             #'+org-unfold-to-2nd-level-or-point-h
+             #'+org-disable-truncate-lines-or-wrap-words-h)
 
   (add-hook! 'org-load-hook
              #'+org-init-appearance-h
