@@ -7,59 +7,55 @@
 ;;
 ;;; Packages
 
-(use-package! enh-ruby-mode
-  :mode ("\\.\\(?:pry\\|irb\\)rc\\'" . +ruby-init-h)
-  :mode ("\\.\\(?:rb\\|rake\\|rabl\\|ru\\|builder\\|gemspec\\|jbuilder\\|thor\\)\\'" .  +ruby-init-h)
-  :mode ("/\\(?:Berks\\|Cap\\|Gem\\|Guard\\|Pod\\|Puppet\\|Rake\\|Thor\\|Vagrant\\)file\\'" .  +ruby-init-h)
-  :preface
-  (after! ruby-mode
-    (require 'enh-ruby-mode))
-  (defun +ruby-init-h ()
-    "Enable `enh-ruby-mode' if ruby is available, otherwise `ruby-mode'."
-    (if (executable-find "ruby")
-        (enh-ruby-mode)
-      (ruby-mode)))
+(use-package! ruby-mode  ; built-in
+  ;; Other extensions are already registered in `auto-mode-alist' by `ruby-mode'
+  :mode "\\.\\(?:a?rb\\|aslsx\\)\\'"
+  :mode "/\\(?:Brew\\|Fast\\)file\\'"
+  :interpreter "j?ruby\\(?:[0-9.]+\\)"
   :config
-  (set-electric! '(ruby-mode enh-ruby-mode) :words '("else" "end" "elsif"))
-  (set-repl-handler! '(ruby-mode enh-ruby-mode) #'inf-ruby)
+  (setq ruby-insert-encoding-magic-comment nil)
+
+  (set-electric! 'ruby-mode :words '("else" "end" "elsif"))
+  (set-repl-handler! 'ruby-mode #'inf-ruby)
 
   (when (featurep! +lsp)
-    (add-hook 'enh-ruby-mode-local-vars-hook #'lsp!))
-
-  (after! company-dabbrev-code
-    (add-to-list 'company-dabbrev-code-modes 'enh-ruby-mode nil #'eq)
-    (add-to-list 'company-dabbrev-code-modes 'ruby-mode nil #'eq))
+    (add-hook 'ruby-mode-local-vars-hook #'lsp!))
 
   (after! inf-ruby
     ;; switch to inf-ruby from compile if we detect a breakpoint has been hit
-    (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter))
+    (add-hook 'compilation-filter-hook #'inf-ruby-auto-enter))
 
   ;; so class and module pairs work
-  (setq-hook! (ruby-mode enh-ruby-mode) sp-max-pair-length 6))
+  (setq-hook! 'ruby-mode-hook sp-max-pair-length 6)
+
+  (map! :localleader
+        :map ruby-mode-map
+        "[" #'ruby-toggle-block
+        "{" #'ruby-toggle-block))
 
 
 (use-package! robe
   :defer t
   :init
-  (add-hook! 'enh-ruby-mode-hook
+  (add-hook! 'ruby-mode-hook
     (defun +ruby-init-robe-mode-maybe-h ()
       "Start `robe-mode' if `lsp-mode' isn't active."
-      (unless (or (bound-and-true-p lsp-mode)
-                  (bound-and-true-p lsp--buffer-deferred))
-        (robe-mode +1))))
+      (or (bound-and-true-p lsp-mode)
+          (bound-and-true-p lsp--buffer-deferred)
+          (robe-mode +1))))
   :config
-  (set-repl-handler! 'enh-ruby-mode #'robe-start)
-  (set-company-backend! 'enh-ruby-mode 'company-robe)
-  (set-lookup-handlers! 'enh-ruby-mode
+  (set-repl-handler! 'ruby-mode #'robe-start)
+  (set-company-backend! 'ruby-mode 'company-robe 'company-dabbrev-code)
+  (set-lookup-handlers! 'ruby-mode
     :definition #'robe-jump
     :documentation #'robe-doc)
+  (when (featurep! :editor evil)
+    (add-hook 'robe-mode-hook #'evil-normalize-keymaps))
   (map! :localleader
         :map robe-mode-map
         "'"  #'robe-start
-        ;; robe mode specific
         "h"  #'robe-doc
-        "rr" #'robe-rails-refresh
-        ;; inf-enh-ruby-mode
+        "R"  #'robe-rails-refresh
         :prefix "s"
         "d"  #'ruby-send-definition
         "D"  #'ruby-send-definition-and-go
@@ -70,12 +66,13 @@
 
 ;; NOTE Must be loaded before `robe-mode'
 (use-package! yard-mode
-  :hook (ruby-mode enh-ruby-mode))
+  :hook ruby-mode)
 
 
 (use-package! rubocop
-  :hook (enh-ruby-mode . rubocop-mode)
+  :hook (ruby-mode . rubocop-mode)
   :config
+  (set-popup-rule! "^\\*RuboCop" :select t)
   (map! :localleader
         :map rubocop-mode-map
         "f" #'rubocop-check-current-file
@@ -91,9 +88,9 @@
   :defer t
   :init
   (setq rake-cache-file (concat doom-cache-dir "rake.cache"))
-  (map! :after enh-ruby-mode
+  (map! :after ruby-mode
         :localleader
-        :map enh-ruby-mode-map
+        :map ruby-mode-map 
         :prefix "k"
         "k" #'rake
         "r" #'rake-rerun
@@ -103,9 +100,9 @@
 (use-package! bundler
   :defer t
   :init
-  (map! :after enh-ruby-mode
+  (map! :after ruby-mode
         :localleader
-        :map enh-ruby-mode-map
+        :map ruby-mode-map
         :prefix "b"
         "c" #'bundle-check
         "C" #'bundle-console
@@ -113,6 +110,13 @@
         "u" #'bundle-update
         "e" #'bundle-exec
         "o" #'bundle-open))
+
+(use-package! chruby
+  :when (featurep! +chruby)
+  :hook (ruby-mode . chruby-use-corresponding)
+  :config
+  (setq rspec-use-rvm nil
+        rspec-use-chruby t))
 
 (after! rbenv
   (setq rspec-use-rvm nil)
@@ -125,6 +129,7 @@
 (use-package! rspec-mode
   :mode ("/\\.rspec\\'" . text-mode)
   :init
+  (setq rspec-use-spring-when-possible nil)
   (when (featurep! :editor evil)
     (add-hook 'rspec-mode-hook #'evil-normalize-keymaps))
   :config
@@ -163,3 +168,21 @@
         "a" #'minitest-verify-all
         "s" #'minitest-verify-single
         "v" #'minitest-verify))
+
+
+(use-package! projectile-rails
+  :when (featurep! +rails)
+  :hook ((ruby-mode inf-ruby-mode projectile-rails-server-mode) . projectile-rails-mode)
+  :init
+  (setq inf-ruby-console-environment "development")
+  (when (featurep! :lang web)
+    (add-hook 'web-mode-hook #'projectile-rails-mode))
+  :config
+  (when (featurep! :editor evil)
+    (add-hook 'projectile-rails-mode-hook #'evil-normalize-keymaps))
+  (map! :localleader
+        :map projectile-rails-mode-map
+        "r" #'projectile-rails-command-map)
+  (push '((nil . "projectile-rails-\\(.+\\)") . (nil . "\\1"))
+        which-key-replacement-alist)
+  (set-popup-rule! "^\\*\\(projectile-\\)?rails" :ttl nil))

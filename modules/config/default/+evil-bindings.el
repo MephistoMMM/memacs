@@ -403,13 +403,17 @@
         :desc "Sudo this file"              "U"   #'doom/sudo-this-file
         :desc "Yank filename"               "y"   #'+default/yank-buffer-filename)
 
-      ;;; <leader> g --- git
+      ;;; <leader> g --- git/version control
       (:prefix-map ("g" . "git")
-        :desc "Git revert file"             "R"   #'vc-revert
-        :desc "Copy link to remote"         "y"   #'+vc/browse-at-remote-kill-file-or-region
+        :desc "Revert file"                 "R"   #'vc-revert
+        :desc "Copy link to remote"         "y"   #'browse-at-remote-kill
         :desc "Copy link to homepage"       "Y"   #'+vc/browse-at-remote-kill-homepage
+        (:when (featurep! :ui hydra)
+          :desc "SMerge"                    "m"   #'+vc/smerge-hydra/body)
         (:when (featurep! :ui vc-gutter)
-          :desc "Git revert hunk"           "r"   #'git-gutter:revert-hunk
+          (:when (featurep! :ui hydra)
+            :desc "VCGutter"                "."   #'+vc/gutter-hydra/body)
+          :desc "Revert hunk"               "r"   #'git-gutter:revert-hunk
           :desc "Git stage hunk"            "s"   #'git-gutter:stage-hunk
           :desc "Git time machine"          "t"   #'git-timemachine-toggle
           :desc "Jump to next hunk"         "]"   #'git-gutter:next-hunk
@@ -433,7 +437,7 @@
             :desc "Find issue"                "i"   #'forge-visit-issue
             :desc "Find pull request"         "p"   #'forge-visit-pullreq)
           (:prefix ("o" . "open in browser")
-            :desc "Browse file or region"     "o"   #'+vc/browse-at-remote-file-or-region
+            :desc "Browse file or region"     "o"   #'browse-at-remote
             :desc "Browse homepage"           "h"   #'+vc/browse-at-remote-homepage
             :desc "Browse remote"             "r"   #'forge-browse-remote
             :desc "Browse commit"             "c"   #'forge-browse-commit
@@ -545,6 +549,7 @@
         :desc "Compile in project"           "c" #'projectile-compile-project
         :desc "Repeat last command"          "C" #'projectile-repeat-last-command
         :desc "Remove known project"         "d" #'projectile-remove-known-project
+        :desc "Discover projects in folder"  "D" #'+default/discover-projects
         :desc "Edit project .dir-locals"     "e" #'projectile-edit-dir-locals
         :desc "Find file in project"         "f" #'projectile-find-file
         :desc "Find file in other project"   "F" #'doom/find-file-in-other-project
@@ -605,7 +610,9 @@
           :desc "Flyspell"                   "s" #'flyspell-mode)
         (:when (featurep! :lang org +pomodoro)
           :desc "Pomodoro timer"             "t" #'org-pomodoro)
-        :desc "Word-wrap mode"               "w" #'+word-wrap-mode
+        :desc "Soft line wrapping"           "w" #'visual-line-mode
+        (:when (featurep! :ui word-wrap)
+          :desc "Soft line wrapping"         "w" #'+word-wrap-mode)
         :desc "Zen mode"                     "z" #'writeroom-mode))
 
 ;;

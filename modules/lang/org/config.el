@@ -6,7 +6,8 @@
     (D . C)
     (sh . shell)
     (bash . shell)
-    (matlab . octave))
+    (matlab . octave)
+    (amm . ammonite))
   "An alist mapping languages to babel libraries. This is necessary for babel
 libraries (ob-*.el) that don't match the name of the language.
 
@@ -53,14 +54,6 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 
 (defvar +org-initial-fold-level 2
   "The initial fold level of org files when no #+STARTUP options for it.")
-
-(defvar +org-enable-centralized-exports t
-  "If non-nil, files exported from files in `org-directory' will be stored in
-`+org-export-directory', rather than the same directory has the input file(s).")
-
-(defvar +org-export-directory ".export/"
-  "Where to store exported files relative to `org-directory'. Can be an absolute
-path too.")
 
 (defvar +org-habit-graph-padding 2
   "The padding added to the end of the consistency graph")
@@ -189,6 +182,9 @@ path too.")
         ;; Our :lang common-lisp module uses sly, so...
         org-babel-lisp-eval-fn #'sly-eval)
 
+  ;; Add convenience lang alias for markdown blocks
+  (add-to-list 'org-src-lang-modes '("md" . markdown))
+
   ;; I prefer C-c C-c over C-c ' (more consistent)
   (define-key org-src-mode-map (kbd "C-c C-c") #'org-edit-src-exit)
 
@@ -245,13 +241,7 @@ path too.")
     :override #'org-babel-do-load-languages
     (message
      (concat "`org-babel-do-load-languages' is redundant with Doom's lazy loading mechanism for babel "
-             "packages. There is no need to use it, so it has been disabled")))
-
-  (when (featurep! :lang scala)
-    (add-hook! '+org-babel-load-functions
-      (defun +org-babel-load-ammonite-h (lang)
-        (and (eq lang 'amm)
-             (require 'ob-ammonite nil t))))))
+             "packages. There is no need to use it, so it has been disabled"))))
 
 
 (defun +org-init-capture-defaults-h ()
@@ -323,6 +313,12 @@ I like:
   (after! org-capture
     (org-capture-put :kill-buffer t))
 
+  ;; HACK Doom doesn't support `customize'. Best not to advertise it as an
+  ;;      option in `org-capture's menu.
+  (defadvice! +org--remove-customize-option-a (orig-fn table title &optional prompt specials)
+    :around #'org-mks
+    (funcall orig-fn table title prompt (remove '("C" "Customize org-capture-templates") specials)))
+
   (defadvice! +org--capture-expand-variable-file-a (file)
     "If a variable is used for a file path in `org-capture-template', it is used
 as is, and expanded relative to `default-directory'. This changes it to be
@@ -369,30 +365,6 @@ underlying, modified buffer. This fixes that."
         org-attach-use-inheritance t)
   (after! projectile
     (add-to-list 'projectile-globally-ignored-directories org-attach-id-dir)))
-
-
-(defun +org-init-centralized-exports-h ()
-  "TODO"
-  ;; I don't have any beef with org's built-in export system, but I do wish it
-  ;; would export to a central directory (by default), rather than
-  ;; `default-directory'. This is because all my org files are usually in one
-  ;; place, and I want to be able to refer back to old exports if needed.
-  (setq +org-export-directory (expand-file-name +org-export-directory org-directory))
-
-  (defadvice! +org--export-output-file-name-a (args)
-    "Return a centralized export location unless one is provided or the current
-file isn't in `org-directory'."
-    :filter-args #'org-export-output-file-name
-    (when (and +org-enable-centralized-exports
-               (not (nth 2 args))
-               buffer-file-name
-               (file-in-directory-p buffer-file-name org-directory))
-      (cl-destructuring-bind (extension &optional subtreep _pubdir) args
-        (let ((dir (expand-file-name +org-export-directory org-directory)))
-          (unless (file-directory-p dir)
-            (make-directory dir t))
-          (setq args (list extension subtreep dir)))))
-    args))
 
 
 (defun +org-init-custom-links-h ()
@@ -451,7 +423,7 @@ file isn't in `org-directory'."
     (setq org-pandoc-options
           '((standalone . t)
             (mathjax . t)
-            (variable . "revealjs-url=https://cdn.jsdelivr.net/npm/reveal.js@3/")))))
+            (variable . "revealjs-url=https://revealjs.com")))))
 
 
 (defun +org-init-habit-h ()
@@ -500,11 +472,11 @@ eldoc string."
     (funcall orig-fn
              (cl-loop for part in path
                       ;; Remove full link syntax
-                      for part = (replace-regexp-in-string org-link-any-re "\\4" part)
+                      for fixedpart = (replace-regexp-in-string org-link-any-re "\\4" part)
                       for n from 0
                       for face = (nth (% n org-n-level-faces) org-level-faces)
                       collect
-                      (org-add-props part
+                      (org-add-props fixedpart
                           nil 'face `(:foreground ,(face-foreground face nil t) :weight bold)))
              width prefix separator))
 
@@ -713,12 +685,12 @@ between the two."
 (defun +org-init-popup-rules-h ()
   (set-popup-rules!
     '(("^\\*Org Links" :slot -1 :vslot -1 :size 2 :ttl 0)
-      ("^\\*\\(?:Agenda Com\\|Calendar\\|Org Export Dispatcher\\)"
+      ("^ ?\\*\\(?:Agenda Com\\|Calendar\\|Org Export Dispatcher\\)"
        :slot -1 :vslot -1 :size #'+popup-shrink-to-fit :ttl 0)
-      ("^\\*Org Select" :slot -1 :vslot -2 :ttl 0 :size 0.25)
+      ("^\\*Org \\(?:Select\\|Attach\\)" :slot -1 :vslot -2 :ttl 0 :size 0.25)
       ("^\\*Org Agenda"    :ignore t)
       ("^\\*Org Src"       :size 0.4  :quit nil :select t :autosave t :modeline t :ttl nil)
-      ("^CAPTURE.*\\.org$" :size 0.25 :quit nil :select t :autosave t))))
+      ("^CAPTURE-.*\\.org$" :size 0.25 :quit nil :select t :autosave t))))
 
 
 (defun +org-init-protocol-lazy-loader-h ()
@@ -792,10 +764,6 @@ compelling reason, so..."
 (use-package! toc-org ; auto-table of contents
   :hook (org-mode . toc-org-enable)
   :config (setq toc-org-hrefify-default "gh"))
-
-
-(use-package! org-bookmark-heading ; add org heading support to bookmark.el
-  :after (:or bookmark org))
 
 
 (use-package! org-bullets ; "prettier" bullets
@@ -979,7 +947,6 @@ compelling reason, so..."
              #'+org-init-babel-lazy-loader-h
              #'+org-init-capture-defaults-h
              #'+org-init-capture-frame-h
-             #'+org-init-centralized-exports-h
              #'+org-init-custom-links-h
              #'+org-init-export-h
              #'+org-init-habit-h
@@ -1007,16 +974,18 @@ compelling reason, so..."
     (run-hooks 'org-load-hook))
 
   :config
+  (setq org-archive-subtree-save-file-p t) ; save target buffer after archiving
+
   ;; Global ID state means we can have ID links anywhere. This is required for
   ;; `org-brain', however.
   (setq org-id-track-globally t
-        org-id-locations-file (concat org-directory ".orgids")
+        org-id-locations-file (expand-file-name ".orgids" org-directory)
         org-id-locations-file-relative t)
 
   ;; HACK `org-id' doesn't check if `org-id-locations-file' exists or is
   ;;      writeable before trying to read/write to it.
   (defadvice! +org--fail-gracefully-a (&rest _)
     :before-while '(org-id-locations-save org-id-locations-load)
-    (file-exists-p org-id-locations-file))
+    (file-writable-p org-id-locations-file))
 
   (add-hook 'org-open-at-point-functions #'doom-set-jump-h))

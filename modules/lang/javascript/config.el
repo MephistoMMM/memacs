@@ -148,7 +148,8 @@ If LSP fails to start (e.g. no available server or project), then we fall back
 to tide."
     (let ((buffer-file-name (buffer-file-name (buffer-base-buffer))))
       (when (or (derived-mode-p 'js-mode 'typescript-mode)
-                (and (eq major-mode 'web-mode)
+                (and buffer-file-name
+                     (eq major-mode 'web-mode)
                      (string= "tsx" (file-name-extension buffer-file-name))))
         (if (not buffer-file-name)
             ;; necessary because `tide-setup' and `lsp' will error if not a
@@ -211,10 +212,7 @@ to tide."
 
 (use-package! js2-refactor
   :hook ((js2-mode rjsx-mode) . js2-refactor-mode)
-  :config
-  (when (featurep! :editor evil +everywhere)
-    (let ((js2-refactor-mode-map (evil-get-auxiliary-keymap js2-refactor-mode-map 'normal t t)))
-      (js2r-add-keybindings-with-prefix (format "%s r" doom-localleader-key))))
+  :init
   (map! :after js2-mode
         :map js2-mode-map
         :localleader
@@ -233,7 +231,12 @@ to tide."
           (:prefix ("u" . "unwrap"))
           (:prefix ("v" . "var"))
           (:prefix ("w" . "wrap"))
-          (:prefix ("3" . "ternary")))))
+          (:prefix ("3" . "ternary"))))
+  :config
+  (when (featurep! :editor evil +everywhere)
+    (add-hook 'js2-refactor-mode-hook #'evil-normalize-keymaps)
+    (let ((js2-refactor-mode-map (evil-get-auxiliary-keymap js2-refactor-mode-map 'normal t t)))
+      (js2r-add-keybindings-with-prefix (format "%s r" doom-localleader-key)))))
 
 
 (use-package! eslintd-fix

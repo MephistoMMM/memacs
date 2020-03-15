@@ -70,7 +70,7 @@
         :desc "Sudo find file"              "S"   #'doom/sudo-find-file
         :desc "Yank filename"               "y"   #'+default/yank-buffer-filename
         :desc "Open scratch buffer"         "x"   #'doom/open-scratch-buffer
-        :desc "Open project scratch buffer" "X"   #'doom/switch-to-scratch-buffer
+        :desc "Switch to scratch buffer"    "X"   #'doom/switch-to-scratch-buffer
         (:when (featurep! :tools editorconfig)
           :desc "Open project editorconfig"   "."   #'editorconfig-find-current-editorconfig))
 
@@ -238,7 +238,7 @@
       ;;; <leader> v --- versioning
       (:prefix-map ("v" . "versioning")
         :desc "Git revert file"             "R"   #'vc-revert
-        :desc "Kill link to remote"         "y"   #'+vc/browse-at-remote-kill-file-or-region
+        :desc "Kill link to remote"         "y"   #'browse-at-remote-kill
         :desc "Kill link to homepage"       "Y"   #'+vc/browse-at-remote-kill-homepage
         (:when (featurep! :ui vc-gutter)
           :desc "Git revert hunk"           "r"   #'git-gutter:revert-hunk
@@ -264,7 +264,7 @@
             :desc "Find issue"                "i"   #'forge-visit-issue
             :desc "Find pull request"         "p"   #'forge-visit-pullreq)
           (:prefix ("o" . "open in browser")
-            :desc "Browse file or region"     "."   #'+vc/browse-at-remote-file-or-region
+            :desc "Browse file or region"     "."   #'browse-at-remote
             :desc "Browse homepage"           "h"   #'+vc/browse-at-remote-homepage
             :desc "Browse remote"             "r"   #'forge-browse-remote
             :desc "Browse commit"             "c"   #'forge-browse-commit
@@ -411,7 +411,7 @@
         "C-S-h"      #'company-show-doc-buffer
         "C-s"        #'company-search-candidates
         "M-s"        #'company-filter-candidates
-        "<C-tab>"    #'company-complete-common-or-cycle
+        [C-tab]      #'company-complete-common-or-cycle
         [tab]        #'company-complete-common-or-cycle
         [backtab]    #'company-select-previous
         "C-RET"      #'counsel-company

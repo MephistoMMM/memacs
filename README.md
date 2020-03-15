@@ -54,7 +54,7 @@ the documentation](docs/getting_started.org#install).
   <img src="https://github.com/hlissner/doom-emacs/raw/screenshots/cacochan.png" align="right" />
 </a>
 
-It is a story as old as time. A stubborn, shell-dwelling, and melodramatic
+It is a story as old as time. A stubborn, shell-dwelling, and melodramatic as
 vimmer -- envious of the features of modern text editors -- spirals into despair
 before succumbing to the [dark side][url:evil-mode]. This is his config.
 
@@ -125,7 +125,7 @@ We have [a Discord server][url:discord]! Hop on and say hi!
 Encountered strange behavior or an error? Here are some things to try before you
 shoot off that bug report:
 
-- Run `bin/doom refresh`. This ensures Doom is properly set up and its autoloads
+- Run `bin/doom sync`. This ensures Doom is properly set up and its autoloads
   files are up-to-date.
 - If you have byte-compiled your config (with `bin/doom compile`), see if
   `bin/doom clean` makes the issue go away. Never debug issues with a

@@ -1,7 +1,7 @@
 ;;; lang/scala/autoload.el -*- lexical-binding: t; -*-
 
 ;;;###autoload
-(defun +scala-comment-indent-new-line (&optional _)
+(defun +scala-comment-indent-new-line-fn (&optional _)
   "Continue the commnt on the current line.
 
 Meant to be used for `scala-mode's `comment-line-break-function'."
@@ -40,11 +40,15 @@ Meant to be used for `scala-mode's `comment-line-break-function'."
   (interactive)
   (if (and (require 'sbt-mode nil t)
            (sbt:find-root))
-      (run-scala)
-    (let ((buffer-name "*scala-repl")
-          buffer)
-      (unless (comint-check-proc buffer-name)
-        (setq buffer (make-comint-in-buffer
-                      "scala-repl" buffer-name "scala")))
+      (let ((buffer-name (sbt:buffer-name)))
+        (unless (comint-check-proc buffer-name)
+          (kill-buffer buffer-name))
+        (run-scala)
+        (get-buffer buffer-name))
+    (let* ((buffer-name "*scala-repl")
+           (buffer
+            (if (comint-check-proc buffer-name)
+                (get-buffer buffer-name)
+              (make-comint-in-buffer "scala-repl" buffer-name "scala"))))
       (display-buffer buffer)
       buffer)))

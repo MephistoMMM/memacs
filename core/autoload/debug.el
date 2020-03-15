@@ -23,17 +23,19 @@
     (when (file-exists-p file)
       (insert-file-contents file))))
 
-(defun doom--collect-forms-in (file form)
+(defsubst doom--collect-forms-in (file form)
   (when (file-readable-p file)
     (let (forms)
       (with-temp-buffer
         (insert-file-contents file)
         (delay-mode-hooks (emacs-lisp-mode))
         (while (re-search-forward (format "(%s " (regexp-quote form)) nil t)
-          (unless (doom-point-in-string-or-comment-p)
-            (save-excursion
-              (goto-char (match-beginning 0))
-              (push (sexp-at-point) forms))))
+          (let ((ppss (syntax-ppss)))
+            (unless (or (nth 4 ppss)
+                        (nth 3 ppss))
+              (save-excursion
+                (goto-char (match-beginning 0))
+                (push (sexp-at-point) forms)))))
         (nreverse forms)))))
 
 ;;;###autoload
@@ -100,6 +102,15 @@ ready to be pasted in a bug report on github."
                             "package!"))
                   (error (format "<%S>" e)))
                 '("n/a")))
+         (unpin
+          ,@(or (condition-case e
+                    (mapcan #'identity
+                            (mapcar
+                             #'cdr (doom--collect-forms-in
+                                    (doom-path doom-private-dir "packages.el")
+                                    "unpin!")))
+                  (error (format "<%S>" e)))
+                '("n/a")))
          (elpa
           ,@(or (condition-case e
                     (progn
@@ -107,15 +118,7 @@ ready to be pasted in a bug report on github."
                       (cl-loop for (name . _) in package-alist
                                collect (format "%s" name)))
                   (error (format "<%S>" e)))
-                '("n/a")))
-         (unpin ,@(or (condition-case e
-                          (mapcan #'identity
-                                  (mapcar
-                                   #'cdr (doom--collect-forms-in
-                                          (doom-path doom-private-dir "packages.el")
-                                          "unpin!")))
-                        (error (format "<%S>" e)))
-                      '("n/a"))))))))
+                '("n/a"))))))))
 
 
 ;;
@@ -155,13 +158,14 @@ markdown and copies it to your clipboard, ready to be pasted into bug reports!"
           (progn
             (save-excursion
               (pp info (current-buffer)))
-            (when (search-forward "(modules " nil t)
-              (goto-char (match-beginning 0))
-              (cl-destructuring-bind (beg . end)
-                  (bounds-of-thing-at-point 'sexp)
-                (let ((sexp (prin1-to-string (sexp-at-point))))
-                  (delete-region beg end)
-                  (insert sexp)))))
+            (dolist (sym '(modules packages))
+              (when (re-search-forward (format "^ *\\((%s\\)" sym) nil t)
+                (goto-char (match-beginning 1))
+                (cl-destructuring-bind (beg . end)
+                    (bounds-of-thing-at-point 'sexp)
+                  (let ((sexp (prin1-to-string (sexp-at-point))))
+                    (delete-region beg end)
+                    (insert sexp))))))
         (insert "<details>\n\n```\n")
         (dolist (group info)
           (insert! "%-8s%-10s %s\n"
@@ -216,7 +220,7 @@ markdown and copies it to your clipboard, ready to be pasted into bug reports!"
        (prin1-to-string
         (macroexp-progn
          (append `((setq noninteractive nil
-                         doom-debug-mode t
+                         init-file-debug t
                          load-path ',load-path
                          package--init-file-ensured t
                          package-user-dir ,package-user-dir

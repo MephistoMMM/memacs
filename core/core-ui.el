@@ -98,7 +98,8 @@ size.")
     (unless (or doom-inhibit-switch-window-hooks
                 (eq doom--last-window (selected-window))
                 (minibufferp))
-      (let ((doom-inhibit-switch-window-hooks t))
+      (let ((doom-inhibit-switch-window-hooks t)
+            (inhibit-redisplay t))
         (run-hooks 'doom-switch-window-hook)
         (setq doom--last-window (selected-window))))))
 
@@ -116,7 +117,8 @@ size.")
             (eq (current-buffer) (get-buffer buffer-or-name))
             (and (eq orig-fn #'switch-to-buffer) (car args)))
         (apply orig-fn buffer-or-name args)
-      (let ((doom-inhibit-switch-buffer-hooks t))
+      (let ((doom-inhibit-switch-buffer-hooks t)
+            (inhibit-redisplay t))
         (when-let (buffer (apply orig-fn buffer-or-name args))
           (with-current-buffer (if (windowp buffer)
                                    (window-buffer buffer)
@@ -128,7 +130,8 @@ size.")
   (let ((gc-cons-threshold most-positive-fixnum))
     (if doom-inhibit-switch-buffer-hooks
         (apply orig-fn args)
-      (let ((doom-inhibit-switch-buffer-hooks t))
+      (let ((doom-inhibit-switch-buffer-hooks t)
+            (inhibit-redisplay t))
         (when-let (buffer (apply orig-fn args))
           (with-current-buffer buffer
             (run-hooks 'doom-switch-buffer-hook))
@@ -291,14 +294,14 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 (setq window-resize-pixelwise t
       frame-resize-pixelwise t)
 
-(when (bound-and-true-p tool-bar-mode)
+(unless (assq 'menu-bar-lines default-frame-alist)
   ;; We do this in early-init.el too, but in case the user is on Emacs 26 we do
   ;; it here too: disable tool and scrollbars, as Doom encourages
   ;; keyboard-centric workflows, so these are just clutter (the scrollbar also
   ;; impacts performance).
-  (push '(menu-bar-lines . 0) default-frame-alist)
-  (push '(tool-bar-lines . 0) default-frame-alist)
-  (push '(vertical-scroll-bars) default-frame-alist))
+  (add-to-list 'default-frame-alist '(menu-bar-lines . 0))
+  (add-to-list 'default-frame-alist '(tool-bar-lines . 0))
+  (add-to-list 'default-frame-alist '(vertical-scroll-bars)))
 
 (when IS-MAC
   ;; Curse Lion and its sudden but inevitable fullscreen mode!
@@ -489,8 +492,8 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
          (defadvice! doom--disable-all-the-icons-in-tty-a (orig-fn &rest args)
            "Return a blank string in tty Emacs, which doesn't support multiple fonts."
            :around '(all-the-icons-octicon all-the-icons-material
-                                           all-the-icons-faicon all-the-icons-fileicon
-                                           all-the-icons-wicon all-the-icons-alltheicon)
+                     all-the-icons-faicon all-the-icons-fileicon
+                     all-the-icons-wicon all-the-icons-alltheicon)
            (if (or (not after-init-time) (display-multi-font-p))
                (apply orig-fn args)
              "")))
@@ -586,6 +589,8 @@ behavior). Do not set this directly, this is let-bound in `doom-init-theme-h'.")
   "Loads `doom-variable-pitch-font',`doom-serif-font' and `doom-unicode-font'."
   (condition-case e
       (with-selected-frame (or frame (selected-frame))
+        (when doom-font
+          (set-face-attribute 'fixed-pitch nil :font doom-font))
         (when doom-serif-font
           (set-face-attribute 'fixed-pitch-serif nil :font doom-serif-font))
         (when doom-variable-pitch-font

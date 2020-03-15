@@ -54,8 +54,8 @@ Emacs.")
   ;;   searches from the current directory down to / for certain project
   ;;   markers, like package.json, setup.py, or Cargo.toml
   ;; + `projectile-root-top-down-recurring' -> consults
-  ;;   `projectile-project-root-files-top-down-recurring'; searches from the
-  ;;   current directory down to / for a directory that has .svn or Makefile but
+  ;;   `projectile-project-root-files-top-down-recurring'; e.g. searches from
+  ;;   the current directory down to / for a directory that has Makefile but
   ;;   doesn't have a parent with one of those files.
   ;;
   ;; In the interest of performance, we reduce the number of project root marker
@@ -191,15 +191,14 @@ state are passed in.")
                                      on-load
                                      on-enter
                                      on-exit)
-  "Define a project minor-mode named NAME (a symbol) and declare where and how
-it is activated. Project modes allow you to configure 'sub-modes' for
-major-modes that are specific to a folder, project structure, framework or
-whatever arbitrary context you define. These project modes can have their own
-settings, keymaps, hooks, snippets, etc.
+  "Define a project minor mode named NAME and where/how it is activated.
+
+Project modes allow you to configure 'sub-modes' for major-modes that are
+specific to a folder, project structure, framework or whatever arbitrary context
+you define. These project modes can have their own settings, keymaps, hooks,
+snippets, etc.
 
 This creates NAME-hook and NAME-map as well.
-
-A project can be enabled through .dir-locals.el too, by setting `doom-project'.
 
 PLIST may contain any of these properties, which are all checked to see if NAME
 should be activated. If they are *all* true, NAME is activated.

@@ -116,8 +116,7 @@ declaration) or dependency thereof that hasn't already been."
               (make-hash-table :test #'equal)))
          (recipes (doom-package-recipe-list)))
      (unless force-p
-       (straight--make-build-cache-available)
-       (straight--make-package-modifications-available))
+       (straight--make-build-cache-available))
      (if-let (built
               (doom-with-package-recipes recipes (package local-repo)
                 (unless force-p
@@ -125,6 +124,7 @@ declaration) or dependency thereof that hasn't already been."
                   (let ((build-dir (straight--build-dir package))
                         (repo-dir  (straight--repos-dir local-repo)))
                     (and (or (file-newer-than-file-p repo-dir build-dir)
+                             (file-exists-p (straight--modified-dir (or local-repo package)))
                              ;; Doesn't make sense to compare el and elc files
                              ;; when the former isn't a symlink to their source.
                              (when straight-use-symlinks
@@ -168,6 +168,9 @@ declaration) or dependency thereof that hasn't already been."
          (unless (file-in-directory-p default-directory repo-dir)
            (print! (warn "(%d/%d) Skipping %s because it is local") i total package)
            (cl-return))
+         (when (eq type 'git)
+           (unless (file-exists-p ".git")
+             (error "%S is not a valid repository" package)))
          (condition-case-unless-debug e
              (let ((ref (straight-vc-get-commit type local-repo))
                    (target-ref (cdr (assoc local-repo pinned)))
@@ -186,9 +189,12 @@ declaration) or dependency thereof that hasn't already been."
                      (print! (info "\033[K(%d/%d) %s is up-to-date...%s") i total package esc)
                      (cl-return))
 
-                    ((straight-vc-commit-present-p recipe target-ref)
-                     (print! (start "\033[K(%d/%d) Checking out %s (%s)...%s")
-                             i total package (doom--abbrev-commit target-ref) esc)
+                    ((if (straight-vc-commit-present-p recipe target-ref)
+                         (print! (start "\033[K(%d/%d) Checking out %s (%s)...%s")
+                                 i total package (doom--abbrev-commit target-ref) esc)
+                       (print! (start "\033[K(%d/%d) Fetching %s...%s") i total package esc)
+                       (and (straight-vc-fetch-from-remote recipe)
+                            (straight-vc-commit-present-p recipe target-ref)))
                      (straight-vc-check-out-commit recipe target-ref)
                      (or (not (eq type 'git))
                          (setq output (doom--commit-log-between ref target-ref)))
@@ -272,7 +278,8 @@ declaration) or dependency thereof that hasn't already been."
       (straight--call "git" "clean" "-ffd")
       (if (not (car (straight--call "git" "replace" "--graft" "HEAD")))
           (print! (info "\033[Krepos/%s is already compact\033[1A" repo))
-        (straight--call "git" "gc")
+        (straight--call "git" "reflog" "expire" "--expire=all" "--all")
+        (straight--call "git" "gc" "--prune=now")
         (print! (success "\033[KRegrafted repos/%s (from %0.1fKB to %0.1fKB)")
                 repo before-size (doom-directory-size default-directory))
         (print-group! (print! "%s" (straight--process-get-output))))

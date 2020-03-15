@@ -25,12 +25,18 @@
   (set-repl-handler!
     '(haskell-mode haskell-cabal-mode literate-haskell-mode)
     #'+haskell/open-repl :persist t)
+  ;; Don't kill REPL popup on ESC/C-g
+  (set-popup-rule! "^\\*haskell\\*" :quit nil)
 
   (add-hook! 'haskell-mode-hook
              #'haskell-collapse-mode ; support folding haskell code blocks
              #'interactive-haskell-mode)
 
   (add-to-list 'completion-ignored-extensions ".hi")
+
+  (map! :map haskell-mode-map
+        :n "o" #'+haskell/evil-open-below
+        :n "O" #'+haskell/evil-open-above)
 
   (map! :localleader
         :map haskell-mode-map

@@ -268,8 +268,15 @@ choco install git emacs ripgrep fd llvm
 #+END_SRC
 
 #+begin_quote
-Switching out choco for [[https://scoop.sh/][scoop]] should just work, but it hasn't been tested.
+Scoop is also a viable way of installing Emacs. However, because Emacs is a GUI
+application, it is relegated to the 'extras' Scoop bucket and that will need to
+be enabled.
 #+end_quote
+
+#+BEGIN_SRC sh
+scoop enable extras
+scoop install git emacs ripgrep fd llvm
+#+END_SRC
 
 You will need [[https://mywindowshub.com/how-to-edit-system-environment-variables-for-a-user-in-windows-10/][the ~HOME~ system variable]] set to =C:\Users\USERNAME\=, otherwise
 Emacs will treat =C:\Users\USERNAME\AppData\Roaming= as your ~HOME~, which
@@ -500,7 +507,7 @@ things to be aware of while you convert your old config to Doom:
   blocks. Remove these and, instead, add ~package!~ declarations to
   =~/.doom.d/packages.el= to install your packages.
 
-  See [[*Package management]["Package Management"]], earlier in this guide.
+  See [[#package-management]["Package Management"]], earlier in this guide.
 
 (This section is incomplete)
 
@@ -1187,7 +1194,7 @@ provide tools to make this easier. Here are a few things you can try, first:
 + Investigate the =*Messages*= log for warnings or error messages. This log can
   be opened with =SPC h e=, =C-h e= or =M-x view-echo-area-messages=.
 
-+ Look up errors/warnings [[file:faq.org::Common%20Issues][on the FAQ]] and [[https://github.com/hlissner/doom-emacs/issues][Doom's issue tracker]]. It is possible
++ Look up errors/warnings [[file:faq.org::Common Issues][on the FAQ]] and [[https://github.com/hlissner/doom-emacs/issues][Doom's issue tracker]]. It is possible
   that a solution for your issue already exists. The FAQ can be searched from
   inside Doom with =SPC h d f= (or =C-h d f= for non-evil users).
 

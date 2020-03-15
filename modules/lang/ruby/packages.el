@@ -2,11 +2,11 @@
 ;;; lang/ruby/packages.el
 
 ;; Major modes
-(package! enh-ruby-mode :pin "732331b99a")
+(package! ruby-mode :built-in t)
 (package! yard-mode :pin "ba74a47463")
 
 ;; REPL
-(package! inf-ruby :pin "fd8d392fef")
+(package! inf-ruby :pin "e4ae089218")
 (when (featurep! :completion company)
   (package! company-inf-ruby :pin "fe3e4863bc"))
 
@@ -23,7 +23,14 @@
   (package! rbenv :pin "2ea1a5bdc1"))
 (when (featurep! +rvm)
   (package! rvm :pin "134497bc46"))
+(when (featurep! +chruby)
+  (package! chruby :pin "42bc6d521f"))
 
 ;; Testing frameworks
-(package! rspec-mode :pin "c4353a1bff")
-(package! minitest :pin "6d9f6233b7")
+(package! rspec-mode :pin "9a2a9d2935")
+(package! minitest :pin "97d7d1760b")
+
+;; Rails
+(when (featurep! +rails)
+  (package! projectile-rails :pin "0398d940a2")
+  (package! inflections :pin "e4f1372cf2"))

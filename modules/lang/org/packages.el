@@ -27,7 +27,7 @@
   :recipe (:host github
            :repo "emacs-straight/org-mode"
            :files ("*.el" "lisp/*.el" "contrib/lisp/*.el"))
-  :pin "2096c9c76f")
+  :pin "0a8faecb7f")
 ;; ...And prevent other packages from pulling org; org-plus-contrib satisfies
 ;; the dependency already: https://github.com/raxod502/straight.el/issues/352
 (package! org :recipe (:local-repo nil))
@@ -41,9 +41,8 @@
   :recipe (:host github :repo "TobiasZawada/org-yt")
   :pin "40cc1ac76d")
 (package! ox-clip :pin "bd36f9fb4e")
-(package! toc-org :pin "379b457fcf")
+(package! toc-org :pin "5deaec41ed")
 (package! org-cliplink :pin "82402cae7e")
-(package! org-bookmark-heading :pin "38a2813f72")
 
 (when (featurep! :editor evil +everywhere)
   (package! evil-org
@@ -54,16 +53,16 @@
 (when (featurep! :tools magit)
   (package! orgit :pin "e7cddf39e3"))
 (when (featurep! +brain)
-  (package! org-brain :pin "8cb2efc860"))
+  (package! org-brain :pin "6b7fced801"))
 (when (featurep! +dragndrop)
-  (package! org-download :pin "70401884e9"))
+  (package! org-download :pin "3c48102793"))
 (when (featurep! +gnuplot)
   (package! gnuplot :pin "a406143d52")
   (package! gnuplot-mode :pin "601f639298"))
 (when (featurep! +ipython) ; DEPRECATED
   (package! ob-ipython :pin "7147455230"))
 (when (featurep! +jupyter)
-  (package! jupyter :pin "9e3c163358"))
+  (package! jupyter :pin "d4b06c54d3"))
 (when (featurep! +pomodoro)
   (package! org-pomodoro :pin "aa07c11318"))
 (when (featurep! +present)
@@ -71,9 +70,9 @@
     :recipe (:host github :repo "anler/centered-window-mode")
     :pin "24f7c5be9d")
   (package! org-tree-slide :pin "7bf09a02bd")
-  (package! org-re-reveal :pin "14df7542f2"))
+  (package! ox-reveal :pin "0d947cbce6"))
 (when (featurep! +journal)
-  (package! org-journal :pin "128f0533a7"))
+  (package! org-journal :pin "9d40f6260c"))
 
 ;;; Babel
 (package! ob-async :pin "80a30b96a0")
@@ -81,6 +80,8 @@
   (package! ob-crystal :pin "d84c1adee4"))
 (when (featurep! :lang go)
   (package! ob-go :pin "2067ed55f4"))
+(when (featurep! :lang hy)
+  (package! ob-hy :pin "a42ecaf440"))
 (when (featurep! :lang nim)
   (package! ob-nim :pin "bf1642cb93"))
 (when (featurep! :lang racket)
@@ -100,6 +101,6 @@
 (when (featurep! +hugo)
   (package! ox-hugo
     :recipe (:host github :repo "kaushalmodi/ox-hugo" :nonrecursive t)
-    :pin "a80b250987"))
+    :pin "1c1e3ec467"))
 (when (featurep! :lang rst)
   (package! ox-rst :pin "9158bfd180"))

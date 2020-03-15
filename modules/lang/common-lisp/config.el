@@ -8,24 +8,34 @@
 ;;
 ;; packages
 
+;;;###package lisp-mode
 (defvar inferior-lisp-program "sbcl")
-
-(after! lisp-mode
-  (set-repl-handler! 'lisp-mode #'sly-mrepl)
-  (set-eval-handler! 'lisp-mode #'sly-eval-region)
-  (set-lookup-handlers! 'lisp-mode
-    :definition #'sly-edit-definition
-    :documentation #'sly-describe-symbol)
-
-  (add-hook 'lisp-mode-hook #'rainbow-delimiters-mode))
+(add-hook 'lisp-mode-hook #'rainbow-delimiters-mode)
 
 
-(after! sly
+(use-package! sly
+  :defer t
+  :init
+  (after! lisp-mode
+    (set-repl-handler! 'lisp-mode #'sly-mrepl)
+    (set-eval-handler! 'lisp-mode #'sly-eval-region)
+    (set-lookup-handlers! 'lisp-mode
+      :definition #'sly-edit-definition
+      :documentation #'sly-describe-symbol))
+
+  ;; HACK Ensures that sly's contrib modules are loaded as soon as possible, but
+  ;;      also as late as possible, so users have an opportunity to override
+  ;;      `sly-contrib' in an `after!' block.
+  (add-hook! 'doom-after-init-modules-hook
+    (after! sly (sly-setup)))
+
+  :config
   (setq sly-mrepl-history-file-name (concat doom-cache-dir "sly-mrepl-history")
         sly-kill-without-query-p t
         sly-net-coding-system 'utf-8-unix
-        ;; Doom defaults to non-fuzzy search, because it is slower and less
-        ;; precise. Change this to `sly-flex-completions' for fuzzy completion
+        ;; Doom defaults to non-fuzzy search, because it is faster and more
+        ;; precise (but requires more keystrokes). Change this to
+        ;; `sly-flex-completions' for fuzzy completion
         sly-complete-symbol-function 'sly-simple-completions)
 
   (set-popup-rules!
@@ -36,10 +46,6 @@
       ;; Do not display debugger or inspector buffers in a popup window. These
       ;; buffers are meant to be displayed with sufficient vertical space.
       ("^\\*sly-\\(?:db\\|inspector\\)" :ignore t)))
-
-  (sp-with-modes '(sly-mrepl-mode)
-    (sp-local-pair "'" "'" :actions nil)
-    (sp-local-pair "`" "`" :actions nil))
 
   (defun +common-lisp--cleanup-sly-maybe-h ()
     "Kill processes and leftover buffers when killing the last sly buffer."
@@ -71,8 +77,7 @@
         :map lisp-mode-map
         :desc "Sly"          "'" #'sly
         :desc "Sly (ask)"    ";" (λ!! #'sly '-)
-        :desc "Expand macro"          "m" #'sly-macroexpand-1-inplace
-        :desc "Expand macro in popup" "M" #'sly-macroexpand-1
+        :desc "Expand macro" "m" #'macrostep-expand
         (:prefix ("c" . "compile")
           :desc "Compile file"          "c" #'sly-compile-file
           :desc "Compile/load file"     "C" #'sly-compile-and-load-file
@@ -134,4 +139,4 @@
 (use-package! sly-repl-ansi-color
   :defer t
   :init
-  (add-to-list 'sly-contribs 'sly-repl-ansi-color nil #'eq))
+  (add-to-list 'sly-contribs 'sly-repl-ansi-color))

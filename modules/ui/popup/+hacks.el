@@ -26,6 +26,15 @@
 ;;
 ;;; Core functions
 
+(defadvice! +popup--make-case-sensitive-a (orig-fn &rest args)
+  "Make regexps in `display-buffer-alist' case-sensitive.
+
+To reduce fewer edge cases and improve performance when `display-buffer-alist'
+grows larger."
+  :around #'display-buffer-assq-regexp
+  (let (case-fold-search)
+    (apply orig-fn args)))
+
 ;; Don't try to resize popup windows
 (advice-add #'balance-windows :around #'+popup-save-a)
 
@@ -266,7 +275,18 @@ Ugh, such an ugly hack."
     :around #'org-switch-to-buffer-other-window
     (if +popup-mode
         (pop-to-buffer buf nil norecord)
-      (funcall orig-fn buf norecord))))
+      (funcall orig-fn buf norecord)))
+
+  ;; HACK `pop-to-buffer-same-window' consults `display-buffer-alist', which is
+  ;;      what our popup manager uses to manage popup windows. However,
+  ;;      `org-src-switch-to-buffer' already does its own window management
+  ;;      prior to calling `pop-to-buffer-same-window', so there's no need to
+  ;;      _then_ hand off the buffer to the pop up manager.
+  (defadvice! +popup--org-src-switch-to-buffer-a (orig-fn &rest args)
+    :around #'org-src-switch-to-buffer
+    (cl-letf (((symbol-function #'pop-to-buffer-same-window)
+               (symbol-function #'switch-to-buffer)))
+      (apply orig-fn args))))
 
 
 ;;;###package persp-mode
