@@ -34,6 +34,13 @@
 ;; `nil' to disable it:
 (setq display-line-numbers-type 'relative)
 
+;; Scratch buffers preserve their last major mode, however, so this only affects
+;; the first, fresh scratch buffer you create. This accepts:
+;;   t           Inherits the major mode of the last buffer you had selected.
+;;   nil         Uses `fundamental-mode'
+;;   MAJOR-MODE  Any major mode symbol"
+(setq doom-scratch-initial-major-mode t)
+
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
