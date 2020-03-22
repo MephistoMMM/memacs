@@ -108,7 +108,7 @@ possible."
               fill-column 80)
 
 ;; Word wrapping
-(setq-default word-wrap t
+(setq-default word-wrap nil
               truncate-lines t
               truncate-partial-width-windows nil)
 
