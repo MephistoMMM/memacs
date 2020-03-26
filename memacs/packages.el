@@ -51,4 +51,5 @@
 ;; our package manager can't deal with; see raxod502/straight.el#279)
 ;(package! builtin-package :recipe (:branch "develop"))
 
-(package! org-fancy-priorities :pin "819bb993b7")
+(package! org-fancy-priorities
+  :recipe (:host github :repo "MephistoMMM/org-fancy-priorities"))

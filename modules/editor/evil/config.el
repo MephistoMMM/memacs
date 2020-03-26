@@ -3,7 +3,7 @@
 ;; I'm a vimmer at heart. Its modal philosophy suits me better, and this module
 ;; strives to make Emacs a much better vim than vim was.
 
-(defvar +evil-repeat-keys (cons ";" ",")
+(defvar +evil-repeat-keys (cons ";" "C-;")
   "The keys to use for universal repeating motions.
 
 This is a cons cell whose CAR is the key for repeating a motion forward, and
@@ -60,6 +60,9 @@ directives. By default, this only recognizes C directives.")
   (evil-select-search-module 'evil-search-module 'evil-search)
 
   (put 'evil-define-key* 'lisp-indent-function 'defun)
+
+  ;; unset repeat forward keybind
+  (define-key evil-motion-state-map "," nil)
 
   ;; stop copying each visual state move to the clipboard:
   ;; https://bitbucket.org/lyro/evil/issue/336/osx-visual-state-copies-the-region-on
@@ -307,6 +310,7 @@ directives. By default, this only recognizes C directives.")
         evil-snipe-scope 'line
         evil-snipe-repeat-scope 'visible
         evil-snipe-enable-highlight t
+        evil-snipe-override-evil-repeat-keys nil
         evil-snipe-enable-incremental-highlight t
         evil-snipe-auto-disable-substitute t
         evil-snipe-show-prompt nil
