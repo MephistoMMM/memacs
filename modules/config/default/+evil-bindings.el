@@ -6,10 +6,7 @@
   ;; Minibuffer
   (define-key! evil-ex-completion-map
     "C-a" #'evil-beginning-of-line
-    "C-b" #'evil-backward-char
-    "C-s" (if (featurep! :completion ivy)
-              #'counsel-minibuffer-history
-            #'helm-minibuffer-history))
+    "C-b" #'evil-backward-char)
 
   (define-key! :keymaps +default-minibuffer-maps
     [escape] #'abort-recursive-edit
@@ -492,6 +489,14 @@
         :desc "Org export to clipboard"        "y" #'+org/export-to-clipboard
         :desc "Org export to clipboard as RTF" "Y" #'+org/export-to-clipboard-as-rich-text
 
+        (:when (featurep! :lang org +roam)
+          (:prefix ("r" . "roam")
+            :desc "Org Roam"         "r" #'org-roam
+            :desc "Switch to buffer" "b" #'org-roam-switch-to-buffer
+            :desc "Insert"           "i" #'org-roam-insert
+            :desc "Find file"        "f" #'org-roam-find-file
+            :desc "Show graph"       "g" #'org-roam-show-graph))
+
         (:when (featurep! :lang org +journal)
           (:prefix ("j" . "journal")
             :desc "New Entry"      "j" #'org-journal-new-entry
@@ -561,10 +566,10 @@
         :desc "Find recent project files"    "r" #'projectile-recentf
         :desc "Run project"                  "R" #'projectile-run-project
         :desc "Save project files"           "s" #'projectile-save-project-buffers
-        :desc "Pop up scratch buffer"        "x" #'doom/open-project-scratch-buffer
-        :desc "Switch to scratch buffer"     "X" #'doom/switch-to-project-scratch-buffer
         :desc "List project tasks"           "t" #'magit-todos-list
-        :desc "Test project"                 "T" #'projectile-test-project)
+        :desc "Test project"                 "T" #'projectile-test-project
+        :desc "Pop up scratch buffer"        "x" #'doom/open-project-scratch-buffer
+        :desc "Switch to scratch buffer"     "X" #'doom/switch-to-project-scratch-buffer)
 
       ;;; <leader> q --- quit/session
       (:prefix-map ("q" . "quit/session")
@@ -611,7 +616,7 @@
         (:when (featurep! :lang org +pomodoro)
           :desc "Pomodoro timer"             "t" #'org-pomodoro)
         :desc "Soft line wrapping"           "w" #'visual-line-mode
-        (:when (featurep! :ui word-wrap)
+        (:when (featurep! :editor word-wrap)
           :desc "Soft line wrapping"         "w" #'+word-wrap-mode)
         :desc "Zen mode"                     "z" #'writeroom-mode))
 

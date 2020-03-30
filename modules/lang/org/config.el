@@ -130,9 +130,9 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
   ;;      underlying faces like the `org-todo' face does, so we define our own
   ;;      intermediary faces that extend from org-todo.
   (with-no-warnings
-    (custom-declare-face '+org-todo-active '((t (:inherit (bold font-lock-constant-face org-todo)))) "")
+    (custom-declare-face '+org-todo-active  '((t (:inherit (bold font-lock-constant-face org-todo)))) "")
     (custom-declare-face '+org-todo-project '((t (:inherit (bold font-lock-doc-face org-todo)))) "")
-    (custom-declare-face '+org-todo-onhold '((t (:inherit (bold warning org-todo)))) ""))
+    (custom-declare-face '+org-todo-onhold  '((t (:inherit (bold warning org-todo)))) ""))
   (setq org-todo-keywords
         '((sequence
            "TODO(t)"  ; A task that needs doing & is ready to do
@@ -163,7 +163,7 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
         (apply orig-fn args)))
 
   ;; Automatic indent detection in org files is meaningless
-  (cl-pushnew 'org-mode doom-detect-indentation-excluded-modes :test #'eq)
+  (add-to-list 'doom-detect-indentation-excluded-modes 'org-mode)
 
   (set-pretty-symbols! 'org-mode
     :name "#+NAME:"
@@ -201,7 +201,10 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 
   ;; Fix 'require(...).print is not a function' error from `ob-js' when
   ;; executing JS src blocks
-  (setq org-babel-js-function-wrapper "console.log(require('util').inspect(function(){\n%s\n}()));"))
+  (setq org-babel-js-function-wrapper "console.log(require('util').inspect(function(){\n%s\n}()));")
+
+  (after! python
+    (setq org-babel-python-command python-shell-interpreter)))
 
 
 (defun +org-init-babel-lazy-loader-h ()
@@ -237,11 +240,7 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
         (add-to-list 'org-babel-load-languages (cons lang t)))
       t))
 
-  (defadvice! +org--noop-org-babel-do-load-languages-a (&rest _)
-    :override #'org-babel-do-load-languages
-    (message
-     (concat "`org-babel-do-load-languages' is redundant with Doom's lazy loading mechanism for babel "
-             "packages. There is no need to use it, so it has been disabled"))))
+  (advice-add #'org-babel-do-load-languages :override #'ignore))
 
 
 (defun +org-init-capture-defaults-h ()
@@ -965,6 +964,7 @@ compelling reason, so..."
   (if (featurep! +jupyter)   (load! "contrib/jupyter"))
   (if (featurep! +pomodoro)  (load! "contrib/pomodoro"))
   (if (featurep! +present)   (load! "contrib/present"))
+  (if (featurep! +roam)      (load! "contrib/roam"))
 
   ;; In case the user has eagerly loaded org from their configs
   (when (and (featurep 'org)

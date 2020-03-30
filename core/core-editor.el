@@ -85,8 +85,13 @@ possible."
       create-lockfiles nil
       make-backup-files nil
       ;; But have a place to store them in case we do use them...
-      auto-save-list-file-name (concat doom-cache-dir "autosave")
-      backup-directory-alist `(("." . ,(concat doom-cache-dir "backup/"))))
+      ;; auto-save-list-file-name (concat doom-cache-dir "autosave")
+      auto-save-list-file-prefix (concat doom-cache-dir "autosave/")
+      auto-save-file-name-transforms `((".*" ,(concat doom-cache-dir "autosave/") t))
+      backup-directory-alist `((".*" . ,(concat doom-cache-dir "backup/"))))
+
+(after! tramp
+  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp nil)))
 
 (add-hook! 'after-save-hook
   (defun doom-guess-mode-h ()

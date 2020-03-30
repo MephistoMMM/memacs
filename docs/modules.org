@@ -42,7 +42,7 @@ completion.
 + [[file:../modules/completion/company/README.org][company]] =+childframe +tng= - The ultimate code completion backend
 + helm =+fuzzy +childframe= - *Another* search engine for love and life
 + ido - The /other/ *other* search engine for love and life
-+ [[file:../modules/completion/ivy/README.org][ivy]] =+fuzzy +prescient +childframe= - /The/ search engine for love and life
++ [[file:../modules/completion/ivy/README.org][ivy]] =+fuzzy +prescient +childframe +icons= - /The/ search engine for love and life
 
 * :config
 Modules that configure Emacs one way or another, or focus on making it easier
@@ -107,7 +107,7 @@ Modules that bring support for a language or group of languages to Emacs.
 + [[file:../modules/lang/fsharp/README.org][fsharp]] - TODO
 + [[file:../modules/lang/fstar/README.org][fstar]] - F* support
 + [[file:../modules/lang/go/README.org][go]] =+lsp= - TODO
-+ [[file:../modules/lang/haskell/README.org][haskell]] =+dante +intero +lsp= - TODO
++ [[file:../modules/lang/haskell/README.org][haskell]] =+dante +ghcide +lsp +intero= - TODO
 + hy - TODO
 + [[file:../modules/lang/idris/README.org][idris]] - TODO
 + java =+meghanada +lsp= - TODO
@@ -122,7 +122,7 @@ Modules that bring support for a language or group of languages to Emacs.
 + [[file:../modules/lang/nim/README.org][nim]] - TODO
 + nix - TODO
 + [[file:../modules/lang/ocaml/README.org][ocaml]] =+lsp= - TODO
-+ [[file:../modules/lang/org/README.org][org]] =+brain +dragndrop +gnuplot +hugo +ipython +journal +jupyter +pandoc +pomodoro +present= - TODO
++ [[file:../modules/lang/org/README.org][org]] =+brain +dragndrop +gnuplot +hugo +ipython +journal +jupyter +pandoc +pomodoro +present +roam= - TODO
 + [[file:../modules/lang/perl/README.org][perl]] - TODO
 + [[file:../modules/lang/php/README.org][php]] =+lsp= - TODO
 + plantuml - TODO
@@ -136,6 +136,7 @@ Modules that bring support for a language or group of languages to Emacs.
 + scala =+lsp= - TODO
 + [[file:../modules/lang/scheme/README.org][scheme]] - TODO
 + [[file:../modules/lang/sh/README.org][sh]] =+fish +lsp= - TODO
++ [[file:../modules/lang/sml/README.org][sml]] - TODO
 + [[file:../modules/lang/solidity/README.org][solidity]] - TODO
 + swift =+lsp= - TODO
 + terra - TODO

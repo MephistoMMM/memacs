@@ -362,8 +362,8 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 ;; while we're in the minibuffer.
 (setq enable-recursive-minibuffers t)
 
-;; Show current key-sequence in minibuffer, like vim does. Any feedback after
-;; typing is better UX than no feedback at all.
+;; Show current key-sequence in minibuffer ala 'set showcmd' in vim. Any
+;; feedback after typing is better UX than no feedback at all.
 (setq echo-keystrokes 0.02)
 
 ;; Expand the minibuffer to fit multi-line text displayed in the echo-area. This
@@ -373,7 +373,7 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
       max-mini-window-height 0.15)
 
 ;; Typing yes/no is obnoxious when y/n will do
-(fset #'yes-or-no-p #'y-or-n-p)
+(advice-add #'yes-or-no-p :override #'y-or-n-p)
 
 ;; Try really hard to keep the cursor from getting stuck in the read-only prompt
 ;; portion of the minibuffer.
@@ -430,17 +430,17 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 
   ;; Temporarily disable `hl-line' when selection is active, since it doesn't
   ;; serve much purpose when the selection is so much more visible.
-  (defvar doom-buffer-hl-line-mode nil)
+  (defvar doom--hl-line-mode nil)
 
   (add-hook! '(evil-visual-state-entry-hook activate-mark-hook)
     (defun doom-disable-hl-line-h ()
       (when hl-line-mode
-        (setq-local doom-buffer-hl-line-mode t)
+        (setq-local doom--hl-line-mode t)
         (hl-line-mode -1))))
 
   (add-hook! '(evil-visual-state-exit-hook deactivate-mark-hook)
     (defun doom-enable-hl-line-maybe-h ()
-      (when doom-buffer-hl-line-mode
+      (when doom--hl-line-mode
         (hl-line-mode +1)))))
 
 
@@ -561,6 +561,7 @@ display-line-numbers-mode."
 ;; Underline looks a bit better when drawn lower
 (setq x-underline-at-descent-line t)
 
+;; DEPRECATED In Emacs 27
 (defvar doom--prefer-theme-elc nil
   "If non-nil, `load-theme' will prefer the compiled theme (unlike its default
 behavior). Do not set this directly, this is let-bound in `doom-init-theme-h'.")
@@ -613,7 +614,7 @@ behavior). Do not set this directly, this is let-bound in `doom-init-theme-h'.")
   "Load the theme specified by `doom-theme' in FRAME."
   (when (and doom-theme (not (memq doom-theme custom-enabled-themes)))
     (with-selected-frame (or frame (selected-frame))
-      (let ((doom--prefer-theme-elc t))
+      (let ((doom--prefer-theme-elc t)) ; DEPRECATED in Emacs 27
         (load-theme doom-theme t)))))
 
 (defadvice! doom--run-load-theme-hooks-a (theme &optional _no-confirm no-enable)
@@ -624,18 +625,28 @@ behavior). Do not set this directly, this is let-bound in `doom-init-theme-h'.")
           doom-init-theme-p t)
     (run-hooks 'doom-load-theme-hook)))
 
-(defadvice! doom--prefer-compiled-theme-a (orig-fn &rest args)
-  "Make `load-theme' prioritize the byte-compiled theme for a moderate boost in
-startup (or theme switch) time, so long as `doom--prefer-theme-elc' is non-nil."
-  :around #'load-theme
-  (if (or (null after-init-time)
-          doom--prefer-theme-elc)
-      (cl-letf* ((old-locate-file (symbol-function 'locate-file))
-                 ((symbol-function 'locate-file)
-                  (lambda (filename path &optional _suffixes predicate)
-                    (funcall old-locate-file filename path '("c" "") predicate))))
-        (apply orig-fn args))
-    (apply orig-fn args)))
+(defadvice! doom--disable-enabled-themes-a (theme &optional _no-confirm no-enable)
+  "Disable previously enabled themes before loading a new one.
+Otherwise, themes can conflict with each other."
+  :after-while #'load-theme
+  (unless no-enable
+    (mapc #'disable-theme (remq theme custom-enabled-themes))))
+
+(unless EMACS27+
+  ;; DEPRECATED Not needed in Emacs 27
+  (defadvice! doom--prefer-compiled-theme-a (orig-fn &rest args)
+    "Have `load-theme' prioritize the byte-compiled theme.
+This offers a moderate boost in startup (or theme switch) time, so long as
+`doom--prefer-theme-elc' is non-nil."
+    :around #'load-theme
+    (if (or (null after-init-time)
+            doom--prefer-theme-elc)
+        (cl-letf* ((old-locate-file (symbol-function 'locate-file))
+                   ((symbol-function 'locate-file)
+                    (lambda (filename path &optional _suffixes predicate)
+                      (funcall old-locate-file filename path '("c" "") predicate))))
+          (apply orig-fn args))
+      (apply orig-fn args))))
 
 
 ;;
@@ -695,8 +706,8 @@ startup (or theme switch) time, so long as `doom--prefer-theme-elc' is non-nil."
 
 (after! whitespace
   (defun doom-disable-whitespace-mode-in-childframes-a (orig-fn)
-    "`whitespace-mode' inundates child frames with whitspace markers, so disable
-it to fix all that visual noise."
+    "`whitespace-mode' inundates child frames with whitespace markers, so
+disable it to fix all that visual noise."
     (unless (frame-parameter nil 'parent-frame)
       (funcall orig-fn)))
   (add-function :around whitespace-enable-predicate #'doom-disable-whitespace-mode-in-childframes-a))

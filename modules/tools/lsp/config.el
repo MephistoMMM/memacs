@@ -16,6 +16,7 @@ excluded servers' identifiers to `+lsp-capf-blacklist'.")
   "Language servers listed here will always use the `company-lsp' backend,
 irrespective of what `+lsp-company-backend' is set to.")
 
+
 ;;
 ;;; Packages
 
@@ -36,12 +37,26 @@ irrespective of what `+lsp-company-backend' is set to.")
         lsp-groovy-server-install-dir (concat lsp-server-install-dir "lsp-groovy/")
         lsp-intelephense-storage-path (concat doom-cache-dir "lsp-intelephense/"))
 
+  ;; Disable LSP's superfluous, expensive and/or debatably unnecessary features.
+  ;; Some servers implement these poorly. Better to just rely on Emacs' native
+  ;; mechanisms and make these opt-in.
+  (setq lsp-enable-folding nil
+        ;; Potentially slow
+        lsp-enable-file-watchers nil
+        lsp-enable-text-document-color nil
+        lsp-enable-semantic-highlighting nil
+        ;; Don't modify our code without our permission
+        lsp-enable-indentation nil
+        lsp-enable-on-type-formatting nil)
+
   :config
   (set-lookup-handlers! 'lsp-mode :async t
     :documentation #'lsp-describe-thing-at-point
     :definition #'lsp-find-definition
     :references #'lsp-find-references)
 
+  ;; TODO Lazy load these. They don't need to be loaded all at once unless the
+  ;;      user uses `lsp-install-server'.
   (when lsp-auto-configure
     (mapc (lambda (package) (require package nil t))
           lsp-client-packages))
