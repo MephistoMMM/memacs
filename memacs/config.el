@@ -63,3 +63,39 @@
   :hook (org-mode . org-fancy-priorities-mode)
   :config (setq org-fancy-priorities-list '("☢" "☕" "■")))
 ;; ("❗" "⬆" "⬇" "☕")
+
+;; Missions
+(setq memacs-mission-starter-mission-list
+      '(
+        ;; config new org file in dropbox
+        ("Dropbox Note Buffer" org-mode
+          (concat org-directory "/notes/") (memacs//mission-start-find-file-name nil))
+        ("Codewar&Golang" go-mode
+          (format-time-string "~/Workspace/go/src/codewar_pg/%Y_%m_%d"))
+        ;; ("Daily Report" org-mode
+        ;;   "~/Documents/works/seven/daily_report" (format-time-string "%Y_%m_%d.org"))
+        ))
+
+;; Helps
+(setq memacs-mission-helper-help-list
+      '(
+        ("Projectile"
+          ("ignoring files" "https://projectile.readthedocs.io/en/latest/projects/#ignoring-files"))
+        ("Dockerfile"
+          ("docker reference" "https://docs.docker.com/engine/reference/builder/#usage")
+          ("compose reference" "https://docs.docker.com/compose/compose-file/"))
+        ("Golang"
+          ("debugger: Delve" "https://github.com/derekparker/delve/blob/master/Documentation/cli/README.md"))
+        ("Tools"
+          ("RestClient" "https://github.com/pashky/restclient.el"))
+        )
+      )
+
+;; add memacs keybinds group
+(map!
+ :leader
+ (:prefix-map ("m" . "memacs")
+   :desc "starter" "s" #'+memacs/mission-starter-start
+   :desc "helper"  "h" #'+memacs/mission-helper-help
+   )
+ )
