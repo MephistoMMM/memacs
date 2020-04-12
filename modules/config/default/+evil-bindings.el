@@ -39,19 +39,11 @@
                  (and (featurep! :completion company +tng)
                       (+company-has-completion-p))
                  #'+company/complete)
-      :n [tab] (general-predicate-dispatch nil
-                 (and (featurep! :editor fold)
-                      (save-excursion (end-of-line) (invisible-p (point))))
-                 #'+fold/toggle
-                 (fboundp 'evil-jump-item)
-                 #'evil-jump-item)
       :v [tab] (general-predicate-dispatch nil
                  (and (bound-and-true-p yas-minor-mode)
                       (or (eq evil-visual-selection 'line)
                           (not (memq (char-after) (list ?\( ?\[ ?\{ ?\} ?\] ?\))))))
-                 #'yas-insert-snippet
-                 (fboundp 'evil-jump-item)
-                 #'evil-jump-item)
+                 #'yas-insert-snippet)
 
       ;; Smarter newlines
       :i [remap newline] #'newline-and-indent  ; auto-indent on newline
@@ -267,7 +259,6 @@
       :desc "Org Capture"           "A"    #'org-agenda-list
       :desc "Pop up scratch buffer" "x"    #'doom/open-scratch-buffer
       :desc "Org Capture"           "X"    #'org-capture
-
       ;; C-u is used by evil
       :desc "Universal argument"    "u"    #'universal-argument
       ;; :desc "window"                "w"    evil-window-map
@@ -276,12 +267,10 @@
       (:when (featurep! :ui popup)
         :desc "Toggle last popup"     "~"    #'+popup/toggle)
       :desc "Find file"             "."    #'find-file
-
       :desc "Switch buffer"         ","    #'switch-to-buffer
       (:when (featurep! :ui workspaces)
         :desc "Switch workspace buffer" "," #'persp-switch-to-buffer
         :desc "Switch buffer"           "<" #'switch-to-buffer)
-
       :desc "Switch to last buffer" "`"    #'evil-switch-to-windows-last-buffer
       :desc "Resume last search"    "'"
       (cond ((featurep! :completion ivy)   #'ivy-resume)
@@ -491,11 +480,17 @@
 
         (:when (featurep! :lang org +roam)
           (:prefix ("r" . "roam")
-            :desc "Org Roam"         "r" #'org-roam
             :desc "Switch to buffer" "b" #'org-roam-switch-to-buffer
-            :desc "Insert"           "i" #'org-roam-insert
+            :desc "Org Roam Capture" "c" #'org-roam-capture
             :desc "Find file"        "f" #'org-roam-find-file
-            :desc "Show graph"       "g" #'org-roam-show-graph))
+            :desc "Show graph"       "g" #'org-roam-graph-show
+            :desc "Insert"           "i" #'org-roam-insert
+            :desc "Org Roam"         "r" #'org-roam
+            (:prefix ("d" . "by date")
+              :desc "Arbitrary date" "d" #'org-roam-date
+              :desc "Today"          "t" #'org-roam-today
+              :desc "Tomorrow"       "m" #'org-roam-tomorrow
+              :desc "Yesterday"      "y" #'org-roam-yesterday)))
 
         (:when (featurep! :lang org +journal)
           (:prefix ("j" . "journal")

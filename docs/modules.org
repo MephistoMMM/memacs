@@ -61,6 +61,7 @@ Modules that affect and augment your ability to manipulate or insert text.
 + [[file:../modules/editor/file-templates/README.org][file-templates]] - Auto-inserted templates in blank new files
 + [[file:../modules/editor/fold/README.org][fold]] - universal code folding
 + format =+onsave= - TODO
++ god - TODO
 + [[file:../modules/editor/lispy/README.org][lispy]] - TODO
 + multiple-cursors - TODO
 + [[file:../modules/editor/objed/README.org][objed]] - TODO
@@ -112,9 +113,9 @@ Modules that bring support for a language or group of languages to Emacs.
 + [[file:../modules/lang/idris/README.org][idris]] - TODO
 + java =+meghanada +lsp= - TODO
 + [[file:../modules/lang/javascript/README.org][javascript]] =+lsp= - JavaScript, TypeScript, and CoffeeScript support
-+ julia - TODO
++ julia =+lsp= - TODO
 + kotlin =+lsp+= - TODO
-+ [[file:../modules/lang/latex/README.org][latex]] =+latexmk +cdlatex= - TODO
++ [[file:../modules/lang/latex/README.org][latex]] =+latexmk +cdlatex +fold= - TODO
 + lean - TODO
 + [[file:../modules/lang/ledger/README.org][ledger]] - TODO
 + lua =+moonscript= - TODO
@@ -191,7 +192,7 @@ Aesthetic modules that affect the Emacs interface or user experience.
 + [[file:../modules/ui/neotree/README.org][neotree]] - TODO
 + [[file:../modules/ui/ophints/README.org][ophints]] - TODO
 + [[file:../modules/ui/popup/README.org][popup]] =+all +defaults= - Makes temporary/disposable windows less intrusive
-+ pretty-code - TODO
++ [[file:../modules//ui/pretty-code/README.org][pretty-code]] =+fira +hasklig +iosevka +pragmata-pro= - TODO
 + [[file:../modules/ui/tabs/README.org][tabs]] - TODO
 + treemacs - TODO
 + [[file:../modules/ui/unicode/README.org][unicode]] - TODO

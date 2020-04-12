@@ -11,8 +11,8 @@
   "An alist mapping languages to babel libraries. This is necessary for babel
 libraries (ob-*.el) that don't match the name of the language.
 
-For example, with (fish . shell) will cause #+BEGIN_SRC fish to load ob-shell.el
-when executed.")
+For example, (fish . shell) will cause #+BEGIN_SRC fish blocks to load
+ob-shell.el when executed.")
 
 (defvar +org-babel-load-functions ()
   "A list of functions executed to load the current executing src block. They
@@ -75,7 +75,6 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
   (setq-default
    ;; Don't monopolize the whole frame just for the agenda
    org-agenda-window-setup 'current-window
-   org-agenda-inhibit-startup t
    org-agenda-skip-unavailable-files t
    ;; Move the agenda to show the previous 3 days and the next 7 days for a bit
    ;; better context instead of just the current week which is a bit confusing
@@ -167,8 +166,15 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 
   (set-pretty-symbols! 'org-mode
     :name "#+NAME:"
+    :name "#+name:"
     :src_block "#+BEGIN_SRC"
-    :src_block_end "#+END_SRC"))
+    :src_block "#+begin_src"
+    :src_block_end "#+END_SRC"
+    :src_block_end "#+end_src"
+    :quote "#+BEGIN_QUOTE"
+    :quote "#+begin_quote"
+    :quote_end "#+END_QUOTE"
+    :quote_end "#+end_quote"))
 
 
 (defun +org-init-babel-h ()
@@ -181,9 +187,6 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
         org-src-window-setup 'other-window
         ;; Our :lang common-lisp module uses sly, so...
         org-babel-lisp-eval-fn #'sly-eval)
-
-  ;; Add convenience lang alias for markdown blocks
-  (add-to-list 'org-src-lang-modes '("md" . markdown))
 
   ;; I prefer C-c C-c over C-c ' (more consistent)
   (define-key org-src-mode-map (kbd "C-c C-c") #'org-edit-src-exit)
@@ -524,7 +527,14 @@ current workspace (and clean them up)."
                 (lambda (file-or-data &optional type data-p &rest props)
                   (let ((type (if (plist-get props :width) type)))
                     (apply old-create-image file-or-data type data-p props)))))
-      (apply orig-fn args))))
+      (apply orig-fn args)))
+
+  (defadvice! +org--fix-inconsistent-uuidgen-case-a (uuid)
+    "Ensure uuidgen always produces lowercase output regardless of system."
+    :filter-return #'org-id-new
+    (if (eq org-id-method 'uuid)
+        (downcase uuid)
+      uuid)))
 
 
 (defun +org-init-keybinds-h ()
@@ -731,38 +741,23 @@ compelling reason, so..."
   )
 
 
-(defun +org-init-smartparens-h ()
-  "TODO"
-  (after! smartparens
-    (defun +org-sp-point-in-checkbox-p (_id action _context)
-      (and (eq action 'insert)
-           (sp--looking-at-p "\\s-*]")))
-
-    (defun +org-sp-point-at-bol-p (_id action _context)
-      (and (eq action 'insert)
-           (save-excursion
-             (skip-chars-backward "*")
-             (bolp))))
-
-    (defun +org-sp-in-src-block-p (_id action _context)
-      (and (eq action 'insert)
-           (org-in-src-block-p)))
-
-    ;; make delimiter auto-closing a little more conservative
-    (sp-with-modes 'org-mode
-      (sp-local-pair "*" "*" :unless '(:add sp-point-before-word-p sp-in-math-p +org-sp-point-at-bol-p +org-sp-in-src-block-p))
-      (sp-local-pair "_" "_" :unless '(:add sp-point-before-word-p sp-in-math-p +org-sp-in-src-block-p))
-      (sp-local-pair "/" "/" :unless '(:add sp-point-before-word-p sp-in-math-p +org-sp-point-in-checkbox-p +org-sp-in-src-block-p))
-      (sp-local-pair "~" "~" :unless '(:add sp-point-before-word-p +org-sp-in-src-block-p))
-      (sp-local-pair "=" "=" :unless '(:add sp-point-before-word-p sp-in-math-p +org-sp-in-src-block-p)))))
-
-
 ;;
 ;;; Packages
 
 (use-package! toc-org ; auto-table of contents
   :hook (org-mode . toc-org-enable)
-  :config (setq toc-org-hrefify-default "gh"))
+  :config
+  (setq toc-org-hrefify-default "gh")
+
+  (defadvice! +org-inhibit-scrolling-a (orig-fn &rest args)
+    "Prevent the jarring scrolling that occurs when the-ToC is regenerated."
+    :around #'toc-org-insert-toc
+    (let ((p (set-marker (make-marker) (point)))
+          (s (window-start)))
+      (prog1 (apply orig-fn args)
+        (goto-char p)
+        (set-window-start nil s t)
+        (set-marker p nil)))))
 
 
 (use-package! org-bullets ; "prettier" bullets
@@ -912,6 +907,8 @@ compelling reason, so..."
         org-publish-timestamp-directory (concat doom-cache-dir "org-timestamps/")
         org-preview-latex-image-directory (concat doom-cache-dir "org-latex/"))
 
+  ;; Make most of the default modules opt-in, because I sincerely doubt most
+  ;; users use all of them.
   (defvar org-modules
     '(;; ol-w3m
       ;; ol-bbdb
@@ -925,8 +922,18 @@ compelling reason, so..."
       ;; ol-eww
       ))
 
-  (add-hook 'org-mode-local-vars-hook #'eldoc-mode)
+  ;;; Custom org modules
+  (if (featurep! +brain)     (load! "contrib/brain"))
+  (if (featurep! +dragndrop) (load! "contrib/dragndrop"))
+  (if (featurep! +ipython)   (load! "contrib/ipython"))
+  (if (featurep! +journal)   (load! "contrib/journal"))
+  (if (featurep! +jupyter)   (load! "contrib/jupyter"))
+  (if (featurep! +pomodoro)  (load! "contrib/pomodoro"))
+  (if (featurep! +present)   (load! "contrib/present"))
+  (if (featurep! +roam)      (load! "contrib/roam"))
 
+  ;; Add our general hooks after the submodules, so that any hooks the
+  ;; submodules add run after them, and can overwrite any defaults if necessary.
   (add-hook! 'org-mode-hook
              ;; `show-paren-mode' causes flickering with indent overlays made by
              ;; `org-indent-mode', so we turn off show-paren-mode altogether
@@ -953,18 +960,11 @@ compelling reason, so..."
              #'+org-init-keybinds-h
              #'+org-init-popup-rules-h
              #'+org-init-protocol-h
-             #'+org-init-protocol-lazy-loader-h
-             #'+org-init-smartparens-h)
+             #'+org-init-protocol-lazy-loader-h)
 
-  ;;; Custom org modules
-  (if (featurep! +brain)     (load! "contrib/brain"))
-  (if (featurep! +dragndrop) (load! "contrib/dragndrop"))
-  (if (featurep! +ipython)   (load! "contrib/ipython"))
-  (if (featurep! +journal)   (load! "contrib/journal"))
-  (if (featurep! +jupyter)   (load! "contrib/jupyter"))
-  (if (featurep! +pomodoro)  (load! "contrib/pomodoro"))
-  (if (featurep! +present)   (load! "contrib/present"))
-  (if (featurep! +roam)      (load! "contrib/roam"))
+  ;; (Re)activate eldoc-mode in org-mode a little later, because it disables
+  ;; itself if started too soon (which is the case with `global-eldoc-mode').
+  (add-hook 'org-mode-local-vars-hook #'eldoc-mode)
 
   ;; In case the user has eagerly loaded org from their configs
   (when (and (featurep 'org)

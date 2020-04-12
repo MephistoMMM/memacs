@@ -55,9 +55,6 @@ This marks a foldable marker for `outline-minor-mode' in elisp buffers.")
   ;; variable-width indentation is superior in elisp
   (add-to-list 'doom-detect-indentation-excluded-modes 'emacs-lisp-mode nil #'eq)
 
-  ;; Use helpful instead of describe-* from `company'
-  (advice-add #'elisp--company-doc-buffer :around #'doom-use-helpful-a)
-
   (add-hook! 'emacs-lisp-mode-hook
              #'outline-minor-mode
              ;; fontificiation
@@ -107,7 +104,8 @@ This marks a foldable marker for `outline-minor-mode' in elisp buffers.")
           "v" #'find-variable
           "l" #'find-library)))
 
-;; Adapted from http://www.modernemacs.com/post/comint-highlighting/
+;; Adapted from http://www.modernemacs.com/post/comint-highlighting/ to add
+;; syntax highlighting to ielm REPLs.
 (add-hook! 'ielm-mode-hook
   (defun +emacs-lisp-init-syntax-highlighting-h ()
     (font-lock-add-keywords
@@ -132,7 +130,7 @@ This marks a foldable marker for `outline-minor-mode' in elisp buffers.")
 
 ;;;###package overseer
 (autoload 'overseer-test "overseer" nil t)
-(remove-hook 'emacs-lisp-mode-hook 'overseer-enable-mode)
+(remove-hook 'emacs-lisp-mode-hook #'overseer-enable-mode)
 
 
 (use-package! flycheck-cask

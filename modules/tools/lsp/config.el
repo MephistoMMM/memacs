@@ -16,6 +16,13 @@ excluded servers' identifiers to `+lsp-capf-blacklist'.")
   "Language servers listed here will always use the `company-lsp' backend,
 irrespective of what `+lsp-company-backend' is set to.")
 
+(defvar +lsp-defer-shutdown 3
+  "If non-nil, defer shutdown of LSP servers for this many seconds after last
+workspace buffer is closed.
+
+This delay prevents premature server shutdown when a user still intends on
+working on that project after closing the last buffer.")
+
 
 ;;
 ;;; Packages
@@ -27,8 +34,7 @@ irrespective of what `+lsp-company-backend' is set to.")
   ;; Don't prompt the user for the project root every time we open a new
   ;; lsp-worthy file, instead, try to guess it with projectile.
   (setq lsp-auto-guess-root t)
-  ;; Auto-kill LSP server once you've killed the last buffer associated with its
-  ;; project.
+  ;; Auto-kill LSP server after last workspace buffer is killed.
   (setq lsp-keep-workspace-alive nil)
   ;; Let `flycheck-check-syntax-automatically' determine this.
   (setq lsp-flycheck-live-reporting nil)
@@ -50,6 +56,7 @@ irrespective of what `+lsp-company-backend' is set to.")
         lsp-enable-on-type-formatting nil)
 
   :config
+  (set-popup-rule! "^\\*lsp-help" :size 0.35 :quit t)
   (set-lookup-handlers! 'lsp-mode :async t
     :documentation #'lsp-describe-thing-at-point
     :definition #'lsp-find-definition
@@ -150,16 +157,19 @@ This gives the user a chance to open other project files before the server is
 auto-killed (which is a potentially expensive process)."
     :around #'lsp--shutdown-workspace
     (if (or lsp-keep-workspace-alive
-            restart)
+            restart
+            (null +lsp-defer-shutdown)
+            (= +lsp-defer-shutdown 0))
         (funcall orig-fn)
       (when (timerp +lsp--deferred-shutdown-timer)
         (cancel-timer +lsp--deferred-shutdown-timer))
       (setq +lsp--deferred-shutdown-timer
             (run-at-time
-             3 nil (lambda (workspace)
-                     (let ((lsp--cur-workspace workspace))
-                       (unless (lsp--workspace-buffers lsp--cur-workspace)
-                         (funcall orig-fn))))
+             (if (numberp +lsp-defer-shutdown) +lsp-defer-shutdown 3)
+             nil (lambda (workspace)
+                   (let ((lsp--cur-workspace workspace))
+                     (unless (lsp--workspace-buffers lsp--cur-workspace)
+                       (funcall orig-fn))))
              lsp--cur-workspace))))
 
   (defadvice! +lsp-prompt-if-no-project-a (session file-name)

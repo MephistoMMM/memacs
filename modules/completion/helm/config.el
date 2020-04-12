@@ -189,3 +189,7 @@ be negative.")
         (lambda (buf &optional _resume) (pop-to-buffer buf)))
   (global-set-key [remap swiper] #'swiper-helm)
   (add-to-list 'swiper-font-lock-exclude #'+doom-dashboard-mode nil #'eq))
+
+
+(use-package! helm-descbinds
+  :hook (helm-mode . helm-descbinds-mode))

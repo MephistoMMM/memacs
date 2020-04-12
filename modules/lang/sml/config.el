@@ -12,7 +12,7 @@
 
   (map! :map sml-mode-map
         :i "RET"   #'reindent-then-newline-and-indent
-        :i "M-SPC" #'sml-electric-space
+        :i "S-SPC" #'sml-electric-space
         :i "|"     #'sml-electric-pipe
         :localleader
         :desc "Run SML" "'" #'run-sml
@@ -24,4 +24,6 @@
 
 (use-package! company-mlton
   :when (featurep! :completion company)
-  :hook (sml-mode . company-mlton-init))
+  :hook (sml-mode . company-mlton-init)
+  :config
+  (set-company-backend! 'sml-mode company-mlton-grouped-backend))

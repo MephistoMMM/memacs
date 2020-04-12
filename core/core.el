@@ -197,9 +197,12 @@ users).")
 ;; least a little more discerning.
 (setq gnutls-verify-error (not (getenv "INSECURE"))
       gnutls-algorithm-priority
-      (concat "SECURE128:+SECURE192:-VERS-ALL:+VERS-TLS1.2"
-              (if (ignore-errors (>= libgnutls-version 30605))
-                ":+VERS-TLS1.3"))
+      (when (boundp 'libgnutls-version)
+        (concat "SECURE128:+SECURE192:-VERS-ALL:+VERS-TLS1.2"
+                (if (and (not IS-WINDOWS)
+                         (not (version< emacs-version "26.3"))
+                         (>= libgnutls-version 30605))
+                    ":+VERS-TLS1.3")))
       ;; `gnutls-min-prime-bits' is set based on recommendations from
       ;; https://www.keylength.com/en/4/
       gnutls-min-prime-bits 3072
@@ -256,8 +259,8 @@ users).")
 ;;; Optimizations
 
 ;; Disable bidirectional text rendering for a modest performance boost. I've set
-;; this to `nil' in the past, but the `bidi-display-reordering's docs say this
-;; isn't a good idea, and suggests this is just as good:
+;; this to `nil' in the past, but the `bidi-display-reordering's docs say that
+;; is an undefined state and suggest this to be just as good:
 (setq-default bidi-display-reordering 'left-to-right
               bidi-paragraph-direction 'left-to-right)
 
@@ -267,7 +270,8 @@ users).")
 (setq highlight-nonselected-windows nil)
 
 ;; More performant rapid scrolling over unfontified regions. May cause brief
-;; spells of inaccurate fontification immediately after scrolling.
+;; spells of inaccurate syntax highlighting right after scrolling, which should
+;; quickly self-correct.
 (setq fast-but-imprecise-scrolling t)
 
 ;; Resizing the Emacs frame can be a terribly expensive part of changing the
@@ -278,16 +282,15 @@ users).")
 ;; Don't ping things that look like domain names.
 (setq ffap-machine-p-known 'reject)
 
+;; Font compacting can be terribly expensive, especially for rendering icon
+;; fonts on Windows. Whether it has a noteable affect on Linux and Mac hasn't
+;; been determined, but we inhibit it there anyway.
+(setq inhibit-compacting-font-caches t)
+
 ;; Performance on Windows is considerably worse than elsewhere, especially if
 ;; WSL is involved. We'll need everything we can get.
 (when IS-WINDOWS
-  ;; Reduce the workload when doing file IO
-  (setq w32-get-true-file-attributes nil)
-
-  ;; Font compacting can be terribly expensive, especially for rendering icon
-  ;; fonts on Windows. Whether it has a noteable affect on Linux and Mac hasn't
-  ;; been determined.
-  (setq inhibit-compacting-font-caches t))
+  (setq w32-get-true-file-attributes nil)) ; slightly faster IO
 
 ;; Remove command line options that aren't relevant to our current OS; means
 ;; slightly less to process at startup.
@@ -366,12 +369,12 @@ If you want to disable incremental loading altogether, either remove
 `doom-incremental-first-idle-timer' to nil. Incremental loading does not occur
 in daemon sessions (they are loaded immediately at startup).")
 
-(defvar doom-incremental-first-idle-timer 2
+(defvar doom-incremental-first-idle-timer 2.0
   "How long (in idle seconds) until incremental loading starts.
 
 Set this to nil to disable incremental loading.")
 
-(defvar doom-incremental-idle-timer 1.5
+(defvar doom-incremental-idle-timer 0.75
   "How long (in idle seconds) in between incrementally loading packages.")
 
 (defun doom-load-packages-incrementally (packages &optional now)
@@ -412,7 +415,7 @@ intervals."
 If this is a daemon session, load them all immediately instead."
   (if (daemonp)
       (mapc #'require (cdr doom-incremental-packages))
-    (when (integerp doom-incremental-first-idle-timer)
+    (when (numberp doom-incremental-first-idle-timer)
       (run-with-idle-timer doom-incremental-first-idle-timer
                            nil #'doom-load-packages-incrementally
                            (cdr doom-incremental-packages) t))))
