@@ -28,7 +28,8 @@
   :recipe (:host github :repo "hlissner/emacs-so-long")
   :pin "ed666b0716")
 (package! undo-fu :pin "0c34b6747e")
-(package! undo-fu-session :pin "b808ef0cdc")
+;; (package! undo-fu-session
+;;   :recipe (:host github :repo "emacsmirror/undo-fu-session"))
 (package! ws-butler
   ;; Use my fork of ws-butler, which has a few choice improvements and
   ;; optimizations (the original has been abandoned).
