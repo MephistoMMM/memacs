@@ -76,6 +76,7 @@ Modules that reconfigure or augment packages or features built into Emacs.
 + [[file:../modules/emacs/dired/README.org][dired]] =+ranger +icons= - TODO
 + electric - TODO
 + [[file:../modules/emacs/ibuffer/README.org][ibuffer]] =+icons= - TODO
++ [[file:../modules/emacs/undo/README.org][undo]] =+tree= - A smarter, more intuitive & persistent undo history
 + vc - TODO
 
 * :email
@@ -108,7 +109,7 @@ Modules that bring support for a language or group of languages to Emacs.
 + [[file:../modules/lang/fsharp/README.org][fsharp]] - TODO
 + [[file:../modules/lang/fstar/README.org][fstar]] - F* support
 + [[file:../modules/lang/go/README.org][go]] =+lsp= - TODO
-+ [[file:../modules/lang/haskell/README.org][haskell]] =+dante +ghcide +lsp +intero= - TODO
++ [[file:../modules/lang/haskell/README.org][haskell]] =+dante +ghcide +lsp= - TODO
 + hy - TODO
 + [[file:../modules/lang/idris/README.org][idris]] - TODO
 + java =+meghanada +lsp= - TODO
