@@ -27,7 +27,7 @@
   - [[#how-do-i-change-the-leaderlocalleader-keys][How do I change the leader/localleader keys?]]
   - [[#how-do-i-change-the-style-of-line-numbers-or-disable-them-altogether][How do I change the style of line-numbers (or disable them altogether)?]]
   - [[#how-do-i-change-the-behavior-and-appearance-of-popup-windows][How do I change the behavior and appearance of popup windows?]]
-  - [[#how-do-i-change-the-appearance-of-a-face-or-faces][How do I change the appearance of a face (or faces)?]]
+  - [[#how-do-i-customize-a-theme-or-faces][How do I customize a theme or face(s)?]]
   - [[#can-doom-be-customized-without-restarting-emacs][Can Doom be customized without restarting Emacs?]]
   - [[#can-vimevil-be-removed-for-a-more-vanilla-emacs-experience][Can Vim/Evil be removed for a more vanilla Emacs experience?]]
   - [[#when-should-and-shouldnt-i-use-bindoom][When should and shouldn't I use ~bin/doom~?]]
@@ -449,8 +449,8 @@ You'll find [[file:contributing.org::*Conventions][an overview of Doom's code co
 
 ** What version of Doom am I running?
 You'll find the current version displayed in the modeline on the dashboard. It
-can also be retrieved using ~M-x doom/version~ (bound to =SPC h d v= by default)
-or ~doom info~ on the command line.
+can also be retrieved using ~M-x doom/version~ (bound to =SPC h d v= or =C-h d
+v= by default) or ~bin/doom version~ on the command line.
 
 ** Is Discord the only option for interacting with your community?
 Yes. I selected it for my personal convenience and have no plans to extend our
@@ -671,18 +671,18 @@ rules.
 You'll find more comprehensive documentation on ~set-popup-rule!~ in its
 docstring (available through =SPC h f= -- or =C-h f= for non-evil users).
 
-** How do I change the appearance of a face (or faces)?
+** How do I customize a theme or face(s)?
 Doom provides the ~custom-set-faces!~ and ~custom-theme-set-faces!~ macros as a
 convenience.
 
-#+begin_quote
-*Do not use ~M-x customize~ or any of the built-in Emacs customize-* API.* Doom
-does not support it and never will; those settings could break at any time.
-#+end_quote
+See =SPC h f custom-set-faces\!= (or =C-h f custom-set-faces\!=) for
+documentation on and examples of its use.
 
-See =<help> f custom-set-faces\!= (or =M-x helpful-function custom-set-faces\!=)
-for documentation and examples on how to use it. =<help>= is =SPC h= for evil
-users and =C-h= for non-evil users.
+#+begin_quote
+Other sources may recommend ~M-x customize~, ~M-x customize-themes~ or ~M-x
+customize-face~. *Do not use these commands.* Doom does not support them and
+their settings could break any time.
+#+end_quote
 
 ** Can Doom be customized without restarting Emacs?
 Short answer: You can, but you shouldn't.
@@ -701,10 +701,7 @@ tools for experienced Emacs users to skirt around it (most of the time):
   runs ~doom sync~, restarts the Doom initialization process and re-evaluates
   your personal config. However, this won't clear pre-existing state; Doom won't
   unload modules/packages that have already been loaded and it can't anticipate
-  complications arising from a private config that isn't idempotent.
-- Some ~bin/doom~ commands are available as elisp commands. e.g. ~doom/reload~
-  for ~doom sync~, ~doom/upgrade~ for ~doom upgrade~ ~doom//s~, ~doom//update~, etc. Feel free to use them, but
-  consider them highly experimental and subject to change without notice.
+  complications arising from your private config.
 - You can quickly restart Emacs and restore the last session with
   ~doom/restart-and-restore~ (bound to =SPC q r=).
 
@@ -772,24 +769,25 @@ Looking for a terminal in Emacs? Doom offers four modules:
 + =:term term=
 + =:term vterm=.
 
-Which do you choose?
+But which do you choose?
 
 + =eshell= is the Emacs Lisp shell. It's stable, works anywhere Emacs runs (on
   any OS) and has no external dependencies, /but/ lacks features you'll expect
   from mature shells and tends to be slower than them.
 + =shell= is a shell /for/ your shell. Think of it like a REPL for bash/zsh,
-  rather than terminal emulation. For simple back-and-forth this has the
-  greatest compatibility, but the simplest feature set. It won't work with
-  TUI programs like htop or vim.
+  rather than terminal emulation. Due to its simplicity, you're less likely to
+  encounter edge cases (e.g. against your shell config), but it has the smallest
+  feature set. It also won't work with TUI programs like htop or vim.
 + =term= is Emacs' built-in terminal emulator. It's alright when it works, awful
-  when it doesn't.
-+ =vterm= is as good as terminal emulation gets in Emacs atm, but requires that
-  a) Emacs be built with dynamic modules support and b) that you compile
-  vterm-module.so (this is done when you first start up vterm, but may have
-  additional dependencies, like libvterm). In any case, this doesn't work on
-  Windows.
+  when it doesn't. =vterm= is almost always a better option.
++ =vterm= is as good as terminal emulation gets in Emacs atm, but has a few
+  extra steps to get going. a) Emacs must be built with dynamic modules support
+  and b) you'll need to compile vterm-module.so, which has external dependencies
+  (libvterm). It is automatically built when you first open =vterm=, but this
+  will fail on Windows, NixOS and Guix out of the box -- you're on your own
+  there!
 
-Ultimately, I recommend =eshell= or =vterm=. The former is
+For a terminal in Emacs, =eshell= and =vterm= are generally the best options.
 
 ** How do I enable LSP support for <insert language here>?
 Doom supports LSP, but it is not enabled by default. To enable it, you must:

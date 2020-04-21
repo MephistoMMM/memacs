@@ -465,14 +465,23 @@
       (:prefix-map ("n" . "notes")
         :desc "Search notes for symbol"      "*" #'+default/search-notes-for-symbol-at-point
         :desc "Org agenda"                   "a" #'org-agenda
+        (:when (featurep! :tools biblio)
+          :desc "Bibliographic entries"        "b"
+          (cond ((featurep! :completion ivy)   #'ivy-bibtex)
+                ((featurep! :completion helm)  #'helm-bibtex)))
+
         :desc "Toggle org-clock"             "c" #'+org/toggle-clock
         :desc "Cancel org-clock"             "C" #'org-clock-cancel
         :desc "Open deft"                    "d" #'deft
+        (:when (featurep! :lang org +noter)
+          :desc "Org noter"                  "e" #'org-noter)
+
         :desc "Find file in notes"           "f" #'+default/find-in-notes
         :desc "Browse notes"                 "F" #'+default/browse-notes
         :desc "Org store link"               "l" #'org-store-link
         :desc "Tags search"                  "m" #'org-tags-view
         :desc "Org capture"                  "n" #'org-capture
+        :desc "Goto capture"                 "N" #'org-capture-goto-target
         :desc "Active org-clock"             "o" #'org-clock-goto
         :desc "Todo list"                    "t" #'org-todo-list
         :desc "Search notes"                 "s" #'+default/org-notes-search
@@ -490,10 +499,10 @@
             :desc "Insert"           "i" #'org-roam-insert
             :desc "Org Roam"         "r" #'org-roam
             (:prefix ("d" . "by date")
-              :desc "Arbitrary date" "d" #'org-roam-date
-              :desc "Today"          "t" #'org-roam-today
-              :desc "Tomorrow"       "m" #'org-roam-tomorrow
-              :desc "Yesterday"      "y" #'org-roam-yesterday)))
+              :desc "Arbitrary date" "d" #'org-roam-dailies-date
+              :desc "Today"          "t" #'org-roam-dailies-today
+              :desc "Tomorrow"       "m" #'org-roam-dailies-tomorrow
+              :desc "Yesterday"      "y" #'org-roam-dailies-yesterday)))
 
         (:when (featurep! :lang org +journal)
           (:prefix ("j" . "journal")

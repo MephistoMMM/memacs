@@ -147,10 +147,11 @@ size.")
 e.g. If you indent with spaces by default, tabs will be highlighted. If you
 indent with tabs, spaces at BOL are highlighted.
 
-Does nothing if `whitespace-mode' is already active or the current buffer is
-read-only or not file-visiting."
+Does nothing if `whitespace-mode' or 'global-whitespace-mode' is already 
+active or if the current buffer is read-only or not file-visiting."
   (unless (or (eq major-mode 'fundamental-mode)
               buffer-read-only
+              (bound-and-true-p global-whitespace-mode)
               (null buffer-file-name))
     (require 'whitespace)
     (set (make-local-variable 'whitespace-style)
@@ -167,6 +168,10 @@ read-only or not file-visiting."
 
 ;; Simpler confirmation prompt when killing Emacs
 (setq confirm-kill-emacs #'doom-quit-p)
+
+;; Don't prompt for confirmation when we create a new file or buffer (assume the
+;; user knows what they're doing).
+(setq confirm-nonexistent-file-or-buffer nil)
 
 (setq uniquify-buffer-name-style 'forward
       ;; no beeping or blinking please
@@ -212,8 +217,19 @@ read-only or not file-visiting."
 ;;
 ;;; Cursor
 
+;; The blinking cursor is distracting, but also interferes with cursor settings
+;; in some minor modes that try to change it buffer-locally (like treemacs) and
+;; can cause freezing for folks (esp on macOS) with customized & color cursors.
+(blink-cursor-mode -1)
+
 ;; Don't blink the paren matching the one at point, it's too distracting.
 (setq blink-matching-paren nil)
+
+;; Some terminals offer two different cursors: a “visible” static cursor and a
+;; “very visible” blinking one. By default, Emacs uses the very visible cursor
+;; and switches to it when you start or resume Emacs. If `visible-cursor' is nil
+;; when Emacs starts or resumes, it uses the normal cursor.
+(setq visible-cursor nil)
 
 ;; Don't stretch the cursor to fit wide characters, it is disorienting,
 ;; especially for tabs.
@@ -225,8 +241,6 @@ read-only or not file-visiting."
 
 ;; Make `next-buffer', `other-buffer', etc. ignore unreal buffers.
 (push '(buffer-predicate . doom-buffer-frame-predicate) default-frame-alist)
-
-(setq confirm-nonexistent-file-or-buffer t)
 
 (defadvice! doom--switch-to-fallback-buffer-maybe-a (&rest _)
   "Switch to `doom-fallback-buffer' if on last real buffer.

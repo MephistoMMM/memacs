@@ -1,7 +1,7 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; ui/treemacs/packages.el
 
-(package! treemacs :pin "d2ed942c76")
+(package! treemacs :pin "2bb14ac262")
 (when (featurep! :editor evil +everywhere)
   (package! treemacs-evil))
 (package! treemacs-projectile)

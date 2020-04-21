@@ -47,6 +47,11 @@ working on that project after closing the last buffer.")
   ;; Some servers implement these poorly. Better to just rely on Emacs' native
   ;; mechanisms and make these opt-in.
   (setq lsp-enable-folding nil
+        ;; HACK Fix #2911, until it is resolved upstream. Links come in
+        ;;      asynchronously from the server, but lsp makes no effort to
+        ;;      "select" the original buffer before laying them down, so they
+        ;;      could be rendered in the wrong buffer (like the minibuffer).
+        lsp-enable-links nil
         ;; Potentially slow
         lsp-enable-file-watchers nil
         lsp-enable-text-document-color nil
@@ -56,7 +61,7 @@ working on that project after closing the last buffer.")
         lsp-enable-on-type-formatting nil)
 
   :config
-  (set-popup-rule! "^\\*lsp-help" :size 0.35 :quit t)
+  (set-popup-rule! "^\\*lsp-help" :size 0.35 :quit t :select t)
   (set-lookup-handlers! 'lsp-mode :async t
     :documentation #'lsp-describe-thing-at-point
     :definition #'lsp-find-definition
@@ -160,7 +165,7 @@ auto-killed (which is a potentially expensive process)."
             restart
             (null +lsp-defer-shutdown)
             (= +lsp-defer-shutdown 0))
-        (funcall orig-fn)
+        (funcall orig-fn restart)
       (when (timerp +lsp--deferred-shutdown-timer)
         (cancel-timer +lsp--deferred-shutdown-timer))
       (setq +lsp--deferred-shutdown-timer

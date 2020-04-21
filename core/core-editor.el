@@ -143,10 +143,9 @@ possible."
 ;; since programmers' tools tend to be POSIX compliant.
 (setq require-final-newline t)
 
-;; Default to hard line-wrapping in text modes. Hard wrapping is more
-;; performant, and Emacs makes it trivially easy to reflow text with
-;; `fill-paragraph' and `evil-fill'.
-(add-hook 'text-mode-hook #'auto-fill-mode)
+;; Default to soft line-wrapping in text modes. It is more sensibile for text
+;; modes, even if hard wrapping is more performant.
+(add-hook 'text-mode-hook #'visual-line-mode)
 
 
 ;;
@@ -386,8 +385,6 @@ files, so we replace calls to `pp' with the much faster `prin1'."
   ;; Reduced from the default of 5000 for slightly faster analysis
   (setq dtrt-indent-max-lines 2000)
 
-  ;; Add support for more languages
-  (add-to-list 'dtrt-indent-hook-mapping-list '(typescript-mode javascript typescript-indent-level))
   ;; always keep tab-width up-to-date
   (push '(t tab-width) dtrt-indent-hook-generic-mapping-list)
 
