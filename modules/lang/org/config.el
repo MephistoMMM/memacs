@@ -807,11 +807,10 @@ compelling reason, so..."
         (set-window-start nil s t)
         (set-marker p nil)))))
 
-
-(use-package! org-bullets ; "prettier" bullets
-  :hook (org-mode . org-bullets-mode)
-  :config (setq org-bullets-bullet-list '("✾" "✿" "❀" "❖" "✧")))
-;; ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
+;; (use-package! org-bullets ; "prettier" bullets
+;;   :hook (org-mode . org-bullets-mode)
+;;   :config (setq org-bullets-bullet-list '("✾" "✿" "❀" "❖" "✧")))
+;; ;; ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶
 (use-package! org-superstar ; "prettier" bullets
   :hook (org-mode . org-superstar-mode)
   :config
