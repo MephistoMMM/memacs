@@ -157,7 +157,7 @@
             :desc "Switch to buffer" "b" #'org-roam-switch-to-buffer
             :desc "Org Roam Capture" "c" #'org-roam-capture
             :desc "Find file"        "f" #'org-roam-find-file
-            :desc "Show graph"       "g" #'org-roam-graph-show
+            :desc "Show graph"       "g" #'org-roam-graph
             :desc "Insert"           "i" #'org-roam-insert
             :desc "Org Roam"         "r" #'org-roam
             (:prefix ("d" . "by date")
@@ -540,14 +540,4 @@
       ;;; treemacs
       (:when (featurep! :ui treemacs)
         "<f9>"   #'+treemacs/toggle
-        "<C-f9>" #'+treemacs/find-file)
-
-      ;;; yasnippet
-      (:after yasnippet
-        :map yas-keymap  ; keymap while editing an inserted snippet
-        "C-e"           #'+snippets/goto-end-of-field
-        "C-a"           #'+snippets/goto-start-of-field
-        "<S-tab>"       #'yas-prev-field
-        "<M-backspace>" #'+snippets/delete-to-start-of-field
-        [backspace]     #'+snippets/delete-backward-char
-        [delete]        #'+snippets/delete-forward-char-or-field))
+        "<C-f9>" #'+treemacs/find-file))
