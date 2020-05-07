@@ -821,6 +821,7 @@ compelling reason, so..."
   ;; down larger org buffers.
   (setq org-superstar-prettify-item-bullets nil
         org-superstar-special-todo-items nil
+        org-superstar-headline-bullets-list '("✾" "✧" "❀" "✿" "❖")
         ;; ...but configure it in case the user wants it later
         org-superstar-todo-bullet-alist
         '(("TODO" . 9744)
