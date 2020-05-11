@@ -269,8 +269,13 @@ directives. By default, this only recognizes C directives.")
         evil-escape-delay 0.15)
   (evil-define-key* '(insert replace visual operator) 'global "\C-g" #'evil-escape)
   :config
-  ;; no `evil-escape' in minibuffer
-  (add-hook 'evil-escape-inhibit-functions #'minibufferp)
+  ;; no `evil-escape' in minibuffer, unless `evil-collection-setup-minibuffer'
+  ;; is enabled, where we could be in insert mode in the minibuffer.
+  (add-hook! 'evil-escape-inhibit-functions
+    (defun +evil-inhibit-escape-in-minibuffer-fn ()
+      (and (minibufferp)
+           (or (not (bound-and-true-p evil-collection-setup-minibuffer))
+               (evil-normal-state-p)))))
   ;; so that evil-escape-mode-hook runs, and can be toggled by evil-mc
   (evil-escape-mode +1))
 
@@ -422,22 +427,22 @@ To change these keys see `+evil-repeat-keys'."
       :m  "]y"    #'+evil:c-string-encode
       :m  "[y"    #'+evil:c-string-decode
       (:when (featurep! :lang web)
-        :m "]x"   #'+web:encode-html-entities
-        :m "[x"   #'+web:decode-html-entities)
+       :m "]x"   #'+web:encode-html-entities
+       :m "[x"   #'+web:decode-html-entities)
       (:when (featurep! :ui vc-gutter)
-        :m "]d"   #'git-gutter:next-hunk
-        :m "[d"   #'git-gutter:previous-hunk)
+       :m "]d"   #'git-gutter:next-hunk
+       :m "[d"   #'git-gutter:previous-hunk)
       (:when (featurep! :ui hl-todo)
-        :m "]t"   #'hl-todo-next
-        :m "[t"   #'hl-todo-previous)
+       :m "]t"   #'hl-todo-next
+       :m "[t"   #'hl-todo-previous)
       (:when (featurep! :ui workspaces)
-        :n "gt"   #'+workspace:switch-next
-        :n "gT"   #'+workspace:switch-previous
-        :n "]w"   #'+workspace/switch-right
-        :n "[w"   #'+workspace/switch-left)
+       :n "gt"   #'+workspace:switch-next
+       :n "gT"   #'+workspace:switch-previous
+       :n "]w"   #'+workspace/switch-right
+       :n "[w"   #'+workspace/switch-left)
       (:when (featurep! :ui tabs)
-        :n "gt"   #'centaur-tabs-forward
-        :n "gT"   #'centaur-tabs-backward)
+       :n "gt"   #'centaur-tabs-forward
+       :n "gT"   #'centaur-tabs-backward)
 
       ;; custom vim-unmpaired-esque keys
       :m  "]#"    #'+evil/next-preproc-directive
@@ -489,7 +494,7 @@ To change these keys see `+evil-repeat-keys'."
           :n "gr" #'notmuch-refresh-this-buffer
           :n "gR" #'notmuch-poll-and-refresh-this-buffer)
         (:after elfeed
-          :map elfeed-search-update--force
+          :map elfeed-search-mode-map
           :n "gr" #'elfeed-search-update--force
           :n "gR" #'elfeed-search-fetch))
 
@@ -505,30 +510,30 @@ To change these keys see `+evil-repeat-keys'."
 
       ;; window management (prefix "C-w")
       (:map evil-window-map
-        ;; Navigation
-        "C-h"     #'evil-window-left
-        "C-j"     #'evil-window-down
-        "C-k"     #'evil-window-up
-        "C-l"     #'evil-window-right
-        "C-w"     #'other-window
-        ;; Swapping windows
-        "H"       #'+evil/window-move-left
-        "J"       #'+evil/window-move-down
-        "K"       #'+evil/window-move-up
-        "L"       #'+evil/window-move-right
-        "C-S-w"   #'ace-swap-window
-        ;; Window undo/redo
-        (:prefix "m"
-          "m"       #'doom/window-maximize-buffer
-          "v"       #'doom/window-maximize-vertically
-          "s"       #'doom/window-maximize-horizontally)
-        "u"       #'winner-undo
-        "C-u"     #'winner-undo
-        "C-r"     #'winner-redo
-        "o"       #'doom/window-enlargen
-        ;; Delete window
-        "d"       #'evil-window-delete
-        "C-C"     #'ace-delete-window)
+       ;; Navigation
+       "C-h"     #'evil-window-left
+       "C-j"     #'evil-window-down
+       "C-k"     #'evil-window-up
+       "C-l"     #'evil-window-right
+       "C-w"     #'other-window
+       ;; Swapping windows
+       "H"       #'+evil/window-move-left
+       "J"       #'+evil/window-move-down
+       "K"       #'+evil/window-move-up
+       "L"       #'+evil/window-move-right
+       "C-S-w"   #'ace-swap-window
+       ;; Window undo/redo
+       (:prefix "m"
+        "m"       #'doom/window-maximize-buffer
+        "v"       #'doom/window-maximize-vertically
+        "s"       #'doom/window-maximize-horizontally)
+       "u"       #'winner-undo
+       "C-u"     #'winner-undo
+       "C-r"     #'winner-redo
+       "o"       #'doom/window-enlargen
+       ;; Delete window
+       "d"       #'evil-window-delete
+       "C-C"     #'ace-delete-window)
 
       ;; text objects
       :textobj "a" #'evil-inner-arg                    #'evil-outer-arg
@@ -555,13 +560,13 @@ To change these keys see `+evil-repeat-keys'."
 
       ;; Omni-completion
       (:when (featurep! :completion company)
-        (:prefix "C-x"
-          :i "C-l"    #'+company/whole-lines
-          :i "C-k"    #'+company/dict-or-keywords
-          :i "C-f"    #'company-files
-          :i "C-]"    #'company-etags
-          :i "s"      #'company-ispell
-          :i "C-s"    #'company-yasnippet
-          :i "C-o"    #'company-capf
-          :i "C-n"    #'+company/dabbrev
-          :i "C-p"    #'+company/dabbrev-code-previous)))
+       (:prefix "C-x"
+        :i "C-l"    #'+company/whole-lines
+        :i "C-k"    #'+company/dict-or-keywords
+        :i "C-f"    #'company-files
+        :i "C-]"    #'company-etags
+        :i "s"      #'company-ispell
+        :i "C-s"    #'company-yasnippet
+        :i "C-o"    #'company-capf
+        :i "C-n"    #'+company/dabbrev
+        :i "C-p"    #'+company/dabbrev-code-previous)))

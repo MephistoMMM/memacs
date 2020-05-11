@@ -28,7 +28,9 @@
 
 ;; If you intend to use org, it is recommended you change this!
 (setq org-directory "~/Dropbox/org"
-      +org-capture-work-directory "~/Documents/works/seven")
+      +org-capture-work-directory "~/Documents/works/seven"
+      org-attach-id-dir (expand-file-name "~/Dropbox/org/statics/")
+      org-download-image-dir (expand-file-name "~/Dropbox/org/statics/"))
 
 ;; If you want to change the style of line numbers, change this to `relative' or
 ;; `nil' to disable it:
