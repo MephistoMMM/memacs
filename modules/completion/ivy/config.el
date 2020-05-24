@@ -208,6 +208,11 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
   ;; of its own, on top of the defaults.
   (setq ivy-initial-inputs-alist nil)
 
+  (setq counsel-rg-base-command
+        (if (memq system-type '(ms-dos windows-nt))
+            "rg -M 240 --max-columns-preview --with-filename --no-heading --line-number --color never %s --path-separator / ."
+          "rg -M 240 --max-columns-preview --with-filename --no-heading --line-number --color never %s"))
+
   ;; Integrate with `helpful'
   (setq counsel-describe-function-function #'helpful-callable
         counsel-describe-variable-function #'helpful-variable)

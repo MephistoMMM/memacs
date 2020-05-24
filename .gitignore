@@ -33,3 +33,6 @@ network-security.data
 *.cache-*
 *.log
 .directory
+
+# extral
+.git/

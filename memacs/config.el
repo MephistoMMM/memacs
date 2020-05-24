@@ -28,7 +28,7 @@
 
 ;; If you intend to use org, it is recommended you change this!
 (setq org-directory "~/Dropbox/org"
-      +org-capture-work-directory "~/Documents/works/seven"
+      +org-capture-work-directory "~/Documents/works"
       org-attach-id-dir (expand-file-name "~/Dropbox/org/statics/")
       org-download-image-dir (expand-file-name "~/Dropbox/org/statics/"))
 
