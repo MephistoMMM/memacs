@@ -118,6 +118,7 @@ unreadable. Returns the names of envvars that were changed."
         (env
          (with-temp-buffer
            (save-excursion
+             (setq-local coding-system-for-read 'utf-8)
              (insert "\0\n") ; to prevent off-by-one
              (insert-file-contents file))
            (save-match-data
@@ -157,7 +158,7 @@ at the values with which this function was called."
 A factory for quickly producing interaction commands, particularly for keybinds
 or aliases."
   (declare (doc-string 1) (pure t) (side-effect-free t))
-  `(lambda () (interactive) ,@body))
+  `(lambda (&rest _) (interactive) ,@body))
 (defalias 'lambda! 'λ!)
 
 (defun λ!! (command &optional arg)
@@ -165,7 +166,7 @@ or aliases."
 A factory for quickly producing interactive, prefixed commands for keybinds or
 aliases."
   (declare (doc-string 1) (pure t) (side-effect-free t))
-  (lambda () (interactive)
+  (lambda (&rest _) (interactive)
      (let ((current-prefix-arg arg))
        (call-interactively command))))
 (defalias 'lambda!! 'λ!!)
@@ -209,38 +210,41 @@ the same name, for use with `funcall' or `apply'. ARGLIST and BODY are as in
   (setq body (macroexp-progn body))
   (when (memq (car bindings) '(defun defmacro))
     (setq bindings (list bindings)))
-  (dolist (binding (nreverse bindings) body)
+  (dolist (binding (reverse bindings) (macroexpand body))
     (let ((type (car binding))
           (rest (cdr binding)))
       (setq
        body (pcase type
               (`defmacro `(cl-macrolet ((,(car rest) ,(cadr rest) ,@(cddr rest))) ,body))
               (`defun `(cl-letf* ((,(car rest) (symbol-function #',(car rest)))
-                                   ((symbol-function #',(car rest))
-                                    (lambda ,(cadr rest) ,@(cddr rest))))
-                          ,body))
+                                  ((symbol-function #',(car rest))
+                                   (lambda ,(cadr rest) ,@(cddr rest))))
+                         (ignore ,(car rest))
+                         ,body))
               (_
                (when (eq (car-safe type) 'function)
-                 (setq type `(symbol-function ,type)))
-               `(cl-letf ((,type ,@rest)) ,body)))))))
+                 (setq type (list 'symbol-function type)))
+               (list 'cl-letf (list (cons type rest)) body)))))))
 
 (defmacro quiet! (&rest forms)
   "Run FORMS without generating any output.
 
-This silences calls to `message', `load-file', `write-region' and anything that
+This silences calls to `message', `load', `write-region' and anything that
 writes to `standard-output'."
-  `(cond (doom-debug-mode ,@forms)
-         ((not doom-interactive-mode)
-          (letf! ((standard-output (lambda (&rest _)))
-                  (defun load-file (file) (load-file nil t))
-                  (defun message (&rest _))
-                  (defun write-region (start end filename &optional append visit lockname mustbenew)
-                    (unless visit (setq visit 'no-message))
-                    (funcall write-region start end filename append visit lockname mustbenew)))
-            ,@forms))
-         ((let ((inhibit-message t)
-                (save-silently t))
-            (prog1 ,@forms (message ""))))))
+  `(if doom-debug-mode
+       (progn ,@forms)
+     ,(if doom-interactive-mode
+          `(let ((inhibit-message t)
+                 (save-silently t))
+             (prog1 ,@forms (message "")))
+        `(letf! ((standard-output (lambda (&rest _)))
+                 (defun message (&rest _))
+                 (defun load (file &optional noerror nomessage nosuffix must-suffix)
+                   (funcall load file noerror t nosuffix must-suffix))
+                 (defun write-region (start end filename &optional append visit lockname mustbenew)
+                   (unless visit (setq visit 'no-message))
+                   (funcall write-region start end filename append visit lockname mustbenew)))
+           ,@forms))))
 
 (defmacro if! (cond then &rest body)
   "Expands to THEN if COND is non-nil, to BODY otherwise.
@@ -260,6 +264,13 @@ See `if!' for details on this macro's purpose."
     (macroexp-progn body)))
 
 
+;;; Closure factories
+(defmacro fn! (arglist &rest body)
+  "Expands to (cl-function (lambda ARGLIST BODY...))"
+  (declare (indent defun) (doc-string 1) (pure t) (side-effect-free t))
+  `(cl-function (lambda ,arglist ,@body)))
+
+
 ;;; Mutation
 (defmacro appendq! (sym &rest lists)
   "Append LISTS to SYM in place."
@@ -268,14 +279,13 @@ See `if!' for details on this macro's purpose."
 (defmacro setq! (&rest settings)
   "A stripped-down `customize-set-variable' with the syntax of `setq'.
 
-Use this instead of `setq' when you know a variable has a custom setter (a :set
-property in its `defcustom' declaration). This trigger setters. `setq' does
-not."
+This can be used as a drop-in replacement for `setq'. Particularly when you know
+a variable has a custom setter (a :set property in its `defcustom' declaration).
+This triggers setters. `setq' does not."
   (macroexp-progn
    (cl-loop for (var val) on settings by 'cddr
-            collect (list (or (get var 'custom-set) #'set)
-                          (list 'quote var)
-                          val))))
+            collect `(funcall (or (get ',var 'custom-set) #'set)
+                              ',var ,val))))
 
 (defmacro delq! (elt list &optional fetcher)
   "`delq' ELT from LIST in-place.
@@ -466,10 +476,18 @@ advised)."
               (put ',fn 'permanent-local-hook t)
               (add-hook sym #',fn ,append))))))
 
+(defmacro add-hook-trigger! (hook-var &rest targets)
+  "TODO"
+  `(let ((fn (intern (format "%s-h" ,hook-var))))
+     (fset fn (lambda (&rest _) (run-hooks ,hook-var) (set ,hook-var nil)))
+     (put ,hook-var 'permanent-local t)
+     (dolist (on (list ,@targets))
+       (if (functionp on)
+           (advice-add on :before fn)
+         (add-hook on fn)))))
+
 (defmacro add-hook! (hooks &rest rest)
   "A convenience macro for adding N functions to M hooks.
-
-If N and M = 1, there's no benefit to using this macro over `add-hook'.
 
 This macro accepts, in order:
 

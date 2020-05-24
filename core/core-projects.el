@@ -20,7 +20,6 @@ Emacs.")
 ;;; Packages
 
 (use-package! projectile
-  :after-call after-find-file dired-before-readin-hook minibuffer-setup-hook
   :commands (projectile-project-root
              projectile-project-name
              projectile-project-p
@@ -68,7 +67,8 @@ Emacs.")
   ;; In the interest of performance, we reduce the number of project root marker
   ;; files/directories projectile searches for when resolving the project root.
   (setq projectile-project-root-files-bottom-up
-        (append '(".project"     ; doom project marker
+        (append '(".projectile"  ; projectile's root marker
+                  ".project"     ; doom project marker
                   ".git")        ; Git VCS root dir
                 (when (executable-find "hg")
                   '(".hg"))      ; Mercurial VCS root dir
@@ -146,8 +146,9 @@ c) are not valid projectile projects."
    ;; .gitignore. This is recommended in the projectile docs.
    ((executable-find doom-projectile-fd-binary)
     (setq projectile-generic-command
-          (format "%s . -0 -H -E .git --color=never --type file --type symlink --follow"
-                  doom-projectile-fd-binary)
+          (concat (format "%s . -0 -H -E .git --color=never --type file --type symlink --follow"
+                          doom-projectile-fd-binary)
+                  (if IS-WINDOWS " --path-separator=/"))
           projectile-git-command projectile-generic-command
           projectile-git-submodule-command nil
           ;; ensure Windows users get fd's benefits

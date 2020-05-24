@@ -1,8 +1,8 @@
 ;;; core/cli/upgrade.el -*- lexical-binding: t; -*-
 
 (defcli! (upgrade up)
-  ((force-p ["-f" "--force"] "Discard local changes to Doom and packages, and upgrade anyway")
-   (packages-only-p ["-p" "--packages"] "Only upgrade packages, not Doom"))
+    ((force-p ["-f" "--force"] "Discard local changes to Doom and packages, and upgrade anyway")
+     (packages-only-p ["-p" "--packages"] "Only upgrade packages, not Doom"))
   "Updates Doom and packages.
 
 This requires that ~/.emacs.d is a git repo, and is the equivalent of the
@@ -19,7 +19,7 @@ following shell commands:
          nil (list
               (unless packages-only-p
                 (doom-cli-upgrade doom-auto-accept doom-auto-discard))
-              (doom-cli-execute "refresh")
+              (doom-cli-execute "sync")
               (when (doom-cli-packages-update)
                 (doom-cli-reload-package-autoloads)
                 t)))
@@ -106,10 +106,25 @@ following shell commands:
                   (print! (start "Upgrading Doom Emacs..."))
                   (print-group!
                    (doom-clean-byte-compiled-files)
-                   (if (and (zerop (car (doom-call-process "git" "reset" "--hard" target-remote)))
-                            (equal (vc-git--rev-parse "HEAD") new-rev))
-                       (print! (info "%s") (cdr result))
+                   (unless (and (zerop (car (doom-call-process "git" "reset" "--hard" target-remote)))
+                                (equal (vc-git--rev-parse "HEAD") new-rev))
                      (error "Failed to check out %s" (substring new-rev 0 10)))
+                   (print! (info "%s") (cdr result))
+
+                   ;; Reload Doom's CLI & libraries, in case there were any
+                   ;; upstream changes. Major changes will still break, however
+                   (condition-case-unless-debug e
+                       (progn
+                         (mapc (lambda (f) (load (symbol-name f)))
+                               '(core core-lib
+                                      core-cli
+                                      core-modules
+                                      core-packages))
+                         (doom-initialize 'force))
+                     (error
+                      (signal 'doom-error (list "Could not upgrade Doom without issues"
+                                                e))))
+
                    (print! (success "Finished upgrading Doom Emacs")))
                   t)))))
         (ignore-errors

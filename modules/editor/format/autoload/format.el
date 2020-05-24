@@ -102,7 +102,11 @@ Stolen shamelessly from go-mode"
 (defun +format-probe-a (orig-fn)
   "Use `+format-with' instead, if it is set.
 Prompts for a formatter if universal arg is set."
-  (cond (current-prefix-arg
+  (cond ((or (eq +format-with :none)
+             (doom-temp-buffer-p (current-buffer))
+             (doom-special-buffer-p (current-buffer)))
+         nil)
+        (current-prefix-arg
          (list (or (+format-completing-read)
                    (user-error "Aborted"))
                t))
@@ -198,7 +202,15 @@ See `+format/buffer' for the interactive version of this function, and
 ;;; Commands
 
 ;;;###autoload
-(defalias '+format/buffer #'format-all-buffer)
+(defun +format/buffer ()
+  "Reformat the current buffer using LSP or `format-all-buffer'."
+  (interactive)
+  (call-interactively
+   (if (and +format-with-lsp
+            (bound-and-true-p lsp-mode)
+            (lsp-feature? "textDocument/formatting"))
+       #'lsp-format-buffer
+     #'format-all-buffer)))
 
 ;;;###autoload
 (defun +format/region (beg end)
@@ -208,10 +220,14 @@ WARNING: this may not work everywhere. It will throw errors if the region
 contains a syntax error in isolation. It is mostly useful for formatting
 snippets or single lines."
   (interactive "rP")
-  (save-restriction
-    (narrow-to-region beg end)
-    (let ((+format-region-p t))
-      (+format/buffer))))
+  (if (and +format-with-lsp
+           (bound-and-true-p lsp-mode)
+           (lsp-feature? "textDocument/rangeFormatting"))
+      #'lsp-format-region
+    (save-restriction
+      (narrow-to-region beg end)
+      (let ((+format-region-p t))
+        (+format/buffer)))))
 
 ;;;###autoload
 (defun +format/region-or-buffer ()
@@ -220,14 +236,8 @@ is selected)."
   (interactive)
   (call-interactively
    (if (doom-region-active-p)
-       (if (and (bound-and-true-p lsp-mode)
-                (lsp-feature? "textDocument/rangeFormatting"))
-           #'lsp-format-region
-         #'+format/region)
-     (if (and (bound-and-true-p lsp-mode)
-              (lsp-feature? "textDocument/formatting"))
-         #'lsp-format-buffer
-       #'+format/buffer))))
+       #'+format/region
+     #'+format/buffer)))
 
 
 ;;
