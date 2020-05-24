@@ -29,11 +29,9 @@ If prefix ARG is non-nil, recreate vterm buffer in the current project's root."
           (when (bound-and-true-p evil-local-mode)
             (evil-change-to-initial-state))
           (goto-char (point-max)))
-      (require 'vterm)
       (setenv "PROOT" (or (doom-project-root) default-directory))
       (let ((buffer (get-buffer-create buffer-name)))
         (with-current-buffer buffer
-          (doom-mark-buffer-as-real-h)
           (unless (eq major-mode 'vterm-mode)
             (vterm-mode)))
         (pop-to-buffer buffer)))))
@@ -50,8 +48,26 @@ If prefix ARG is non-nil, cd into `default-directory' instead of project root."
   ;; This hack forces vterm to redraw, fixing strange artefacting in the tty.
   (save-window-excursion
     (pop-to-buffer "*scratch*"))
-  (let ((default-directory
-          (if arg
-              default-directory
-            (or (doom-project-root) default-directory))))
+  (let* ((project-root (or (doom-project-root) default-directory))
+         (default-directory
+           (if arg
+               default-directory
+             project-root))
+         display-buffer-alist)
+    (setenv "PROOT" project-root)
     (vterm)))
+
+
+(defvar +vterm--insert-point nil)
+
+;;;###autoload
+(defun +vterm-remember-insert-point-h ()
+  "Remember point when leaving insert mode."
+  (setq-local +vterm--insert-point (point)))
+
+;;;###autoload
+(defun +vterm-goto-insert-point-h ()
+  "Go to the point we were at when we left insert mode."
+  (when +vterm--insert-point
+    (goto-char +vterm--insert-point)
+    (setq-local +vterm--insert-point nil)))

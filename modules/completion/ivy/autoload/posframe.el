@@ -4,7 +4,7 @@
 ;;;###autoload
 (defun +ivy-display-at-frame-center-near-bottom-fn (str)
   "TODO"
-  (ivy-posframe--display str #'+ivy-poshandler-frame-center-near-bottom-fn))
+  (ivy-posframe--display (concat str "\n~") #'+ivy-poshandler-frame-center-near-bottom-fn))
 
 ;;;###autoload
 (defun +ivy-poshandler-frame-center-near-bottom-fn (info)

@@ -16,6 +16,8 @@
 (use-package! doom-modeline
   :unless (featurep! +light)
   :hook (after-init . doom-modeline-mode)
+  :hook (doom-modeline-mode . size-indication-mode) ; filesize in modeline
+  :hook (doom-modeline-mode . column-number-mode)   ; cursor column in modeline
   :init
   (unless after-init-time
     ;; prevent flash of unstyled modeline at startup
@@ -41,10 +43,7 @@
   (defvar mouse-wheel-down-event nil)
   (defvar mouse-wheel-up-event nil)
 
-  (size-indication-mode +1) ; filesize in modeline
-  (column-number-mode +1)   ; cursor column in modeline
-
-  (add-hook 'doom-change-font-size-hook #'+modeline-resize-for-font-h)
+  (add-hook 'after-setting-font-hook #'+modeline-resize-for-font-h)
   (add-hook 'doom-load-theme-hook #'doom-modeline-refresh-bars)
 
   (add-hook '+doom-dashboard-mode-hook #'doom-modeline-set-project-modeline)
@@ -53,21 +52,8 @@
     (defun +modeline-hide-in-non-status-buffer-h ()
       "Show minimal modeline in magit-status buffer, no modeline elsewhere."
       (if (eq major-mode 'magit-status-mode)
-          (doom-modeline-set-project-modeline)
+          (doom-modeline-set-vcs-modeline)
         (hide-mode-line-mode))))
-
-  ;; Remove unused segments & extra padding
-  (doom-modeline-def-modeline 'main
-    '(bar workspace-name window-number modals matches buffer-info remote-host buffer-position selection-info)
-    '(objed-state misc-info persp-name irc mu4e github debug input-method buffer-encoding lsp major-mode process vcs checker))
-
-  (doom-modeline-def-modeline 'special
-    '(bar window-number modals matches buffer-info-simple buffer-position selection-info)
-    '(objed-state misc-info persp-name debug input-method irc-buffers buffer-encoding lsp major-mode process checker))
-
-  (doom-modeline-def-modeline 'project
-    '(bar window-number modals buffer-default-directory)
-    '(misc-info mu4e github debug battery " " major-mode process))
 
   ;; Some functions modify the buffer, causing the modeline to show a false
   ;; modified state, so force them to behave.

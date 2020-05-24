@@ -22,7 +22,7 @@
     :slot 20 :size 0.8 :select t :quit nil :ttl 0)
   (set-evil-initial-state! 'image-dired-display-image-mode 'emacs)
 
-  (let ((args (list "-aBhl" "--group-directories-first")))
+  (let ((args (list "-ahl" "--group-directories-first")))
     (when IS-BSD
       ;; Use GNU ls as `gls' from `coreutils' if available. Add `(setq
       ;; dired-use-ls-dired nil)' to your config to suppress the Dired warning
@@ -31,20 +31,16 @@
           (setq insert-directory-program gls)
         ;; BSD ls doesn't support --group-directories-first
         (setq args (delete "--group-directories-first" args))))
-    (setq dired-listing-switches (string-join args " ")))
+    (setq dired-listing-switches (string-join args " "))
 
-  (add-hook! 'dired-mode-hook
-    (defun +dired-disable-gnu-ls-flags-in-tramp-buffers-h ()
-      "Fix #1703: dired over TRAMP displays a blank screen.
+    (add-hook! 'dired-mode-hook
+      (defun +dired-disable-gnu-ls-flags-in-tramp-buffers-h ()
+        "Fix #1703: dired over TRAMP displays a blank screen.
 
 This is because there's no guarantee the remote system has GNU ls, which is the
 only variant that supports --group-directories-first."
-      (when (file-remote-p default-directory)
-        (setq-local dired-listing-switches
-                    (string-join
-                     (split-string dired-listing-switches
-                                   "--group-directories-first")
-                     " ")))))
+        (when (file-remote-p default-directory)
+          (setq-local dired-listing-switches (car args))))))
 
   ;; Don't complain about this command being disabled when we use it
   (put 'dired-find-alternate-file 'disabled nil)
@@ -65,7 +61,7 @@ only variant that supports --group-directories-first."
 
 
 (use-package! diff-hl
-  :hook (dired-mode . diff-hl-dired-mode)
+  :hook (dired-mode . diff-hl-dired-mode-unless-remote)
   :hook (magit-post-refresh . diff-hl-magit-post-refresh)
   :config
   ;; use margin instead of fringe
@@ -120,13 +116,13 @@ we have to clean it up ourselves."
     (defvar +wdired-icons-enabled -1)
 
     (defadvice! +dired-disable-icons-in-wdired-mode-a (&rest _)
-      :before #'+wdired-before-start-advice
+      :before #'wdired-change-to-wdired-mode
       (setq-local +wdired-icons-enabled (if all-the-icons-dired-mode 1 -1))
       (when all-the-icons-dired-mode
         (all-the-icons-dired-mode -1)))
 
     (defadvice! +dired-restore-icons-after-wdired-mode-a (&rest _)
-      :after #'+wdired-after-finish-advice
+      :after #'wdired-change-to-dired-mode
       (all-the-icons-dired-mode +wdired-icons-enabled))))
 
 

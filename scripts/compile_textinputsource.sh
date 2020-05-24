@@ -14,4 +14,4 @@ else
     echo "Create $HOME/.local/bin."
     mkdir -p $HOME/.local/bin
 fi
-gcc -framework Carbon -o $HOME/.local/bin/textinputsource $ROOTPATH/local/text_input_source/main.c
+gcc -framework Carbon -o $HOME/.local/bin/textinputsource $ROOTPATH/lib/text_input_source/main.c

@@ -1,7 +1,8 @@
 ;;; core/cli/upgrade.el -*- lexical-binding: t; -*-
 
 (defcli! (upgrade up)
-  ((force-p ["-f" "--force"]))
+  ((force-p ["-f" "--force"] "Discard local changes to Doom and packages, and upgrade anyway")
+   (packages-only-p ["-p" "--packages"] "Only upgrade packages, not Doom"))
   "Updates Doom and packages.
 
 This requires that ~/.emacs.d is a git repo, and is the equivalent of the
@@ -10,18 +11,20 @@ following shell commands:
     cd ~/.emacs.d
     git pull --rebase
     bin/doom clean
-    bin/doom refresh
+    bin/doom sync
     bin/doom update"
   :bare t
-  (if (delq
-       nil (list
-            (doom-cli-upgrade doom-auto-accept force-p)
-            (doom-cli-execute "refresh")
-            (when (doom-cli-packages-update)
-              (doom-cli-reload-package-autoloads)
-              t)))
-      (print! (success "Done! Restart Emacs for changes to take effect."))
-    (print! "Nothing to do. Doom is up-to-date!")))
+  (let ((doom-auto-discard force-p))
+    (if (delq
+         nil (list
+              (unless packages-only-p
+                (doom-cli-upgrade doom-auto-accept doom-auto-discard))
+              (doom-cli-execute "refresh")
+              (when (doom-cli-packages-update)
+                (doom-cli-reload-package-autoloads)
+                t)))
+        (print! (success "Done! Restart Emacs for changes to take effect."))
+      (print! "Nothing to do. Doom is up-to-date!"))))
 
 
 ;;

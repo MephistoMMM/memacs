@@ -1,16 +1,7 @@
 ;;; lang/coq/config.el -*- lexical-binding: t; -*-
 
 ;;;###package proof-general
-;; HACK `proof-general' ascertains its own library path at compile time in its
-;; autoloads file using `byte-compile-current-file' (and stores it in
-;; `pg-init--script-full-path'). This means that when
-;; `doom-package-autoload-file' is created and byte-compiled,
-;; `pg-init--script-full-path' will be wrong, causing file-missing errors as it
-;; tries to load `proof-site'. We prevent this by defining these two variables
-;; early, in our own autoloads file.
-(setq pg-init--script-full-path (locate-library "proof-general")
-      pg-init--pg-root (file-name-directory pg-init--script-full-path)
-      proof-splash-enable nil)
+(setq proof-splash-enable nil)
 
 
 ;;;###package coq
@@ -81,11 +72,11 @@
   (setq company-coq-disabled-features '(hello company-defaults))
 
   (if (featurep! :completion company)
-      (map! :map coq-mode-map [remap company-complete-common]
-            #'company-indent-or-complete-common)
+      (define-key coq-mode-map [remap company-complete-common]
+        #'company-indent-or-complete-common)
     ;; `company-coq''s company defaults impose idle-completion on folks, so
-    ;; we'll set up company ourselves.
-    ;; See https://github.com/cpitclaudel/company-coq/issues/42
+    ;; we'll set up company ourselves. See
+    ;; https://github.com/cpitclaudel/company-coq/issues/42
     (add-to-list 'company-coq-disabled-features 'company))
 
   (map! :map coq-mode-map

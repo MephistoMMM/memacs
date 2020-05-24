@@ -23,18 +23,10 @@ else
 fi
 
 echo "Start install Fira Code Memacs Symbol fonts..."
-cp $ROOTPATH/local/fonts/FiraCode-Regular-Memacs-Symbol.otf ~/Library/Fonts/FiraCode-Regular-Symbol.otf
+# https://github.com/tonsky/FiraCode/wiki/Installing
+brew tap homebrew/cask-fonts && brew cask install font-fira-code
 if [ $? -eq 0 ]; then
     echo "Finish installing Fira Code Memacs Symbol fonts."
 else
     echo "Failed to install Fira Code Memacs Symbol fonts!"
-fi
-
-# https://github.com/sebastiencs/icons-in-terminal
-echo "Start install icons-in-terminal fonts..."
-cp $ROOTPATH/local/fonts/icons-in-terminal.ttf ~/Library/Fonts/icons-in-terminal.ttf
-if [ $? -eq 0 ]; then
-    echo "Finish installing icons-in-terminal fonts."
-else
-    echo "Failed to install icons-in-terminal fonts!"
 fi

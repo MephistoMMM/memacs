@@ -27,11 +27,17 @@ capture, the end position, and the output buffer.")
         markdown-gfm-additional-languages '("sh")
         markdown-make-gfm-checkboxes-buttons t
 
-        ;; Preview/compilation defaults
+        ;; `+markdown-compile' offers support for many transpilers (see
+        ;; `+markdown-compile-functions'), which it tries until one succeeds.
         markdown-command #'+markdown-compile
+        ;; This is set to `nil' by default, which causes a wrong-type-arg error
+        ;; when you use `markdown-open'. These are more sensible defaults.
         markdown-open-command
         (cond (IS-MAC "open")
               (IS-LINUX "xdg-open"))
+
+        ;; A sensible and simple default preamble for markdown exports that
+        ;; takes after the github asthetic (plus highlightjs syntax coloring).
         markdown-content-type "application/xhtml+xml"
         markdown-css-paths
         '("https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css"
@@ -42,11 +48,25 @@ capture, the end position, and the output buffer.")
                 "<script src='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release/build/highlight.min.js'></script>"
                 "<script>document.addEventListener('DOMContentLoaded', () => { document.body.classList.add('markdown-body'); document.querySelectorAll('pre[lang] > code').forEach((code) => { code.classList.add(code.parentElement.lang); }); document.querySelectorAll('pre > code').forEach((code) => { hljs.highlightBlock(code); }); });</script>"))
 
+  ;; A shorter alias for org src blocks than "markdown"
+  (after! org-src
+    (add-to-list 'org-src-lang-modes '("md" . markdown)))
+
   :config
   (set-flyspell-predicate! '(markdown-mode gfm-mode)
     #'+markdown-flyspell-word-p)
   (set-lookup-handlers! '(markdown-mode gfm-mode)
-    :file #'markdown-follow-thing-at-point)
+    ;; `markdown-follow-thing-at-point' may open an external program or a
+    ;; buffer. No good way to tell, so pretend it's async.
+    :file '(markdown-follow-thing-at-point :async t))
+
+  (sp-local-pair '(markdown-mode gfm-mode) "`" "`"
+                 :unless '(:add sp-point-before-word-p sp-point-before-same-p))
+
+  ;; Don't trigger autofill in code blocks (see `auto-fill-mode')
+  (setq-hook! 'markdown-mode-hook
+    fill-nobreak-predicate (cons #'markdown-code-block-at-point-p
+                                 fill-nobreak-predicate))
 
   ;; HACK Prevent mis-fontification of YAML metadata blocks in `markdown-mode'
   ;;      which occurs when the first line contains a colon in it. See
@@ -57,6 +77,7 @@ capture, the end position, and the output buffer.")
 
   (map! :map markdown-mode-map
         :localleader
+        "'" #'markdown-edit-code-block
         "o" #'markdown-open
         "p" #'markdown-preview
         "e" #'markdown-export
@@ -71,6 +92,10 @@ capture, the end position, and the output buffer.")
 (use-package! evil-markdown
   :when (featurep! :editor evil +everywhere)
   :hook (markdown-mode . evil-markdown-mode)
+  :init
+  ;; REVIEW Until Somelauw/evil-markdown#1 is resolved:
+  (defun evil-disable-insert-state-bindings ()
+    evil-disable-insert-state-bindings)
   :config
   (add-hook 'evil-markdown-mode-hook #'evil-normalize-keymaps)
   (map! :map evil-markdown-mode-map

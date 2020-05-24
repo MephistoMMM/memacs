@@ -28,11 +28,12 @@ It is integrated into Helpful, in Doom.
     - [[#prependq][prependq!]]
     - [[#quiet][quiet!]]
     - [[#remove-hook][remove-hook!]]
+    - [[#setq][setq!]]
     - [[#setq-hook][setq-hook!]]
     - [[#unsetq-hook][unsetq-hook!]]
     - [[#use-package][use-package!]]
 - [[#interesting-snippets][Interesting snippets]]
-  - [[#persist-emacs-initial-frame-size-across-sessions][Persist Emacs' initial frame size across sessions]]
+  - [[#center-emacs-initial-frame-with-a-fixed-size][Center Emacs' initial frame with a fixed size]]
   - [[#persist-emacs-initial-frame-position-dimensions-andor-full-screen-state-across-sessions][Persist Emacs' initial frame position, dimensions and/or full-screen state across sessions]]
   - [[#update-cursor-shape-under-terminal-emacs][Update cursor shape under terminal Emacs]]
 
@@ -387,7 +388,7 @@ These are side-by-side comparisons, showing how to bind keys with and without
 *** package!
 #+BEGIN_SRC elisp :eval no
 ;; To install a package that can be found on ELPA or any of the sources
-;; specified in `doom-core-package-sources':
+;; specified in `straight-recipe-repositories':
 (package! evil)
 (package! js2-mode)
 (package! rainbow-delimiters)
@@ -405,7 +406,7 @@ These are side-by-side comparisons, showing how to bind keys with and without
 (package! ansible :recipe (:nonrecursive t))
 
 ;; To pin a package to a specific commit:
-(package! evil :pin "e7bc39de2f961505e8e112da8c1b315ae8afce52")
+(package! evil :pin "e7bc39de2f9")
 ;; ...or branch:
 (package! evil :recipe (:branch "stable"))
 ;; To unpin a pinned package:
@@ -470,6 +471,14 @@ These are side-by-side comparisons, showing how to bind keys with and without
 ;; Removing arbitrary forms (must be exactly the same as the definition)
 (remove-hook! (one-mode second-mode) (setq v 5) (setq a 2))
 #+END_SRC
+*** setq!
+#+BEGIN_SRC elisp
+;; Each of these have a setter associated with them, which must be triggered in
+;; order for their new values to have an effect.
+(setq! evil-want-Y-yank-to-eol nil
+       evil-want-C-u-scroll nil
+       evil-want-C-d-scroll nil)
+#+END_SRC
 *** setq-hook!
 #+BEGIN_SRC elisp :eval no
 ;; Set multiple variables after a hook
@@ -512,21 +521,21 @@ These are side-by-side comparisons, showing how to bind keys with and without
   :defer-incrementally t)
 #+END_SRC
 * Interesting snippets
-** Persist Emacs' initial frame size across sessions
+** Center Emacs' initial frame with a fixed size
 #+BEGIN_SRC elisp
 (let ((display-height   (display-pixel-height))
       (display-width    (display-pixel-width)))
-  (add-to-list 'initial-frame-alist
-               `((left . ,(/ new-frame-width 2))
-                 (top . ,(/ new-frame-height 2))
-                 (width . ,(/ display-width 2))
-                 (height . ,(/ display-height 2)))))
+  (pushnew! initial-frame-alist
+            `(left . ,(/ display-width 2))
+            `(top . ,(/ display-height 2))
+            `(width . ,display-width)
+            `(height . ,display-height)))
 #+END_SRC
 
 ** Persist Emacs' initial frame position, dimensions and/or full-screen state across sessions
 #+BEGIN_SRC elisp
 ;; add to ~/.doom.d/config.el
-(when-let (dims (doom-cache-get 'last-frame-size))
+(when-let (dims (doom-store-get 'last-frame-size))
   (cl-destructuring-bind ((left . top) width height fullscreen) dims
     (setq initial-frame-alist
           (append initial-frame-alist
@@ -537,7 +546,7 @@ These are side-by-side comparisons, showing how to bind keys with and without
                     (fullscreen . ,fullscreen))))))
 
 (defun save-frame-dimensions ()
-  (doom-cache-set 'last-frame-size
+  (doom-store-set 'last-frame-size
                   (list (frame-position)
                         (frame-width)
                         (frame-height)

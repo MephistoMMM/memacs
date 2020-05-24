@@ -11,14 +11,14 @@
 ;;; Packages
 
 (use-package! sh-script ; built-in
-  :mode ("\\.zunit\\'" . sh-mode)
+  :mode ("\\.\\(?:zunit\\|env\\)\\'" . sh-mode)
   :mode ("/bspwmrc\\'" . sh-mode)
   :config
   (set-electric! 'sh-mode :words '("else" "elif" "fi" "done" "then" "do" "esac" ";;"))
   (set-repl-handler! 'sh-mode #'+sh/open-repl)
 
   (when (featurep! +lsp)
-    (add-hook 'sh-mode-hook #'lsp!))
+    (add-hook 'sh-mode-local-vars-hook #'lsp!))
 
   (setq sh-indent-after-continuation 'always)
 

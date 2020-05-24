@@ -25,8 +25,8 @@ buffer.")
     ("d"  "dired $1")
     ("bd" "eshell-up $1")
     ("rg" "rg --color=always $*")
-    ("l"  "ls -lh")
-    ("ll" "ls -lah")
+    ("l"  "ls -lh $*")
+    ("ll" "ls -lah $*")
     ("clear" "clear-scrollback")) ; more sensible than default
   "An alist of default eshell aliases, meant to emulate useful shell utilities,
 like fasd and bd. Note that you may overwrite these in your
@@ -48,7 +48,7 @@ You should use `set-eshell-alias!' to change this.")
 
 
 ;;
-;; Packages
+;;; Packages
 
 (after! eshell ; built-in
   (setq eshell-banner-message
@@ -135,8 +135,6 @@ You should use `set-eshell-alias!' to change this.")
             :ni "C-j"    #'eshell-next-matching-input-from-input
             :ni "C-k"    #'eshell-previous-matching-input-from-input
             :ig "C-d"    #'+eshell/quit-or-delete-char
-            "TAB"   #'+eshell/pcomplete
-            [tab]   #'+eshell/pcomplete
             "C-s"   #'+eshell/search-history
             ;; Emacs bindings
             "C-e"   #'end-of-line
@@ -154,15 +152,7 @@ You should use `set-eshell-alias!' to change this.")
             [remap doom/backward-kill-to-bol-and-indent] #'eshell-kill-input
             [remap evil-delete-back-to-indentation] #'eshell-kill-input
             [remap evil-window-split]   #'+eshell/split-below
-            [remap evil-window-vsplit]  #'+eshell/split-right)))
-  (add-hook! 'eshell-mode-hook
-    (defun +eshell-init-company-h ()
-      (when (featurep! :completion company)
-        (company-mode +1)
-        (setq-local company-backends '(company-pcomplete))
-        (setq-local company-frontends (cons 'company-tng-frontend company-frontends))
-        (when (bound-and-true-p evil-local-mode)
-          (evil-normalize-keymaps))))))
+            [remap evil-window-vsplit]  #'+eshell/split-right))))
 
 
 (use-package! eshell-up
@@ -181,3 +171,15 @@ You should use `set-eshell-alias!' to change this.")
 (use-package! esh-help
   :after eshell
   :config (setup-esh-help-eldoc))
+
+
+(use-package! fish-completion
+  :hook (eshell-mode . fish-completion-mode)
+  :init (setq fish-completion-fallback-on-bash-p t)
+  :config
+  ;; HACK Even with `fish-completion-fallback-on-bash-p' non-nil, fish must be
+  ;;      installed for bash completion to work. How frustrating. This way we
+  ;;      can at least get bash completion whether or not fish is present.
+  (defadvice! +eshell--fallback-to-bash-a (&rest _)
+    :before-while #'fish-completion--list-completions-with-desc
+    (executable-find "fish")))

@@ -3,9 +3,6 @@
 (defvar doom--help-major-mode-module-alist
   '((dockerfile-mode :tools docker)
     (agda2-mode      :lang agda)
-    (haxor-mode      :lang assembly)
-    (mips-mode       :lang assembly)
-    (nasm-mode       :lang assembly)
     (c-mode          :lang cc)
     (c++-mode        :lang cc)
     (objc++-mode     :lang cc)
@@ -41,6 +38,7 @@
     (LaTeX-mode      :lang latex)
     (ledger-mode     :lang ledger)
     (lua-mode        :lang lua)
+    (moonscript-mode :lang lua)
     (markdown-mode   :lang markdown)
     (gfm-mode        :lang markdown)
     (nim-mode        :lang nim)
@@ -48,6 +46,7 @@
     (taureg-mode     :lang ocaml)
     (org-mode        :lang org)
     (perl-mode       :lang perl)
+    (raku-mode       :lang perl)
     (php-mode        :lang php)
     (hack-mode       :lang php)
     (plantuml-mode   :lang plantuml)
@@ -55,9 +54,10 @@
     (python-mode     :lang python)
     (restclient-mode :lang rest)
     (ruby-mode       :lang ruby)
-    (enh-ruby-mode   :lang ruby)
     (rust-mode       :lang rust)
+    (rustic-mode     :lang rust)
     (scala-mode      :lang scala)
+    (scheme-mode     :lang scheme)
     (sh-mode         :lang sh)
     (swift-mode      :lang swift)
     (web-mode        :lang web)
@@ -135,7 +135,8 @@ selection of all minor-modes, active or not."
                                           (list (or (+org-get-global-property "TITLE")
                                                     (file-relative-name (buffer-file-name)))))
                                         path
-                                        (list (replace-regexp-in-string org-link-any-re "\\4" text)))
+                                        (when text
+                                          (list (replace-regexp-in-string org-link-any-re "\\4" text))))
                                 " > ")
                                tags)
                          " ")
@@ -469,27 +470,44 @@ If prefix arg is present, refresh the cache."
         (insert (symbol-name package) "\n")
 
         (package--print-help-section "Source")
-        (insert (or (pcase (doom-package-backend package)
-                      (`straight
-                       (format! "Straight (%s)\n%s"
-                                (let ((default-directory (straight--build-dir (symbol-name package))))
-                                  (cdr
-                                   (doom-call-process "git" "log" "-1" "--format=%D %h %ci")))
-                                (indent
-                                 13 (string-trim
-                                     (pp-to-string
-                                      (doom-package-build-recipe package))))))
-                      (`elpa
-                       (format "[M]ELPA %s" (doom--package-url package)))
-                      (`builtin "Built-in")
-                      (_ (abbreviate-file-name (symbol-file package))))
-                    "unknown")
-                "\n")
+        (pcase (doom-package-backend package)
+          (`straight
+           (insert "Straight\n")
+           (package--print-help-section "Pinned")
+           (insert (if-let (pin (plist-get (cdr (assq package doom-packages)) :pin))
+                       pin
+                     "unpinned")
+                   "\n")
+           (package--print-help-section "Build")
+           (insert (let ((default-directory (straight--repos-dir (symbol-name package))))
+                     (cdr
+                      (doom-call-process "git" "log" "-1" "--format=%D %h %ci")))
+                   "\n")
+           (let ((recipe (doom-package-build-recipe package)))
+             (insert (format! "%s\n"
+                              (indent 13
+                                      (string-trim (pp-to-string recipe)))))
 
-        (when (gethash (symbol-name package) straight--build-cache)
+             (package--print-help-section "Homepage")
+             (insert (doom--package-url package))))
+          (`elpa (insert "[M]ELPA " (doom--package-url package)))
+          (`builtin (insert "Built-in"))
+          (`other (insert
+                   (abbreviate-file-name
+                    (or (symbol-file package)
+                        (locate-library (symbol-name package))))))
+          (_ (insert "Not installed")))
+        (insert "\n")
+
+        (when-let
+            (modules
+             (if (gethash (symbol-name package) straight--build-cache)
+                 (doom-package-get package :modules)
+               (plist-get (cdr (assq package (doom-packages-list 'all)))
+                          :modules)))
           (package--print-help-section "Modules")
           (insert "Declared by the following Doom modules:\n")
-          (dolist (m (doom-package-get package :modules))
+          (dolist (m modules)
             (insert indent)
             (doom--help-package-insert-button
               (format "%s %s" (car m) (or (cdr m) ""))
@@ -600,11 +618,7 @@ config blocks in your private config."
     (recenter)))
 
 ;;;###autoload
-(defun doom/help-package-homepage (package)
-  "Open PACKAGE's repo or homepage in your browser."
-  (interactive (list (doom--package-list "Open package homepage: ")))
-  (browse-url (doom--package-url package)))
-
+(defalias 'doom/help-package-homepage #'straight-visit-package-website)
 
 (defun doom--help-search-prompt (prompt)
   (let ((query (doom-thing-at-point-or-region)))

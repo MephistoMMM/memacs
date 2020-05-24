@@ -9,7 +9,7 @@
 ROOTPATH=${PWD%/scripts}
 
 brew tap railwaycat/emacsmacport
-brew install emacs-mac
+brew install emacs-mac --HEAD --with-modules --with-jansson --with-imagemagick
 brew link emacs-mac
 ln -s /usr/local/opt/emacs-mac/Emacs.app /Applications
 
@@ -18,7 +18,7 @@ $ROOTPATH/scripts/install_fonts.sh
 # install testinputsource -- change to more better plan
 $ROOTPATH/scripts/compile_textinputsource.sh
 # install hammerspoon
-$ROOTPATH/scripts/install_hammerspoon.sh
+# $ROOTPATH/scripts/install_hammerspoon.sh
 # link emacs
 $ROOTPATH/scripts/link_memacs.sh
 # link tools

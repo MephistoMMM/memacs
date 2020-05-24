@@ -50,6 +50,7 @@ stored in `persp-save-dir'.")
           (persp-mode +1)))))
   :config
   (setq persp-autokill-buffer-on-remove 'kill-weak
+        persp-reset-windows-on-nil-window-conf nil
         persp-nil-hidden t
         persp-auto-save-fname "autosave"
         persp-save-dir (concat doom-etc-dir "workspaces/")
@@ -76,10 +77,12 @@ stored in `persp-save-dir'.")
       "Ensure a main workspace exists."
       (when persp-mode
         (let (persp-before-switch-functions)
-          ;; The default perspective persp-mode creates (`persp-nil-name') is
-          ;; special and doesn't represent a real persp object, so buffers can't
-          ;; really be assigned to it, among other quirks. We create a *real* main
-          ;; workspace to fill this role.
+          ;; The default perspective persp-mode creates is special and doesn't
+          ;; represent a real persp object, so buffers can't really be assigned
+          ;; to it, among other quirks, so we get rid of it...
+          (when (equal (car persp-names-cache) persp-nil-name)
+            (pop persp-names-cache))
+          ;; ...and create a *real* main workspace to fill this role.
           (unless (or (persp-get-by-name +workspaces-main)
                       ;; Start from 2 b/c persp-mode counts the nil workspace
                       (> (hash-table-count *persp-hash*) 2))
@@ -114,15 +117,15 @@ stored in `persp-save-dir'.")
   ;; add buffers when they are switched to.
   (setq persp-add-buffer-on-find-file nil
         persp-add-buffer-on-after-change-major-mode nil)
-
   (add-hook! '(doom-switch-buffer-hook server-visit-hook)
     (defun +workspaces-add-current-buffer-h ()
       "Add current buffer to focused perspective."
-      (and persp-mode
-           (not (persp-buffer-filtered-out-p
-                 (current-buffer)
-                 persp-add-buffer-on-after-change-major-mode-filter-functions))
-           (persp-add-buffer (current-buffer) (get-current-persp) nil nil))))
+      (or (not persp-mode)
+          (persp-buffer-filtered-out-p
+           (or (buffer-base-buffer (current-buffer))
+               (current-buffer))
+           persp-add-buffer-on-after-change-major-mode-filter-functions)
+          (persp-add-buffer (current-buffer) (get-current-persp) nil nil))))
 
   (add-hook 'persp-add-buffer-on-after-change-major-mode-filter-functions
             #'doom-unreal-buffer-p)
@@ -177,7 +180,10 @@ stored in `persp-save-dir'.")
             ("xt" counsel-projectile-switch-project-action-run-term "invoke term from project root")
             ("X" counsel-projectile-switch-project-action-org-capture "org-capture into project")))
 
-  (add-hook 'projectile-after-switch-project-hook #'+workspaces-switch-to-project-h)
+  (when (featurep! :completion helm)
+    (after! helm-projectile
+      (setcar helm-source-projectile-projects-actions
+              '("Switch to Project" . +workspaces-switch-to-project-h))))
 
   ;; Fix #1973: visual selection surviving workspace changes
   (add-hook 'persp-before-deactivate-functions #'deactivate-mark)

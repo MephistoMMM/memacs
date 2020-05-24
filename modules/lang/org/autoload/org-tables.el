@@ -46,11 +46,10 @@ re-align the table if necessary. (Necessary because org-mode has a
 
 ;;;###autoload
 (defun +org-realign-table-maybe-h ()
-  "Auto-align table under cursor and re-calculate formulas."
+  "Auto-align table under cursor."
   (when (and (org-at-table-p) org-table-may-need-update)
     (let ((pt (point))
           (inhibit-message t))
-      (org-table-recalculate)
       (if org-table-may-need-update (org-table-align))
       (goto-char pt))))
 
@@ -85,6 +84,12 @@ Meant for `org-mode-hook'."
           ;; does not determine the width of the column.
           (when noalign (setq org-table-may-need-update c)))
         t))))
+
+;;;###autoload
+(defun +org-disable-truncate-lines-or-wrap-words-h ()
+  "Disable truncate lines."
+  (setq-local word-wrap nil)
+  (setq-local truncate-lines nil))
 
 
 ;;

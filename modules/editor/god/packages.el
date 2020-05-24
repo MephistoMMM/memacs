@@ -1,4 +1,4 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; editor/god/packages.el
 
-(package! god-mode :pin "344167ed9b4c212273dd056e7481cf1373b461d0")
+(package! god-mode :pin "1eb6ef3a4f67a805c5d6deb1e3895b6c853707d7")

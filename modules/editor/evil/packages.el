@@ -1,22 +1,25 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; editor/evil/packages.el
 
-(package! evil :pin "d14e9e2cac539f388a1f4699eb3ffab0834aa3e4")
+(package! evil :pin "d243eae8649272799ec3864fde14c1164f036940")
 (package! evil-args :pin "758ad5ae54ad34202064fec192c88151c08cb387")
 (package! evil-embrace :pin "4379adea032b25e359d01a36301b4a5afdd0d1b7")
-(package! evil-escape :pin "f4e9116bfbaac8c9d210c17ad488e0982291245f")
-(package! evil-exchange :pin "35dd0f0662789f043bd89a9f9801ffaf4318123f")
+(package! evil-escape
+  :recipe (:host github :repo "hlissner/evil-escape")
+  :pin "819f1ee1cf3f69a1ae920e6004f2c0baeebbe077")
+(package! evil-exchange :pin "3030e21ee16a42dfce7f7cf86147b778b3f5d8c1")
 (package! evil-indent-plus :pin "0c7501e6efed661242c3a20e0a6c79a6455c2c40")
-(package! evil-nerd-commenter :pin "a5555ff02a43ddc4b54ba38e19c5a233c3a0b304")
+(package! evil-lion :pin "6b03593f5dd6e7c9ca02207f9a73615cf94c93ab")
+(package! evil-nerd-commenter :pin "1bd2de52011c39777a3e8779b14cee2790dc873b")
 (package! evil-numbers
   :recipe (:host github :repo "janpath/evil-numbers")
-  :pin "d988041c1fe6e941dc8d591390750b237f71f524")
-(package! evil-snipe :pin "3ec8adfd4990f95fa0fab2b7019ead3596857673")
+  :pin "c2cfdd1eb1f193bea28ee79b191b78309677058a")
+(package! evil-snipe :pin "2ba6353bb9253dbbc4193f1d35403e7dcc1317b1")
 (package! evil-surround :pin "9b0b17f06cef9bac81ee4800d121265e54718a17")
 (package! evil-textobj-anyblock :pin "ff00980f0634f95bf2ad9956b615a155ea8743be")
-(package! evil-traces :pin "257c66bd7a9162caef3b04137af0dc9360fe3d53")
+(package! evil-traces :pin "bc25cae9fa5ab0ba1507827f0944f52ce0ca7462")
 (package! evil-visualstar :pin "06c053d8f7381f91c53311b1234872ca96ced752")
-(package! exato :pin "88266fa7fcfbef704032f671b94f756f2f98bd4f")
+(package! exato :pin "d5daea30176d48e74c9d063ac9bfc240ebeb97d0")
 (package! evil-quick-diff
   :recipe (:host github :repo "rgrinberg/evil-quick-diff")
   :pin "69c883720b30a892c63bc89f49d4f0e8b8028908")
@@ -29,4 +32,4 @@
     (package! neotree)
     (autoload 'neotree-make-executor "neotree" nil nil 'macro))
 
-  (package! evil-collection :pin "8532282e6492ce92d8c54e43ce9e9ce616d8ab5f"))
+  (package! evil-collection :pin "ba3630476b3927d9d2e3ec75308a28e3a5bd54a8"))

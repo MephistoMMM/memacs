@@ -2,11 +2,10 @@
 ;;; app/wanderlust/packages.el
 
 ;; HACK These are wanderlust's dependencies (wanderlust depends on semi, semi
-;;      depends on flim, flim on apel), but both flim and apel have non-standard
-;;      default branches, which straight cannot detect without our help.
-(package! flim :recipe (:branch "flim-1_14-wl")
-  :pin "e4bd54fd7d335215b54f7ef27ed974c8cd68d472")
-(package! apel :recipe (:branch "semi-1_14-wl")
-  :pin "d146ddbf8818e81d3577d5eee7825d377bec0c73")
+;;      depends on flim, flim on apel), but they all have non-standard default
+;;      branches which straight cannot detect without our help.
+(package! apel :recipe (:branch "apel-wl") :pin "d146ddbf8818e81d3577d5eee7825d377bec0c73")
+(package! flim :recipe (:branch "flim-1_14-wl") :pin "f303f2f6c124bc8635add96d3326a2209749437b")
+(package! semi :recipe (:branch "semi-1_14-wl") :pin "57a948c5f07e57e78ab3c0e6fd76ffcd591bb4ac")
 
-(package! wanderlust :pin "7a919e422a48f5021576e68282703de430558879")
+(package! wanderlust :pin "7af0d582cd48a37469e0606ea35887740d78c8b5")

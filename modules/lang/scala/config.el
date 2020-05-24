@@ -13,7 +13,7 @@
         scala-indent:use-javadoc-style t)
 
   (setq-hook! 'scala-mode-hook
-    comment-line-break-function #'+scala-comment-indent-new-line)
+    comment-line-break-function #'+scala-comment-indent-new-line-fn)
 
   (when (featurep! +lsp)
     (add-hook 'scala-mode-local-vars-hook #'lsp!)))
@@ -21,4 +21,4 @@
 
 (use-package! sbt-mode
   :after scala-mode
-  :config (set-repl-handler! 'scala-mode #'+scala/open-repl))
+  :config (set-repl-handler! 'scala-mode #'+scala/open-repl :persist t))

@@ -1,9 +1,11 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; checkers/spell/packages.el
 
-(package! flyspell-correct :pin "7b4cf8c9ba5ac65e3bb2b62f5b72d45f4c9cf7b6")
+(package! flyspell-correct :pin "fd8ac7a4f922ce5ea1cc5d4583a7d584847cb6b5")
 (cond ((featurep! :completion ivy)
        (package! flyspell-correct-ivy))
       ((featurep! :completion helm)
        (package! flyspell-correct-helm))
       ((package! flyspell-correct-popup)))
+
+(package! flyspell-lazy :pin "3ebf68cc9eb10c972a2de8d7861cbabbbce69570")

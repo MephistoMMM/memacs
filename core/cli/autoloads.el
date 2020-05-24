@@ -27,17 +27,21 @@ one wants that.")
 (defun doom-cli-reload-core-autoloads (&optional file)
   (print! (start "(Re)generating core autoloads..."))
   (print-group!
-   (let ((file (or file doom-autoload-file)))
+   (let ((file (or file doom-autoload-file))
+         doom-autoload-cached-vars)
      (cl-check-type file string)
      (and (print! (start "Generating core autoloads..."))
           (doom-cli--write-autoloads
-           file (doom-cli--generate-autoloads
-                 (cl-loop for dir in (append (list doom-core-dir)
-                                             (cdr (doom-module-load-path 'all-p))
-                                             (list doom-private-dir))
-                          if (doom-glob dir "autoload.el") collect it
-                          if (doom-glob dir "autoload/*.el") append it)
-                 'scan))
+           file
+           (doom-cli--generate-emacs-version-check)
+           (doom-cli--generate-autoloads
+            (cl-loop for dir
+                     in (append (list doom-core-dir)
+                                (cdr (doom-module-load-path 'all-p))
+                                (list doom-private-dir))
+                     if (doom-glob dir "autoload.el") collect it
+                     if (doom-glob dir "autoload/*.el") append it)
+            'scan))
           (print! (start "Byte-compiling core autoloads file..."))
           (doom-cli--byte-compile-file file)
           (print! (success "Generated %s")
@@ -88,7 +92,6 @@ one wants that.")
 (defun doom-cli--byte-compile-file (file)
   (condition-case-unless-debug e
       (let ((byte-compile-warnings (if doom-debug-mode byte-compile-warnings))
-            (byte-compile-dynamic t)
             (byte-compile-dynamic-docstrings t))
         (when (byte-compile-file file)
           (unless doom-interactive-mode
@@ -103,6 +106,12 @@ one wants that.")
   (print-group! (print! "M-x doom/restart-and-restore")
                 (print! "M-x doom/restart")
                 (print! "M-x doom/reload")))
+
+(defun doom-cli--generate-emacs-version-check ()
+  `((unless (equal emacs-major-version (eval-when-compile emacs-major-version))
+      (signal 'doom-error
+              (list "Your installed (major) version of Emacs has changed"
+                    "Run 'doom sync && doom build' to bring Doom up to speed")))))
 
 (defun doom-cli--generate-var-cache (vars)
   `((setq ,@(cl-loop for var in vars
@@ -133,10 +142,8 @@ one wants that.")
           (form))))
 
 (defun doom-cli--generate-autoloads-autodefs (file buffer module &optional module-enabled-p)
-  (with-current-buffer
-      (or (get-file-buffer file)
-          (autoload-find-file file))
-    (goto-char (point-min))
+  (with-temp-buffer
+    (insert-file-contents file)
     (while (re-search-forward "^;;;###autodef *\\([^\n]+\\)?\n" nil t)
       (let* ((standard-output buffer)
              (form    (read (current-buffer)))

@@ -7,7 +7,7 @@
                             (match-string 2 buffer-file-name))
                   "")`}
 #+DATE:    `(format (format-time-string "%B %%s, %Y") (string-to-number (format-time-string "%d")))`
-#+SINCE:   ${2:{replace with next tagged release version}}
+#+SINCE:   ${2:<replace with next tagged release version>}
 #+STARTUP: inlineimages nofold
 
 * Table of Contents :TOC_3:noexport:
@@ -57,7 +57,7 @@ This module provides no flags.
 # A list of internal modifications to included packages; omit if unneeded
 
 * Prerequisites
-This module has no prereqisites.
+This module has no prerequisites.
 
 * Features
 # An in-depth list of features, how to use them, and their dependencies.

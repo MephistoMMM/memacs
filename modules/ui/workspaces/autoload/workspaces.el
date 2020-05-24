@@ -68,13 +68,14 @@ error if NAME doesn't exist."
   "Return a list of workspace structs (satisifes `+workspace-p')."
   ;; We don't use `hash-table-values' because it doesn't ensure order in older
   ;; versions of Emacs
-  (cdr (cl-loop for persp being the hash-values of *persp-hash*
-                collect persp)))
+  (cl-loop for name in persp-names-cache
+           if (gethash name *persp-hash*)
+           collect it))
 
 ;;;###autoload
 (defun +workspace-list-names ()
   "Return the list of names of open workspaces."
-  (mapcar #'safe-persp-name (+workspace-list)))
+  persp-names-cache)
 
 ;;;###autoload
 (defun +workspace-buffer-list (&optional persp)
@@ -403,6 +404,31 @@ the next."
 
               ((+workspace-error "Can't delete last workspace" t)))))))
 
+;;;###autoload
+(defun +workspace/swap-left (&optional count)
+  "Swap the current workspace with the COUNTth workspace on its left."
+  (interactive "p")
+  (let* ((current-name (+workspace-current-name))
+         (count (or count 1))
+         (index (- (cl-position current-name persp-names-cache :test #'equal)
+                   count))
+         (names (remove current-name persp-names-cache)))
+    (unless names
+      (user-error "Only one workspace"))
+    (let ((index (min (max 0 index) (length names))))
+      (setq persp-names-cache
+            (append (cl-subseq names 0 index)
+                    (list current-name)
+                    (cl-subseq names index))))
+    (when (called-interactively-p 'any)
+      (+workspace/display))))
+
+;;;###autoload
+(defun +workspace/swap-right (&optional count)
+  "Swap the current workspace with the COUNTth workspace on its right."
+  (interactive "p")
+  (funcall-interactively #'+workspace/swap-left (- count)))
+
 
 ;;
 ;;; Tabs display in minibuffer
@@ -498,9 +524,17 @@ This be hooked to `projectile-after-switch-project-hook'."
   (when dir
     (setq +workspaces--project-dir dir))
   (when (and persp-mode +workspaces--project-dir)
+    (when projectile-before-switch-project-hook
+      (with-temp-buffer
+        ;; Load the project dir-local variables into the switch buffer, so the
+        ;; action can make use of them
+        (setq default-directory +workspaces--project-dir)
+        (hack-dir-local-variables-non-file-buffer)
+        (run-hooks 'projectile-before-switch-project-hook)))
     (unwind-protect
         (if (and (not (null +workspaces-on-switch-project-behavior))
                  (or (eq +workspaces-on-switch-project-behavior t)
+                     (equal (safe-persp-name (get-current-persp)) persp-nil-name)
                      (+workspace-buffer-list)))
             (let* ((persp
                     (let ((project-name (doom-project-name +workspaces--project-dir)))
@@ -517,11 +551,13 @@ This be hooked to `projectile-after-switch-project-hook'."
                'success))
           (with-current-buffer (doom-fallback-buffer)
             (setq default-directory +workspaces--project-dir)
+            (hack-dir-local-variables-non-file-buffer)
             (message "Switched to '%s'" (doom-project-name +workspaces--project-dir)))
           (with-demoted-errors "Workspace error: %s"
             (+workspace-rename (+workspace-current-name) (doom-project-name +workspaces--project-dir)))
           (unless current-prefix-arg
             (funcall +workspaces-switch-project-function +workspaces--project-dir)))
+      (run-hooks 'projectile-after-switch-project-hook)
       (setq +workspaces--project-dir nil))))
 
 

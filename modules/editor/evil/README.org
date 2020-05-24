@@ -16,6 +16,8 @@
 - [[#configuration][Configuration]]
   - [[#removing-evil-mode][Removing evil-mode]]
   - [[#restoring-old-substitution-behavior-on-ss][Restoring old substitution behavior on s/S]]
+  - [[#restoring-old-y-behavior-yank-the-whole-line][Restoring old Y behavior (yank the whole line)]]
+  - [[#disabling-cursor-movement-when-exiting-insert-mode][Disabling cursor movement when exiting insert mode]]
 
 * Description
 This holy module brings the vim experience to Emacs.
@@ -32,8 +34,8 @@ This holy module brings the vim experience to Emacs.
 + [[https://github.com/syl20bnr/evil-escape][evil-escape]]
 + [[https://github.com/Dewdrops/evil-exchange][evil-exchange]]
 + [[https://github.com/TheBB/evil-indent-plus][evil-indent-plus]]
++ [[https://github.com/edkolev/evil-lion][evil-lion]]
 + [[https://github.com/redguardtoo/evil-nerd-commenter][evil-nerd-commentary]]
-+ [[https://github.com/redguardtoo/evil-matchit][evil-matchit]]
 + [[https://github.com/cofi/evil-numbers][evil-numbers]]
 + [[https://github.com/noctuid/evil-textobj-anyblock][evil-textobj-anyblock]]
 + [[https://github.com/hlissner/evil-snipe][evil-snipe]]
@@ -66,8 +68,10 @@ The following vim plugins have been ported to evil:
 |-----------------------+--------------------------------+--------------------------------------------|
 | vim-commentary        | evil-nerd-commenter            | omap =gc=                                  |
 | vim-easymotion        | evil-easymotion                | omap =gs=                                  |
+| vim-lion              | evil-lion                      | omap =gl= / =gL=                           |
 | vim-seek or vim-sneak | evil-snipe                     | mmap =s= / =S=, omap =z= / =Z= & =x= / =X= |
 | vim-surround          | evil-embrace and evil-surround | vmap =S=, omap =ys=                        |
+| vim-unimpaired        | (provided by Doom)             | [[https://github.com/hlissner/doom-emacs/blob/develop/modules/editor/evil/config.el#L413-L460][see the list]]                               |
 
 This module has also ported vim-unimpaired keybinds to Emacs.
 
@@ -135,7 +139,7 @@ And these are text objects added by this module:
 You must do two things to remove Evil:
 
 1. Remove =:editor evil= from =~/.doom.d/init.el=,
-2. Run ~doom refresh~ to clean up lingering dependencies and refresh your
+2. Run ~doom sync~ to clean up lingering dependencies and regenerate your
    autoloads files.
 3. [OPTIONAL] You may want to assign new values to ~doom-leader-alt-key~ and
    ~doom-localleader-alt-key~. These are bound to =C-c= and =C-c l= by default.
@@ -171,3 +175,23 @@ To disable evil-snipe on s/S, you can either:
    added to =$DOOMDIR/packages.el=, but this will also disable incremental
    highlighting for the f/F/t/T motions keys.
 3. Or use =cl= and =cc=, respectively; they do the same thing.
+** Restoring old Y behavior (yank the whole line)
+Doom changes the behavior of the =Y= key in normal mode to yank-to-EOL
+(equivalent to =y$=). This was to make it consistent with the =C= and =D=
+capital operators, and because it was redundant with =yy=, which is easier to
+type than =y$=.
+
+If you prefer the old behavior, it can be reversed with:
+
+#+BEGIN_SRC elisp
+;; add to ~/.doom.d/config.el
+(setq! evil-want-Y-yank-to-eol nil)
+#+END_SRC
+** Disabling cursor movement when exiting insert mode
+Vim (and evil) move the cursor one character back when exiting insert mode. If
+you prefer that it didn't, set:
+
+#+BEGIN_SRC elisp
+;; add to ~/.doom.d/config.el
+(setq evil-move-cursor-back nil)
+#+END_SRC

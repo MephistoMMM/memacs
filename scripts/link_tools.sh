@@ -14,11 +14,11 @@ if [ ! -e $BIN_DIR ]; then
 fi
 
 # * Tools Dir
-TOOLS_ROOT=${PWD%/scripts}/local/tools
+TOOLS_ROOT=${PWD%/scripts}/bin
 
 for script in $TOOLS_ROOT/*.sh; do
     if [ -x $script ]; then
-        suffix=${script##/*/local/tools/}
+        suffix=${script##/*/bin/}
         echo "Link $script to $BIN_DIR/${suffix%.sh}"
         ln -s $script $BIN_DIR/${suffix%.sh}
     fi

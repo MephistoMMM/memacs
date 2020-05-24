@@ -12,6 +12,10 @@
         evil-goggles-enable-change nil)
   :config
   (pushnew! evil-goggles--commands
+            '(evil-magit-yank-whole-line
+              :face evil-goggles-yank-face
+              :switch evil-goggles-enable-yank
+              :advice evil-goggles--generic-async-advice)
             '(+evil:yank-unindented
               :face evil-goggles-yank-face
               :switch evil-goggles-enable-yank
@@ -27,7 +31,6 @@
   :unless (featurep! :editor evil)
   :after-call pre-command-hook
   :config
-  (volatile-highlights-mode)
-  (after! undo-tree
-    (vhl/define-extension 'undo-tree 'undo-tree-yank 'undo-tree-move)
-    (vhl/install-extension 'undo-tree)))
+  (after! undo-fu
+    (vhl/define-extension 'undo-fu 'undo-fu-only-undo 'undo-fu-only-redo)
+    (vhl/install-extension 'undo-fu)))

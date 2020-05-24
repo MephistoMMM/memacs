@@ -6,7 +6,7 @@
 :; DOOMBASE="$(dirname "$0")/.."
 :; [ "$1" = -d ] || [ "$1" = --debug ] && { shift; export DEBUG=1; }
 :; [ "$1" = run ] && { cd "$DOOMBASE"; shift; exec $EMACS -q --no-splash -l bin/doom "$@"; exit 0; }
-:; exec $EMACS --script "$0" -- "$@"
+:; exec $EMACS --no-site-file --script "$0" -- "$@"
 :; exit 0
 
 (let* ((load-prefer-newer t)
@@ -14,6 +14,13 @@
        (emacsdir (getenv "EMACSDIR"))
        (user-emacs-directory
         (abbreviate-file-name (or emacsdir (expand-file-name "../" loaddir)))))
+
+  ;; HACK Load `cl' and site files manually so we can stop them from polluting
+  ;;      CLI logs with deprecation and file load messages.
+  (let ((inhibit-message t))
+    (when (> emacs-major-version 26)
+      (require 'cl))
+    (load "site-start" t t))
 
   (push (expand-file-name "core" user-emacs-directory) load-path)
   (require 'core)
@@ -57,10 +64,10 @@ with a different private module."
       (setq command "help"))
 
     (when (equal (user-real-uid) 0)
-      (message
-       (concat "WARNING: This script is running as root. This isn't necessary and is likely\n"
-               "unintentional. It will cause file permissions errors later if you use this\n"
-               "Doom installation on a non-root account.\n"))
+      (print!
+       (concat "WARNING: This script is running as root. This likely wasn't intentional, and\n"
+               "is unnecessary to use this script. This will cause file permissions errors\n"
+               "later if you use this Doom installation on a non-root account.\n"))
       (unless (or doom-auto-accept (y-or-n-p "Continue anyway?"))
         (user-error "Aborted")))
 
@@ -100,10 +107,11 @@ with a different private module."
                     (dolist (item (cdr e))
                       (print! "%S" item))
                   (print! "n/a")))
-               (when (string-match-p (regexp-quote straight-process-buffer)
-                                     (error-message-string e))
-                 (print! (bold "Straight output:"))
-                 (print-group! (print! "%s" (straight--process-get-output)))))
+               (when (featurep 'straight)
+                 (when (string-match-p (regexp-quote straight-process-buffer)
+                                       (error-message-string e))
+                   (print! (bold "Straight output:"))
+                   (print-group! (print! "%s" (straight--process-get-output))))))
               (unless debug-on-error
                 (terpri)
                 (print!

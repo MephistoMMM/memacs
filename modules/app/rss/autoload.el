@@ -70,7 +70,7 @@
   (let ((search-buffers (doom-buffers-in-mode 'elfeed-search-mode))
         (show-buffers (doom-buffers-in-mode 'elfeed-show-mode))
         kill-buffer-query-functions)
-    (dolist (file +rss-elfeed-files)
+    (dolist (file (bound-and-true-p rmh-elfeed-org-files))
       (when-let (buf (get-file-buffer (expand-file-name file org-directory)))
         (kill-buffer buf)))
     (dolist (b search-buffers)
@@ -101,10 +101,9 @@
 ;;;###autoload
 (defun +rss-put-sliced-image-fn (spec alt &optional flags)
   "TODO"
-  (cl-letf (((symbol-function #'insert-image)
-             (lambda (image &optional alt _area _slice)
-               (let ((height (cdr (image-size image t))))
-                 (insert-sliced-image image alt nil (max 1 (/ height 20.0)) 1)))))
+  (letf! (defun insert-image (image &optional alt _area _slice)
+           (let ((height (cdr (image-size image t))))
+             (insert-sliced-image image alt nil (max 1 (/ height 20.0)) 1)))
     (shr-put-image spec alt flags)))
 
 ;;;###autoload

@@ -4,10 +4,6 @@
 ;; by apps Reeder and Readkit. It can be invoked via `=rss'. Otherwise, if you
 ;; don't care for the UI you can invoke elfeed directly with `elfeed'.
 
-(defvar +rss-elfeed-files (list "elfeed.org")
-  "Where to look for elfeed.org files, relative to `org-directory'. Can be
-absolute paths.")
-
 (defvar +rss-split-direction 'below
   "What direction to pop up the entry buffer in elfeed.")
 
@@ -21,10 +17,11 @@ easier to scroll through.")
 
 (use-package! elfeed
   :commands elfeed
+  :init
+  (setq elfeed-db-directory (concat doom-local-dir "elfeed/db/")
+        elfeed-enclosure-default-dir (concat doom-local-dir "elfeed/enclosures/"))
   :config
   (setq elfeed-search-filter "@2-week-ago "
-        elfeed-db-directory (concat doom-local-dir "elfeed/db/")
-        elfeed-enclosure-default-dir (concat doom-local-dir "elfeed/enclosures/")
         elfeed-show-entry-switch #'pop-to-buffer
         elfeed-show-entry-delete #'+rss/delete-pane
         shr-max-image-proportion 0.8)
@@ -67,8 +64,11 @@ easier to scroll through.")
 (use-package! elfeed-org
   :when (featurep! +org)
   :after elfeed
+  :preface
+  (setq rmh-elfeed-org-files (list "elfeed.org"))
   :config
-  (let ((default-directory org-directory))
-    (setq rmh-elfeed-org-files
-          (mapcar #'expand-file-name +rss-elfeed-files)))
-  (elfeed-org))
+  (and (let ((default-directory org-directory))
+         (setq rmh-elfeed-org-files
+               (cl-remove-if-not
+                #'file-exists-p (mapcar #'expand-file-name rmh-elfeed-org-files))))
+       (elfeed-org)))

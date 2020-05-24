@@ -1,10 +1,11 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; tools/magit/packages.el
 
-(when (package! magit :pin "5503aa1857e78bb43502261956173a66c9b88c71")
-  (package! forge :pin "269effb4954071f590954c0e5b4faba3f27d03d0")
+(when (package! magit :pin "d27d6e467857ed4a78c7cf7d609561df789e2a6c")
+  (when (featurep! +forge)
+    (package! forge :pin "e2da80660a0550f613400ce3b238025589800417"))
   (package! magit-gitflow :pin "cc41b561ec6eea947fe9a176349fb4f771ed865b")
-  (package! magit-todos :pin "a64e36574bcb77a86726922df905307e55ea62ed")
-  (package! github-review :pin "e8a275939e1a774c84b71ab3df2ce1599445dab0")
+  (package! magit-todos :pin "a0e5d1f3c7dfcb4f18c1b0d57f1746a4872df5c6")
+  (package! github-review :pin "50c6bcc7cf4d7193577b3f74eea4dd72f2b7795b")
   (when (featurep! :editor evil +everywhere)
-    (package! evil-magit :pin "7223dca89c0b4bca9871c453a30a4d4edfdb444e")))
+    (package! evil-magit :pin "253c644807013fe92429acdef418748794b8f254")))

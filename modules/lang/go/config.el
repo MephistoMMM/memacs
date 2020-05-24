@@ -54,7 +54,7 @@
         (:prefix ("ri" . "imports")
           "a" #'go-import-add
           "r" #'go-remove-unused-imports)
-        (:prefix ( "b" . "build")
+        (:prefix ("b" . "build")
           :desc "go run ." "r" (λ! (compile "go run ."))
           :desc "go build" "b" (λ! (compile "go build"))
           :desc "go clean" "c" (λ! (compile "go clean")))
@@ -65,7 +65,10 @@
           "n" #'+go/test-nested
           "g" #'go-gen-test-dwim
           "G" #'go-gen-test-all
-          "e" #'go-gen-test-exported)))
+          "e" #'go-gen-test-exported
+          (:prefix ("b" . "bench")
+            "s" #'+go/bench-single
+            "a" #'+go/bench-all))))
 
 
 (use-package! gorepl-mode

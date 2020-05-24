@@ -8,9 +8,11 @@ Will be saved in `doom-scratch-dir'.")
 (defvar doom-scratch-dir (concat doom-etc-dir "scratch")
   "Where to save persistent scratch buffers.")
 
-(defvar doom-scratch-buffer-major-mode nil
-  "What major mode to use in scratch buffers. This can be one of the
-following:
+(defvar doom-scratch-initial-major-mode nil
+  "What major mode to start fresh scratch buffers in.
+
+Scratch buffers preserve their last major mode, however, so this only affects
+the first, fresh scratch buffer you create. This accepts:
 
   t           Inherits the major mode of the last buffer you had selected.
   nil         Uses `fundamental-mode'
@@ -30,34 +32,57 @@ following:
   (setq-local doom-scratch-current-project
               (or name
                   doom-scratch-default-file))
-  (let ((scratch-file
+  (let ((smart-scratch-file
+         (expand-file-name (concat doom-scratch-current-project ".el")
+                           doom-scratch-dir))
+        (scratch-file
          (expand-file-name doom-scratch-current-project
                            doom-scratch-dir)))
     (make-directory doom-scratch-dir t)
-    (when (file-readable-p scratch-file)
-      (erase-buffer)
-      (insert-file-contents scratch-file)
-      (set-auto-mode)
-      t)))
+    (cond ((file-readable-p smart-scratch-file)
+           (message "Reading %s" smart-scratch-file)
+           (cl-destructuring-bind (content point mode)
+               (with-temp-buffer
+                 (save-excursion (insert-file-contents smart-scratch-file))
+                 (read (current-buffer)))
+             (erase-buffer)
+             (funcall mode)
+             (insert content)
+             (goto-char point)
+             t))
+          ((file-readable-p scratch-file) ; DEPRECATED
+           (when (file-readable-p scratch-file)
+             (let ((pt (point)))
+               (erase-buffer)
+               (insert-file-contents scratch-file)
+               (set-auto-mode)
+               (goto-char pt))
+             t)))))
 
 ;;;###autoload
-(defun doom-scratch-buffer (&optional mode directory project-name)
+(defun doom-scratch-buffer (&optional dont-restore-p mode directory project-name)
   "Return a scratchpad buffer in major MODE."
-  (with-current-buffer
-      (get-buffer-create (if project-name
-                             (format "*doom:scratch (%s)*" project-name)
-                           "*doom:scratch*"))
-    (setq default-directory directory)
-    (unless doom-scratch-current-project
-      (doom--load-persistent-scratch-buffer project-name)
-      (when (and (eq major-mode 'fundamental-mode)
-                 (functionp mode))
-        (funcall mode)))
-    (cl-pushnew (current-buffer) doom-scratch-buffers)
-    (add-hook 'kill-buffer-hook #'doom-persist-scratch-buffer-h nil 'local)
-    (add-hook 'doom-switch-buffer-hook #'doom-persist-scratch-buffers-after-switch-h)
-    (run-hooks 'doom-scratch-buffer-created-hook)
-    (current-buffer)))
+  (let* ((buffer-name (if project-name
+                          (format "*doom:scratch (%s)*" project-name)
+                        "*doom:scratch*"))
+         (buffer (get-buffer buffer-name)))
+    (with-current-buffer
+        (or buffer (get-buffer-create buffer-name))
+      (setq default-directory directory)
+      (setq-local so-long--inhibited t)
+      (if dont-restore-p
+          (erase-buffer)
+        (unless buffer
+          (doom--load-persistent-scratch-buffer project-name)
+          (when (and (eq major-mode 'fundamental-mode)
+                     (functionp mode))
+            (funcall mode))))
+      (cl-pushnew (current-buffer) doom-scratch-buffers)
+      (add-transient-hook! 'doom-switch-buffer-hook (doom-persist-scratch-buffers-h))
+      (add-transient-hook! 'doom-switch-window-hook (doom-persist-scratch-buffers-h))
+      (add-hook 'kill-buffer-hook #'doom-persist-scratch-buffer-h nil 'local)
+      (run-hooks 'doom-scratch-buffer-created-hook)
+      (current-buffer))))
 
 
 ;;
@@ -66,11 +91,18 @@ following:
 ;;;###autoload
 (defun doom-persist-scratch-buffer-h ()
   "Save the current buffer to `doom-scratch-dir'."
-  (write-region
-   (point-min) (point-max)
-   (expand-file-name (or doom-scratch-current-project
-                         doom-scratch-default-file)
-                     doom-scratch-dir)))
+  (let ((content (buffer-substring-no-properties (point-min) (point-max)))
+        (point (point))
+        (mode major-mode))
+    (with-temp-file
+        (expand-file-name (concat (or doom-scratch-current-project
+                                      doom-scratch-default-file)
+                                  ".el")
+                          doom-scratch-dir)
+      (prin1 (list content
+                   point
+                   mode)
+             (current-buffer)))))
 
 ;;;###autoload
 (defun doom-persist-scratch-buffers-h ()
@@ -96,55 +128,59 @@ following:
 ;;
 ;;; Commands
 
+(defvar projectile-enable-caching)
 ;;;###autoload
-(defun doom/open-scratch-buffer (&optional arg project-p)
+(defun doom/open-scratch-buffer (&optional arg project-p same-window-p)
   "Pop up a persistent scratch buffer.
 
-If passed the prefix ARG, switch to it in the current window.
+If passed the prefix ARG, do not restore the last scratch buffer.
 If PROJECT-P is non-nil, open a persistent scratch buffer associated with the
   current project."
   (interactive "P")
   (let (projectile-enable-caching)
     (funcall
-     (if arg
+     (if same-window-p
          #'switch-to-buffer
        #'pop-to-buffer)
      (doom-scratch-buffer
-      (cond ((eq doom-scratch-buffer-major-mode t)
+      arg
+      (cond ((eq doom-scratch-initial-major-mode t)
              (unless (or buffer-read-only
                          (derived-mode-p 'special-mode)
                          (string-match-p "^ ?\\*" (buffer-name)))
                major-mode))
-            ((null doom-scratch-buffer-major-mode)
+            ((null doom-scratch-initial-major-mode)
              nil)
-            ((symbolp doom-scratch-buffer-major-mode)
-             doom-scratch-buffer-major-mode))
+            ((symbolp doom-scratch-initial-major-mode)
+             doom-scratch-initial-major-mode))
       default-directory
       (when project-p
         (doom-project-name))))))
 
 ;;;###autoload
-(defun doom/switch-to-scratch-buffer (&optional project-p)
+(defun doom/switch-to-scratch-buffer (&optional arg project-p)
   "Like `doom/open-scratch-buffer', but switches to it in the current window.
 
-If passed the prefix arg, open project scratch buffer."
+If passed the prefix ARG, do not restore the last scratch buffer."
   (interactive "P")
-  (doom/open-scratch-buffer t project-p))
+  (doom/open-scratch-buffer arg project-p 'same-window))
 
 ;;;###autoload
-(defun doom/open-project-scratch-buffer (&optional current-window)
+(defun doom/open-project-scratch-buffer (&optional arg same-window-p)
   "Opens the (persistent) project scratch buffer in a popup.
 
-If passed the prefix arg, switch to it in the current window."
+If passed the prefix ARG, do not restore the last scratch buffer."
   (interactive "P")
-  (doom/open-scratch-buffer current-window 'project))
+  (doom/open-scratch-buffer arg 'project same-window-p))
 
 ;;;###autoload
-(defun doom/switch-to-project-scratch-buffer ()
+(defun doom/switch-to-project-scratch-buffer (&optional arg)
   "Like `doom/open-project-scratch-buffer', but switches to it in the current
-window."
-  (interactive)
-  (doom/open-project-scratch-buffer t))
+window.
+
+If passed the prefix ARG, do not restore the last scratch buffer."
+  (interactive "P")
+  (doom/open-project-scratch-buffer arg 'same-window))
 
 ;;;###autoload
 (defun doom/revert-scratch-buffer ()

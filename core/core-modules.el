@@ -142,10 +142,8 @@ following properties:
   :path  [STRING]       path to category root directory
 
 Example:
-  (doom-module-set :lang 'haskell :flags '(+intero))"
-  (puthash (cons category module)
-           plist
-           doom-modules))
+  (doom-module-set :lang 'haskell :flags '(+dante))"
+  (puthash (cons category module) plist doom-modules))
 
 (defun doom-module-path (category module &optional file)
   "Like `expand-file-name', but expands FILE relative to CATEGORY (keywordp) and
@@ -213,13 +211,15 @@ those directories. The first returned path is always `doom-private-dir'."
   (declare (pure t) (side-effect-free t))
   (append (list doom-private-dir)
           (if module-dirs
-              (doom-files-in (if (listp module-dirs)
-                                 module-dirs
-                               doom-modules-dirs)
-                             :type 'dirs
-                             :mindepth 1
-                             :depth 1)
-            (cl-loop for plist being the hash-values of (doom-modules)
+              (mapcar (lambda (m) (doom-module-locate-path (car m) (cdr m)))
+                      (doom-files-in (if (listp module-dirs)
+                                         module-dirs
+                                       doom-modules-dirs)
+                                     :map #'doom-module-from-path
+                                     :type 'dirs
+                                     :mindepth 1
+                                     :depth 1))
+            (cl-loop for plist being the hash-values of doom-modules
                      collect (plist-get plist :path)))
           nil))
 
@@ -483,39 +483,6 @@ WARNINGS:
                (lambda () ,@body)
                'append)))
 
-(defmacro require! (category module &rest flags)
-  "Loads the CATEGORY MODULE module with FLAGS.
-
-CATEGORY is a keyword, MODULE is a symbol and FLAGS are symbols.
-
-  (require! :lang php +lsp)
-
-This is for testing and internal use. This is not the correct way to enable a
-module."
-  `(let ((doom-modules (or ,doom-modules (doom-modules)))
-         (module-path (doom-module-locate-path ,category ',module)))
-     (doom-module-set
-      ,category ',module
-      (let ((plist (doom-module-get ,category ',module)))
-        ,(when flags
-           `(plist-put plist :flags `,flags))
-        (unless (plist-member plist :path)
-          (plist-put plist :path ,(doom-module-locate-path category module)))
-        plist))
-     (if (directory-name-p module-path)
-         (condition-case-unless-debug ex
-             (let ((doom--current-module ',(cons category module))
-                   (doom--current-flags ',flags))
-               (load! "init" module-path :noerror)
-               (load! "config" module-path :noerror))
-           ('error
-            (lwarn 'doom-modules :error
-                   "%s in '%s %s' -> %s"
-                   (car ex) ,category ',module
-                   (error-message-string ex))))
-       (warn 'doom-modules :warning "Couldn't find module '%s %s'"
-             ,category ',module))))
-
 (defmacro featurep! (category &optional module flag)
   "Returns t if CATEGORY MODULE is enabled.
 
@@ -539,67 +506,6 @@ CATEGORY and MODULE can be omitted When this macro is used from inside a module
                          category module flag (file!)))
                 (memq category (doom-module-get (car module) (cdr module) :flags)))))
        t))
-
-(defmacro after! (package &rest body)
-  "Evaluate BODY after PACKAGE have loaded.
-
-PACKAGE is a symbol or list of them. These are package names, not modes,
-functions or variables. It can be:
-
-- An unquoted package symbol (the name of a package)
-    (after! helm BODY...)
-- An unquoted list of package symbols (i.e. BODY is evaluated once both magit
-  and git-gutter have loaded)
-    (after! (magit git-gutter) BODY...)
-- An unquoted, nested list of compound package lists, using any combination of
-  :or/:any and :and/:all
-    (after! (:or package-a package-b ...)  BODY...)
-    (after! (:and package-a package-b ...) BODY...)
-    (after! (:and package-a (:or package-b package-c) ...) BODY...)
-  Without :or/:any/:and/:all, :and/:all are implied.
-
-This is a wrapper around `eval-after-load' that:
-
-1. Suppresses warnings for disabled packages at compile-time
-2. No-ops for package that are disabled by the user (via `package!')
-3. Supports compound package statements (see below)
-4. Prevents eager expansion pulling in autoloaded macros all at once"
-  (declare (indent defun) (debug t))
-  (if (symbolp package)
-      (unless (memq package (bound-and-true-p doom-disabled-packages))
-        (list (if (or (not (bound-and-true-p byte-compile-current-file))
-                      (require package nil 'noerror))
-                  #'progn
-                #'with-no-warnings)
-              (let ((body (macroexp-progn body)))
-                `(if (featurep ',package)
-                     ,body
-                   ;; We intentionally avoid `with-eval-after-load' to prevent
-                   ;; eager macro expansion from pulling (or failing to pull) in
-                   ;; autoloaded macros/packages.
-                   (eval-after-load ',package ',body)))))
-    (let ((p (car package)))
-      (cond ((not (keywordp p))
-             `(after! (:and ,@package) ,@body))
-            ((memq p '(:or :any))
-             (macroexp-progn
-              (cl-loop for next in (cdr package)
-                       collect `(after! ,next ,@body))))
-            ((memq p '(:and :all))
-             (dolist (next (cdr package))
-               (setq body `((after! ,next ,@body))))
-             (car body))))))
-
-;; DEPRECATED
-(defmacro def-package! (&rest args)
-  (message "`def-package!' was renamed to `use-package!'; use that instead.")
-  `(use-package! ,@args))
-(make-obsolete 'def-package! 'use-package! "2.0.9")
-
-(defmacro def-package-hook! (&rest args)
-  (message "`def-package-hook!' was renamed to `use-package-hook!'; use that instead.")
-  `(use-package-hook! ,@args))
-(make-obsolete 'def-package-hook! 'use-package-hook! "2.0.9")
 
 (provide 'core-modules)
 ;;; core-modules.el ends here

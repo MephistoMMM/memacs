@@ -1,5 +1,8 @@
 ;;; lang/php/config.el -*- lexical-binding: t; -*-
 
+(defvar +php--company-backends nil
+  "List of company backends to use in `php-mode'.")
+
 (after! projectile
   (add-to-list 'projectile-project-root-files "composer.json"))
 
@@ -11,7 +14,7 @@
   :mode "\\.inc\\'"
   :config
   ;; Disable HTML compatibility in php-mode. `web-mode' has superior support for
-  ;; php+html. Use the .phtml
+  ;; php+html. Use the .phtml extension instead.
   (setq php-template-compatibility nil)
 
   (set-docsets! 'php-mode "PHP" "PHPUnit" "Laravel" "CakePHP" "CodeIgniter" "Doctrine_ORM")
@@ -23,7 +26,10 @@
       (add-hook 'php-mode-local-vars-hook #'lsp!)
     ;; `+php-company-backend' uses `company-phpactor', `php-extras-company' or
     ;; `company-dabbrev-code', in that order.
-    (set-company-backend! 'php-mode '+php-company-backend 'company-dabbrev-code))
+    (when +php--company-backends
+      (set-company-backend! 'php-mode
+        (cons :separate +php--company-backends)
+        'company-dabbrev-code)))
 
   ;; Use the smallest `sp-max-pair-length' for optimum `smartparens' performance
   (setq-hook! 'php-mode-hook sp-max-pair-length 5)
@@ -43,10 +49,11 @@
 (use-package! phpactor
   :unless (featurep! +lsp)
   :after php-mode
+  :init
+  (add-to-list '+php--company-backends #'company-phpactor nil 'eq)
   :config
   (set-lookup-handlers! 'php-mode
     :definition #'phpactor-goto-definition)
-
   (map! :localleader
         :map php-mode-map
         :prefix ("r" . "refactor")
@@ -74,6 +81,8 @@
   :preface
   ;; We'll set up company support ourselves
   (advice-add #'php-extras-company-setup :override #'ignore)
+  :init
+  (add-to-list '+php--company-backends #'php-extras-company)
   :config
   (setq php-extras-eldoc-functions-file
         (concat doom-etc-dir "php-extras-eldoc-functions"))

@@ -1,10 +1,5 @@
 ;;; lang/latex/+ref.el -*- lexical-binding: t; -*-
 
-(when (stringp +latex-bibtex-file)
-  (setq bibtex-completion-bibliography (list (expand-file-name +latex-bibtex-file))
-        reftex-default-bibliography bibtex-completion-bibliography))
-
-
 (use-package! reftex
   :hook (LaTeX-mode . reftex-mode)
   :config
@@ -23,6 +18,8 @@
           (?t . "\\textcite[]{%l}"))
         reftex-plug-into-AUCTeX t
         reftex-toc-split-windows-fraction 0.3)
+  (when (featurep! :editor evil)
+    (add-hook 'reftex-mode-hook #'evil-normalize-keymaps))
   (map! :map reftex-mode-map
         :localleader
         ";" 'reftex-toc)

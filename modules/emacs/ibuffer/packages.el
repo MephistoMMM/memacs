@@ -1,5 +1,5 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; emacs/ibuffer/packages.el
 
-(package! ibuffer-projectile :pin "76496214144687cee0b5139be2e61b1e400cac87")
-(package! ibuffer-vc :pin "64cb03887bcae6127e80f0d9342c33206e21d2d2")
+(package! ibuffer-projectile :pin "504b0edaa0d937ce60ccc8fdf09f2dae0a90fbaf")
+(package! ibuffer-vc :pin "1249c1e30cf11badfe032ac3b1058f24ba510ace")

@@ -39,3 +39,25 @@
         ((user-error "No search engine is enabled. Enable helm or ivy!")))
   ;; Tell lookup module to let us handle things from here
   'deferred)
+
+;;;###autoload
+(defun +nix-shell-init-mode ()
+  "Resolve a (cached-)?nix-shell shebang to the correct major mode."
+  (save-excursion
+    (goto-char (point-min))
+    (save-match-data
+      (if (not (re-search-forward "#! *\\(?:cached-\\)?nix-shell +-i +\\([^ \n]+\\)" 256 t))
+          (message "Couldn't determine mode for this script")
+        (let* ((interp (match-string 1))
+               (mode
+                (assoc-default
+                 interp
+                 (mapcar (lambda (e)
+                           (cons (format "\\`%s\\'" (car e))
+                                 (cdr e)))
+                         interpreter-mode-alist)
+                 #'string-match-p)))
+          (when mode
+            (prog1 (set-auto-mode-0 mode)
+              (when (eq major-mode 'sh-mode)
+                (sh-set-shell interp)))))))))

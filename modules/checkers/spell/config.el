@@ -3,8 +3,6 @@
 (defvar ispell-dictionary "en_US")
 
 (after! ispell
-  (add-to-list 'ispell-extra-args "--dont-tex-check-comments")
-
   ;; Don't spellcheck org blocks
   (pushnew! ispell-skip-region-alist
             '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:")
@@ -22,7 +20,7 @@
                ((executable-find "hunspell") 'hunspell))
     (`aspell
      (setq ispell-program-name "aspell"
-           ispell-extra-args '("--sug-mode=ultra" "--run-together"))
+           ispell-extra-args '("--sug-mode=ultra" "--run-together" "--dont-tex-check-comments"))
 
      (add-hook! 'text-mode-hook
        (defun +spell-remove-run-together-switch-for-aspell-h ()
@@ -48,28 +46,43 @@
         ;; messages for every word when checking the entire buffer
         flyspell-issue-message-flag nil)
 
-  (add-hook 'text-mode-hook #'flyspell-mode)
+  (add-hook! '(org-mode-hook
+               markdown-mode-hook
+               TeX-mode-hook
+               rst-mode-hook
+               mu4e-compose-mode-hook
+               message-mode-hook
+               git-commit-mode-hook)
+             #'flyspell-mode)
+
   (when (featurep! +everywhere)
-    (add-hook! '(conf-mode-hook prog-mode-hook)
+    (add-hook! '(yaml-mode-hook
+                 conf-mode-hook
+                 prog-mode-hook)
                #'flyspell-prog-mode))
 
   (add-hook! 'flyspell-mode-hook
     (defun +spell-inhibit-duplicate-detection-maybe-h ()
       "Don't mark duplicates when style/grammar linters are present.
 e.g. proselint and langtool."
-      (when (or (and (bound-and-true-p flycheck-mode)
-                     (executable-find "proselint"))
-                (featurep 'langtool))
-        (setq-local flyspell-mark-duplications-flag nil))))
+      (and (or (and (bound-and-true-p flycheck-mode)
+                    (executable-find "proselint"))
+               (featurep 'langtool))
+           (setq-local flyspell-mark-duplications-flag nil))))
 
   ;; Ensure mode-local predicates declared with `set-flyspell-predicate!' are
   ;; used in their respective major modes.
   (add-hook 'flyspell-mode-hook #'+spell-init-flyspell-predicate-h)
 
-  (map! :map flyspell-mouse-map
-        "RET"     #'flyspell-correct-at-point
-        [return]  #'flyspell-correct-at-point
-        [mouse-1] #'flyspell-correct-at-point))
+  (let ((flyspell-correct
+         (general-predicate-dispatch nil
+           (and (not (or mark-active (ignore-errors (evil-insert-state-p))))
+                (memq 'flyspell-incorrect (face-at-point nil t)))
+           #'flyspell-correct-at-point)))
+    (map! :map flyspell-mouse-map
+          "RET"    flyspell-correct
+          [return] flyspell-correct
+          [mouse-1] #'flyspell-correct-at-point)))
 
 
 (use-package! flyspell-correct
@@ -82,3 +95,7 @@ e.g. proselint and langtool."
         ((require 'flyspell-correct-popup nil t)
          (setq flyspell-popup-correct-delay 0.8)
          (define-key popup-menu-keymap [escape] #'keyboard-quit))))
+
+
+(use-package! flyspell-lazy
+  :after flyspell)

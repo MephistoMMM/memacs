@@ -35,7 +35,7 @@
 (defun +default/yank-buffer-filename ()
   "Copy the current buffer's path to the kill ring."
   (interactive)
-  (if-let* ((filename (or buffer-file-name (bound-and-true-p list-buffers-directory))))
+  (if-let (filename (or buffer-file-name (bound-and-true-p list-buffers-directory)))
       (message (kill-new (abbreviate-file-name filename)))
     (error "Couldn't find filename in current buffer")))
 
@@ -49,21 +49,6 @@ If `buffer-file-name' isn't set, uses `default-directory'."
      (if arg
          (abbreviate-file-name path)
        (file-name-nondirectory path)))))
-
-;;;###autoload
-(defun +default--newline-indent-and-continue-comments-a ()
-  "A replacement for `newline-and-indent'.
-
-Continues comments if executed from a commented line, with special support for
-languages with weak native comment continuation support (like C-family
-languages)."
-  (interactive)
-  (if (and (sp-point-in-comment)
-           comment-line-break-function)
-      (funcall comment-line-break-function nil)
-    (delete-horizontal-space t)
-    (newline nil t)
-    (indent-according-to-mode)))
 
 
 (defun doom--backward-delete-whitespace-to-column ()

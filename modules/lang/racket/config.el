@@ -8,12 +8,13 @@
 ;;; Packages
 
 (use-package! racket-mode
+  :mode "\\.rkt\\'"  ; give it precedence over :lang scheme
   :hook (racket-repl-mode . racket-unicode-input-method-enable)
   :config
   (set-repl-handler! 'racket-mode #'+racket/open-repl)
   (set-lookup-handlers! 'racket-mode
-    :definition    #'racket-visit-definition
-    :documentation #'racket-describe)
+    :definition    #'racket-xp-visit-definition
+    :documentation #'racket-xp-describe)
   (set-docsets! 'racket-mode "Racket")
   (set-pretty-symbols! 'racket-mode
     :lambda  "lambda"
@@ -24,8 +25,11 @@
 
   (add-hook! 'racket-mode-hook
              #'rainbow-delimiters-mode
-             #'highlight-quoted-mode
-             #'racket-smart-open-bracket-mode)
+             #'highlight-quoted-mode)
+
+  (unless (or (featurep! :editor parinfer)
+              (featurep! :editor lispy))
+    (add-hook! 'racket-mode-hook #'racket-smart-open-bracket-mode))
 
   (map! :localleader
         :map racket-mode-map

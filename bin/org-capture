@@ -14,7 +14,7 @@ cleanup() {
 }
 
 # If emacs isn't running, we start a temporary daemon, solely for this window.
-if ! emacsclient -e nil; then
+if ! emacsclient --suppress-output --eval nil; then
   emacs --daemon
   trap cleanup EXIT INT TERM
   daemon=1
@@ -22,8 +22,8 @@ fi
 
 # org-capture key mapped to argument flags
 # keys=$(emacsclient -e "(+org-capture-available-keys)" | cut -d '"' -f2)
-while getopts hk opt; do
-  key="\"$opt\""
+while getopts "hk:" opt; do
+  key="\"$OPTARG\""
   break
 done
 shift $((OPTIND-1))
@@ -32,7 +32,7 @@ shift $((OPTIND-1))
 
 if [ $daemon ]; then
   emacsclient -a "" \
-    -c -F '((name . "org-capture") (width . 70) (height . 25) (transient . t))' \
+    -c -F '((name . "doom-capture") (width . 70) (height . 25) (transient . t))' \
     -e "(+org-capture/open-frame \"$str\" ${key:-nil})"
 else
   # Non-daemon servers flicker a lot if frames are created from terminal, so we

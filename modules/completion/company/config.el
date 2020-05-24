@@ -4,23 +4,40 @@
   :commands company-complete-common company-manual-begin company-grab-line
   :after-call pre-command-hook after-find-file
   :init
-  (setq company-minimum-prefix-length 2
+  (setq company-idle-delay 0.25
+        company-minimum-prefix-length 2
         company-tooltip-limit 14
-        company-dabbrev-downcase nil
-        company-dabbrev-ignore-case nil
-        company-dabbrev-code-other-buffers t
         company-tooltip-align-annotations t
         company-require-match 'never
         company-global-modes
         '(not erc-mode message-mode help-mode gud-mode eshell-mode)
-        company-backends '(company-capf)
-        company-frontends
-        '(company-pseudo-tooltip-frontend
-          company-echo-metadata-frontend))
+        company-frontends '(company-pseudo-tooltip-frontend
+                            company-echo-metadata-frontend)
+
+        ;; Buffer-local backends will be computed when loading a major mode, so
+        ;; only specify a global default here.
+        company-backends  '(company-capf)
+
+        ;; Company overrides `company-active-map' based on
+        ;; `company-auto-complete-chars'; no magic please!
+        company-auto-complete-chars nil
+
+        ;; Only search the current buffer for `company-dabbrev' (a backend that
+        ;; suggests text your open buffers). This prevents Company from causing
+        ;; lag once you have a lot of buffers open.
+        company-dabbrev-other-buffers nil
+        ;; Make `company-dabbrev' fully case-sensitive, to improve UX with
+        ;; domain-specific words with particular casing.
+        company-dabbrev-ignore-case nil
+        company-dabbrev-downcase nil)
+
   :config
   (when (featurep! :editor evil)
     (add-hook 'company-mode-hook #'evil-normalize-keymaps)
-
+    (unless (featurep! +childframe)
+      ;; Don't persist company popups when switching back to normal mode.
+      ;; `company-box' aborts on mode switch so it doesn't need this.
+      (add-hook 'evil-normal-state-entry-hook #'company-abort))
     ;; Allow users to switch between backends on the fly. E.g. C-x C-s followed
     ;; by C-x C-n, will switch from `company-yasnippet' to
     ;; `company-dabbrev-code'.
@@ -28,7 +45,7 @@
       :before #'company-begin-backend
       (company-abort)))
 
-  (add-hook 'company-mode-hook #'+company-init-backends-h)
+  (add-hook 'after-change-major-mode-hook #'+company-init-backends-h 'append)
   (global-company-mode +1))
 
 
@@ -49,8 +66,7 @@
 ;; Packages
 
 (after! company-files
-  (pushnew! company-files--regexps
-            "file:\\(\\(?:\\.\\{1,2\\}/\\|~/\\|/\\)[^\]\n]*\\)"))
+  (add-to-list 'company-files--regexps "file:\\(\\(?:\\.\\{1,2\\}/\\|~/\\|/\\)[^\]\n]*\\)"))
 
 
 (use-package! company-prescient
@@ -106,6 +122,8 @@
             (ElispVariable . ,(all-the-icons-material "check_circle"             :face 'all-the-icons-blue))
             (ElispFeature  . ,(all-the-icons-material "stars"                    :face 'all-the-icons-orange))
             (ElispFace     . ,(all-the-icons-material "format_paint"             :face 'all-the-icons-pink)))))
+
+  (delq! 'company-echo-metadata-frontend company-frontends)
 
   (defun +company-box-icons--elisp-fn (candidate)
     (when (derived-mode-p 'emacs-lisp-mode)

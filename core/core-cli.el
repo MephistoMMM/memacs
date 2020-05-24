@@ -258,7 +258,7 @@ BODY will be run when this dispatcher is called."
                    (print! "%2s) %s" (1+ (length options))
                            (if (cl-find-if (doom-rpartial #'string-match-p desc)
                                            doom--cli-straight-discard-options)
-                               (concat desc " (Recommended)")
+                               (green (concat desc " (Recommended)"))
                              desc))))
          (terpri)
          (let* ((options
@@ -355,16 +355,10 @@ stale."
          (doom-cli-reload-env-file 'force))
 
        (doom-cli-reload-core-autoloads)
-       (unwind-protect
-           (progn
-             (and (doom-cli-packages-install)
-                  (setq success t))
-             (and (doom-cli-packages-build)
-                  (setq success t))
-             (and (doom-cli-packages-purge prune-p 'builds-p prune-p prune-p)
-                  (setq success t)))
-         (doom-cli-reload-package-autoloads)
-         (doom-cli-byte-compile nil 'recompile))
+       (doom-cli-packages-install)
+       (doom-cli-packages-build)
+       (doom-cli-packages-purge prune-p 'builds-p prune-p prune-p)
+       (doom-cli-reload-package-autoloads)
        t)))
 
   (load! "cli/env")

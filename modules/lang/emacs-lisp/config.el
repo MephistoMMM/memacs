@@ -21,7 +21,7 @@ This marks a foldable marker for `outline-minor-mode' in elisp buffers.")
   :config
   (set-repl-handler! '(emacs-lisp-mode lisp-interaction-mode) #'+emacs-lisp/open-repl)
   (set-eval-handler! '(emacs-lisp-mode lisp-interaction-mode) #'+emacs-lisp-eval)
-  (set-lookup-handlers! 'emacs-lisp-mode
+  (set-lookup-handlers! '(emacs-lisp-mode helpful-mode)
     :definition    #'+emacs-lisp-lookup-definition
     :documentation #'+emacs-lisp-lookup-documentation)
   (set-docsets! '(emacs-lisp-mode lisp-interaction-mode) "Emacs Lisp")
@@ -50,13 +50,12 @@ This marks a foldable marker for `outline-minor-mode' in elisp buffers.")
     mode-name "Elisp"
     ;; Don't treat autoloads or sexp openers as outline headers, we have
     ;; hideshow for that.
-    outline-regexp +emacs-lisp-outline-regexp)
+    outline-regexp +emacs-lisp-outline-regexp
+    ;; Fixed indenter that intends plists sensibly.
+    lisp-indent-function #'+emacs-lisp-indent-function)
 
   ;; variable-width indentation is superior in elisp
   (add-to-list 'doom-detect-indentation-excluded-modes 'emacs-lisp-mode nil #'eq)
-
-  ;; Use helpful instead of describe-* from `company'
-  (advice-add #'elisp--company-doc-buffer :around #'doom-use-helpful-a)
 
   (add-hook! 'emacs-lisp-mode-hook
              #'outline-minor-mode
@@ -85,7 +84,9 @@ This marks a foldable marker for `outline-minor-mode' in elisp buffers.")
              ("^;;;###\\(autodef\\|if\\|package\\)[ \n]" (1 font-lock-warning-face t)))
            ;; highlight defined, special variables & functions
            (when +emacs-lisp-enable-extra-fontification
-             `((+emacs-lisp-highlight-vars-and-faces . +emacs-lisp--face)))))
+             `((+emacs-lisp-highlight-vars-and-faces . +emacs-lisp--face)))
+
+           `(("(package!\\_>" (0 (+emacs-lisp-truncate-pin))))))
 
   ;; Recenter window after following definition
   (advice-add #'elisp-def :after #'doom-recenter-a)
@@ -107,7 +108,8 @@ This marks a foldable marker for `outline-minor-mode' in elisp buffers.")
           "v" #'find-variable
           "l" #'find-library)))
 
-;; Adapted from http://www.modernemacs.com/post/comint-highlighting/
+;; Adapted from http://www.modernemacs.com/post/comint-highlighting/ to add
+;; syntax highlighting to ielm REPLs.
 (add-hook! 'ielm-mode-hook
   (defun +emacs-lisp-init-syntax-highlighting-h ()
     (font-lock-add-keywords
@@ -132,7 +134,7 @@ This marks a foldable marker for `outline-minor-mode' in elisp buffers.")
 
 ;;;###package overseer
 (autoload 'overseer-test "overseer" nil t)
-(remove-hook 'emacs-lisp-mode-hook 'overseer-enable-mode)
+(remove-hook 'emacs-lisp-mode-hook #'overseer-enable-mode)
 
 
 (use-package! flycheck-cask

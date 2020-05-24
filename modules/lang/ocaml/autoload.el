@@ -6,4 +6,6 @@
   (interactive)
   (comment-indent-new-line)
   (when (eq (char-before) ?*)
-    (just-one-space)))
+    (just-one-space))
+  (unless (eq (char-after) 32)
+    (save-excursion (insert " "))))
