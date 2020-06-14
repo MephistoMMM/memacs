@@ -181,7 +181,7 @@ Dictionary.app behind the scenes to get definitions.")
   :init
   (add-hook '+lookup-documentation-functions #'+lookup-dash-docsets-backend-fn)
   :config
-  (setq dash-docs-enable-debugging doom-debug-mode
+  (setq dash-docs-enable-debugging doom-debug-p
         dash-docs-docsets-path (concat doom-etc-dir "docsets/")
         dash-docs-min-length 2
         dash-docs-browser-func #'eww)
@@ -208,8 +208,7 @@ See https://github.com/magit/ghub/issues/81"
         (setq xwidget-webkit-last-session-buffer +lookup--dash-docs-xwidget-webkit-last-session-buffer)
         (save-window-excursion
           (xwidget-webkit-browse-url url new-session))
-        (with-popup-rules!
-          '((set-popup-rule! "^\\*xwidget" :vslot -11 :size 0.35 :select nil))
+        (with-popup-rules! '(("^\\*xwidget" :vslot -11 :size 0.35 :select nil))
           (pop-to-buffer xwidget-webkit-last-session-buffer))
         (setq +lookup--dash-docs-xwidget-webkit-last-session-buffer xwidget-webkit-last-session-buffer
               xwidget-webkit-last-session-buffer nil)))

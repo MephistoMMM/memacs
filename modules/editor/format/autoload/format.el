@@ -105,7 +105,7 @@ Prompts for a formatter if universal arg is set."
   (cond ((or (eq +format-with :none)
              (doom-temp-buffer-p (current-buffer))
              (doom-special-buffer-p (current-buffer)))
-         nil)
+         (list nil nil))
         (current-prefix-arg
          (list (or (+format-completing-read)
                    (user-error "Aborted"))
@@ -223,7 +223,7 @@ snippets or single lines."
   (if (and +format-with-lsp
            (bound-and-true-p lsp-mode)
            (lsp-feature? "textDocument/rangeFormatting"))
-      #'lsp-format-region
+      (call-interactively #'lsp-format-region)
     (save-restriction
       (narrow-to-region beg end)
       (let ((+format-region-p t))

@@ -9,7 +9,7 @@
   :hook (scheme-mode . geiser-mode)
   :init
   (setq geiser-active-implementations '(guile chicken mit chibi chez)
-        geiser-mode-start-repl-p t
+        geiser-autodoc-identifier-format "%s → %s"
         geiser-smart-tab-p t)
   (unless (featurep! :lang racket)
     (push 'racket geiser-active-implementations))
@@ -21,8 +21,11 @@
       :documentation #'geiser-doc-symbol-at-point))
   :config
   (set-popup-rules!
-    '(("\\*[Gg]eiser \\(?:[Mm]essages\\|DBG\\|Xref\\)\\*" :quit nil)
-      ( "\\* [A-Za-z0-9_-]+ REPL \\*" :quit nil)))
+    '(("^\\*geiser messages\\*$" :slot 1 :vslot -1)
+      ("^\\*Geiser dbg\\*$"      :slot 1 :vslot -1)
+      ("^\\*Geiser xref\\*$"     :slot 1 :vslot -1)
+      ("^\\*Geiser documentation\\*$" :slot 2 :vslot 2 :select t :size 0.35)
+      ("^\\* [A-Za-z0-9_-]+ REPL \\*$" :quit nil :ttl nil)))
   (map! :localleader
         :map scheme-mode-map
         "'"  #'geiser-mode-switch-to-repl
@@ -54,3 +57,7 @@
           "r" #'geiser-restart-repl
           "R" #'geiser-reload
           "c" #'geiser-repl-clear-buffer)))
+
+(use-package! flycheck-guile
+  :when (featurep! :checkers syntax)
+  :after geiser)

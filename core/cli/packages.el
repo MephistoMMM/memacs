@@ -12,9 +12,8 @@ This excludes packages whose `package!' declaration contains a non-nil :freeze
 or :ignore property."
   (straight-check-all)
   (let ((doom-auto-discard discard-p))
-    (doom-cli-reload-core-autoloads)
     (when (doom-cli-packages-update)
-      (doom-cli-reload-package-autoloads))
+      (doom-autoloads-reload))
     t))
 
 (defcli! (build b)
@@ -25,7 +24,7 @@ This ensures that all needed files are symlinked from their package repo and
 their elisp files are byte-compiled. This is especially necessary if you upgrade
 Emacs (as byte-code is generally not forward-compatible)."
   (when (doom-cli-packages-build (not rebuild-p))
-    (doom-cli-reload-package-autoloads))
+    (doom-autoloads-reload))
   t)
 
 (defcli! (purge p)
@@ -48,7 +47,7 @@ list remains lean."
          (not norepos-p)
          (not nobuilds-p)
          regraft-p)
-    (doom-cli-reload-package-autoloads))
+    (doom-autoloads-reload))
   t)
 
 ;; (defcli! rollback () ; TODO doom rollback
@@ -106,7 +105,7 @@ list remains lean."
           nil (mapcar (doom-rpartial #'gethash straight--repo-cache)
                       (mapcar #'symbol-name straight-recipe-repositories)))
          (recipe package type local-repo)
-       (let ((esc (unless doom-debug-mode "\033[1A"))
+       (let ((esc (unless doom-debug-p "\033[1A"))
              (ref (straight-vc-get-commit type local-repo))
              newref output)
          (print! (start "\033[KUpdating recipes for %s...%s") package esc)
@@ -174,7 +173,7 @@ declaration) or dependency thereof that hasn't already been."
      (unless force-p
        (straight--make-build-cache-available))
      (if-let (built
-              (doom--with-package-recipes recipes (package local-repo)
+              (doom--with-package-recipes recipes (package local-repo recipe)
                 (unless force-p
                   ;; Ensure packages with outdated files/bytecode are rebuilt
                   (let ((build-dir (straight--build-dir package))
@@ -190,6 +189,7 @@ declaration) or dependency thereof that hasn't already been."
                                         if (and (file-exists-p elc-file)
                                                 (file-newer-than-file-p file elc-file))
                                         return t)))
+                         (not (plist-get recipe :no-build))
                          (puthash package t straight--packages-to-rebuild))))
                 (straight-use-package (intern package))))
          (print! (success "Rebuilt %d package(s)") (length built))
@@ -207,7 +207,7 @@ declaration) or dependency thereof that hasn't already been."
          (packages-to-rebuild (make-hash-table :test 'equal))
          (repos-to-rebuild (make-hash-table :test 'equal))
          (total (length recipes))
-         (esc (unless doom-debug-mode "\033[1A"))
+         (esc (unless doom-debug-p "\033[1A"))
          (i 0)
          errors)
     (when recipes
@@ -405,31 +405,31 @@ If ELPA-P, include packages installed with package.el (M-x package-install)."
   (doom--barf-if-incomplete-packages)
   (print! (start "Purging orphaned packages (for the emperor)..."))
   (cl-destructuring-bind (&optional builds-to-purge repos-to-purge repos-to-regraft)
-      (let ((rdirs (straight--directory-files (straight--repos-dir) nil nil 'sort))
-            (bdirs (straight--directory-files (straight--build-dir) nil nil 'sort)))
-        (list (seq-remove (doom-rpartial #'gethash straight--profile-cache)
-                          bdirs)
-              (seq-remove (doom-rpartial #'straight--checkhash straight--repo-cache)
-                          rdirs)
-              (seq-filter (doom-rpartial #'straight--checkhash straight--repo-cache)
-                          rdirs)))
-    (let (success)
-      (print-group!
-       (if (not builds-p)
-           (print! (info "Skipping builds"))
-         (and (/= 0 (doom--cli-packages-purge-builds builds-to-purge))
-              (setq success t)
-              (straight-prune-build-cache)))
-       (if (not elpa-p)
-           (print! (info "Skipping elpa packages"))
-         (and (/= 0 (doom--cli-packages-purge-elpa))
-              (setq success t)))
-       (if (not repos-p)
-           (print! (info "Skipping repos"))
-         (and (/= 0 (doom--cli-packages-purge-repos repos-to-purge))
-              (setq success t)))
-       (if (not regraft-repos-p)
-           (print! (info "Skipping regrafting"))
-         (and (doom--cli-packages-regraft-repos repos-to-regraft)
-              (setq success t)))
-       success))))
+      (let ((rdirs
+             (and (or repos-p regraft-repos-p)
+                  (straight--directory-files (straight--repos-dir) nil nil 'sort))))
+        (list (when builds-p
+                (seq-remove (doom-rpartial #'gethash straight--profile-cache)
+                            (straight--directory-files (straight--build-dir) nil nil 'sort)))
+              (when repos-p
+                (seq-remove (doom-rpartial #'straight--checkhash straight--repo-cache)
+                            rdirs))
+              (when regraft-repos-p
+                (seq-filter (doom-rpartial #'straight--checkhash straight--repo-cache)
+                            rdirs))))
+    (print-group!
+     (delq
+      nil (list
+           (if (not builds-p)
+               (ignore (print! (info "Skipping builds")))
+             (and (/= 0 (doom--cli-packages-purge-builds builds-to-purge))
+                  (straight-prune-build-cache)))
+           (if (not elpa-p)
+               (ignore (print! (info "Skipping elpa packages")))
+             (/= 0 (doom--cli-packages-purge-elpa)))
+           (if (not repos-p)
+               (ignore (print! (info "Skipping repos")))
+             (/= 0 (doom--cli-packages-purge-repos repos-to-purge)))
+           (if (not regraft-repos-p)
+               (ignore (print! (info "Skipping regrafting")))
+             (doom--cli-packages-regraft-repos repos-to-regraft)))))))

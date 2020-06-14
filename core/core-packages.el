@@ -41,6 +41,13 @@ package's name as a symbol, and whose CDR is the plist supplied to its
 (defvar doom-disabled-packages ()
   "A list of packages that should be ignored by `use-package!' and `after!'.")
 
+(defvar doom-packages-file "packages"
+  "The basename of packages file for modules.
+
+Package files are read whenever Doom's package manager wants a manifest of all
+desired packages. They are rarely read in interactive sessions (unless the user
+uses a straight or package.el command directly).")
+
 
 ;;
 ;;; package.el
@@ -93,7 +100,7 @@ package's name as a symbol, and whose CDR is the plist supplied to its
       straight-fix-org nil)
 
 (defadvice! doom--read-pinned-packages-a (orig-fn &rest args)
-  "Read from `doom-pinned-packages' on top of straight's lockfiles."
+  "Read `:pin's in `doom-packages' on top of straight's lockfiles."
   :around #'straight--lockfile-read-all
   (append (apply orig-fn args) ; lockfiles still take priority
           (doom-package-pinned-list)))
@@ -102,62 +109,57 @@ package's name as a symbol, and whose CDR is the plist supplied to its
 ;;
 ;;; Bootstrappers
 
-(defun doom--ensure-straight ()
-  (cl-destructuring-bind (&key pin recipe &allow-other-keys)
-      (doom-package-get 'straight)
-    (let ((repo-dir (doom-path straight-base-dir "straight/repos/straight.el"))
-          (repo-url (concat "http" (if gnutls-verify-error "s")
-                            "://github.com/"
-                            (or (plist-get recipe :repo) "raxod502/straight.el")))
-          (branch (or (plist-get recipe :branch) straight-repository-branch))
-          (call (if doom-debug-mode #'doom-exec-process #'doom-call-process)))
-      (if (not (file-directory-p repo-dir))
-          (message "Installing straight...")
-        ;; TODO Rethink this clumsy workaround
+(defun doom--ensure-straight (recipe pin)
+  (let ((repo-dir (doom-path straight-base-dir "straight/repos/straight.el"))
+        (repo-url (concat "http" (if gnutls-verify-error "s")
+                          "://github.com/"
+                          (or (plist-get recipe :repo) "raxod502/straight.el")))
+        (branch (or (plist-get recipe :branch) straight-repository-branch))
+        (call (if doom-debug-p #'doom-exec-process #'doom-call-process)))
+    (unless (file-directory-p repo-dir)
+      (message "Installing straight...")
+      (cond
+       ((eq straight-vc-git-default-clone-depth 'full)
+        (funcall call "git" "clone" "--origin" "origin" repo-url repo-dir))
+       ((null pin)
+        (funcall call "git" "clone" "--origin" "origin" repo-url repo-dir
+                 "--depth" (number-to-string straight-vc-git-default-clone-depth)
+                 "--branch" straight-repository-branch))
+       ((integerp straight-vc-git-default-clone-depth)
+        (make-directory repo-dir t)
         (let ((default-directory repo-dir))
-          (unless (equal (cdr (doom-call-process "git" "rev-parse" "HEAD")) pin)
-            (delete-directory repo-dir 'recursive)
-            (message "Updating straight..."))))
-      (unless (file-directory-p repo-dir)
-        (cond
-         ((eq straight-vc-git-default-clone-depth 'full)
-          (funcall call "git" "clone" "--origin" "origin" repo-url repo-dir))
-         ((null pin)
-          (funcall call "git" "clone" "--origin" "origin" repo-url repo-dir
-                   "--depth" (number-to-string straight-vc-git-default-clone-depth)
-                   "--branch" straight-repository-branch))
-         ((integerp straight-vc-git-default-clone-depth)
-          (make-directory repo-dir t)
-          (let ((default-directory repo-dir))
-            (funcall call "git" "init")
-            (funcall call "git" "checkout" "-b" straight-repository-branch)
-            (funcall call "git" "remote" "add" "origin" repo-url)
-            (funcall call "git" "fetch" "origin" pin
-                     "--depth" (number-to-string straight-vc-git-default-clone-depth))
-            (funcall call "git" "checkout" "--detach" pin)))))
-      (require 'straight (concat repo-dir "/straight.el"))
-      (doom-log "Initializing recipes")
-      (with-temp-buffer
-        (insert-file-contents (doom-path repo-dir "bootstrap.el"))
-        ;; Don't install straight for us -- we've already done that -- only set
-        ;; up its recipe repos for us.
-        (eval-region (search-forward "(require 'straight)")
-                     (point-max))))))
+          (funcall call "git" "init")
+          (funcall call "git" "checkout" "-b" straight-repository-branch)
+          (funcall call "git" "remote" "add" "origin" repo-url)
+          (funcall call "git" "fetch" "origin" pin
+                   "--depth" (number-to-string straight-vc-git-default-clone-depth))
+          (funcall call "git" "checkout" "--detach" pin)))))
+    (require 'straight (concat repo-dir "/straight.el"))
+    (doom-log "Initializing recipes")
+    (with-temp-buffer
+      (insert-file-contents (doom-path repo-dir "bootstrap.el"))
+      ;; Don't install straight for us -- we've already done that -- only set
+      ;; up its recipe repos for us.
+      (eval-region (search-forward "(require 'straight)")
+                   (point-max)))))
+
+(defun doom--ensure-core-packages (packages)
+  (doom-log "Installing core packages")
+  (dolist (package packages)
+    (let ((name (car package)))
+      (when-let (recipe (plist-get (cdr package) :recipe))
+        (straight-override-recipe (cons name recipe)))
+      (straight-use-package name))))
 
 (defun doom-initialize-core-packages (&optional force-p)
   "Ensure `straight' is installed and was compiled with this version of Emacs."
   (when (or force-p (null (bound-and-true-p straight-recipe-repositories)))
     (doom-log "Initializing straight")
-    (let ((doom-disabled-packages nil)
-          (doom-packages (doom-package-list nil 'core-only)))
-      (doom--ensure-straight)
-      (doom-log "Installing core packages")
-      (dolist (package doom-packages)
-        (cl-destructuring-bind (name &key recipe &allow-other-keys)
-            package
-          (when recipe
-            (straight-override-recipe (cons name recipe)))
-          (straight-use-package name))))))
+    (let ((packages (doom-package-list nil 'core)))
+      (cl-destructuring-bind (&key recipe pin &allow-other-keys)
+          (alist-get 'straight packages)
+        (doom--ensure-straight recipe pin))
+      (doom--ensure-core-packages packages))))
 
 (defun doom-initialize-packages (&optional force-p)
   "Process all packages, essential and otherwise, if they haven't already been.
@@ -338,12 +340,12 @@ was installed with."
 
 If ALL-P, gather packages unconditionally across all modules, including disabled
 ones."
-  (let ((doom-interactive-mode t)
+  (let ((packages-file (concat doom-packages-file ".el"))
         doom-packages)
     (doom--read-packages
-     (doom-path doom-core-dir "packages.el") all-p 'noerror)
+     (doom-path doom-core-dir packages-file) all-p 'noerror)
     (unless core-only-p
-      (let ((private-packages (doom-path doom-private-dir "packages.el"))
+      (let ((private-packages (doom-path doom-private-dir packages-file))
             (doom-modules (doom-module-list)))
         (if all-p
             (mapc #'doom--read-packages
@@ -355,7 +357,7 @@ ones."
           ;; packages are properly overwritten.
           (doom--read-packages private-packages nil 'noerror)
           (cl-loop for key being the hash-keys of doom-modules
-                   for path = (doom-module-path (car key) (cdr key) "packages.el")
+                   for path = (doom-module-path (car key) (cdr key) packages-file)
                    for doom--current-module = key
                    do (doom--read-packages path nil 'noerror)))
         (doom--read-packages private-packages all-p 'noerror)))
@@ -397,11 +399,10 @@ ones."
   "Return straight recipes for non-builtin packages with a local-repo."
   (let (recipes)
     (dolist (recipe (hash-table-values straight--recipe-cache))
-      (cl-destructuring-bind (&key local-repo type no-build &allow-other-keys)
+      (cl-destructuring-bind (&key local-repo type &allow-other-keys)
           recipe
         (unless (or (null local-repo)
-                    (eq type 'built-in)
-                    no-build)
+                    (eq type 'built-in))
           (push recipe recipes))))
     (nreverse recipes)))
 

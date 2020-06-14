@@ -9,10 +9,10 @@
 ;; Tools
 (package! macrostep :pin "424e3734a1ee526a1bd7b5c3cd1d3ef19d184267")
 (package! overseer :pin "02d49f582e80e36b4334c9187801c5ecfb027789")
-(package! elisp-def :pin "368b04da68783601b52e3169312183381871cf9e")
+(package! elisp-def :pin "da1f76391ac0d277e3c5758203e0150f6bae0beb")
 (package! elisp-demos :pin "4cd55a30d5dbd8d36a0e6f87261c4fef17fc6db0")
 (when (featurep! :checkers syntax)
   (package! flycheck-cask :pin "3457ae553c4feaf8168008f063d78fdde8fb5f94"))
 
 ;; Libraries
-(package! buttercup :pin "532d082a363add4f6d9838ca3f924a773ce12136")
+(package! buttercup :pin "e71a40f1ffef4847df28c9d4ad7edc1e360ee52a")

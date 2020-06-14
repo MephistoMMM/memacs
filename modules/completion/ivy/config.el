@@ -112,7 +112,8 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
   (when (featurep! +icons)
     (cl-pushnew '(+ivy-rich-buffer-icon)
                 (cadr (plist-get ivy-rich-display-transformers-list
-                                 'ivy-switch-buffer))))
+                                 'ivy-switch-buffer))
+                :test #'equal))
 
   ;; Enahnce the appearance of a couple counsel commands
   (plist-put! ivy-rich-display-transformers-list
@@ -183,6 +184,7 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
     [remap info-lookup-symbol]       #'counsel-info-lookup-symbol
     [remap load-theme]               #'counsel-load-theme
     [remap locate]                   #'counsel-locate
+    [remap org-goto]                 #'counsel-org-goto
     [remap org-set-tags-command]     #'counsel-org-tag
     [remap projectile-compile-project] #'+ivy/project-compile
     [remap recentf-open-files]       #'counsel-recentf
@@ -209,6 +211,20 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
         (if (memq system-type '(ms-dos windows-nt))
             "rg -M 240 --max-columns-preview --with-filename --no-heading --line-number --color never %s --path-separator / ."
           "rg -M 240 --max-columns-preview --with-filename --no-heading --line-number --color never %s"))
+  ;; REVIEW Counsel allows `counsel-rg-base-command' to be a string or list.
+  ;;        This backwards compatibility complicates things for Doom. Simpler to
+  ;;        just force it to always be a list.
+  (when (stringp counsel-rg-base-command)
+    (setq counsel-rg-base-command (split-string counsel-rg-base-command)))
+
+  ;; REVIEW Fix #3215: prevents mingw on Windows throwing an error trying to
+  ;;        expand / to an absolute path. Remove this when it is fixed upstream
+  ;;        in counsel.
+  (when (and (memq system-type '(windows-nt ms-dos))
+             (listp counsel-rg-base-command)
+             (member "--path-separator" counsel-rg-base-command))
+    (setf (cadr (member "--path-separator" counsel-rg-base-command))
+          "//"))
 
   ;; Integrate with `helpful'
   (setq counsel-describe-function-function #'helpful-callable

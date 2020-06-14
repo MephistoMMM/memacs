@@ -16,13 +16,17 @@ called.")
 ;; Packages
 
 (use-package! python
-  :defer t
+  :mode ("[./]flake8\\'" . conf-mode)
+  :mode ("/Pipfile\\'" . conf-mode)
   :init
   (setq python-environment-directory doom-cache-dir
         python-indent-guess-indent-offset-verbose nil)
 
   (when (featurep! +lsp)
-    (add-hook 'python-mode-local-vars-hook #'lsp!))
+    (add-hook 'python-mode-local-vars-hook #'lsp!)
+    ;; Use "mspyls" in eglot if in PATH
+    (when (executable-find "Microsoft.Python.LanguageServer")
+      (set-eglot-client! 'python-mode '("Microsoft.Python.LanguageServer"))))
   :config
   (set-repl-handler! 'python-mode #'+python/open-repl :persist t)
   (set-docsets! 'python-mode "Python 3" "NumPy" "SciPy")
@@ -98,6 +102,7 @@ called.")
       "Enable `anaconda-mode' if `lsp-mode' is absent and
 `python-shell-interpreter' is present."
       (unless (or (bound-and-true-p lsp-mode)
+                  (bound-and-true-p eglot--managed-mode)
                   (bound-and-true-p lsp--buffer-deferred)
                   (not (executable-find python-shell-interpreter)))
         (anaconda-mode +1))))
@@ -286,7 +291,7 @@ called.")
 
 
 (use-package! lsp-python-ms
-  :when (featurep! +lsp)
+  :when (and (featurep! +lsp) (not (featurep! :tools lsp +eglot)))
   :after lsp-clients
   :preface
   (after! python

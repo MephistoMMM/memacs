@@ -41,7 +41,7 @@
        :desc "List errors"                           "x"   #'flymake-show-diagnostics-buffer
        (:when (featurep! :checkers syntax)
         :desc "List errors"                         "x"   #'flycheck-list-errors)
-       (:when (featurep! :tools lsp)
+       (:when (and (featurep! :tools lsp) (not (featurep! :tools lsp +eglot)))
         :desc "LSP Code actions"                      "a"   #'lsp-execute-code-action
         :desc "LSP Organize imports"                  "i"   #'lsp-organize-imports
         :desc "LSP Rename"                            "r"   #'lsp-rename
@@ -52,7 +52,13 @@
          :desc "Jump to symbol in any workspace"     "J"   #'lsp-ivy-global-workspace-symbol)
         (:when (featurep! :completion helm)
          :desc "Jump to symbol in current workspace" "j"   #'helm-lsp-workspace-symbol
-         :desc "Jump to symbol in any workspace"     "J"   #'helm-lsp-global-workspace-symbol)))
+         :desc "Jump to symbol in any workspace"     "J"   #'helm-lsp-global-workspace-symbol))
+       (:when (featurep! :tools lsp +eglot)
+        :desc "LSP Execute code action"              "a" #'eglot-code-actions
+        :desc "LSP Format buffer/region"             "F" #'eglot-format
+        :desc "LSP Rename"                           "r" #'eglot-rename
+        :desc "LSP Find declaration"                 "j" #'eglot-find-declaration
+        :desc "LSP Find implementation"              "J" #'eglot-find-implementation))
 
       ;;; <leader> f --- file
       (:prefix-map ("f" . "file")
@@ -120,7 +126,7 @@
       ;;; <leader> i --- insert
       (:prefix-map ("i" . "insert")
        :desc "Current file name"             "f"   #'+default/insert-file-path
-       :desc "Current file path"             "F"   (λ!! #'+default/insert-file-path t)
+       :desc "Current file path"             "F"   (cmd!! #'+default/insert-file-path t)
        :desc "Snippet"                       "s"   #'yas-insert-snippet
        :desc "Unicode"                       "u"   #'unicode-chars-list-chars
        :desc "From clipboard"                "y"   #'+default/yank-pop)
@@ -204,7 +210,8 @@
         :desc "Send to Transmit"           "u" #'+macos/send-to-transmit
         :desc "Send project to Transmit"   "U" #'+macos/send-project-to-transmit
         :desc "Send to Launchbar"          "l" #'+macos/send-to-launchbar
-        :desc "Send project to Launchbar"  "L" #'+macos/send-project-to-launchbar)
+        :desc "Send project to Launchbar"  "L" #'+macos/send-project-to-launchbar
+        :desc "Open in iTerm"              "i" #'+macos/open-in-iterm)
        (:when (featurep! :tools docker)
         :desc "Docker" "D" #'docker)
        (:when (featurep! :email mu4e)
@@ -294,6 +301,7 @@
         :desc "Magit dispatch"             "/"   #'magit-dispatch
         :desc "Forge dispatch"             "'"   #'forge-dispatch
         :desc "Magit status"               "g"   #'magit-status
+        :desc "Magit status here"          "G"   #'magit-status-here
         :desc "Magit file delete"          "x"   #'magit-file-delete
         :desc "Magit blame"                "B"   #'magit-blame-addition
         :desc "Magit clone"                "C"   #'magit-clone
@@ -318,7 +326,7 @@
          :desc "Browse pull requests"      "P"   #'forge-browse-pullreqs)
         (:prefix ("l" . "list")
          (:when (featurep! :tools gist)
-          :desc "List gists"               "g"   #'+gist:list)
+          :desc "List gists"               "g"   #'gist-list)
          :desc "List repositories"         "r"   #'magit-list-repositories
          :desc "List submodules"           "s"   #'magit-list-submodules
          :desc "List issues"               "i"   #'forge-list-issues
@@ -362,7 +370,7 @@
 
       ;;; <leader> m --- multiple cursors
       (:when (featurep! :editor multiple-cursors)
-       (:prefix-map ("m" . "multiple cursors")
+       (:prefix-map ("m" . "multiple-cursors")
         :desc "Edit lines"         "l"         #'mc/edit-lines
         :desc "Mark next"          "n"         #'mc/mark-next-like-this
         :desc "Unmark next"        "N"         #'mc/unmark-next-like-this
@@ -392,7 +400,7 @@
         :desc "Reconnect all"      "r" #'circe-reconnect-all
         :desc "Send message"       "s" #'+irc/send-message
         (:when (featurep! :completion ivy)
-         :desc "Jump to channel"  "j" #'irc/ivy-jump-to-channel)))
+         :desc "Jump to channel"  "j" #'+irc/ivy-jump-to-channel)))
 
       ;;; <leader> T --- twitter
       (:when (featurep! :app twitter)
@@ -411,7 +419,7 @@
       ;;; Text scaling
       [C-mouse-4] #'text-scale-increase
       [C-mouse-5] #'text-scale-decrease
-      [C-down-mouse-2] (λ! (text-scale-set 0))
+      [C-down-mouse-2] (cmd! (text-scale-set 0))
       "M-+" #'doom/reset-font-size
       "M-=" #'doom/increase-font-size
       "M--" #'doom/decrease-font-size
@@ -441,7 +449,7 @@
         "C-x 4 B"     #'switch-to-buffer-other-window
         (:when (featurep! :completion ivy)
           "C-x 4 b"   #'+ivy/switch-workspace-buffer-other-window))
-      "C-x C-b"     #'ibuffer-list-buffers
+      "C-x C-b"     #'ibuffer
       "C-x K"       #'doom/kill-this-buffer-in-all-windows
 
       ;;; company-mode
@@ -462,7 +470,7 @@
         :map company-search-map
         "C-n"        #'company-search-repeat-forward
         "C-p"        #'company-search-repeat-backward
-        "C-s"        (λ! (company-search-abort) (company-filter-candidates)))
+        "C-s"        (cmd! (company-search-abort) (company-filter-candidates)))
 
       ;;; ein notebooks
       (:after ein:notebook-multilang

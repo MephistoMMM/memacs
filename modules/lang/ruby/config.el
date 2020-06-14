@@ -94,6 +94,7 @@
   :defer t
   :init
   (setq rake-cache-file (concat doom-cache-dir "rake.cache"))
+  (setq rake-completion-system 'default)
   (map! :after ruby-mode
         :localleader
         :map ruby-mode-map 
@@ -139,6 +140,7 @@
   (when (featurep! :editor evil)
     (add-hook 'rspec-mode-hook #'evil-normalize-keymaps))
   :config
+  (set-popup-rule! "^\\*\\(rspec-\\)?compilation" :size 0.3 :ttl nil :select t)
   (setq rspec-use-rvm (executable-find "rvm"))
   (map! :localleader
         :prefix "t"

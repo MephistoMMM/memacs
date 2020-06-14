@@ -37,8 +37,11 @@
       (when (eq (car-safe (sexp-at-point)) 'package!)
         (cl-destructuring-bind (beg . end)
             (bounds-of-thing-at-point 'sexp)
-          (let ((package (let (doom-packages)
-                           (eval (sexp-at-point) t))))
+          (let* ((doom-packages nil)
+                 (buffer-file-name
+                  (or buffer-file-name
+                      (bound-and-true-p org-src-source-file-name)))
+                 (package (eval (sexp-at-point) t)))
             (list :beg beg
                   :end end
                   :package (car package)
@@ -86,7 +89,7 @@ Grabs the latest commit id of the package using 'git'."
                            "git" "ls-remote" url
                            (unless select
                              (or branch straight-vc-git-default-branch)))))
-                   (user-error "%s: no id from %s" package url)))
+                   (user-error "Couldn't find a recipe for %s" package)))
            (id (car (split-string
                      (if select
                          (completing-read "Commit: " (split-string id "\n" t))

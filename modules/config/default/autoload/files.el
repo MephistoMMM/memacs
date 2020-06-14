@@ -45,7 +45,7 @@
   (interactive)
   (if (featurep! :completion ivy)
       (call-interactively #'counsel-file-jump)
-    (λ! (doom-project-find-file default-directory))))
+    (cmd! (doom-project-find-file default-directory))))
 
 ;;;###autoload
 (defun +default/discover-projects (arg)
@@ -54,4 +54,6 @@ If prefix ARG is non-nil, prompt for the search path."
   (interactive "P")
   (if arg
       (call-interactively #'projectile-discover-projects-in-directory)
-    (mapc #'projectile-discover-projects-in-directory projectile-project-search-path)))
+    (if projectile-project-search-path
+        (mapc #'projectile-discover-projects-in-directory projectile-project-search-path)
+      (user-error "`projectile-project-search-path' is empty; don't know where to search"))))

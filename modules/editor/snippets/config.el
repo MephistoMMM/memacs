@@ -38,9 +38,7 @@
 
   ;; Reduce verbosity. 3 is too chatty about initializing yasnippet. 2 is just
   ;; right (only shows errors).
-  (setq yas-verbosity (if doom-debug-mode 3 0))
-  ;; Ensure the snippet is properly indented
-  (setq yas-also-auto-indent-first-line t)
+  (setq yas-verbosity (if doom-debug-p 3 0))
 
   ;; default snippets library, if available
   (add-to-list 'load-path +snippets-dir)
@@ -88,6 +86,12 @@
         :map yas-minor-mode-map
         [remap yas-new-snippet]        #'+snippets/new
         [remap yas-visit-snippet-file] #'+snippets/edit)
+
+  ;; REVIEW Fix #2639: For some reason `yas--all-templates' returns duplicates
+  ;;        of some templates. Until I figure out the real cause this fixes it.
+  (defadvice! +snippets--remove-duplicates-a (templates)
+    :filter-return #'yas--all-templates
+    (cl-delete-duplicates templates :test #'equal))
 
   ;; If in a daemon session, front-load this expensive work:
   (if (daemonp) (yas-reload-all)))

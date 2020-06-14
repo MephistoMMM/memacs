@@ -14,15 +14,15 @@
             :local-repo "straight.el"
             :files ("straight*.el")
             :no-build t)
-  :pin "f606bfaf9330cfb1ef6971bb1f6ac4e2c39a39c2")
+  :pin "09cfa1b344cbeeea7da2e075df7c19262fb2b9e6")
 
 ;; core-modules.el
 (package! use-package
   :type 'core
-  :pin "c873d5529c9c80cb58222f22873a4f081c307cb2")
+  :pin "d2640fec376a8458a669e7526e63e5870d875118")
 
 ;; core-ui.el
-(package! all-the-icons :pin "d6cb6d4a779eaa3570d8e451fd4d38b2b4554860")
+(package! all-the-icons :pin "ed8e44de4fa601309d2bba902c3b37cb73e4daa0")
 (package! hide-mode-line :pin "88888825b5b27b300683e662fa3be88d954b1cea")
 (package! highlight-numbers :pin "8b4744c7f46c72b1d3d599d4fb75ef8183dee307")
 (package! rainbow-delimiters :pin "5125f4e47604ad36c3eb4706310fcafac729ca8c")
@@ -54,8 +54,8 @@
     :pin "01b39044b9b65fa4ea7d3166f8b1ffab6f740362"))
 
 ;; core-projects.el
-(package! projectile :pin "768f0570cad57b6885c4472df803906d097cbc1a")
+(package! projectile :pin "7e552b6d876014ca5b4609318ca8a202b2a89014")
 
 ;; core-keybinds.el
-(package! general :pin "42e38034cd2305fa7432866323c923979d8f9b06")
+(package! general :pin "a0b17d207badf462311b2eef7c065b884462cb7c")
 (package! which-key :pin "8b49ae978cceca65967f3544c236f32964ddbed0")

@@ -126,6 +126,9 @@
                    :pre-handlers '(:rem sp-ruby-pre-handler)
                    :post-handlers '(:rem sp-ruby-post-handler))
 
+    ;; Don't eagerly escape Swift style string interpolation
+    (sp-local-pair 'swift-mode "\\(" ")" :when '(sp-in-string-p))
+
     ;; Don't do square-bracket space-expansion where it doesn't make sense to
     (sp-local-pair '(emacs-lisp-mode org-mode markdown-mode gfm-mode)
                    "[" nil :post-handlers '(:rem ("| " "SPC")))
@@ -221,7 +224,7 @@
       (map! :map markdown-mode-map
             :ig "*" (general-predicate-dispatch nil
                       (looking-at-p "\\*\\* *")
-                      (λ! (forward-char 2)))))))
+                      (cmd! (forward-char 2)))))))
 
 
 ;;
@@ -303,7 +306,7 @@ Continues comments if executed from a commented line. Consults
         "s--" #'doom/decrease-font-size
         ;; Conventional text-editing keys & motions
         "s-a" #'mark-whole-buffer
-        "s-/" (λ! (save-excursion (comment-line 1)))
+        "s-/" (cmd! (save-excursion (comment-line 1)))
         :n "s-/" #'evilnc-comment-or-uncomment-lines
         :v "s-/" #'evilnc-comment-operator
         :gi  [s-backspace] #'doom/backward-kill-to-bol-and-indent
@@ -361,7 +364,7 @@ Continues comments if executed from a commented line. Consults
   "db"   #'doom/report-bug
   "dc"   #'doom/goto-private-config-file
   "dC"   #'doom/goto-private-init-file
-  "dd"   #'doom/toggle-debug-mode
+  "dd"   #'doom-debug-mode
   "df"   #'doom/help-faq
   "dh"   #'doom/help
   "dl"   #'doom/help-search-load-path

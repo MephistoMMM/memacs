@@ -54,7 +54,7 @@ Its design is guided by these mantras:
 + **Your system, your rules.** You know better. At least, Doom hopes so! It
   won't *automatically* install system dependencies (and will force plugins not
   to either). Rely on `doom doctor` to tell you what's missing.
-+ **Nix/Guix was a great idea!** The Emacs ecosystem is temperamental. Things
++ **Nix/Guix is a great idea!** The Emacs ecosystem is temperamental. Things
   break and they break often. Disaster recovery should be a priority! Doom's
   package management should be declarative and your private config reproducible,
   and comes with a means to roll back releases and updates (still a WIP).
@@ -73,7 +73,7 @@ Check out [the FAQ][FAQ] for answers to common questions about the project.
 - Optional vim emulation powered by [evil-mode], including ports of popular vim
   plugins like [vim-sneak], [vim-easymotion], [vim-unimpaired] and
   [more][ported-vim-plugins]!
-- Opt-in LSP integration for many languages, using [lsp-mode].
+- Opt-in LSP integration for many languages, using [lsp-mode] or [eglot]
 - Support for *many* programming languages. Includes syntax highlighting,
   linters/checker integration, inline code evaluation, code completion (where
   possible), REPLs, documentation lookups, snippets, and more!
@@ -120,10 +120,10 @@ installing, configuring and maintaining Doom Emacs.
 It's a good idea to add `~/.emacs.d/bin` to your `PATH`! Other `bin/doom`
 commands you should know about:
 
-+ `doom sync` to synchronize your private config with Doom. Installs new
-  packages, removes orphaned packages and regenerates caches. Run this whenever
-  you modify your private `init.el` or `packages.el`, or install/remove an Emacs
-  package through your OS package manager (e.g. mu4e or agda).
++ `doom sync` to synchronize your private config with Doom by installing missing
+  packages, removing orphaned packages, and regenerating caches. Run this
+  whenever you modify your private `init.el` or `packages.el`, or install/remove
+  an Emacs package through your OS package manager (e.g. mu4e or agda).
 + `doom upgrade` to update Doom to the latest release & all installed packages.
 + `doom doctor` to diagnose common issues with your system and config.
 + `doom env` to dump a snapshot of your shell environment to a file that Doom
@@ -240,6 +240,7 @@ kind!
 [helm]: https://github.com/emacs-helm/helm
 [ivy]: https://github.com/abo-abo/swiper
 [lsp-mode]: https://github.com/emacs-lsp/lsp-mode
+[eglot]: https://github.com/joaotavora/eglot
 [nix]: https://nixos.org
 [ported-vim-plugins]: modules/editor/evil/README.org#ported-vim-plugins
 [ripgrep]: https://github.com/BurntSushi/ripgrep

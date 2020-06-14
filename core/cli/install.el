@@ -4,8 +4,7 @@
     ((noconfig-p  ["--no-config"]  "Don't create DOOMDIR or dummy files therein")
      (noenv-p     ["--no-env"]     "Don't generate an envvars file (see 'doom help env')")
      (noinstall-p ["--no-install"] "Don't auto-install packages")
-     (nofonts-p   ["--no-fonts"]   "Don't install (or prompt to install) all-the-icons fonts")
-     &rest _args)
+     (nofonts-p   ["--no-fonts"]   "Don't install (or prompt to install) all-the-icons fonts"))
   "Installs and sets up Doom Emacs for the first time.
 
 This command does the following:
@@ -36,36 +35,20 @@ DOOMDIR environment variable. e.g.
 
       ;; Create init.el, config.el & packages.el
       (mapc (lambda (file)
-              (cl-destructuring-bind (filename . fn) file
+              (cl-destructuring-bind (filename . template) file
                 (if (file-exists-p! filename doom-private-dir)
                     (print! (warn "%s already exists, skipping") filename)
                   (print! (info "Creating %s%s") (relpath doom-private-dir) filename)
                   (with-temp-file (doom-path doom-private-dir filename)
-                    (funcall fn))
+                    (insert-file-contents template))
                   (print! (success "Done!")))))
-            '(("init.el" .
-               (lambda ()
-                 (insert-file-contents
-                  (doom-path doom-emacs-dir "init.example.el"))))
-              ("config.el" .
-               (lambda ()
-                 (insert-file-contents
-                  (doom-path doom-core-dir "templates/config.example.el"))))
-              ("packages.el" .
-               (lambda ()
-                 (insert-file-contents
-                  (doom-path doom-core-dir "templates/packages.example.el")))))))
+            `(("init.el" . ,(doom-path doom-emacs-dir "init.example.el"))
+              ("config.el" . ,(doom-path doom-core-dir "templates/config.example.el"))
+              ("packages.el" . ,(doom-path doom-core-dir "templates/packages.example.el")))))
 
     ;; In case no init.el was present the first time `doom-initialize-modules' was
     ;; called in core.el (e.g. on first install)
-    (ignore-errors
-      (load! "init" doom-private-dir t))
-    (when doom-modules
-      (maphash (lambda (key plist)
-                 (let ((doom--current-module key)
-                       (doom--current-flags (plist-get plist :flags)))
-                   (ignore-errors (load! "init" (plist-get plist :path) t))))
-               doom-modules))
+    (doom-initialize-modules 'force 'no-config)
 
     ;; Ask if user would like an envvar file generated
     (if noenv-p
@@ -83,7 +66,7 @@ DOOMDIR environment variable. e.g.
       (doom-cli-packages-install))
 
     (print! "Regenerating autoloads files")
-    (doom-cli-reload-autoloads)
+    (doom-autoloads-reload)
 
     (cond (nofonts-p)
           (IS-WINDOWS

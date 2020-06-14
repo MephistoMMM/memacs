@@ -66,10 +66,10 @@ list is returned as-is."
   (substring (symbol-name keyword) 1))
 
 (defmacro doom-log (format-string &rest args)
-  "Log to *Messages* if `doom-debug-mode' is on.
+  "Log to *Messages* if `doom-debug-p' is on.
 Does not interrupt the minibuffer if it is in use, but still logs to *Messages*.
 Accepts the same arguments as `message'."
-  `(when doom-debug-mode
+  `(when doom-debug-p
      (let ((inhibit-message (active-minibuffer-window)))
        (message
         ,(concat (propertize "DOOM " 'face 'font-lock-comment-face)
@@ -93,20 +93,6 @@ Meant to be used with `run-hook-wrapped'."
   ;; return nil so `run-hook-wrapped' won't short circuit
   nil)
 
-(defun doom-load-autoloads-file (file &optional noerror)
-  "Tries to load FILE (an autoloads file).
-Return t on success, nil otherwise (but logs a warning)."
-  (condition-case e
-      ;; Avoid `file-name-sans-extension' for premature optimization reasons.
-      ;; `string-remove-suffix' is much cheaper (because it does no file sanity
-      ;; checks during or after; just plain ol' string manipulation).
-      (load (string-remove-suffix ".el" file) noerror 'nomessage)
-    (doom-error
-     (signal (car e) (cdr e)))
-    ((debug error)
-     (message "Autoload file error: %s -> %s" (file-name-nondirectory file) e)
-     nil)))
-
 (defun doom-load-envvars-file (file &optional noerror)
   "Read and set envvars from FILE.
 If NOERROR is non-nil, don't throw an error if the file doesn't exist or is
@@ -127,10 +113,16 @@ unreadable. Returns the names of envvars that were changed."
                 env (split-string (buffer-substring (match-beginning 1) (point-max))
                                   "\0\n"
                                   'omit-nulls))))))
-      (setq process-environment (append (nreverse env) process-environment)
-            exec-path (append (split-string (getenv "PATH") path-separator t)
-                              (list exec-directory))
-            shell-file-name (or (getenv "SHELL") shell-file-name))
+      (setq-default
+       process-environment
+       (append (nreverse env)
+               (default-value 'process-environment))
+       exec-path
+       (append (split-string (getenv "PATH") path-separator t)
+               (list exec-directory))
+       shell-file-name
+       (or (getenv "SHELL")
+           (default-value 'shell-file-name)))
       env)))
 
 
@@ -152,24 +144,6 @@ at the values with which this function was called."
 
 ;;
 ;;; Sugars
-
-(defmacro λ! (&rest body)
-  "Expands to (lambda () (interactive) ,@body).
-A factory for quickly producing interaction commands, particularly for keybinds
-or aliases."
-  (declare (doc-string 1) (pure t) (side-effect-free t))
-  `(lambda (&rest _) (interactive) ,@body))
-(defalias 'lambda! 'λ!)
-
-(defun λ!! (command &optional arg)
-  "Expands to a command that interactively calls COMMAND with prefix ARG.
-A factory for quickly producing interactive, prefixed commands for keybinds or
-aliases."
-  (declare (doc-string 1) (pure t) (side-effect-free t))
-  (lambda (&rest _) (interactive)
-     (let ((current-prefix-arg arg))
-       (call-interactively command))))
-(defalias 'lambda!! 'λ!!)
 
 (defun dir! ()
   "Returns the directory of the emacs lisp file this macro is called from."
@@ -215,7 +189,7 @@ the same name, for use with `funcall' or `apply'. ARGLIST and BODY are as in
           (rest (cdr binding)))
       (setq
        body (pcase type
-              (`defmacro `(cl-macrolet ((,(car rest) ,(cadr rest) ,@(cddr rest))) ,body))
+              (`defmacro `(cl-macrolet ((,@rest)) ,body))
               (`defun `(cl-letf* ((,(car rest) (symbol-function #',(car rest)))
                                   ((symbol-function #',(car rest))
                                    (lambda ,(cadr rest) ,@(cddr rest))))
@@ -231,9 +205,9 @@ the same name, for use with `funcall' or `apply'. ARGLIST and BODY are as in
 
 This silences calls to `message', `load', `write-region' and anything that
 writes to `standard-output'."
-  `(if doom-debug-mode
+  `(if doom-debug-p
        (progn ,@forms)
-     ,(if doom-interactive-mode
+     ,(if doom-interactive-p
           `(let ((inhibit-message t)
                  (save-silently t))
              (prog1 ,@forms (message "")))
@@ -269,6 +243,40 @@ See `if!' for details on this macro's purpose."
   "Expands to (cl-function (lambda ARGLIST BODY...))"
   (declare (indent defun) (doc-string 1) (pure t) (side-effect-free t))
   `(cl-function (lambda ,arglist ,@body)))
+
+(defmacro cmd! (&rest body)
+  "Expands to (lambda () (interactive) ,@body).
+A factory for quickly producing interaction commands, particularly for keybinds
+or aliases."
+  (declare (doc-string 1) (pure t) (side-effect-free t))
+  `(lambda (&rest _) (interactive) ,@body))
+
+(defmacro cmd!! (command &rest args)
+  "Expands to a closure that interactively calls COMMAND with ARGS.
+A factory for quickly producing interactive, prefixed commands for keybinds or
+aliases."
+  (declare (doc-string 1) (pure t) (side-effect-free t))
+  `(lambda (&rest _) (interactive)
+     (funcall-interactively ,command ,@args)))
+
+(defmacro cmds! (&rest branches)
+  "Expands to a `menu-item' dispatcher for keybinds."
+  (declare (doc-string 1))
+  (let ((docstring (if (stringp (car branches)) (pop branches) ""))
+        fallback)
+    (when (cl-oddp (length branches))
+      (setq fallback (car (last branches))
+            branches (butlast branches)))
+    `(general-predicate-dispatch ,fallback
+       :docstring ,docstring
+       ,@branches)))
+
+;; For backwards compatibility
+(defalias 'λ! 'cmd!)
+(defalias 'λ!! 'cmd!!)
+;; DEPRECATED These have been superseded by `cmd!' and `cmd!!'
+(define-obsolete-function-alias 'lambda! 'cmd! "3.0.0")
+(define-obsolete-function-alias 'lambda!! 'cmd!! "3.0.0")
 
 
 ;;; Mutation
@@ -422,7 +430,7 @@ serve as a predicated alternative to `after!'."
            (put ',fn 'permanent-local-hook t)
            (add-hook 'after-load-functions #',fn)))))
 
-(defmacro defer-feature! (feature &optional fn)
+(defmacro defer-feature! (feature &rest fns)
   "Pretend FEATURE hasn't been loaded yet, until FEATURE-hook or FN runs.
 
 Some packages (like `elisp-mode' and `lisp-mode') are loaded immediately at
@@ -430,21 +438,20 @@ startup, which will prematurely trigger `after!' (and `with-eval-after-load')
 blocks. To get around this we make Emacs believe FEATURE hasn't been loaded yet,
 then wait until FEATURE-hook (or MODE-hook, if FN is provided) is triggered to
 reverse this and trigger `after!' blocks at a more reasonable time."
-  (let ((advice-fn (intern (format "doom--defer-feature-%s-a" feature)))
-        (fn (or fn feature)))
+  (let ((advice-fn (intern (format "doom--defer-feature-%s-a" feature))))
     `(progn
-       (setq features (delq ',feature features))
-       (advice-add #',fn :before #',advice-fn)
-       (defun ,advice-fn (&rest _)
+       (delq! ',feature features)
+       (defadvice! ,advice-fn (&rest _)
+         :before ',fns
          ;; Some plugins (like yasnippet) will invoke a fn early to parse
          ;; code, which would prematurely trigger this. In those cases, well
          ;; behaved plugins will use `delay-mode-hooks', which we can check for:
-         (when (and ,(intern (format "%s-hook" fn))
-                    (not delay-mode-hooks))
+         (unless delay-mode-hooks
            ;; ...Otherwise, announce to the world this package has been loaded,
            ;; so `after!' handlers can react.
            (provide ',feature)
-           (advice-remove #',fn #',advice-fn))))))
+           (dolist (fn ',fns)
+             (advice-remove fn #',advice-fn)))))))
 
 
 ;;; Hooks
@@ -620,6 +627,42 @@ testing advice (when combined with `rotate-text').
     `(dolist (targets (list ,@(nreverse where-alist)))
        (dolist (target (cdr targets))
          (advice-remove target #',symbol)))))
+
+
+;;
+;;; Backports
+
+(when! (not EMACS27+)
+  ;; DEPRECATED Backported from Emacs 27
+  (defmacro setq-local (&rest pairs)
+    "Make variables in PAIRS buffer-local and assign them the corresponding values.
+
+PAIRS is a list of variable/value pairs.  For each variable, make
+it buffer-local and assign it the corresponding value.  The
+variables are literal symbols and should not be quoted.
+
+The second VALUE is not computed until after the first VARIABLE
+is set, and so on; each VALUE can use the new value of variables
+set earlier in the ‘setq-local’.  The return value of the
+‘setq-local’ form is the value of the last VALUE.
+
+\(fn [VARIABLE VALUE]...)"
+    (declare (debug setq))
+    (unless (zerop (mod (length pairs) 2))
+      (error "PAIRS must have an even number of variable/value members"))
+    (let ((expr nil))
+      (while pairs
+        (unless (symbolp (car pairs))
+          (error "Attempting to set a non-symbol: %s" (car pairs)))
+        ;; Can't use backquote here, it's too early in the bootstrap.
+        (setq expr
+              (cons
+               (list 'set
+                     (list 'make-local-variable (list 'quote (car pairs)))
+                     (car (cdr pairs)))
+               expr))
+        (setq pairs (cdr (cdr pairs))))
+      (macroexp-progn (nreverse expr)))))
 
 (provide 'core-lib)
 ;;; core-lib.el ends here

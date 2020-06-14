@@ -4,37 +4,36 @@
 (use-package! org-journal
   :defer t
   :init
-  (remove-hook 'org-mode-hook #'org-journal-update-auto-mode-alist)
+  ;; HACK `org-journal' adds a `magic-mode-alist' entry for detecting journal
+  ;;      files, but this causes us lazy loaders a big problem: an unacceptable
+  ;;      delay on the first file the user opens, because calling the autoloaded
+  ;;      `org-journal-is-journal' pulls all of `org' with it. So, we replace it
+  ;;      with our own, extra layer of heuristics.
+  (setq magic-mode-alist (assq-delete-all 'org-journal-is-journal magic-mode-alist))
+  (add-to-list 'magic-mode-alist '(+org-journal-p . org-journal-mode))
 
-  ;; Not using the .org file extension causes needless headache with file
-  ;; detection for no compelling reason, so we make it the default, so
-  ;; `org-journal' doesn't have to do all its `auto-mode-alist' magic.
-  (defvar org-journal-file-format "%Y%m%d.org")
+  (defun +org-journal-p ()
+    (when-let (buffer-file-name (buffer-file-name (buffer-base-buffer)))
+      (and (file-in-directory-p
+            buffer-file-name (expand-file-name org-journal-dir org-directory))
+           (delq! '+org-journal-p magic-mode-alist 'assq)
+           (require 'org-journal nil t)
+           (org-journal-is-journal))))
 
-  ;; HACK `org-journal-dir' is surrounded with setters and `auto-mode-alist'
-  ;;      magic which makes it difficult to create an better default for Doom
-  ;;      users. We set this here so we can detect user-changes to it later.
+  ;; `org-journal-dir' defaults to "~/Documents/journal/", which is an odd
+  ;; default, so we change it to {org-directory}/journal (we expand it after
+  ;; org-journal is loaded).
   (setq org-journal-dir "journal/"
-        org-journal-cache-file (concat doom-cache-dir "org-journal")
+        org-journal-cache-file (concat doom-cache-dir "org-journal"))
+
+  :config
+  ;; `org-journal' can't deal with symlinks, so resolve them here.
+  (setq org-journal-dir (expand-file-name org-journal-dir org-directory)
         ;; Doom opts for an "open in a popup or here" strategy as a default.
         ;; Open in "other window" is less predictable, and can replace a window
         ;; we wanted to keep visible.
         org-journal-find-file #'find-file)
 
-  ;; HACK `org-journal' does some file-path magic at load time that creates
-  ;;      duplicate entries in `auto-mode-alist'. We load org-journal in such a
-  ;;      way that we can generate a final entry after the user could possibly
-  ;;      customize `org-journal-dir'.
-  (after! org
-    (require 'org-journal)
-    ;; Delete duplicate entries in `auto-mode-alist'
-    (setq auto-mode-alist (rassq-delete-all 'org-journal-mode auto-mode-alist))
-    ;; ...and exploit `org-journal-dir''s setter to set up
-    ;; `org-journal-file-pattern' and call `org-journal-update-auto-mode-alist'
-    ;; for us, to create the one-true-entry in `auto-mode-alist.'
-    (setq! org-journal-dir (expand-file-name org-journal-dir org-directory)))
-
-  :config
   (set-popup-rule! "^\\*Org-journal search" :select t :quit t)
 
   (map! (:map org-journal-mode-map
