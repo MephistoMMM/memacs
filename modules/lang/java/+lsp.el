@@ -1,6 +1,9 @@
 ;;; lang/java/+lsp.el -*- lexical-binding: t; -*-
 ;;;###if (featurep! +lsp)
 
+(defvar java-lombok-jar-path (expand-file-name "~/.local/share/lombok-1.18.10.jar")
+  "The path of lombok.jar")
+
 (use-package! lsp-java
   :after lsp-clients
   :preface
@@ -18,6 +21,8 @@
           :desc "Debug test class or method" "d" #'+java/debug-test
           :desc "Debug all tests in class"   "D" #'dap-java-debug-test-class))
   :config
+  (when (file-exists-p java-lombok-jar-path)
+    (add-to-list 'lsp-java-vmargs (concat "-javaagent:" java-lombok-jar-path)))
   (when (featurep! :tools debugger +lsp)
     (setq dap-java-test-runner
           (concat lsp-java-server-install-dir "test-runner/junit-platform-console-standalone.jar"))))

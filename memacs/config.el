@@ -93,11 +93,31 @@
         )
       )
 
+(use-package! kana)
+
 ;; add memacs keybinds group
 (map!
  :leader
  (:prefix-map ("m" . "memacs")
    :desc "starter" "s" #'+memacs/mission-starter-start
    :desc "helper"  "h" #'+memacs/mission-helper-help
-   )
+   :desc "kana"    "k" #'kana)
+ )
+
+(map!
+ ;; kana
+ (:after kana :map kana-mode-map
+  :nm "v" #'kana-validate
+  :nm "s" #'kana-say-question
+  :nm "p" #'kana-previous
+  :nm "n" #'kana-next
+  :nm "t" #'kana-toggle-kana
+  :nm "r" #'kana-toggle-random
+  :nm "l" #'kana-loop-toggle
+  :nm "]" #'kana-loop-inc
+  :nm "[" #'kana-loop-dec
+  :nm "a" #'kana-first
+  :nm "j" #'kana-jump
+  :nm "q" #'kana-quit
+  :nm "d" #'kana-details)
  )
