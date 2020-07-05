@@ -30,7 +30,8 @@
 (setq org-directory "~/Dropbox/org"
       +org-capture-work-directory "~/Documents/works"
       org-attach-id-dir (expand-file-name "~/Dropbox/org/statics/")
-      org-download-image-dir (expand-file-name "~/Dropbox/org/statics/"))
+      org-download-image-dir (expand-file-name "~/Dropbox/org/statics/")
+      org-roam-db-location (expand-file-name "~/.local/roam/org-roam.db"))
 
 ;; If you want to change the style of line numbers, change this to `relative' or
 ;; `nil' to disable it:

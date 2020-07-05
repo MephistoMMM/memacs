@@ -28,7 +28,8 @@ while getopts "hk:" opt; do
 done
 shift $((OPTIND-1))
 
-[ -t 0 ] && str="$*" || str=$(cat)
+[ $# -gt 0 ] && str="$*" || str=$(cat)
+
 
 if [ $daemon ]; then
   emacsclient -a "" \

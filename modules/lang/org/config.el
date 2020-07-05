@@ -280,6 +280,9 @@ I like:
            (file+olp+datetree +org-capture-journal-file)
            "* %U %?\n%i\n%a" :prepend t)
 
+          ("l" "Links" entry
+           (file+headline +org-capture-todo-file "Inbox")
+           "* [ ] %i\nSCHEDULED: %t\n%?\n%a" :prepend t)
           ("w" "Work task" entry
            (file +org-capture-work-todo-file)
            "* TODO [#%^{level|A|B}] %^{Task}\nSCHEDULED: %t\n%a"
