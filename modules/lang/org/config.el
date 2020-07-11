@@ -21,7 +21,7 @@ ob-shell.el when executed.")
 take one argument (the language specified in the src block, as a string). Stops
 at the first function to return non-nil.")
 
-(defvar +org-capture-todo-file "todo.org"
+(defvar +org-capture-todo-file "inbox.org"
   "Default target for todo entries.
 
 Is relative to `org-directory', unless it is absolute. Is used in Doom's default
@@ -282,7 +282,7 @@ I like:
 
           ("l" "Links" entry
            (file+headline +org-capture-todo-file "Inbox")
-           "* [ ] %i\nSCHEDULED: %t\n%?\n%a" :prepend t)
+           "* TODO [#B] %i\nSCHEDULED: %t\n%?\n%a" :prepend t)
           ("w" "Work task" entry
            (file +org-capture-work-todo-file)
            "* TODO [#%^{level|A|B}] %^{Task}\nSCHEDULED: %t\n%a"
@@ -646,7 +646,7 @@ between the two."
          "." #'helm-org-in-buffer-headings
          "/" #'helm-org-agenda-files-headings)
         "A" #'org-archive-subtree
-        "e" #'org-export-dispatch
+        "e" #'+memacs-org-export-dispatch
         "f" #'org-footnote-new
         "h" #'org-toggle-heading
         "i" #'org-toggle-item

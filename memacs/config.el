@@ -91,6 +91,7 @@
           ("debugger: Delve" "https://github.com/derekparker/delve/blob/master/Documentation/cli/README.md"))
         ("Tools"
           ("RestClient" "https://github.com/pashky/restclient.el"))
+        ("Applescript" "http://downloads.techbarrack.com/books/programming/AppleScript/website/index.html")
         )
       )
 
@@ -122,3 +123,6 @@
   :nm "q" #'kana-quit
   :nm "d" #'kana-details)
  )
+
+(when (featurep! :lang org)
+  (load! "+org"))
