@@ -1,6 +1,7 @@
 # -*- mode: snippet -*-
-# name: Org template
+# name: Org template                      
 # --
+#+SETUPFILE: `memacs-org-export-setup-file`
 #+TITLE: ${1:`
 (string-join
  (mapcar #'capitalize

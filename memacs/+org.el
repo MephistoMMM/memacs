@@ -1,5 +1,8 @@
 ;;; memacs/+org.el -*- lexical-binding: t; -*-
 
+(defvar memacs-org-export-setup-file "~/Dropbox/dotconf/export_setup.org"
+  "Setup file path for org to export as more beautiful result.
+Used in org file template")
 
 (setq memacs-org-agenda-todo-view
       `(" " "test Agenda"

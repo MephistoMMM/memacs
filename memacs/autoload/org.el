@@ -42,26 +42,19 @@
   "Select a mission to start from memacs-mission-start-mission-list."
   (interactive
    (list (ivy-completing-read "MISSIONS:"
-    #'memacs//mission-start-candidates-function nil t)))
+                              #'memacs//mission-start-candidates-function nil t)))
   (let ((mode (nth 0 (get-text-property 0 'property mission)))
         (path (nth 1 (get-text-property 0 'property mission)))
-        (file (nth 2 (get-text-property 0 'property mission))))
-    (switch-to-buffer (generate-new-buffer mission))
-    (call-interactively mode)
+        (file (nth 2 (get-text-property 0 'property mission)))
+        (bak--default-directory default-directory))
     (setq default-directory (if (stringp path) path (eval path)))
     (when (or (stringp file) (listp file))
       (let ((visited-file-name (if (stringp file)
                                    (concat default-directory "/" file)
                                  (eval file))))
-        (set-visited-file-name visited-file-name)
-        (if (and (file-name-directory visited-file-name)
-                 (not (string= (file-name-directory visited-file-name)
-                               default-directory)))
-            (setq default-directory (file-name-directory visited-file-name)))
-        ))
-    )
-    ;; TODO create a mission-start-buffer-init-hook
-    (auto-insert)
+        (setq default-directory bak--default-directory)
+        (find-file visited-file-name))
+      ))
   )
 
 (defun memacs//mission-help-candidates-function (str pred _)
@@ -75,8 +68,8 @@
   (interactive
    ;; TODO write function support choose any level menu tree
    (list (let* ((top-item (ivy-completing-read "HELP LIST:"
-                                      #'memacs//mission-help-candidates-function
-                                      nil t))
+                                               #'memacs//mission-help-candidates-function
+                                               nil t))
                 (subhelp (get-text-property 0 'subhelp top-item)))
            (if (listp (car subhelp))
                ;; two level help menu
