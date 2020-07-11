@@ -5,25 +5,26 @@
       `(" " "test Agenda"
         ((agenda ""
                  ((org-agenda-span 'day)
+                  (org-agenda-start-day "+0d")
                   (org-deadline-warning-days 365)))
-         (tags-todo "+Inbox"
+         (todo "TODO"
                ((org-agenda-overriding-header "To Refile")
-                (org-agenda-files '(,(concat org-directory "/" +org-capture-todo-file)))))
-         (todo "TODO"
-               ((org-agenda-overriding-header "Emails")
-                (org-agenda-files '(,(concat org-directory "/" +org-capture-todo-file)))))
-         (todo "NEXT"
+                (org-agenda-files '(,(+org-capture-work-todo-file)))))
+         ;; (todo "TODO"
+         ;;       ((org-agenda-overriding-header "Emails")
+         ;;        (org-agenda-files '(,(concat org-directory "/" +org-capture-todo-file)))))
+         (alltodo ""
                ((org-agenda-overriding-header "In Progress")
-                (org-agenda-files '(,(concat org-directory "/" +org-capture-todo-file)))
+                (org-agenda-files '(,(expand-file-name "next.org" +org-capture-work-directory)))
                 ))
-         (tags-todo "+Projects"
+         (todo "PROJ"
                ((org-agenda-overriding-header "Projects")
-                (org-agenda-files '(,(concat org-directory "/" +org-capture-todo-file)))
+                (org-agenda-files '(,(expand-file-name "proj.org" +org-capture-work-directory)))
                 ))
-         (todo "TODO"
-               ((org-agenda-overriding-header "One-off Tasks")
-                (org-agenda-files '(,(concat org-directory "/" +org-capture-todo-file)))
-                (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))))
+         ;; (todo "TODO"
+         ;;       ((org-agenda-overriding-header "One-off Tasks")
+         ;;        (org-agenda-files '(,(concat org-directory "/" +org-capture-todo-file)))
+         ;;        (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))))
          nil)))
 
 (setq org-agenda-custom-commands nil)
@@ -39,3 +40,8 @@
   (let ((output (funcall orig-fn extension subtreep pub-dir)))
     (setq memacs--org-export-directory nil)
     output))
+
+
+(map! :leader
+      ;; HACK override defalut action of "SPC A"
+      :desc "Org Capture"   "A"    (λ!! #'org-agenda nil " "))
