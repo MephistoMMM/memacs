@@ -12,7 +12,7 @@ Used in org file template")
                   (org-deadline-warning-days 365)))
          (todo "TODO"
                ((org-agenda-overriding-header "To Refile")
-                (org-agenda-files '(,(+org-capture-work-todo-file))))
+                (org-agenda-files '(,(+org-capture-work-todo-file)))))
          ;; (todo "TODO"
          ;;       ((org-agenda-overriding-header "Emails")
          ;;        (org-agenda-files '(,(concat org-directory "/" +org-capture-todo-file)))))
@@ -30,6 +30,7 @@ Used in org file template")
          ;;        (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))))
          nil)))
 
+(setq org-agenda-custom-commands nil)
 (add-to-list 'org-agenda-custom-commands `,memacs-org-agenda-todo-view)
 
 (defadvice! +org-export-output-file-name-a (orig-fn extension &optional subtreep pub-dir)
