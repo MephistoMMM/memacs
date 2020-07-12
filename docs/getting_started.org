@@ -243,7 +243,7 @@ to least recommended for Doom (based on compatibility).
 - [[https://github.com/d12frosted/homebrew-emacs-plus][emacs-plus]]:
   #+BEGIN_SRC bash
   brew tap d12frosted/emacs-plus
-  brew install emacs-plus
+  brew install emacs-plus --with-modern-icon-cg433n
   ln -s /usr/local/opt/emacs-plus/Emacs.app /Applications/Emacs.app
   #+END_SRC
 
@@ -549,7 +549,7 @@ things to be aware of while you convert your old config to Doom:
   blocks. Remove these and, instead, add ~package!~ declarations to
   =~/.doom.d/packages.el= to install your packages.
 
-  See [[#package-management]["Package Management"]], earlier in this guide.
+  See [[#package-management]["Package Management"]], further in this guide.
 
 (This section is incomplete)
 

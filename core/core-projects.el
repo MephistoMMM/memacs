@@ -26,6 +26,7 @@ Emacs.")
              projectile-locate-dominating-file)
   :init
   (setq projectile-cache-file (concat doom-cache-dir "projectile.cache")
+        projectile-auto-discover nil
         projectile-enable-caching doom-interactive-p
         projectile-globally-ignored-files '(".DS_Store" "Icon" "TAGS")
         projectile-globally-ignored-file-suffixes '(".elc" ".pyc" ".o")
@@ -133,10 +134,10 @@ c) are not valid projectile projects."
   ;; HACK Don't rely on VCS-specific commands to generate our file lists. That's
   ;;      7 commands to maintain, versus the more generic, reliable and
   ;;      performant `fd' or `ripgrep'.
-  (defadvice! doom--only-use-generic-command-a (orig-fn vcs)
+  (defadvice! doom--only-use-generic-command-a (vcs)
     "Only use `projectile-generic-command' for indexing project files.
 And if it's a function, evaluate it."
-    :around #'projectile-get-ext-command
+    :override #'projectile-get-ext-command
     (if (functionp projectile-generic-command)
         (funcall projectile-generic-command vcs)
       projectile-generic-command))
@@ -153,7 +154,11 @@ And if it's a function, evaluate it."
           ;; `projectile-globally-ignored-directories' are respected.
           (lambda (_)
             (concat (format "%s . -0 -H -E .git --color=never --type file --type symlink --follow"
-                            doom-projectile-fd-binary)
+                            (or (cl-find-if (if EMACS27+
+                                                (doom-rpartial #'executable-find t)
+                                              #'executable-find)
+                                            '("fdfind" "fd"))
+                                "fd"))
                     (cl-loop for dir in projectile-globally-ignored-directories
                              concat " -E "
                              concat (shell-quote-argument dir))
@@ -189,16 +194,7 @@ when using many of projectile's command, e.g. `projectile-compile-command',
 This suppresses the error so these commands will still run, but prompt you for
 the command instead."
     :around #'projectile-default-generic-command
-    (ignore-errors (apply orig-fn args)))
-
-  ;; Projectile root-searching functions can cause an infinite loop on TRAMP
-  ;; connections, so disable them.
-  ;; TODO Is this still necessary?
-  (defadvice! doom--projectile-locate-dominating-file-a (file _name)
-    "Don't traverse the file system if on a remote connection."
-    :before-while #'projectile-locate-dominating-file
-    (and (stringp file)
-         (not (file-remote-p file nil t)))))
+    (ignore-errors (apply orig-fn args))))
 
 
 ;;

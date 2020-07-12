@@ -18,7 +18,7 @@
         "\n
  Go to^^^^^^                          Actions^^
  ─────^^^^^^───────────────────────── ───────^^───────────────────────────────
- [_1_.._9_]^^     nth/new workspace   [_a_]   new workspace
+ [_1_.._9_]^^     nth/new workspace   [_c_]   new workspace
  [_C-1_.._C-9_]^^ nth/new workspace   [_D_]   close current workspace
  [_<tab>_]^^^^    last workspace      [_r_]   rename current workspace
  [_h_/_l_]^^      circle workspace    [_S_]   save all workspaces/save by names
@@ -52,7 +52,7 @@
         ("<return>" nil :exit t)
         ("TAB" +workspace/other :exit t)
         ("RET" nil :exit t)
-        ("a" +workspace/new :exit t)
+        ("c" +workspace/new :exit t)
         ("b" persp-switch-to-buffer :exit t)
         ("D" +workspace/delete :exit t)
         ("h" +workspace/switch-left)
