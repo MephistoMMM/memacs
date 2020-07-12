@@ -44,6 +44,33 @@
 ;;   MAJOR-MODE  Any major mode symbol"
 (setq doom-scratch-initial-major-mode t)
 
+;; Helps
+(setq memacs-mission-helper-help-list
+      '(
+        ("Projectile"
+          ("ignoring files" "https://projectile.readthedocs.io/en/latest/projects/#ignoring-files"))
+        ("Dockerfile"
+          ("docker reference" "https://docs.docker.com/engine/reference/builder/#usage")
+          ("compose reference" "https://docs.docker.com/compose/compose-file/"))
+        ("Golang"
+          ("debugger: Delve" "https://github.com/derekparker/delve/blob/master/Documentation/cli/README.md"))
+        ("Tools"
+          ("RestClient" "https://github.com/pashky/restclient.el"))
+        ("Applescript" "http://downloads.techbarrack.com/books/programming/AppleScript/website/index.html")
+        )
+      )
+
+;; Missions
+(setq memacs-mission-starter-mission-list
+      '(
+        ;; config new org file in dropbox
+        ("Dropbox Note Buffer" org-mode
+          (concat org-directory "/notes/") (memacs//mission-start-find-file-name nil))
+        ("Codewar&Golang" go-mode
+          (format-time-string "~/Workspace/go/src/codewar_pg/%Y_%m_%d"))
+        ;; ("Daily Report" org-mode
+        ;;   "~/Documents/works/seven/daily_report" (format-time-string "%Y_%m_%d.org"))
+        ))
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
@@ -67,33 +94,44 @@
   :config (setq org-fancy-priorities-list '("☢" "☕" "■")))
 ;; ("❗" "⬆" "⬇" "☕")
 
-;; Missions
-(setq memacs-mission-starter-mission-list
-      '(
-        ;; config new org file in dropbox
-        ("Dropbox Note Buffer" org-mode
-          (concat org-directory "/notes/") (memacs//mission-start-find-file-name nil))
-        ("Codewar&Golang" go-mode
-          (format-time-string "~/Workspace/go/src/codewar_pg/%Y_%m_%d"))
-        ;; ("Daily Report" org-mode
-        ;;   "~/Documents/works/seven/daily_report" (format-time-string "%Y_%m_%d.org"))
-        ))
 
-;; Helps
-(setq memacs-mission-helper-help-list
-      '(
-        ("Projectile"
-          ("ignoring files" "https://projectile.readthedocs.io/en/latest/projects/#ignoring-files"))
-        ("Dockerfile"
-          ("docker reference" "https://docs.docker.com/engine/reference/builder/#usage")
-          ("compose reference" "https://docs.docker.com/compose/compose-file/"))
-        ("Golang"
-          ("debugger: Delve" "https://github.com/derekparker/delve/blob/master/Documentation/cli/README.md"))
-        ("Tools"
-          ("RestClient" "https://github.com/pashky/restclient.el"))
-        ("Applescript" "http://downloads.techbarrack.com/books/programming/AppleScript/website/index.html")
-        )
-      )
+(use-package! smart-input-source
+  :init
+  ;; set the english input source
+  (setq-default smart-input-source-other "com.sogou.inputmethod.sogou.pinyin")
+  ;; set the default other language input source for all buffer
+  (setq smart-input-source-english "com.apple.keylayout.ABC")
+
+  :config
+  ;; Input source specific cursor color
+  (defvar original-cursor-background nil)
+  (add-hook 'smart-input-source-set-english-hook
+            (lambda ()
+              (when original-cursor-background
+                (set-cursor-color original-cursor-background))))
+  (add-hook 'smart-input-source-set-other-hook
+            (lambda ()
+              (unless original-cursor-background
+                (setq original-cursor-background
+                      (or (cdr (assq 'cursor-color default-frame-alist))
+                          (face-background 'cursor)
+                          "Red")))
+              (set-cursor-color "green")))
+
+  ;; (push 'YOUR-COMMAND smart-input-source-preserve-save-triggers)
+
+  ;; enable the /respect/ mode
+  (smart-input-source-global-respect-mode t)
+
+  ;; enable the /follow context/ and /inline english/ mode for all buffers
+  (smart-input-source-global-follow-context-mode t)
+  (smart-input-source-global-inline-mode t)
+
+  ;; enable the /follow context/ and /inline english/ mode for specific buffers
+  ;; :hook
+  ;; (((text-mode prog-mode) . smart-input-source-follow-context-mode)
+  ;;  ((text-mode prog-mode) . smart-input-source-inline-english-mode))
+  )
 
 (use-package! kana)
 
