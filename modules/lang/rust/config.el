@@ -27,6 +27,11 @@
     (after! rustic-flycheck
       (add-to-list 'flycheck-checkers 'rustic-clippy)))
 
+  (when (featurep! +lsp)
+    (if (featurep! :tools lsp +eglot)
+        (setq rustic-lsp-client 'eglot)
+      (setq rustic-lsp-client 'lsp-mode)))
+
   (map! :map rustic-mode-map
         :localleader
         (:prefix ("b" . "build")
@@ -67,7 +72,7 @@
   :init
   ;; HACK Fix #2132: `racer' depends on `rust-mode', which tries to modify
   ;;      `auto-mode-alist'. We make extra sure that doesn't stick, especially
-  ;;      when a buffer is reverted, as it is after rustfmt is done wiht it.
+  ;;      when a buffer is reverted, as it is after rustfmt is done with it.
   (after! rust-mode
     (setq auto-mode-alist (delete '("\\.rs\\'" . rust-mode) auto-mode-alist)))
   :config

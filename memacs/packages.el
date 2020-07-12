@@ -52,3 +52,6 @@
 ;(package! builtin-package :recipe (:branch "develop"))
 
 (package! org-fancy-priorities)
+
+(package! kana
+  :recipe (:host github :repo "chenyanming/kana"))

@@ -32,9 +32,12 @@ exist, and `org-link' otherwise."
            :follow   (lambda (link)
                        (org-link-open-as-file (expand-file-name link (funcall dir-fn)) nil))
            :face     (lambda (link)
-                       (if (file-exists-p (expand-file-name link (funcall dir-fn)))
-                           'org-link
-                         'error))
+                       (let* ((path (expand-file-name link (funcall dir-fn)))
+                              (option-index (string-match-p "::\\(.*\\)\\'" path))
+                              (file-name (substring path 0 option-index)))
+                         (if (file-exists-p file-name)
+                             'org-link
+                           'error)))
            (doom-plist-delete plist :requires))))
 
 
@@ -46,11 +49,15 @@ exist, and `org-link' otherwise."
   "Intepret LINK as an image file path and return its data."
   (setq
    link (expand-file-name
-         link
-         (pcase protocol
-           ("download" (or org-download-image-dir org-attach-id-dir default-directory))
-           ("attachment" org-attach-id-dir)
-           (_ default-directory))))
+         link (pcase protocol
+                ("download"
+                 (or (if (require 'org-download nil t) org-download-image-dir)
+                     (if (require 'org-attach)         org-attach-id-dir)
+                     default-directory))
+                ("attachment"
+                 (require 'org-attach)
+                 org-attach-id-dir)
+                (_ default-directory))))
   (when (and (file-exists-p link)
              (image-type-from-file-name link))
     (with-temp-buffer
@@ -67,8 +74,9 @@ exist, and `org-link' otherwise."
 ;;;###autoload
 (defun +org-http-image-data-fn (protocol link _description)
   "Interpret LINK as an URL to an image file."
-  (when (image-type-from-file-name link)
-    (if-let* ((buf (url-retrieve-synchronously (concat protocol ":" link))))
+  (when (and (image-type-from-file-name link)
+             (not (eq org-display-remote-inline-images 'skip)))
+    (if-let (buf (url-retrieve-synchronously (concat protocol ":" link)))
         (with-current-buffer buf
           (goto-char (point-min))
           (re-search-forward "\r?\n\r?\n" nil t)

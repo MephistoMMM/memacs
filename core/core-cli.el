@@ -1,5 +1,24 @@
 ;;; -*- lexical-binding: t; no-byte-compile: t; -*-
 
+(require 'seq)
+
+(load! "autoload/process")
+(load! "autoload/plist")
+(load! "autoload/files")
+(load! "autoload/output")
+
+;; Create all our core directories to quell file errors
+(mapc (doom-rpartial #'make-directory 'parents)
+      (list doom-local-dir
+            doom-etc-dir
+            doom-cache-dir))
+
+;; Ensure straight and the bare minimum is ready to go
+(require 'core-modules)
+(require 'core-packages)
+(doom-initialize-core-packages)
+
+
 ;;
 ;;; Variables
 
@@ -11,7 +30,13 @@ commands like `doom-cli-packages-install', `doom-cli-packages-update' and
 (defvar doom-auto-discard (getenv "FORCE")
   "If non-nil, discard all local changes while updating.")
 
-(defvar doom--cli-p nil)
+(defvar doom-cli-file "cli"
+  "The basename of CLI config files for modules.
+
+These are loaded when a Doom's CLI starts up. There users and modules can define
+additional CLI commands, or reconfigure existing ones to better suit their
+purpose.")
+
 (defvar doom--cli-commands (make-hash-table :test 'equal))
 (defvar doom--cli-groups (make-hash-table :test 'equal))
 (defvar doom--cli-group nil)
@@ -54,9 +79,10 @@ commands like `doom-cli-packages-install', `doom-cli-packages-update' and
 (defun doom--cli-process (cli args)
   (let* ((args (copy-sequence args))
          (arglist (copy-sequence (doom-cli-arglist cli)))
-         (expected (or (cl-position-if (doom-rpartial #'memq cl--lambda-list-keywords)
-                                       arglist)
-                       (length arglist)))
+         (expected
+          (or (cl-position-if (doom-rpartial #'memq cl--lambda-list-keywords)
+                              arglist)
+              (length arglist)))
          (got 0)
          restvar
          rest
@@ -137,8 +163,26 @@ Executes a cli defined with `defcli!' with the name or alias specified by
 COMMAND, and passes ARGS to it."
   (if-let (cli (doom-cli-get command))
       (funcall (doom-cli-fn cli)
-               (doom--cli-process cli args))
+               (doom--cli-process cli (remq nil args)))
     (user-error "Couldn't find any %S command" command)))
+
+(defun doom-cli-execute-after (&rest args)
+  "Execute shell command ARGS after this CLI session quits.
+
+This is particularly useful when the capabilities of Emacs' batch terminal are
+insufficient (like opening an instance of Emacs, or reloading Doom after a 'doom
+upgrade')."
+  (let ((post-script (concat doom-local-dir ".doom.sh")))
+    (with-temp-file post-script
+      (insert "#!/usr/bin/env sh\n"
+              "rm -f " (prin1-to-string post-script) "\n"
+              "exec " (mapconcat #'shell-quote-argument (remq nil args) " ")
+              "\n"))
+    (let* ((current-mode (file-modes post-script))
+           (add-mode (logand ?\111 (default-file-modes))))
+      (or (/= (logand ?\111 current-mode) 0)
+          (zerop add-mode)
+          (set-file-modes post-script (logior current-mode add-mode))))))
 
 (defmacro defcli! (name speclist &optional docstring &rest body)
   "Defines a CLI command.
@@ -186,10 +230,6 @@ BODY will be run when this dispatcher is called."
                                         for optsym = (if (listp opt) (car opt) opt)
                                         unless (memq optsym cl--lambda-list-keywords)
                                         collect (list optsym `(cdr (assq ',optsym --alist--))))
-                           ,@(unless (plist-get plist :bare)
-                               '((unless doom-init-p
-                                   (doom-initialize 'force 'noerror)
-                                   (doom-initialize-modules))))
                            ,@body)))
         doom--cli-commands)
        (when aliases
@@ -205,13 +245,33 @@ BODY will be run when this dispatcher is called."
 
 
 ;;
-;;; Straight hacks
+;;; straight.el hacks
 
-(defvar doom--cli-straight-discard-options
-  '("^Delete remote \"[^\"]+\", re-create it with correct "
-    "^Reset branch "
-    "^Abort merge$"
-    "^Discard changes$"))
+;; Straight was designed primarily for interactive use, in an interactive Emacs
+;; session, but Doom does its package management in the terminal. Some things
+;; must be modified get straight to behave and improve its UX for our users.
+
+(defvar doom--straight-discard-options
+  '(("has diverged from"
+     . "^Reset [^ ]+ to branch")
+    ("but recipe specifies a URL of"
+     . "Delete remote \"[^\"]+\", re-create it with correct URL")
+    ("has a merge conflict:"
+     . "^Abort merge$")
+    ("has a dirty worktree:"
+     . "^Discard changes$")
+    ("^In repository "
+     . "^Reset branch \\|^Delete remote [^,]+, re-create it with correct URL"))
+  "A list of regexps, mapped to regexps.
+
+Their CAR is tested against the prompt, and CDR is tested against the presented
+option, and is used by `straight-vc-git--popup-raw' to select which option to
+recommend.
+
+It may not be obvious to users what they should do for some straight prompts,
+so Doom will recommend the one that reverts a package back to its (or target)
+original state.")
+
 
 ;; HACK Remove dired & magit options from prompt, since they're inaccessible in
 ;;      noninteractive sessions.
@@ -222,66 +282,72 @@ BODY will be run when this dispatcher is called."
 (defadvice! doom--straight-fallback-to-y-or-n-prompt-a (orig-fn &optional prompt)
   :around #'straight-are-you-sure
   (or doom-auto-accept
-      (if noninteractive
-          (y-or-n-p (format! "%s" (or prompt "")))
-        (funcall orig-fn prompt))))
+      (if doom-interactive-p
+          (funcall orig-fn prompt)
+        (y-or-n-p (format! "%s" (or prompt ""))))))
+
+(defun doom--straight-recommended-option-p (prompt option)
+  (cl-loop for (prompt-re . opt-re) in doom--straight-discard-options
+           if (string-match-p prompt-re prompt)
+           return (string-match-p opt-re option)))
 
 (defadvice! doom--straight-fallback-to-tty-prompt-a (orig-fn prompt actions)
   "Modifies straight to prompt on the terminal when in noninteractive sessions."
   :around #'straight--popup-raw
-  (if (not noninteractive)
+  (if doom-interactive-p
       (funcall orig-fn prompt actions)
-    ;; We can't intercept C-g, so no point displaying any options for this key
-    ;; when C-c is the proper way to abort batch Emacs.
-    (delq! "C-g" actions 'assoc)
-    ;; HACK These are associated with opening dired or magit, which isn't
-    ;;      possible in tty Emacs, so...
-    (delq! "e" actions 'assoc)
-    (delq! "g" actions 'assoc)
-    (if doom-auto-discard
-        (cl-loop with doom-auto-accept = t
-                 for (_key desc func) in actions
-                 when desc
-                 when (cl-find-if (doom-rpartial #'string-match-p desc)
-                                  doom--cli-straight-discard-options)
-                 return (funcall func))
-      (print! (start "%s") (red prompt))
-      (print-group!
-       (terpri)
-       (let (options)
-         (print-group!
-          (print! " 1) Abort")
-          (cl-loop for (_key desc func) in actions
+    (let ((doom--straight-discard-options doom--straight-discard-options))
+      ;; We can't intercept C-g, so no point displaying any options for this key
+      ;; when C-c is the proper way to abort batch Emacs.
+      (delq! "C-g" actions 'assoc)
+      ;; HACK These are associated with opening dired or magit, which isn't
+      ;;      possible in tty Emacs, so...
+      (delq! "e" actions 'assoc)
+      (delq! "g" actions 'assoc)
+      (if doom-auto-discard
+          (cl-loop with doom-auto-accept = t
+                   for (_key desc func) in actions
                    when desc
-                   do (push func options)
-                   and do
-                   (print! "%2s) %s" (1+ (length options))
-                           (if (cl-find-if (doom-rpartial #'string-match-p desc)
-                                           doom--cli-straight-discard-options)
-                               (green (concat desc " (Recommended)"))
-                             desc))))
+                   when (doom--straight-recommended-option-p prompt desc)
+                   return (funcall func))
+        (print! (start "%s") (red prompt))
+        (print-group!
          (terpri)
-         (let* ((options
-                 (cons (lambda ()
-                         (let ((doom-format-indent 0))
-                           (terpri)
-                           (print! (warn "Aborted")))
-                         (kill-emacs 1))
-                       (nreverse options)))
-                (prompt
-                 (format! "How to proceed? (%s) "
-                          (mapconcat #'number-to-string
-                                     (number-sequence 1 (length options))
-                                     ", ")))
-                answer fn)
-           (while (null (nth (setq answer (1- (read-number prompt)))
-                             options))
-             (print! (warn "%s is not a valid answer, try again.")
-                     answer))
-           (funcall (nth answer options))))))))
+         (let (options)
+           (print-group!
+            (print! " 1) Abort")
+            (cl-loop for (_key desc func) in actions
+                     when desc
+                     do (push func options)
+                     and do
+                     (print! "%2s) %s" (1+ (length options))
+                             (if (doom--straight-recommended-option-p prompt desc)
+                                 (progn
+                                   (setq doom--straight-discard-options nil)
+                                   (green (concat desc " (Recommended)")))
+                               desc))))
+           (terpri)
+           (let* ((options
+                   (cons (lambda ()
+                           (let ((doom-output-indent 0))
+                             (terpri)
+                             (print! (warn "Aborted")))
+                           (kill-emacs 1))
+                         (nreverse options)))
+                  (prompt
+                   (format! "How to proceed? (%s) "
+                            (mapconcat #'number-to-string
+                                       (number-sequence 1 (length options))
+                                       ", ")))
+                  answer fn)
+             (while (null (nth (setq answer (1- (read-number prompt)))
+                               options))
+               (print! (warn "%s is not a valid answer, try again.")
+                       answer))
+             (funcall (nth answer options)))))))))
 
 (defadvice! doom--straight-respect-print-indent-a (args)
-  "Indent straight progress messages to respect `doom-format-indent', so we
+  "Indent straight progress messages to respect `doom-output-indent', so we
 don't have to pass whitespace to `straight-use-package's fourth argument
 everywhere we use it (and internally)."
   :filter-args #'straight-use-package
@@ -290,26 +356,11 @@ everywhere we use it (and internally)."
       args
     (list melpa-style-recipe no-clone no-build
           (if (and (not cause)
-                   (boundp 'doom-format-indent)
-                   (> doom-format-indent 0))
-              (make-string (1- (or doom-format-indent 1)) 32)
+                   (boundp 'doom-output-indent)
+                   (> doom-output-indent 0))
+              (make-string (1- (or doom-output-indent 1)) 32)
             cause)
           interactive)))
-
-
-;;
-;;; Dependencies
-
-(require 'seq)
-
-;; Eagerly load these libraries because we may be in a session that hasn't been
-;; fully initialized (e.g. where autoloads files haven't been generated or
-;; `load-path' populated).
-(load! "autoload/cli")
-(load! "autoload/debug")
-(load! "autoload/files")
-(load! "autoload/format")
-(load! "autoload/plist")
 
 
 ;;
@@ -318,13 +369,17 @@ everywhere we use it (and internally)."
 (load! "cli/help")
 (load! "cli/install")
 
-(defcligroup! "Maintenance"
-  "For managing your config and packages"
-  (defcli! (sync s refresh re)
-    ((if-necessary-p   ["-n" "--if-necessary"] "Only regenerate autoloads files if necessary")
-     (inhibit-envvar-p ["-e"] "Don't regenerate the envvar file")
-     (prune-p          ["-p" "--prune"] "Purge orphaned packages & regraft repos"))
-    "Synchronize your config with Doom Emacs.
+(defcli! (refresh re) ()
+  "Deprecated for 'doom sync'"
+  :hidden t
+  (user-error "'doom refresh' has been replaced with 'doom sync'. Use that instead"))
+
+(defcli! (sync s)
+    ((inhibit-envvar-p ["-e"] "Don't regenerate the envvar file")
+     (inhibit-elc-p    ["-c"] "Don't recompile config")
+     (update-p         ["-u"] "Update installed packages after syncing")
+     (prune-p          ["-p" "--prune"] "Purge orphaned package repos & regraft them"))
+  "Synchronize your config with Doom Emacs.
 
 This is the equivalent of running autoremove, install, autoloads, then
 recompile. Run this whenever you:
@@ -337,48 +392,47 @@ recompile. Run this whenever you:
 It will ensure that unneeded packages are removed, all needed packages are
 installed, autoloads files are up-to-date and no byte-compiled files have gone
 stale."
-    :bare t
-    (let (success)
-      ;; Ensures that no pre-existing state pollutes the generation of the new
-      ;; autoloads files.
-      (dolist (file (list doom-autoload-file doom-package-autoload-file))
-        (delete-file file)
-        (delete-file (byte-compile-dest-file file)))
+  (print! (start "Synchronizing your config with Doom Emacs..."))
+  (print-group!
+   (delete-file doom-autoload-file)
+   (when (and (not inhibit-envvar-p)
+              (file-exists-p doom-env-file))
+     (doom-cli-reload-env-file 'force))
+   (run-hooks 'doom-sync-pre-hook)
+   (doom-cli-packages-install)
+   (doom-cli-packages-build)
+   (when update-p
+     (doom-cli-packages-update))
+   (doom-cli-packages-purge prune-p 'builds-p prune-p prune-p)
+   (run-hooks 'doom-sync-post-hook)
+   (when (doom-autoloads-reload)
+     (print! (info "Restart Emacs or use 'M-x doom/reload' for changes to take effect")))
+   t))
 
-      (doom-initialize 'force 'noerror)
-      (doom-initialize-modules)
-
-      (print! (start "Synchronizing your config with Doom Emacs..."))
-      (print-group!
-       (when (and (not inhibit-envvar-p)
-                  (file-exists-p doom-env-file))
-         (doom-cli-reload-env-file 'force))
-
-       (doom-cli-reload-core-autoloads)
-       (doom-cli-packages-install)
-       (doom-cli-packages-build)
-       (doom-cli-packages-purge prune-p 'builds-p prune-p prune-p)
-       (doom-cli-reload-package-autoloads)
-       t)))
-
-  (load! "cli/env")
-  (load! "cli/upgrade")
-  (load! "cli/packages")
-  (load! "cli/autoloads"))
+(load! "cli/env")
+(load! "cli/upgrade")
+(load! "cli/packages")
+(load! "cli/autoloads")
 
 (defcligroup! "Diagnostics"
   "For troubleshooting and diagnostics"
   (load! "cli/doctor")
   (load! "cli/debug")
-  (load! "cli/test"))
+
+  ;; Our tests are broken at the moment. Working on fixing them, but for now we
+  ;; disable them:
+  ;; (load! "cli/test")
+  )
+
 
 (defcligroup! "Compilation"
   "For compiling Doom and your config"
   (load! "cli/byte-compile"))
 
+
 (defcligroup! "Utilities"
   "Conveniences for interacting with Doom externally"
-  (defcli! run ()
+  (defcli! run (&rest args)
     "Run Doom Emacs from bin/doom's parent directory.
 
 All arguments are passed on to Emacs.
@@ -388,11 +442,9 @@ All arguments are passed on to Emacs.
 
 WARNING: this command exists for convenience and testing. Doom will suffer
 additional overhead by being started this way. For the best performance, it is
-best to run Doom out of ~/.emacs.d and ~/.doom.d.")
-
-  ;; (load! "cli/batch")
-  ;; (load! "cli/org")
-  )
+best to run Doom out of ~/.emacs.d and ~/.doom.d."
+    (apply #'doom-cli-execute-after invocation-name args)
+    nil))
 
 (provide 'core-cli)
 ;;; core-cli.el ends here

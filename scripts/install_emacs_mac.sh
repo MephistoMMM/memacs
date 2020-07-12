@@ -16,7 +16,9 @@ ln -s /usr/local/opt/emacs-mac/Emacs.app /Applications
 # install powerline fonts
 $ROOTPATH/scripts/install_fonts.sh
 # install testinputsource -- change to more better plan
-$ROOTPATH/scripts/compile_textinputsource.sh
+# $ROOTPATH/scripts/compile_textinputsource.sh
+# use smart input source, rather than textinputsource
+brew install macism
 # install hammerspoon
 # $ROOTPATH/scripts/install_hammerspoon.sh
 # link emacs

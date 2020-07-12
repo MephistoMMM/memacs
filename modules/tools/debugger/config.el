@@ -89,7 +89,7 @@
 
 
 (use-package! dap-mode
-  :when (featurep! +lsp)
+  :when (and (featurep! +lsp) (not (featurep! :tools lsp +eglot)))
   :hook (dap-mode . dap-tooltip-mode)
   :after lsp-mode
   :demand t
@@ -110,7 +110,7 @@
         (mapc #'require (cddr module)))))
 
   (when (featurep! :lang javascript +lsp)
-    (with-eval-after-load 'js2-mode
+    (after! (:or js2-mode typescript-mode)
       (require 'dap-node)
       (require 'dap-chrome)
       (require 'dap-firefox)

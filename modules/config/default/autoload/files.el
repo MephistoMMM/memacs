@@ -28,13 +28,15 @@
 (defun +default/browse-notes ()
   "Browse files from `org-directory'."
   (interactive)
-  (require 'org)
+  (unless (bound-and-true-p org-directory)
+    (require 'org))
   (doom-project-browse org-directory))
 ;;;###autoload
 (defun +default/find-in-notes ()
   "Find a file under `org-directory', recursively."
   (interactive)
-  (require 'org)
+  (unless (bound-and-true-p org-directory)
+    (require 'org))
   (doom-project-find-file org-directory))
 
 ;;;###autoload
@@ -43,7 +45,7 @@
   (interactive)
   (if (featurep! :completion ivy)
       (call-interactively #'counsel-file-jump)
-    (λ! (doom-project-find-file default-directory))))
+    (cmd! (doom-project-find-file default-directory))))
 
 ;;;###autoload
 (defun +default/discover-projects (arg)
@@ -52,4 +54,6 @@ If prefix ARG is non-nil, prompt for the search path."
   (interactive "P")
   (if arg
       (call-interactively #'projectile-discover-projects-in-directory)
-    (mapc #'projectile-discover-projects-in-directory projectile-project-search-path)))
+    (if projectile-project-search-path
+        (mapc #'projectile-discover-projects-in-directory projectile-project-search-path)
+      (user-error "`projectile-project-search-path' is empty; don't know where to search"))))

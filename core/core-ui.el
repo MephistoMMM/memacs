@@ -315,6 +315,13 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
   (add-to-list 'default-frame-alist '(tool-bar-lines . 0))
   (add-to-list 'default-frame-alist '(vertical-scroll-bars)))
 
+;; These are disabled directly through their frame parameters, to avoid the
+;; extra work their minor modes do, but we have to unset these variables
+;; ourselves, otherwise users will have to cycle them twice to re-enable them.
+(setq menu-bar-mode nil
+      tool-bar-mode nil
+      scroll-bar-mode nil)
+
 (when! IS-MAC
   ;; Curse Lion and its sudden but inevitable fullscreen mode!
   ;; NOTE Meaningless to railwaycat's emacs-mac build
@@ -452,9 +459,9 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 
 (use-package! winner
   ;; undo/redo changes to Emacs' window layout
-  :after-call after-find-file doom-switch-window-hook
   :preface (defvar winner-dont-bind-my-keys t) ; I'll bind keys myself
-  :config (winner-mode +1)
+  :hook (doom-first-buffer . winner-mode)
+  :config
   (appendq! winner-boring-buffers
             '("*Compile-Log*" "*inferior-lisp*" "*Fuzzy Completions*"
               "*Apropos*" "*Help*" "*cvs*" "*Buffer List*" "*Ibuffer*"
@@ -463,13 +470,12 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 
 (use-package! paren
   ;; highlight matching delimiters
-  :after-call after-find-file doom-switch-buffer-hook
+  :hook (doom-first-buffer . show-paren-mode)
   :config
   (setq show-paren-delay 0.1
         show-paren-highlight-openparen t
         show-paren-when-point-inside-paren t
-        show-paren-when-point-in-periphery t)
-  (show-paren-mode +1))
+        show-paren-when-point-in-periphery t))
 
 
 ;;;###package whitespace
@@ -652,6 +658,15 @@ behavior). Do not set this directly, this is let-bound in `doom-init-theme-h'.")
       result)))
 
 (when! (not EMACS27+)
+  ;; DEPRECATED `doom--load-theme-a' handles this for us after the theme is
+  ;;            loaded, but this only works on Emacs 27+. Disabling old themes
+  ;;            must be done *before* the theme is loaded in Emacs 26.
+  (defadvice! doom--disable-previous-themes-a (theme &optional _no-confirm no-enable)
+    "Disable other themes when loading a new one."
+    :before #'load-theme
+    (unless no-enable
+      (mapc #'disable-theme custom-enabled-themes)))
+
   ;; DEPRECATED Not needed in Emacs 27
   (defadvice! doom--prefer-compiled-theme-a (orig-fn &rest args)
     "Have `load-theme' prioritize the byte-compiled theme.

@@ -20,14 +20,14 @@ Emacs.")
 ;;; Packages
 
 (use-package! projectile
-  :after-call after-find-file dired-before-readin-hook minibuffer-setup-hook
   :commands (projectile-project-root
              projectile-project-name
              projectile-project-p
              projectile-locate-dominating-file)
   :init
   (setq projectile-cache-file (concat doom-cache-dir "projectile.cache")
-        projectile-enable-caching doom-interactive-mode
+        projectile-auto-discover nil
+        projectile-enable-caching doom-interactive-p
         projectile-globally-ignored-files '(".DS_Store" "Icon" "TAGS")
         projectile-globally-ignored-file-suffixes '(".elc" ".pyc" ".o")
         projectile-kill-buffers-filter 'kill-only-files
@@ -39,16 +39,6 @@ Emacs.")
 
   :config
   (projectile-mode +1)
-
-  ;; REVIEW Resolve the project root once, when the file/buffer is opened. This
-  ;;        speeds up projectile's project root resolution by leaps, but does
-  ;;        put you at risk of having a stale project root.
-  (setq-hook! '(change-major-mode-after-body-hook
-                ;; In case the user saves the file to a new location
-                after-save-hook
-                ;; ...or makes external changes then returns to Emacs
-                focus-in-hook)
-    projectile-project-root (if default-directory (doom-project-root)))
 
   ;; Projectile runs four functions to determine the root (in this order):
   ;;
@@ -68,7 +58,8 @@ Emacs.")
   ;; In the interest of performance, we reduce the number of project root marker
   ;; files/directories projectile searches for when resolving the project root.
   (setq projectile-project-root-files-bottom-up
-        (append '(".project"     ; doom project marker
+        (append '(".projectile"  ; projectile's root marker
+                  ".project"     ; doom project marker
                   ".git")        ; Git VCS root dir
                 (when (executable-find "hg")
                   '(".hg"))      ; Mercurial VCS root dir
@@ -112,7 +103,7 @@ b) represent blacklisted directories that are too big, change too often or are
    private. (see `doom-projectile-cache-blacklist'),
 c) are not valid projectile projects."
       (when (and (bound-and-true-p projectile-projects-cache)
-                 doom-interactive-mode)
+                 doom-interactive-p)
         (cl-loop with blacklist = (mapcar #'file-truename doom-projectile-cache-blacklist)
                  for proot in (hash-table-keys projectile-projects-cache)
                  if (or (not (stringp proot))
@@ -140,15 +131,38 @@ c) are not valid projectile projects."
                     projectile-project-root-files)
             projectile-project-root-files-bottom-up nil)))
 
+  ;; HACK Don't rely on VCS-specific commands to generate our file lists. That's
+  ;;      7 commands to maintain, versus the more generic, reliable and
+  ;;      performant `fd' or `ripgrep'.
+  (defadvice! doom--only-use-generic-command-a (vcs)
+    "Only use `projectile-generic-command' for indexing project files.
+And if it's a function, evaluate it."
+    :override #'projectile-get-ext-command
+    (if (functionp projectile-generic-command)
+        (funcall projectile-generic-command vcs)
+      projectile-generic-command))
+
   (cond
    ;; If fd exists, use it for git and generic projects. fd is a rust program
    ;; that is significantly faster than git ls-files or find, and it respects
    ;; .gitignore. This is recommended in the projectile docs.
    ((executable-find doom-projectile-fd-binary)
     (setq projectile-generic-command
-          (format "%s . -0 -H -E .git --color=never --type file --type symlink --follow"
-                  doom-projectile-fd-binary)
-          projectile-git-command projectile-generic-command
+          ;; `projectile-generic-command' doesn't typically support a function.
+          ;; My `doom--only-use-generic-command-a' advice allows this. I do it
+          ;; this way so that future changes to
+          ;; `projectile-globally-ignored-directories' are respected.
+          (lambda (_)
+            (concat (format "%s . -0 -H -E .git --color=never --type file --type symlink --follow"
+                            (or (cl-find-if (if EMACS27+
+                                                (doom-rpartial #'executable-find t)
+                                              #'executable-find)
+                                            '("fdfind" "fd"))
+                                "fd"))
+                    (cl-loop for dir in projectile-globally-ignored-directories
+                             concat " -E "
+                             concat (shell-quote-argument dir))
+                    (if IS-WINDOWS " --path-separator=//")))
           projectile-git-submodule-command nil
           ;; ensure Windows users get fd's benefits
           projectile-indexing-method 'alien))
@@ -156,12 +170,12 @@ c) are not valid projectile projects."
    ;; Otherwise, resort to ripgrep, which is also faster than find
    ((executable-find "rg")
     (setq projectile-generic-command
-          (concat "rg -0 --files --follow --color=never --hidden"
-                  (cl-loop for dir in projectile-globally-ignored-directories
-                           concat " --glob "
-                           concat (shell-quote-argument (concat "!" dir)))
-                  (if IS-WINDOWS " --path-separator /"))
-          projectile-git-command projectile-generic-command
+          (lambda (_)
+            (concat "rg -0 --files --follow --color=never --hidden"
+                    (cl-loop for dir in projectile-globally-ignored-directories
+                             concat " --glob "
+                             concat (shell-quote-argument (concat "!" dir)))
+                    (if IS-WINDOWS " --path-separator //")))
           projectile-git-submodule-command nil
           ;; ensure Windows users get rg's benefits
           projectile-indexing-method 'alien))
@@ -180,16 +194,7 @@ when using many of projectile's command, e.g. `projectile-compile-command',
 This suppresses the error so these commands will still run, but prompt you for
 the command instead."
     :around #'projectile-default-generic-command
-    (ignore-errors (apply orig-fn args)))
-
-  ;; Projectile root-searching functions can cause an infinite loop on TRAMP
-  ;; connections, so disable them.
-  ;; TODO Is this still necessary?
-  (defadvice! doom--projectile-locate-dominating-file-a (file _name)
-    "Don't traverse the file system if on a remote connection."
-    :before-while #'projectile-locate-dominating-file
-    (and (stringp file)
-         (not (file-remote-p file nil t)))))
+    (ignore-errors (apply orig-fn args))))
 
 
 ;;

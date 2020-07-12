@@ -178,7 +178,7 @@ If ARG (universal argument), open selection in other-window."
         (user-error "%S doesn't support wgrep" caller)))))
 
 ;;;###autoload
-(defun +ivy-yas-prompt (prompt choices &optional display-fn)
+(defun +ivy-yas-prompt-fn (prompt choices &optional display-fn)
   (yas-completing-prompt prompt choices display-fn #'ivy-completing-read))
 
 ;;;###autoload
@@ -252,8 +252,7 @@ The point of this is to avoid Emacs locking up indexing massive file trees."
          (directory (or in project-root))
          (args (concat (if all-files " -uu")
                        (unless recursive " --maxdepth 1")
-                       " "
-                       (mapconcat #'shell-quote-argument args " "))))
+                       " " (mapconcat #'shell-quote-argument args " "))))
     (setq deactivate-mark t)
     (counsel-rg
      (or query

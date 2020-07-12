@@ -19,7 +19,7 @@ results buffer.")
 ;;; Packages
 
 (use-package! ivy
-  :after-call pre-command-hook
+  :hook (doom-first-input . ivy-mode)
   :init
   (let ((standard-search-fn
          (if (featurep! +prescient)
@@ -88,7 +88,7 @@ results buffer.")
       (setq +ivy--origin nil)))
 
   (after! yasnippet
-    (add-hook 'yas-prompt-functions #'+ivy-yas-prompt))
+    (add-hook 'yas-prompt-functions #'+ivy-yas-prompt-fn))
 
   (defadvice! +ivy--inhibit-completion-in-region-a (orig-fn &rest args)
     "`ivy-completion-in-region' struggles with completing certain
@@ -98,12 +98,10 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
       (apply orig-fn args)))
 
   (define-key! ivy-minibuffer-map
-    "C-c C-e" #'+ivy/woccur
     [remap doom/delete-backward-word] #'ivy-backward-kill-word
+    "C-c C-e" #'+ivy/woccur
     "C-o" #'ivy-dispatching-done
-    "M-o" #'hydra-ivy/body)
-
-  (ivy-mode +1))
+    "M-o" #'hydra-ivy/body))
 
 
 (use-package! ivy-rich
@@ -114,14 +112,15 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
   (when (featurep! +icons)
     (cl-pushnew '(+ivy-rich-buffer-icon)
                 (cadr (plist-get ivy-rich-display-transformers-list
-                                 'ivy-switch-buffer))))
+                                 'ivy-switch-buffer))
+                :test #'equal))
 
-  ;; Include variable value in `counsel-describe-variable'
+  ;; Enahnce the appearance of a couple counsel commands
   (plist-put! ivy-rich-display-transformers-list
               'counsel-describe-variable
               '(:columns
                 ((counsel-describe-variable-transformer (:width 40)) ; the original transformer
-                 (+ivy-rich-describe-variable-transformer (:width 50))
+                 (+ivy-rich-describe-variable-transformer (:width 50)) ; display variable value
                  (ivy-rich-counsel-variable-docstring (:face font-lock-doc-face))))
               'counsel-M-x
               '(:columns
@@ -141,10 +140,9 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
 
   ;; Highlight buffers differently based on whether they're in the same project
   ;; as the current project or not.
-  (let* ((plist (plist-get ivy-rich-display-transformers-list 'ivy-switch-buffer))
-         (switch-buffer-alist (assq 'ivy-rich-candidate (plist-get plist :columns))))
-    (when switch-buffer-alist
-      (setcar switch-buffer-alist '+ivy-rich-buffer-name)))
+  (when-let* ((plist (plist-get ivy-rich-display-transformers-list 'ivy-switch-buffer))
+              (switch-buffer-alist (assq 'ivy-rich-candidate (plist-get plist :columns))))
+    (setcar switch-buffer-alist '+ivy-rich-buffer-name))
 
   (ivy-rich-mode +1))
 
@@ -186,6 +184,7 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
     [remap info-lookup-symbol]       #'counsel-info-lookup-symbol
     [remap load-theme]               #'counsel-load-theme
     [remap locate]                   #'counsel-locate
+    [remap org-goto]                 #'counsel-org-goto
     [remap org-set-tags-command]     #'counsel-org-tag
     [remap projectile-compile-project] #'+ivy/project-compile
     [remap recentf-open-files]       #'counsel-recentf
@@ -212,6 +211,20 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
         (if (memq system-type '(ms-dos windows-nt))
             "rg -M 240 --max-columns-preview --with-filename --no-heading --line-number --color never %s --path-separator / ."
           "rg -M 240 --max-columns-preview --with-filename --no-heading --line-number --color never %s"))
+  ;; REVIEW Counsel allows `counsel-rg-base-command' to be a string or list.
+  ;;        This backwards compatibility complicates things for Doom. Simpler to
+  ;;        just force it to always be a list.
+  (when (stringp counsel-rg-base-command)
+    (setq counsel-rg-base-command (split-string counsel-rg-base-command)))
+
+  ;; REVIEW Fix #3215: prevents mingw on Windows throwing an error trying to
+  ;;        expand / to an absolute path. Remove this when it is fixed upstream
+  ;;        in counsel.
+  (when (and (memq system-type '(windows-nt ms-dos))
+             (listp counsel-rg-base-command)
+             (member "--path-separator" counsel-rg-base-command))
+    (setf (cadr (member "--path-separator" counsel-rg-base-command))
+          "//"))
 
   ;; Integrate with `helpful'
   (setq counsel-describe-function-function #'helpful-callable
@@ -219,6 +232,7 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
 
   ;; Record in jumplist when opening files via counsel-{ag,rg,pt,git-grep}
   (add-hook 'counsel-grep-post-action-hook #'better-jumper-set-jump)
+  (add-hook 'counsel-grep-post-action-hook #'recenter)
   (ivy-add-actions
    'counsel-rg ; also applies to `counsel-rg'
    '(("O" +ivy-git-grep-other-window-action "open in other window")))
@@ -269,9 +283,10 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
     :override #'counsel--find-return-list
     (cl-destructuring-bind (find-program . args)
         (cond ((executable-find doom-projectile-fd-binary)
-               (cons doom-projectile-fd-binary
-                     (list "--color=never" "-E" ".git"
-                           "--type" "file" "--type" "symlink" "--follow")))
+               (append (list doom-projectile-fd-binary
+                             "--color=never" "-E" ".git"
+                             "--type" "file" "--type" "symlink" "--follow")
+                       (if IS-WINDOWS '("--path-separator=/"))))
               ((executable-find "rg")
                (append (list "rg" "--files" "--follow" "--color=never" "--hidden" "--no-messages")
                        (cl-loop for dir in projectile-globally-ignored-directories
@@ -288,8 +303,8 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
          (let ((offset (if (member find-program (list "rg" doom-projectile-fd-binary)) 0 2))
                files)
            (while (< (point) (point-max))
-             (push (buffer-substring
-                    (+ offset (line-beginning-position)) (line-end-position)) files)
+             (push (buffer-substring (+ offset (line-beginning-position)) (line-end-position))
+                   files)
              (forward-line 1))
            (nreverse files)))))))
 

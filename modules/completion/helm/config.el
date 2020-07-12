@@ -23,8 +23,7 @@ be negative.")
 ;;; Packages
 
 (use-package! helm-mode
-  :defer t
-  :after-call pre-command-hook
+  :hook (doom-first-input . helm-mode)
   :init
   (map! [remap apropos]                   #'helm-apropos
         [remap find-library]              #'helm-locate-library
@@ -43,7 +42,6 @@ be negative.")
         [remap recentf-open-files]        #'helm-recentf
         [remap yank-pop]                  #'helm-show-kill-ring)
   :config
-  (helm-mode +1)
   ;; helm is too heavy for `find-file-at-point'
   (add-to-list 'helm-completing-read-handlers-alist (cons #'find-file-at-point nil)))
 
@@ -130,7 +128,7 @@ be negative.")
         "C-c C-e" #'helm-rg--bounce)
   (map! :map helm-rg--bounce-mode-map
         "q" #'kill-current-buffer
-        "C-c C-c" (λ! (helm-rg--bounce-dump) (kill-current-buffer))
+        "C-c C-c" (cmd! (helm-rg--bounce-dump) (kill-current-buffer))
         "C-x C-c" #'helm-rg--bounce-dump-current-file
         "C-c C-k" #'kill-current-buffer))
 

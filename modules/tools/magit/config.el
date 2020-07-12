@@ -11,12 +11,12 @@
         transient-history-file (concat doom-etc-dir "transient/history"))
   :config
   (setq transient-default-level 5
-        magit-revision-show-gravatars '("^Author:     " . "^Commit:     ")
         magit-diff-refine-hunk t ; show granular diffs in selected hunk
         ;; Don't autosave repo buffers. This is too magical, and saving can
         ;; trigger a bunch of unwanted side-effects, like save hooks and
         ;; formatters. Trust us to know what we're doing.
         magit-save-repository-buffers nil)
+  (add-hook 'magit-process-mode-hook #'goto-address-mode)
 
   (defadvice! +magit-revert-repo-buffers-deferred-a (&rest _)
     :after '(magit-checkout magit-branch-and-checkout)
@@ -28,6 +28,10 @@
     (+magit-mark-stale-buffers-h))
   ;; ...then refresh the rest only when we switch to them, not all at once.
   (add-hook 'doom-switch-buffer-hook #'+magit-revert-buffer-maybe-h)
+
+  ;; Center the target file, because it's poor UX to have it at the bottom of
+  ;; the window after invoking `magit-status-here'.
+  (advice-add #'magit-status-here :after #'doom-recenter-a)
 
   ;; The default location for git-credential-cache is in
   ;; ~/.cache/git/credential. However, if ~/.git-credential-cache/ exists, then
@@ -184,4 +188,8 @@ ensure it is built when we actually use Forge."
         (setcar desc (cdr key))))
     (evil-define-key* evil-magit-state git-rebase-mode-map
       "gj" #'git-rebase-move-line-down
-      "gk" #'git-rebase-move-line-up)))
+      "gk" #'git-rebase-move-line-up))
+  (transient-replace-suffix 'magit-dispatch 'magit-worktree
+    '("%" "Gitflow" magit-gitflow-popup))
+  (transient-append-suffix 'magit-dispatch '(0 -1 -1)
+    '("*" "Worktree" magit-worktree)))

@@ -8,6 +8,7 @@
     (sh . shell)
     (bash . shell)
     (matlab . octave)
+    (rust . rustic-babel)
     (amm . ammonite))
   "An alist mapping languages to babel libraries. This is necessary for babel
 libraries (ob-*.el) that don't match the name of the language.
@@ -20,7 +21,7 @@ ob-shell.el when executed.")
 take one argument (the language specified in the src block, as a string). Stops
 at the first function to return non-nil.")
 
-(defvar +org-capture-todo-file "todo.org"
+(defvar +org-capture-todo-file "inbox.org"
   "Default target for todo entries.
 
 Is relative to `org-directory', unless it is absolute. Is used in Doom's default
@@ -52,9 +53,6 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 
 (defvar +org-capture-work-directory "~/Desktop"
   "Default, work directory for org-capture.")
-
-(defvar +org-initial-fold-level 2
-  "The initial fold level of org files when no #+STARTUP options for it.")
 
 (defvar +org-habit-graph-padding 2
   "The padding added to the end of the consistency graph")
@@ -167,7 +165,7 @@ This forces it to read the background before rendering."
           ("HOLD" . +org-todo-onhold)
           ("PROJ" . +org-todo-project)))
 
-  (defadvice! +org-display-link-in-eldoc-a (&rest args)
+  (defadvice! +org-display-link-in-eldoc-a (&rest _)
     "Display full link in minibuffer when cursor/mouse is over it."
     :before-until #'org-eldoc-documentation-function
     (when-let (link (org-element-property :raw-link (org-element-context)))
@@ -203,20 +201,16 @@ This forces it to read the background before rendering."
   ;; I prefer C-c C-c over C-c ' (more consistent)
   (define-key org-src-mode-map (kbd "C-c C-c") #'org-edit-src-exit)
 
-  (defadvice! +org-fix-newline-and-indent-in-src-blocks-a ()
+  (defadvice! +org-fix-newline-and-indent-in-src-blocks-a (&optional indent _arg _interactive)
     "Mimic `newline-and-indent' in src blocks w/ lang-appropriate indentation."
-    :after #'org-return-indent
-    (when (org-in-src-block-p t)
+    :after #'org-return
+    (when (and indent (org-in-src-block-p t))
       (org-babel-do-in-edit-buffer
        (call-interactively #'indent-for-tab-command))))
 
   ;; Refresh inline images after executing src blocks (useful for plantuml or
   ;; ipython, where the result could be an image)
   (add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images)
-
-  ;; Fix 'require(...).print is not a function' error from `ob-js' when
-  ;; executing JS src blocks
-  (setq org-babel-js-function-wrapper "console.log(require('util').inspect(function(){\n%s\n}()));")
 
   (after! python
     (setq org-babel-python-command python-shell-interpreter)))
@@ -286,6 +280,9 @@ I like:
            (file+olp+datetree +org-capture-journal-file)
            "* %U %?\n%i\n%a" :prepend t)
 
+          ("l" "Links" entry
+           (file+headline +org-capture-todo-file "Inbox")
+           "* TODO [#B] %i\nSCHEDULED: %t\n%?\n%a" :prepend t)
           ("w" "Work task" entry
            (file +org-capture-work-todo-file)
            "* TODO [#%^{level|A|B}] %^{Task}\nSCHEDULED: %t\n%a"
@@ -331,11 +328,17 @@ I like:
   (after! org-capture
     (org-capture-put :kill-buffer t))
 
+  ;; Fix #462: when refiling from org-capture, Emacs prompts to kill the
+  ;; underlying, modified buffer. This fixes that.
+  (add-hook 'org-after-refile-insert-hook #'save-buffer)
+
   ;; HACK Doom doesn't support `customize'. Best not to advertise it as an
   ;;      option in `org-capture's menu.
   (defadvice! +org--remove-customize-option-a (orig-fn table title &optional prompt specials)
     :around #'org-mks
-    (funcall orig-fn table title prompt (remove '("C" "Customize org-capture-templates") specials)))
+    (funcall orig-fn table title prompt
+             (remove '("C" "Customize org-capture-templates")
+                     specials)))
 
   (defadvice! +org--capture-expand-variable-file-a (file)
     "If a variable is used for a file path in `org-capture-template', it is used
@@ -345,13 +348,6 @@ relative to `org-directory', unless it is an absolute path."
     (if (and (symbolp file) (boundp file))
         (expand-file-name (symbol-value file) org-directory)
       file))
-
-  (defadvice! +org--prevent-save-prompts-when-refiling-a (&rest _)
-    "Fix #462: when refiling from org-capture, Emacs prompts to kill the
-underlying, modified buffer. This fixes that."
-    :after #'org-refile
-    (when (bound-and-true-p org-capture-is-refiling)
-      (org-save-all-org-buffers)))
 
   (add-hook! 'org-capture-mode-hook
     (defun +org-show-target-in-capture-header-h ()
@@ -369,6 +365,10 @@ underlying, modified buffer. This fixes that."
 (defun +org-init-capture-frame-h ()
   (add-hook 'org-capture-after-finalize-hook #'+org-capture-cleanup-frame-h)
 
+  (defadvice! +org-capture-refile-cleanup-frame-a (&rest _)
+    :after #'org-capture-refile
+    (+org-capture-cleanup-frame-h))
+
   (when (featurep! :ui doom-dashboard)
     (add-hook '+doom-dashboard-inhibit-functions #'+org-capture-frame-p)))
 
@@ -378,12 +378,24 @@ underlying, modified buffer. This fixes that."
   (setq org-attach-store-link-p t     ; store link after attaching files
         org-attach-use-inheritance t) ; inherit properties from parent nodes
 
-  ;; Centralized attachments directory
-  (after! org-attach
+  ;; Autoload all these commands that org-attach doesn't autoload itself
+  (use-package! org-attach
+    :commands (org-attach-new
+               org-attach-open
+               org-attach-open-in-emacs
+               org-attach-reveal-in-emacs
+               org-attach-url
+               org-attach-set-directory
+               org-attach-sync)
+    :config
     (unless org-attach-id-dir
+      ;; Centralized attachments directory by default
       (setq org-attach-id-dir (expand-file-name ".attach/" org-directory)))
     (after! projectile
-      (add-to-list 'projectile-globally-ignored-directories org-attach-id-dir))))
+      (add-to-list 'projectile-globally-ignored-directories org-attach-id-dir)))
+
+  ;; Add inline image previews for attachment links
+  (org-link-set-parameters "attachment" :image-data-fun #'+org-inline-image-data-fn))
 
 
 (defun +org-init-custom-links-h ()
@@ -404,6 +416,7 @@ underlying, modified buffer. This fixes that."
             '("gimages"     . "https://google.com/images?q=%s")
             '("gmap"        . "https://maps.google.com/maps?q=%s")
             '("duckduckgo"  . "https://duckduckgo.com/?q=%s")
+            '("wikipedia"   . "https://en.wikipedia.org/wiki/%s")
             '("wolfram"     . "https://wolframalpha.com/input/?i=%s")
             '("doom-repo"   . "https://github.com/hlissner/doom-emacs/%s"))
 
@@ -412,13 +425,19 @@ underlying, modified buffer. This fixes that."
   (+org-define-basic-link "doom-docs" 'doom-docs-dir)
   (+org-define-basic-link "doom-modules" 'doom-modules-dir)
 
-  ;; Allow inline image previews of http(s)? urls or data uris
+  ;; Allow inline image previews of http(s)? urls or data uris.
+  ;; `+org-http-image-data-fn' will respect `org-display-remote-inline-images'.
+  (setq org-display-remote-inline-images 'download) ; TRAMP urls
   (org-link-set-parameters "http"  :image-data-fun #'+org-http-image-data-fn)
   (org-link-set-parameters "https" :image-data-fun #'+org-http-image-data-fn)
   (org-link-set-parameters "img"   :image-data-fun #'+org-inline-image-data-fn)
 
   ;; Add support for youtube links + previews
-  (require 'org-yt nil t))
+  (require 'org-yt nil t)
+  (defadvice! +org-dont-preview-if-disabled-a (&rest _)
+    "Make `org-yt' respect `org-display-remote-inline-images'."
+    :before-while #'org-yt-image-data-fun
+    (not (eq org-display-remote-inline-images 'skip))))
 
 
 (defun +org-init-export-h ()
@@ -442,28 +461,46 @@ underlying, modified buffer. This fixes that."
     (setq org-pandoc-options
           '((standalone . t)
             (mathjax . t)
-            (variable . "revealjs-url=https://revealjs.com")))))
+            (variable . "revealjs-url=https://revealjs.com"))))
+
+  (defadvice! +org--dont-trigger-save-hooks-on-export-a (orig-fn &rest args)
+    "`org-export-to-file' triggers save hooks, which may inadvertantly change
+the exported output (i.e. formatters)."
+    :around #'org-export-to-file
+    (let (before-save-hook after-save-hook)
+      (apply orig-fn args)))
+
+  (defadvice! +org--fix-async-export-a (orig-fn &rest args)
+    :around #'org-export-to-file
+    (if (not org-export-in-background)
+        (apply orig-fn args)
+      (setq org-export-async-init-file (make-temp-file "doom-org-async-export"))
+      (with-temp-file org-export-async-init-file
+        (prin1 `(progn (setq org-export-async-debug ,debug-on-error
+                             load-path ',load-path)
+                       (load ,user-init-file nil t))
+               (current-buffer)))
+      (apply orig-fn args))))
 
 
 (defun +org-init-habit-h ()
-  "TODO"
   (add-hook! 'org-agenda-mode-hook
     (defun +org-habit-resize-graph-h ()
       "Right align and resize the consistency graphs based on
 `+org-habit-graph-window-ratio'"
-      (require 'org-habit)
-      (let* ((total-days (float (+ org-habit-preceding-days org-habit-following-days)))
-             (preceding-days-ratio (/ org-habit-preceding-days total-days))
-             (graph-width (floor (* (window-width) +org-habit-graph-window-ratio)))
-             (preceding-days (floor (* graph-width preceding-days-ratio)))
-             (following-days (- graph-width preceding-days))
-             (graph-column (- (window-width) (+ preceding-days following-days)))
-             (graph-column-adjusted (if (> graph-column +org-habit-min-width)
-                                        (- graph-column +org-habit-graph-padding)
-                                      nil)))
-        (setq-local org-habit-preceding-days preceding-days)
-        (setq-local org-habit-following-days following-days)
-        (setq-local org-habit-graph-column graph-column-adjusted)))))
+      (when (featurep 'org-habit)
+        (let* ((total-days (float (+ org-habit-preceding-days org-habit-following-days)))
+               (preceding-days-ratio (/ org-habit-preceding-days total-days))
+               (graph-width (floor (* (window-width) +org-habit-graph-window-ratio)))
+               (preceding-days (floor (* graph-width preceding-days-ratio)))
+               (following-days (- graph-width preceding-days))
+               (graph-column (- (window-width) (+ preceding-days following-days)))
+               (graph-column-adjusted (if (> graph-column +org-habit-min-width)
+                                          (- graph-column +org-habit-graph-padding)
+                                        nil)))
+          (setq-local org-habit-preceding-days preceding-days)
+          (setq-local org-habit-following-days following-days)
+          (setq-local org-habit-graph-column graph-column-adjusted))))))
 
 
 (defun +org-init-hacks-h ()
@@ -473,16 +510,20 @@ underlying, modified buffer. This fixes that."
   ;; Open directory links in dired
   (add-to-list 'org-file-apps '(directory . emacs))
 
-  ;; When you create a sparse tree and `org-indent-mode' is enabled, the
-  ;; highlighting destroys the invisibility added by `org-indent-mode'.
-  ;; Therefore, don't highlight when creating a sparse tree.
-  (setq org-highlight-sparse-tree-matches nil)
+  ;; HACK Org is known to use a lot of unicode symbols (and large org files tend
+  ;;      to be especially memory hungry). Compounded with
+  ;;      `inhibit-compacting-font-caches' being non-nil, org needs more memory
+  ;;      to be performant.
+  (setq-hook! 'org-mode-hook gcmh-high-cons-threshold (* 2 gcmh-high-cons-threshold))
 
-  (add-hook! 'org-follow-link-hook
-    (defun +org-delayed-recenter-h ()
-      "`recenter', but after a tiny delay. Necessary to prevent certain race
-conditions where a window's buffer hasn't changed at the time this hook is run."
-      (run-at-time 0.1 nil #'recenter)))
+  (defadvice! +org--recenter-after-follow-link-a (&rest _args)
+    "Recenter after following a link, but only internal or file links."
+    :after '(org-footnote-action
+             org-follow-timestamp-link
+             org-link-open-as-file
+             org-link-search)
+    (when (get-buffer-window)
+      (recenter)))
 
   (defadvice! +org--strip-properties-from-outline-a (orig-fn path &optional width prefix separator)
     "Remove link syntax and fix variable height text (e.g. org headings) in the
@@ -590,9 +631,9 @@ between the two."
         [C-S-return] #'+org/insert-item-above
         [C-M-return] #'org-insert-subheading
         (:when IS-MAC
-          [s-return]   #'+org/insert-item-below
-          [s-S-return] #'+org/insert-item-above
-          [s-M-return] #'org-insert-subheading)
+         [s-return]   #'+org/insert-item-below
+         [s-S-return] #'+org/insert-item-above
+         [s-M-return] #'org-insert-subheading)
         ;; Org-aware C-a/C-e
         [remap doom/backward-to-bol-or-indent]          #'org-beginning-of-line
         [remap doom/forward-to-last-non-comment-or-eol] #'org-end-of-line
@@ -605,13 +646,13 @@ between the two."
         "," #'org-switchb
         "." #'org-goto
         (:when (featurep! :completion ivy)
-          "." #'counsel-org-goto
-          "/" #'counsel-org-goto-all)
+         "." #'counsel-org-goto
+         "/" #'counsel-org-goto-all)
         (:when (featurep! :completion helm)
-          "." #'helm-org-in-buffer-headings
-          "/" #'helm-org-agenda-files-headings)
+         "." #'helm-org-in-buffer-headings
+         "/" #'helm-org-agenda-files-headings)
         "A" #'org-archive-subtree
-        "e" #'org-export-dispatch
+        "e" #'+memacs-org-export-dispatch
         "f" #'org-footnote-new
         "h" #'org-toggle-heading
         "i" #'org-toggle-item
@@ -623,112 +664,141 @@ between the two."
         "t" #'org-todo
         "T" #'org-todo-list
         (:prefix ("a" . "attachments")
-          "a" #'org-attach
-          "d" #'org-attach-delete-one
-          "D" #'org-attach-delete-all
-          "f" #'+org/find-file-in-attachments
-          "l" #'+org/attach-file-and-insert-link
-          "n" #'org-attach-new
-          "o" #'org-attach-open
-          "O" #'org-attach-open-in-emacs
-          "r" #'org-attach-reveal
-          "R" #'org-attach-reveal-in-emacs
-          "u" #'org-attach-url
-          "s" #'org-attach-set-directory
-          "S" #'org-attach-sync
-          (:when (featurep! +dragndrop)
-            "c" #'org-download-screenshot
-            "y" #'org-download-yank))
+         "a" #'org-attach
+         "d" #'org-attach-delete-one
+         "D" #'org-attach-delete-all
+         "f" #'+org/find-file-in-attachments
+         "l" #'+org/attach-file-and-insert-link
+         "n" #'org-attach-new
+         "o" #'org-attach-open
+         "O" #'org-attach-open-in-emacs
+         "r" #'org-attach-reveal
+         "R" #'org-attach-reveal-in-emacs
+         "u" #'org-attach-url
+         "s" #'org-attach-set-directory
+         "S" #'org-attach-sync
+         (:when (featurep! +dragndrop)
+          "c" #'org-download-screenshot
+          "y" #'org-download-yank))
         (:prefix ("b" . "tables")
-          "-" #'org-table-insert-hline
-          "a" #'org-table-align
-          "b" #'org-table-blank-field
-          "c" #'org-table-create-or-convert-from-region
-          "dc" #'org-table-delete-column
-          "dr" #'org-table-kill-row
-          "e" #'org-table-edit-field
-          "f" #'org-table-edit-formulas
-          "h" #'org-table-field-info
-          "s" #'org-table-sort-lines
-          "r" #'org-table-recalculate
-          "R" #'org-table-recalculate-buffer-tables
-          (:when (featurep! +gnuplot)
-            "p" #'org-plot/gnuplot))
+         "-" #'org-table-insert-hline
+         "a" #'org-table-align
+         "b" #'org-table-blank-field
+         "c" #'org-table-create-or-convert-from-region
+         "e" #'org-table-edit-field
+         "f" #'org-table-edit-formulas
+         "h" #'org-table-field-info
+         "s" #'org-table-sort-lines
+         "r" #'org-table-recalculate
+         "R" #'org-table-recalculate-buffer-tables
+         (:prefix ("d" . "delete")
+          "c" #'org-table-delete-column
+          "r" #'org-table-kill-row)
+         (:prefix ("i" . "insert")
+          "c" #'org-table-insert-column
+          "h" #'org-table-insert-hline
+          "r" #'org-table-insert-row
+          "H" #'org-table-hline-and-move)
+         (:prefix ("t" . "toggle")
+          "f" #'org-table-toggle-formula-debugger
+          "o" #'org-table-toggle-coordinate-overlays)
+         (:when (featurep! +gnuplot)
+          "p" #'org-plot/gnuplot))
         (:prefix ("c" . "clock")
-          "c" #'org-clock-cancel
-          "d" #'org-clock-mark-default-task
-          "e" #'org-clock-modify-effort-estimate
-          "E" #'org-set-effort
-          "g" #'org-clock-goto
-          "G" (λ! (org-clock-goto 'select))
-          "i" #'org-clock-in
-          "I" #'org-clock-in-last
-          "o" #'org-clock-out
-          "r" #'org-resolve-clocks
-          "R" #'org-clock-report
-          "t" #'org-evaluate-time-range
-          "=" #'org-clock-timestamps-up
-          "-" #'org-clock-timestamps-down)
+         "c" #'org-clock-cancel
+         "d" #'org-clock-mark-default-task
+         "e" #'org-clock-modify-effort-estimate
+         "E" #'org-set-effort
+         "g" #'org-clock-goto
+         "G" (λ! (org-clock-goto 'select))
+         "i" #'org-clock-in
+         "I" #'org-clock-in-last
+         "o" #'org-clock-out
+         "r" #'org-resolve-clocks
+         "R" #'org-clock-report
+         "t" #'org-evaluate-time-range
+         "=" #'org-clock-timestamps-up
+         "-" #'org-clock-timestamps-down)
         (:prefix ("d" . "date/deadline")
-          "d" #'org-deadline
-          "s" #'org-schedule
-          "t" #'org-time-stamp
-          "T" #'org-time-stamp-inactive)
+         "d" #'org-deadline
+         "s" #'org-schedule
+         "t" #'org-time-stamp
+         "T" #'org-time-stamp-inactive)
         (:prefix ("g" . "goto")
-          "g" #'org-goto
-          (:when (featurep! :completion ivy)
-            "g" #'counsel-org-goto
-            "G" #'counsel-org-goto-all)
-          (:when (featurep! :completion helm)
-            "g" #'helm-org-in-buffer-headings
-            "G" #'helm-org-agenda-files-headings)
-          "c" #'org-clock-goto
-          "C" (λ! (org-clock-goto 'select))
-          "i" #'org-id-goto
-          "r" #'org-refile-goto-last-stored
-          "v" #'+org/goto-visible
-          "x" #'org-capture-goto-last-stored)
+         "g" #'org-goto
+         (:when (featurep! :completion ivy)
+          "g" #'counsel-org-goto
+          "G" #'counsel-org-goto-all)
+         (:when (featurep! :completion helm)
+          "g" #'helm-org-in-buffer-headings
+          "G" #'helm-org-agenda-files-headings)
+         "c" #'org-clock-goto
+         "C" (λ! (org-clock-goto 'select))
+         "i" #'org-id-goto
+         "r" #'org-refile-goto-last-stored
+         "v" #'+org/goto-visible
+         "x" #'org-capture-goto-last-stored)
         (:prefix ("l" . "links")
-          "c" #'org-cliplink
-          "d" #'+org/remove-link
-          "i" #'org-id-store-link
-          "l" #'org-insert-link
-          "L" #'org-insert-all-links
-          "s" #'org-store-link
-          "S" #'org-insert-last-stored-link
-          "t" #'org-toggle-link-display)
+         "c" #'org-cliplink
+         "d" #'+org/remove-link
+         "i" #'org-id-store-link
+         "l" #'org-insert-link
+         "L" #'org-insert-all-links
+         "s" #'org-store-link
+         "S" #'org-insert-last-stored-link
+         "t" #'org-toggle-link-display)
         (:prefix ("r" . "refile")
-          "." #'+org/refile-to-current-file
-          "c" #'+org/refile-to-running-clock
-          "l" #'+org/refile-to-last-location
-          "f" #'+org/refile-to-file
-          "o" #'+org/refile-to-other-window
-          "O" #'+org/refile-to-other-buffer
-          "v" #'+org/refile-to-visible
-          "r" #'org-refile) ; to all `org-refile-targets'
+         "." #'+org/refile-to-current-file
+         "c" #'+org/refile-to-running-clock
+         "l" #'+org/refile-to-last-location
+         "f" #'+org/refile-to-file
+         "o" #'+org/refile-to-other-window
+         "O" #'+org/refile-to-other-buffer
+         "v" #'+org/refile-to-visible
+         "r" #'org-refile) ; to all `org-refile-targets'
+        (:prefix ("s" . "Tree/Subtree")
+         "a" #'org-toggle-archive-tag
+         "b" #'org-tree-to-indirect-buffer
+         "d" #'org-cut-subtree
+         "h" #'org-promote-subtree
+         "j" #'org-move-subtree-down
+         "k" #'org-move-subtree-up
+         "l" #'org-demote-subtree
+         "n" #'org-narrow-to-subtree
+         "r" #'org-refile
+         "s" #'org-sparse-tree
+         "A" #'org-archive-subtree
+         "N" #'widen
+         "S" #'org-sort
+         (:prefix ("p" . "Org Priority")
+          "d" #'org-priority-down
+          "p" #'org-priority
+          "u" #'org-priority-up))
         (:prefix ("w" . "wrapper")
-          "r" '+org/wrap-resume
-          "q" '+org/wrap-quote
-          "l" '+org/wrap-link
-          "o" '+org/wrap-ordered-list
-          "u" '+org/wrap-unordered-list
-          "s" '+org/wrap-source-code))
+         "r" '+org/wrap-resume
+         "q" '+org/wrap-quote
+         "l" '+org/wrap-link
+         "o" '+org/wrap-ordered-list
+         "u" '+org/wrap-unordered-list
+         "s" '+org/wrap-source-code))
+
 
   (map! :after org-agenda
         :map org-agenda-mode-map
         :m "C-SPC" #'org-agenda-show-and-scroll-up
         :localleader
-        "d" #'org-agenda-deadline
+        (:prefix ("d" . "date/deadline")
+         "d" #'org-agenda-deadline
+         "s" #'org-agenda-schedule)
         (:prefix ("c" . "clock")
-          "c" #'org-agenda-clock-in
-          "C" #'org-agenda-clock-out
-          "g" #'org-agenda-clock-goto
-          "r" #'org-agenda-clockreport-mode
-          "s" #'org-agenda-show-clocking-issues
-          "x" #'org-agenda-clock-cancel)
+         "c" #'org-agenda-clock-cancel
+         "g" #'org-agenda-clock-goto
+         "i" #'org-agenda-clock-in
+         "o" #'org-agenda-clock-out
+         "r" #'org-agenda-clockreport-mode
+         "s" #'org-agenda-show-clocking-issues)
         "q" #'org-agenda-set-tags
         "r" #'org-agenda-refile
-        "s" #'org-agenda-schedule
         "t" #'org-agenda-todo))
 
 
@@ -781,6 +851,11 @@ compelling reason, so..."
   ;; TODO org-board or better link grabbing support
   ;; TODO org-capture + org-protocol instead of bin/org-capture
   )
+
+
+(defun +org-init-smartparens-h ()
+  ;; Disable the slow defaults
+  (provide 'smartparens-org))
 
 
 ;;
@@ -914,8 +989,8 @@ compelling reason, so..."
         :nei "M-]" #'org-metaright
         :nei "M-[" #'org-metaleft
         ;; more intuitive RET keybinds
-        :i [return] #'org-return-indent
-        :i "RET"    #'org-return-indent
+        :i [return] (λ! (org-return t))
+        :i "RET"    (λ! (org-return t))
         :n [return] #'+org/dwim-at-point
         :n "RET"    #'+org/dwim-at-point
         ;; more vim-esque org motion keys (not covered by evil-org-mode)
@@ -934,22 +1009,23 @@ compelling reason, so..."
         :n "zc"  #'+org/close-fold
         :n "zC"  #'outline-hide-subtree
         :n "zm"  #'+org/hide-next-fold-level
+        :n "zM"  #'+org/close-all-folds
         :n "zn"  #'org-tree-to-indirect-buffer
         :n "zo"  #'+org/open-fold
         :n "zO"  #'outline-show-subtree
         :n "zr"  #'+org/show-next-fold-level
-        :n "zR"  #'outline-show-all
+        :n "zR"  #'+org/open-all-folds
         :n "zi"  #'org-toggle-inline-images
 
         :map org-read-date-minibuffer-local-map
-        "C-h"   (λ! (org-eval-in-calendar '(calendar-backward-day 1)))
-        "C-l"   (λ! (org-eval-in-calendar '(calendar-forward-day 1)))
-        "C-k"   (λ! (org-eval-in-calendar '(calendar-backward-week 1)))
-        "C-j"   (λ! (org-eval-in-calendar '(calendar-forward-week 1)))
-        "C-S-h" (λ! (org-eval-in-calendar '(calendar-backward-month 1)))
-        "C-S-l" (λ! (org-eval-in-calendar '(calendar-forward-month 1)))
-        "C-S-k" (λ! (org-eval-in-calendar '(calendar-backward-year 1)))
-        "C-S-j" (λ! (org-eval-in-calendar '(calendar-forward-year 1)))))
+        "C-h"   (cmd! (org-eval-in-calendar '(calendar-backward-day 1)))
+        "C-l"   (cmd! (org-eval-in-calendar '(calendar-forward-day 1)))
+        "C-k"   (cmd! (org-eval-in-calendar '(calendar-backward-week 1)))
+        "C-j"   (cmd! (org-eval-in-calendar '(calendar-forward-week 1)))
+        "C-S-h" (cmd! (org-eval-in-calendar '(calendar-backward-month 1)))
+        "C-S-l" (cmd! (org-eval-in-calendar '(calendar-forward-month 1)))
+        "C-S-k" (cmd! (org-eval-in-calendar '(calendar-backward-year 1)))
+        "C-S-j" (cmd! (org-eval-in-calendar '(calendar-forward-year 1)))))
 
 
 (use-package! evil-org-agenda
@@ -993,15 +1069,8 @@ compelling reason, so..."
       ))
 
   ;;; Custom org modules
-  (if (featurep! +brain)     (load! "contrib/brain"))
-  (if (featurep! +dragndrop) (load! "contrib/dragndrop"))
-  (if (featurep! +ipython)   (load! "contrib/ipython"))
-  (if (featurep! +journal)   (load! "contrib/journal"))
-  (if (featurep! +jupyter)   (load! "contrib/jupyter"))
-  (if (featurep! +pomodoro)  (load! "contrib/pomodoro"))
-  (if (featurep! +present)   (load! "contrib/present"))
-  (if (featurep! +roam)      (load! "contrib/roam"))
-  (if (featurep! +noter)     (load! "contrib/noter"))
+  (dolist (flag doom--current-flags)
+    (load! (concat "contrib/" (substring (symbol-name flag) 1)) nil t))
 
   ;; Add our general hooks after the submodules, so that any hooks the
   ;; submodules add run after them, and can overwrite any defaults if necessary.
@@ -1013,8 +1082,8 @@ compelling reason, so..."
              #'doom-disable-show-trailing-whitespace-h
              #'+org-enable-auto-reformat-tables-h
              #'+org-enable-auto-update-cookies-h
-             #'+org-unfold-to-2nd-level-or-point-h
-             #'+org-disable-truncate-lines-or-wrap-words-h)
+             #'+org-disable-truncate-lines-or-wrap-words-h
+             #'+org-make-last-point-visible-h)
 
   (add-hook! 'org-load-hook
              #'+org-init-org-directory-h
@@ -1032,7 +1101,8 @@ compelling reason, so..."
              #'+org-init-keybinds-h
              #'+org-init-popup-rules-h
              #'+org-init-protocol-h
-             #'+org-init-protocol-lazy-loader-h)
+             #'+org-init-protocol-lazy-loader-h
+             #'+org-init-smartparens-h)
 
   ;; (Re)activate eldoc-mode in org-mode a little later, because it disables
   ;; itself if started too soon (which is the case with `global-eldoc-mode').
@@ -1040,9 +1110,9 @@ compelling reason, so..."
 
   ;; In case the user has eagerly loaded org from their configs
   (when (and (featurep 'org)
-             (not doom-reloading-p)
              (not byte-compile-current-file))
-    (message "`org' was already loaded by the time lang/org loaded, this may cause issues")
+    (unless doom-reloading-p
+      (message "`org' was already loaded by the time lang/org loaded, this may cause issues"))
     (run-hooks 'org-load-hook))
 
   :config
@@ -1050,8 +1120,7 @@ compelling reason, so..."
 
   ;; Global ID state means we can have ID links anywhere. This is required for
   ;; `org-brain', however.
-  (setq org-id-track-globally t
-        org-id-locations-file-relative t)
+  (setq org-id-locations-file-relative t)
 
   ;; HACK `org-id' doesn't check if `org-id-locations-file' exists or is
   ;;      writeable before trying to read/write to it.

@@ -4,12 +4,12 @@
   ;; NOTE SPC u replaces C-u as the universal argument.
 
   ;; Minibuffer
-  (define-key! :keymaps '(evil-ex-completion-map evil-ex-search-keymap)
-    "C-a" #'evil-beginning-of-line
-    "C-b" #'evil-backward-char
-    "C-f" #'evil-forward-char
-    "C-j" #'next-complete-history-element
-    "C-k" #'previous-complete-history-element)
+  (map! :map (evil-ex-completion-map evil-ex-search-keymap)
+        "C-a" #'evil-beginning-of-line
+        "C-b" #'evil-backward-char
+        "C-f" #'evil-forward-char
+        :gi "C-j" #'next-complete-history-element
+        :gi "C-k" #'previous-complete-history-element)
 
   (define-key! :keymaps +default-minibuffer-maps
     [escape] #'abort-recursive-edit
@@ -18,39 +18,37 @@
     "C-u"    #'evil-delete-back-to-indentation
     "C-v"    #'yank
     "C-w"    #'doom/delete-backward-word
-    "C-z"    (λ! (ignore-errors (call-interactively #'undo))))
+    "C-z"    (cmd! (ignore-errors (call-interactively #'undo))))
 
-  (when (featurep! :editor evil +everywhere)
-    (define-key! :keymaps +default-minibuffer-maps
-      "C-j"    #'next-line
-      "C-k"    #'previous-line
-      "C-S-j"  #'scroll-up-command
-      "C-S-k"  #'scroll-down-command)
-    (define-key! :states 'insert :keymaps +default-minibuffer-maps
-      "C-j"    #'next-line
-      "C-k"    #'previous-line)
-    (define-key! read-expression-map
-      "C-n" #'next-line-or-history-element
-      "C-p" #'previous-line-or-history-element)))
+  (define-key! :keymaps +default-minibuffer-maps
+    "C-j"    #'next-line
+    "C-k"    #'previous-line
+    "C-S-j"  #'scroll-up-command
+    "C-S-k"  #'scroll-down-command)
+  ;; For folks with `evil-collection-setup-minibuffer' enabled
+  (define-key! :states 'insert :keymaps +default-minibuffer-maps
+    "C-j"    #'next-line
+    "C-k"    #'previous-line)
+  (define-key! read-expression-map
+    "C-n" #'next-line-or-history-element
+    "C-p" #'previous-line-or-history-element))
 
 
 ;;
 ;;; Global keybindings
 
 ;; Smart tab, these will only work in GUI Emacs
-(map! :i [tab] (general-predicate-dispatch nil ; fall back to nearest keymap
-                 (and (featurep! :editor snippets)
-                      (bound-and-true-p yas-minor-mode)
-                      (yas-maybe-expand-abbrev-key-filter 'yas-expand))
-                 #'yas-expand
-                 (and (featurep! :completion company +tng)
-                      (+company-has-completion-p))
-                 #'+company/complete)
-      :v [tab] (general-predicate-dispatch nil
-                 (and (bound-and-true-p yas-minor-mode)
-                      (or (eq evil-visual-selection 'line)
-                          (not (memq (char-after) (list ?\( ?\[ ?\{ ?\} ?\] ?\))))))
-                 #'yas-insert-snippet)
+(map! :i [tab] (cmds! (and (featurep! :editor snippets)
+                           (bound-and-true-p yas-minor-mode)
+                           (yas-maybe-expand-abbrev-key-filter 'yas-expand))
+                      #'yas-expand
+                      (and (featurep! :completion company +tng)
+                           (+company-has-completion-p))
+                      #'+company/complete)
+      :v [tab] (cmds! (and (bound-and-true-p yas-minor-mode)
+                           (or (eq evil-visual-selection 'line)
+                               (not (memq (char-after) (list ?\( ?\[ ?\{ ?\} ?\] ?\))))))
+                      #'yas-insert-snippet)
 
       ;; Smarter newlines
       :i [remap newline] #'newline-and-indent  ; auto-indent on newline
@@ -70,6 +68,8 @@
        [escape]  #'View-quit-all)
       (:after man :map Man-mode-map
        :n "q"    #'kill-current-buffer)
+      (:after geiser-doc :map geiser-doc-mode-map
+       :n "o"    #'link-hint-open-link)
 
       ;; HACK don't add :i to org-mode-map for "C-j", it is configed in
       ;; org modules;
@@ -95,8 +95,8 @@
        :nv "P" #'evil-mc-make-and-goto-first-cursor
        :nv "q" #'evil-mc-undo-all-cursors
        :nv "t" #'+multiple-cursors/evil-mc-toggle-cursors
-       :nv "u" #'evil-mc-undo-last-added-cursor
-       :nv "z" #'+multiple-cursors/evil-mc-make-cursor-here
+       :nv "u" #'+multiple-cursors/evil-mc-undo-cursor
+       :nv "z" #'+multiple-cursors/evil-mc-toggle-cursor-here
        :v  "I" #'evil-mc-make-cursor-in-visual-selection-beg
        :v  "A" #'evil-mc-make-cursor-in-visual-selection-end)
 
@@ -141,7 +141,7 @@
          "C-p"     #'company-select-previous-or-abort
          "C-j"     #'company-select-next-or-abort
          "C-k"     #'company-select-previous-or-abort
-         "C-s"     (λ! (company-search-abort) (company-filter-candidates))
+         "C-s"     (cmd! (company-search-abort) (company-filter-candidates))
          [escape]  #'company-search-abort))
        ;; TAB auto-completion in term buffers
        (:after comint :map comint-mode-map
@@ -329,32 +329,38 @@
 
       ;;; <leader> c --- code
       (:prefix-map ("c" . "code")
-       :desc "Compile"                               "c"   #'compile
-       :desc "Recompile"                             "C"   #'recompile
-       :desc "Jump to definition"                    "d"   #'+lookup/definition
-       :desc "Jump to references"                    "D"   #'+lookup/references
-       :desc "Evaluate buffer/region"                "e"   #'+eval/buffer-or-region
-       :desc "Evaluate & replace region"             "E"   #'+eval:replace-region
-       :desc "Format buffer/region"                  "f"   #'+format/region-or-buffer
-       (:when (featurep! :completion ivy)
-        :desc "Jump to symbol in current workspace" "j"   #'lsp-ivy-workspace-symbol
-        :desc "Jump to symbol in any workspace"     "J"   #'lsp-ivy-global-workspace-symbol)
-       (:when (featurep! :completion helm)
-        :desc "Jump to symbol in current workspace" "j"   #'helm-lsp-workspace-symbol
-        :desc "Jump to symbol in any workspace"     "J"   #'helm-lsp-global-workspace-symbol)
-       :desc "Jump to documentation"                 "k"   #'+lookup/documentation
-       (:when (featurep! :tools lsp)
-        :desc "LSP Execute code action"               "a"   #'lsp-execute-code-action
-        :desc "LSP Organize imports"                  "i"   #'lsp-organize-imports
-        :desc "LSP Rename"                            "r"   #'lsp-rename
-        (:after lsp-mode
-         :desc "LSP"                                   "l"   lsp-command-map))
-       :desc "Send to repl"                          "s"   #'+eval/send-region-to-repl
-       :desc "Delete trailing whitespace"            "w"   #'delete-trailing-whitespace
-       :desc "Delete trailing newlines"              "W"   #'doom/delete-trailing-newlines
-       :desc "List errors"                           "x"   #'flymake-show-diagnostics-buffer
-       (:when (featurep! :checkers syntax)
-        :desc "List errors"                         "x"   #'flycheck-list-errors))
+        (:unless (featurep! :tools lsp +eglot)
+          :desc "LSP Execute code action" "a" #'lsp-execute-code-action
+          :desc "LSP Organize imports" "i" #'lsp-organize-imports
+          (:when (featurep! :completion ivy)
+            :desc "Jump to symbol in current workspace" "j"   #'lsp-ivy-workspace-symbol
+            :desc "Jump to symbol in any workspace"     "J"   #'lsp-ivy-global-workspace-symbol)
+          (:when (featurep! :completion helm)
+            :desc "Jump to symbol in current workspace" "j"   #'helm-lsp-workspace-symbol
+            :desc "Jump to symbol in any workspace"     "J"   #'helm-lsp-global-workspace-symbol)
+          :desc "LSP Rename" "r" #'lsp-rename
+         (:after lsp-mode
+           :desc "LSP"                                   "l"   lsp-command-map))
+        (:when (featurep! :tools lsp +eglot)
+          :desc "LSP Execute code action" "a" #'eglot-code-actions
+          :desc "LSP Format buffer/region" "F" #'eglot-format
+          :desc "LSP Rename" "r" #'eglot-rename
+          :desc "LSP Find declaration" "j" #'eglot-find-declaration
+          :desc "LSP Find implementation" "J" #'eglot-find-implementation)
+        :desc "Compile"                               "c"   #'compile
+        :desc "Recompile"                             "C"   #'recompile
+        :desc "Jump to definition"                    "d"   #'+lookup/definition
+        :desc "Jump to references"                    "D"   #'+lookup/references
+        :desc "Evaluate buffer/region"                "e"   #'+eval/buffer-or-region
+        :desc "Evaluate & replace region"             "E"   #'+eval:replace-region
+        :desc "Format buffer/region"                  "f"   #'+format/region-or-buffer
+        :desc "Jump to documentation"                 "k"   #'+lookup/documentation
+        :desc "Send to repl"                          "s"   #'+eval/send-region-to-repl
+        :desc "Delete trailing whitespace"            "w"   #'delete-trailing-whitespace
+        :desc "Delete trailing newlines"              "W"   #'doom/delete-trailing-newlines
+        :desc "List errors"                           "x"   #'flymake-show-diagnostics-buffer
+        (:when (featurep! :checkers syntax)
+          :desc "List errors"                         "x"   #'flycheck-list-errors))
 
 
       ;;; <leader> d --- diff
@@ -421,6 +427,7 @@
         :desc "Forge dispatch"            "'"   #'forge-dispatch
         :desc "Magit switch branch"       "b"   #'magit-branch-checkout
         :desc "Magit status"              "g"   #'magit-status
+        :desc "Magit status here"         "G"   #'magit-status-here
         :desc "Magit file delete"         "D"   #'magit-file-delete
         :desc "Magit blame"               "B"   #'magit-blame-addition
         :desc "Magit clone"               "C"   #'magit-clone
@@ -463,8 +470,8 @@
       ;;; <leader> i --- insert
       (:prefix-map ("i" . "insert")
        :desc "Current file name"             "f"   #'+default/insert-file-path
-       :desc "Current file path"             "F"   (λ!! #'+default/insert-file-path t)
-       :desc "Evil ex path"                  "p"   (λ! (evil-ex "R!echo "))
+       :desc "Current file path"             "F"   (cmd!! #'+default/insert-file-path t)
+       :desc "Evil ex path"                  "p"   (cmd! (evil-ex "R!echo "))
        :desc "From evil register"            "r"   #'evil-ex-registers
        :desc "Snippet"                       "s"   #'yas-insert-snippet
        :desc "Unicode"                       "u"   #'unicode-chars-list-chars
@@ -501,12 +508,13 @@
 
        (:when (featurep! :lang org +roam)
         (:prefix ("r" . "roam")
-         :desc "Switch to buffer" "b" #'org-roam-switch-to-buffer
-         :desc "Org Roam Capture" "c" #'org-roam-capture
-         :desc "Find file"        "f" #'org-roam-find-file
-         :desc "Show graph"       "g" #'org-roam-graph
-         :desc "Insert"           "i" #'org-roam-insert
-         :desc "Org Roam"         "r" #'org-roam
+         :desc "Switch to buffer"              "b" #'org-roam-switch-to-buffer
+         :desc "Org Roam Capture"              "c" #'org-roam-capture
+         :desc "Find file"                     "f" #'org-roam-find-file
+         :desc "Show graph"                    "g" #'org-roam-graph
+         :desc "Insert"                        "i" #'org-roam-insert
+         :desc "Insert (skipping org-capture)" "I" #'org-roam-insert-immediate
+         :desc "Org Roam"                      "r" #'org-roam
          (:prefix ("d" . "by date")
           :desc "Arbitrary date" "d" #'org-roam-dailies-date
           :desc "Today"          "t" #'org-roam-dailies-today
@@ -556,9 +564,16 @@
         :desc "Send to Transmit"           "u" #'+macos/send-to-transmit
         :desc "Send project to Transmit"   "U" #'+macos/send-project-to-transmit
         :desc "Send to Launchbar"          "l" #'+macos/send-to-launchbar
-        :desc "Send project to Launchbar"  "L" #'+macos/send-project-to-launchbar)
+        :desc "Send project to Launchbar"  "L" #'+macos/send-project-to-launchbar
+        :desc "Open in iTerm"              "i" #'+macos/open-in-iterm)
        (:when (featurep! :tools docker)
-        :desc "Docker" "D" #'docker))
+        :desc "Docker" "D" #'docker)
+       (:when (featurep! :email mu4e)
+        :desc "mu4e" "m" #'=mu4e)
+       (:when (featurep! :email notmuch)
+        :desc "notmuch" "m" #'=notmuch)
+       (:when (featurep! :email wanderlust)
+        :desc "wanderlust" "m" #'=wanderlust))
 
       ;;; <leader> p --- project
       (:prefix-map ("p" . "project")
@@ -582,10 +597,14 @@
        :desc "Find recent project files"    "r" #'projectile-recentf
        :desc "Run project"                  "R" #'projectile-run-project
        :desc "Save project files"           "s" #'projectile-save-project-buffers
-       :desc "List project tasks"           "t" #'magit-todos-list
+       :desc "List project todos"           "t" #'magit-todos-list
        :desc "Test project"                 "T" #'projectile-test-project
        :desc "Pop up scratch buffer"        "x" #'doom/open-project-scratch-buffer
-       :desc "Switch to scratch buffer"     "X" #'doom/switch-to-project-scratch-buffer)
+       :desc "Switch to scratch buffer"     "X" #'doom/switch-to-project-scratch-buffer
+       (:when (and (featurep! :tools taskrunner)
+                   (or (featurep! :completion ivy)
+                       (featurep! :completion helm)))
+        :desc "List project tasks"          "z" #'+taskrunner/project-tasks))
 
       ;;; <leader> q --- quit/session
       (:prefix-map ("q" . "quit/session")
@@ -605,10 +624,18 @@
       ;;; <leader> r --- remote
       (:when (featurep! :tools upload)
        (:prefix-map ("r" . "remote")
+        :desc "Browse remote"              "b" #'ssh-deploy-browse-remote-base-handler
+        :desc "Browse relative"            "B" #'ssh-deploy-browse-remote-handler
+        :desc "Download remote"            "d" #'ssh-deploy-download-handler
+        :desc "Delete local & remote"      "D" #'ssh-deploy-delete-handler
+        :desc "Eshell base terminal"       "e" #'ssh-deploy-remote-terminal-eshell-base-handler
+        :desc "Eshell relative terminal"   "E" #'ssh-deploy-remote-terminal-eshell-handler
+        :desc "Move/rename local & remote" "m" #'ssh-deploy-rename-handler
+        :desc "Open this file on remote"   "o" #'ssh-deploy-open-remote-file-handler
+        :desc "Run deploy script"          "s" #'ssh-deploy-run-deploy-script-handler
         :desc "Upload local"               "u" #'ssh-deploy-upload-handler
         :desc "Upload local (force)"       "U" #'ssh-deploy-upload-handler-forced
-        :desc "Download remote"            "d" #'ssh-deploy-download-handler
-        :desc "Diff local & remote"        "D" #'ssh-deploy-diff-handler
+        :desc "Diff local & remote"        "x" #'ssh-deploy-diff-handler
         :desc "Browse remote files"        "." #'ssh-deploy-browse-remote-handler
         :desc "Detect remote changes"      ">" #'ssh-deploy-remote-changes-handler))
 
@@ -624,6 +651,8 @@
         :desc "Indent guides"              "i" #'highlight-indent-guides-mode)
        :desc "Indent style"                 "I" #'doom/toggle-indent-style
        :desc "Line numbers"                 "l" #'doom/toggle-line-numbers
+       (:when (featurep! :ui minimap)
+        :desc "Minimap"                      "m" #'minimap-mode)
        (:when (featurep! :lang org +present)
         :desc "org-tree-slide mode"        "p" #'org-tree-slide-mode)
        :desc "Read-only mode"               "r" #'read-only-mode
@@ -634,7 +663,8 @@
        :desc "Soft line wrapping"           "w" #'visual-line-mode
        (:when (featurep! :editor word-wrap)
         :desc "Soft line wrapping"         "w" #'+word-wrap-mode)
-       :desc "Zen mode"                     "z" #'writeroom-mode))
+       (:when (featurep! :ui zen)
+        :desc "Zen mode"                   "z" #'writeroom-mode)))
 
 ;;
 ;;; Global & plugin keybinds
