@@ -134,3 +134,53 @@
 
 ;;;###autoload (autoload 'memacs/export-org-in-dired-to-html "autoload/org" nil t)
 (export-org-in-dired! "html" org-html-export-to-html)
+
+;; Roam
+;; org-roam
+(defvar memacs-org-roam-languages
+  `(go
+    python
+    c
+    shell
+    java
+    javascript
+    web
+    lua
+    rust
+    shell
+    sql
+    haskell
+    latex
+    lisp)
+  "Avaliable language for org-roam-capture filename.")
+
+(defvar memacs--org-roam-complete-software-directories nil)
+(defvar memacs--org-roam-complete-program-languages nil)
+
+;;;###autoload
+(defun memacs-org-roam-complete-software-directories ()
+  "Complete name of directories under `roam/software'."
+  (interactive)
+  (memacs--org-roam-complete-directories
+    (expand-file-name "software" org-roam-directory)
+    "Software Name: "
+    'memacs--org-roam-complete-software-directories))
+
+;;;###autoload
+(defun memacs-org-roam-complete-program-languages ()
+  "Complete name of languages."
+  (interactive)
+  (ivy-completing-read
+    "Language Name: "
+    (mapcar #'symbol-name memacs-org-roam-languages) nil nil
+    (car memacs--org-roam-complete-program-languages)
+    'memacs--org-roam-complete-program-languages))
+
+(defun memacs--org-roam-complete-directories (parent-dir message &optional history-symbol)
+  "Complete name of directories under `parent-dir'."
+  (let ((history (or (symbol-value history-symbol) (list)))
+        (conditions (unless (f-directory? parent-dir) (list-directory parent-dir))))
+    (ivy-completing-read message
+                         conditions nil nil
+                         (car history)
+                         history-symbol)))

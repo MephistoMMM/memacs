@@ -1066,6 +1066,7 @@ compelling reason, so..."
       ;; ol-mhe
       ;; ol-rmail
       ;; ol-eww
+      org-habit
       ))
 
   ;;; Custom org modules

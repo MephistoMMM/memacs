@@ -26,13 +26,6 @@
 ;; `load-theme' function. These are the defaults.
 (setq doom-theme 'doom-one)
 
-;; If you intend to use org, it is recommended you change this!
-(setq org-directory "~/Dropbox/org"
-      +org-capture-work-directory "~/Documents/works"
-      org-attach-id-dir (expand-file-name "~/Dropbox/org/statics/")
-      org-download-image-dir (expand-file-name "~/Dropbox/org/statics/")
-      org-roam-db-location (expand-file-name "~/.local/roam/org-roam.db"))
-
 ;; If you want to change the style of line numbers, change this to `relative' or
 ;; `nil' to disable it:
 (setq display-line-numbers-type 'relative)
@@ -43,34 +36,6 @@
 ;;   nil         Uses `fundamental-mode'
 ;;   MAJOR-MODE  Any major mode symbol"
 (setq doom-scratch-initial-major-mode t)
-
-;; Helps
-(setq memacs-mission-helper-help-list
-      '(
-        ("Projectile"
-          ("ignoring files" "https://projectile.readthedocs.io/en/latest/projects/#ignoring-files"))
-        ("Dockerfile"
-          ("docker reference" "https://docs.docker.com/engine/reference/builder/#usage")
-          ("compose reference" "https://docs.docker.com/compose/compose-file/"))
-        ("Golang"
-          ("debugger: Delve" "https://github.com/derekparker/delve/blob/master/Documentation/cli/README.md"))
-        ("Tools"
-          ("RestClient" "https://github.com/pashky/restclient.el"))
-        ("Applescript" "http://downloads.techbarrack.com/books/programming/AppleScript/website/index.html")
-        )
-      )
-
-;; Missions
-(setq memacs-mission-starter-mission-list
-      '(
-        ;; config new org file in dropbox
-        ("Dropbox Note Buffer" org-mode
-          (concat org-directory "/notes/") (memacs//mission-start-find-file-name nil))
-        ("Codewar&Golang" go-mode
-          (format-time-string "~/Workspace/go/src/codewar_pg/%Y_%m_%d"))
-        ;; ("Daily Report" org-mode
-        ;;   "~/Documents/works/seven/daily_report" (format-time-string "%Y_%m_%d.org"))
-        ))
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
@@ -93,7 +58,6 @@
   :hook (org-mode . org-fancy-priorities-mode)
   :config (setq org-fancy-priorities-list '("☢" "☕" "■")))
 ;; ("❗" "⬆" "⬇" "☕")
-
 
 (use-package! smart-input-source
   :init
@@ -137,15 +101,12 @@
 
 ;; add memacs keybinds group
 (map!
- :leader
- (:prefix-map ("m" . "memacs")
-   :desc "starter" "s" #'+memacs/mission-starter-start
-   :desc "helper"  "h" #'+memacs/mission-helper-help
-   :desc "kana"    "k" #'kana)
- )
+ ;;; Leader
+ (:leader
+  (:prefix-map ("m" . "memacs")
+   :desc "kana"    "k" #'kana))
 
-(map!
- ;; kana
+ ;;; Kana
  (:after kana :map kana-mode-map
   :nm "v" #'kana-validate
   :nm "s" #'kana-say-question
