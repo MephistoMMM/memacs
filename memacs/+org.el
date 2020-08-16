@@ -12,6 +12,9 @@ Used in org file template")
       org-download-image-dir (expand-file-name "~/Dropbox/org/statics/")
       org-roam-db-location (expand-file-name "~/.local/roam/org-roam.db"))
 
+;; Roam
+(setq org-roam-buffer-width 0.2)
+
 ;; Agenda View
 (setq memacs-org-agenda-todo-view
       `(" " "test Agenda"
@@ -46,16 +49,20 @@ Used in org file template")
 (defmacro memacs-org-roam-common-head ()
   "Common head for org-roam capture."
   (concat
-   "#+SETUPFILE: " memacs-org-export-setup-file
-   "\n#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n"))
+   ;; "#+SETUPFILE: " memacs-org-export-setup-file "\n"
+   "#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n"))
 
 (setq org-roam-capture-templates
   `(
-    ("d" "default" plain #'org-roam-capture--get-point
-      "%?" :file-name "%<%Y%m%d%H%M%S>-${slug}" :head ,(memacs-org-roam-common-head) :unnarrowed t)
+    ("d" "draft" plain #'org-roam-capture--get-point
+      "%?" :file-name "draft/%<%Y%m%d%H%M%S>-${slug}" :head ,(memacs-org-roam-common-head) :unnarrowed t)
     ("p" "Programming" plain #'org-roam-capture--get-point
       "%?"
       :file-name "prog/%(memacs-org-roam-complete-program-languages)/${slug}"
+      :head ,(memacs-org-roam-common-head) :unnarrowed t)
+    ("o" "OS" plain #'org-roam-capture--get-point
+      "%?"
+      :file-name "os/%^{OS|linux|macOS}/${slug}"
       :head ,(memacs-org-roam-common-head) :unnarrowed t)
     ("a" "Algorithm" plain #'org-roam-capture--get-point
       "%?"
@@ -68,6 +75,10 @@ Used in org file template")
     ("w" "Wiki" plain #'org-roam-capture--get-point
       "%?"
       :file-name "wiki/${slug}"
+      :head ,(memacs-org-roam-common-head) :unnarrowed t)
+    ("t" "Thoughts" plain #'org-roam-capture--get-point
+      "%?"
+      :file-name "thought/${slug}"
       :head ,(memacs-org-roam-common-head) :unnarrowed t)
     ))
 

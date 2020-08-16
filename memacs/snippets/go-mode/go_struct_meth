@@ -1,0 +1,7 @@
+# key: meth
+# name: go_struct_meth
+# --
+// $3 ${6:...}
+func (${1:p} ${2:type}) ${3:funcname}($4) $5 {
+  $0
+}

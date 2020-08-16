@@ -147,10 +147,11 @@
     web
     lua
     rust
-    shell
     sql
     haskell
     latex
+    applescript
+    antlr
     lisp)
   "Avaliable language for org-roam-capture filename.")
 

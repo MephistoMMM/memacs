@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: setter
+# key: setter
+# --
+public void set${2:$(s-upper-camel-case yas-text)}(${1:int} ${2:feild}) {
+       this.$2 = $2;
+}
+$0

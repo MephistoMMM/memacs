@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: is_mode_on
+# key: ismon
+# comment: test if a mode(major or minor) is on
+# --
+(if (and (boundp '${1:the-mode}) $1)
+  ;; t
+  (${2:message "$1 is on"})
+  ;; nil
+  (${3:message "$1 is off"}))
+$0

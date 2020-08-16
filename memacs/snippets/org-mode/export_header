@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: export_header
+# key: e_h
+# --
+#+SETUPFILE: ~/Dropbox/dotconf/export_setup.org
+#+Title: ${1:Title}
+$0

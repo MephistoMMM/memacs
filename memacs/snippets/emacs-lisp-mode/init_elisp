@@ -1,0 +1,24 @@
+# -*- mode: snippet -*-
+# name: init_elisp
+# key: i_elisp
+# --
+;;; ${1:filename} --- ${2:introduction}
+
+;; Author: Mephis Pheies <mephistommm@gmail.com>
+;; Keywords: ${3:keywords}
+
+;; License:
+
+;; ${4:license}
+
+;;; Commentary:
+
+;; ${5:description}
+
+;;; Code:
+
+$0
+
+${6:(provide '$1)}
+
+;;; $1 ends here

@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: getter_and_setter
+# key: getter_setter
+# --
+public ${1:int} get${2:$(s-upper-camel-case yas-text)}() {
+       return ${2:feild};
+}
+
+public void set${2:$(s-upper-camel-case yas-text)}($1 $2) {
+       this.$2 = $2;
+}
+$0
