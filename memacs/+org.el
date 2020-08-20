@@ -131,7 +131,7 @@ Used in org file template")
 
 (map! :leader
       ;; HACK override defalut action of "SPC A"
-      :desc "Org Capture"   "A"    (λ!! #'org-agenda nil " ")
+      :desc "Org Agenda"   "A"    (λ! (org-agenda nil " "))
       (:prefix-map ("m" . "memacs")
        :desc "starter" "s" #'+memacs/mission-starter-start
        :desc "helper"  "h" #'+memacs/mission-helper-help
