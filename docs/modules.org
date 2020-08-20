@@ -4,7 +4,7 @@
 Functionality in Doom is divided into collections of code called modules (à la
 Spacemacs' layers). A module is a bundle of packages, configuration and
 commands, organized into a unit that can be enabled or disabled by adding or
-removing them from your ~doom!~ block (found in =$DOOMDIR/init.el=).
+removing them from your ~doom!~ block in =$DOOMDIR/init.el=.
 
 * Table of Contents :TOC:
 - [[#app][:app]]
@@ -16,14 +16,15 @@ removing them from your ~doom!~ block (found in =$DOOMDIR/init.el=).
 - [[#email][:email]]
 - [[#input][:input]]
 - [[#lang][:lang]]
+- [[#os][:os]]
 - [[#term][:term]]
 - [[#tools][:tools]]
 - [[#ui][:ui]]
 
 * :app
 Application modules are complex and opinionated modules that transform Emacs
-toward a specific purpose. They may have additional dependencies and should be
-loaded last, before =:config= modules.
+toward a specific purpose. They may have additional dependencies and *should be
+loaded last*, before =:config= modules.
 
 + [[file:../modules/app/calendar/README.org][calendar]] - TODO
 + [[file:../modules/app/irc/README.org][irc]] - how neckbeards socialize
@@ -127,11 +128,11 @@ Modules that bring support for a language or group of languages to Emacs.
 + [[file:../modules/lang/nim/README.org][nim]] - TODO
 + nix - TODO
 + [[file:../modules/lang/ocaml/README.org][ocaml]] =+lsp= - TODO
-+ [[file:../modules/lang/org/README.org][org]] =+brain +dragndrop +gnuplot +hugo +ipython +journal +jupyter +noter +pandoc +pomodoro +present +roam= - TODO
++ [[file:../modules/lang/org/README.org][org]] =+brain +dragndrop +gnuplot +hugo +ipython +journal +jupyter +noter +pandoc +pomodoro +present +pretty +roam= - TODO
 + [[file:../modules/lang/php/README.org][php]] =+hack +lsp= - TODO
 + plantuml - TODO
 + purescript =+lsp= - TODO
-+ [[file:../modules/lang/python/README.org][python]] =+cython +lsp +pyenv +conda +poetry= - TODO
++ [[file:../modules/lang/python/README.org][python]] =+cython +lsp +pyright +pyenv +conda +poetry= - TODO
 + qt - TODO
 + racket - TODO
 + [[file:../modules/lang/raku/README.org][raku]] - TODO
@@ -148,6 +149,13 @@ Modules that bring support for a language or group of languages to Emacs.
 + terra - TODO
 + web =+lsp= - HTML and CSS (SCSS/SASS/LESS/Stylus) support.
 + [[file:../modules/lang/yaml/README.org][yaml]] =+lsp= - TODO
+
+
+* :os
+Modules to improve integration into your OS, system, or devices.
+
++ [[file:/mnt/projects/conf/doom-emacs/modules/os/macos/README.org][macos]] - Improve Emacs' compatibility with macOS
++ tty =+osc= - Improves the terminal Emacs experience.
 
 * :term
 Modules that offer terminal emulation.
@@ -171,7 +179,6 @@ Small modules that give Emacs access to external tools & services.
 + [[file:../modules/tools/lookup/README.org][lookup]] =+dictionary +docsets +offline= - Universal jump-to & documentation lookup
   backend
 + [[file:../modules/tools/lsp/README.org][lsp]] =+peek +eglot= - Installation and configuration of language server protocol client (lsp-mode or eglot)
-+ macos - TODO
 + [[file:../modules/tools/magit/README.org][magit]] =+forge= - TODO
 + make - TODO
 + pass =+auth= - TODO
@@ -194,13 +201,13 @@ Aesthetic modules that affect the Emacs interface or user experience.
 + [[file:../modules/ui/hl-todo/README.org][hl-todo]] - TODO
 + [[file:../modules/ui/hydra/README.org][hydra]] - TODO
 + indent-guides - TODO
++ [[file:/mnt/projects/conf/doom-emacs/modules/ui/ligatures/README.org][ligatures]] =+extra +fira +hasklig +iosevka +pragmata-pro= - Ligature support for Emacs
 + [[file:../modules/ui/minimap/README.org][minimap]] - TODO
 + [[file:../modules/ui/modeline/README.org][modeline]] =+light= - TODO
 + [[file:../modules/ui/nav-flash/README.org][nav-flash]] - TODO
 + [[file:../modules/ui/neotree/README.org][neotree]] - TODO
 + [[file:../modules/ui/ophints/README.org][ophints]] - TODO
 + [[file:../modules/ui/popup/README.org][popup]] =+all +defaults= - Makes temporary/disposable windows less intrusive
-+ [[file:../modules//ui/pretty-code/README.org][pretty-code]] =+fira +hasklig +iosevka +pragmata-pro= - TODO
 + [[file:../modules/ui/tabs/README.org][tabs]] - TODO
 + treemacs - TODO
 + [[file:../modules/ui/unicode/README.org][unicode]] - TODO

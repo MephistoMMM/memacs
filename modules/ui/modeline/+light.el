@@ -354,18 +354,18 @@ Requires `anzu', also `evil-anzu' if using `evil-mode' for compatibility with
 ;;; `+modeline-buffer-identification'
 (def-modeline-var! +modeline-buffer-identification ; slightly more informative buffer id
   '((:eval
-     (propertize
-      (let ((buffer-file-name (buffer-file-name (buffer-base-buffer))))
-        (or (when buffer-file-name
-              (if-let (project (doom-project-root buffer-file-name))
-                  (let ((filename (or buffer-file-truename (file-truename buffer-file-name))))
-                    (file-relative-name filename (concat project "..")))))
-            "%b"))
-      'face (cond ((buffer-modified-p)
-                   '(error bold mode-line-buffer-id))
-                  ((+modeline-active)
-                   'mode-line-buffer-id))
-      'help-echo buffer-file-name))
+     (let ((file-name (buffer-file-name (buffer-base-buffer))))
+       (propertize
+        (or (when (and file-name (not (file-remote-p file-name)))
+              (when-let (project (doom-project-root file-name))
+                (file-relative-name (or buffer-file-truename (file-truename file-name))
+                                    (concat project ".."))))
+            "%b")
+        'face (cond ((buffer-modified-p)
+                     '(error bold mode-line-buffer-id))
+                    ((+modeline-active)
+                     'mode-line-buffer-id))
+        'help-echo file-name)))
     (buffer-read-only (:propertize " RO" face warning))))
 
 
@@ -400,9 +400,9 @@ Requires `anzu', also `evil-anzu' if using `evil-mode' for compatibility with
                                                     warning
                                                     info))))
                (+modeline-format-icon "check" "" 'success)))
-            (`running     (+modeline-format-icon "access_time" "*" 'font-lock-comment-face "Running..."))
+            (`running     (+modeline-format-icon "access_time" "*" 'mode-line-inactive "Running..."))
             (`errored     (+modeline-format-icon "sim_card_alert" "!" 'error "Errored!"))
-            (`interrupted (+modeline-format-icon "pause" "!" 'font-lock-comment-face "Interrupted"))
+            (`interrupted (+modeline-format-icon "pause" "!" 'mode-line-inactive "Interrupted"))
             (`suspicious  (+modeline-format-icon "priority_high" "!" 'error "Suspicious"))))))
 
 
@@ -458,14 +458,17 @@ lines are selected, or the NxM dimensions of a block selection.")
 
 ;;; `+modeline-encoding'
 (def-modeline-var! +modeline-encoding
-  '(:eval
-    (concat (coding-system-eol-type-mnemonic buffer-file-coding-system)
-            " "
-            (let ((sys (coding-system-plist buffer-file-coding-system)))
+  `(:eval
+    (let ((sys (coding-system-plist buffer-file-coding-system))
+          (eol (coding-system-eol-type-mnemonic buffer-file-coding-system)))
+      (concat (unless (equal eol ,(if IS-WINDOWS "CRLF" "LF"))
+                (concat "  " eol " "))
               (if (memq (plist-get sys :category)
                         '(coding-category-undecided coding-category-utf-8))
-                  "UTF-8"
-                (upcase (symbol-name (plist-get sys :name))))))))
+                  (unless (string-match-p "utf-8" (symbol-name buffer-file-coding-system))
+                    "UTF-8  ")
+                (concat (upcase (symbol-name (plist-get sys :name)))
+                        "  "))))))
 
 ;; Clearer mnemonic labels for EOL styles
 (setq eol-mnemonic-dos "CRLF"
@@ -491,7 +494,6 @@ lines are selected, or the NxM dimensions of a block selection.")
               vc-mode " "))
     "  "
     +modeline-encoding
-    "  "
     (+modeline-checker ("" +modeline-checker "   "))))
 
 (def-modeline! 'project

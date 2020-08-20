@@ -53,12 +53,6 @@
 ;; You can also try 'gd' (or 'C-c g d') to jump to their definition and see how
 ;; they are implemented.
 
-;; Migrate from `modules/lang/org'
-(use-package! org-fancy-priorities ; priority icons
-  :hook (org-mode . org-fancy-priorities-mode)
-  :config (setq org-fancy-priorities-list '("☢" "☕" "■")))
-;; ("❗" "⬆" "⬇" "☕")
-
 (use-package! smart-input-source
   :init
   ;; set the english input source

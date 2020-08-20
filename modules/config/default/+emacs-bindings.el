@@ -34,8 +34,10 @@
        :desc "Evaluate buffer/region"                "e"   #'+eval/buffer-or-region
        :desc "Evaluate & replace region"             "E"   #'+eval/region-and-replace
        :desc "Format buffer/region"                  "f"   #'+format/region-or-buffer
+       :desc "Find implementations"                  "i"   #'+lookup/implementations
        :desc "Jump to documentation"                 "k"   #'+lookup/documentation
        :desc "Send to repl"                          "s"   #'+eval/send-region-to-repl
+       :desc "Find type definition"                  "t"   #'+lookup/type-definition
        :desc "Delete trailing whitespace"            "w"   #'delete-trailing-whitespace
        :desc "Delete trailing newlines"              "W"   #'doom/delete-trailing-newlines
        :desc "List errors"                           "x"   #'flymake-show-diagnostics-buffer
@@ -43,7 +45,7 @@
         :desc "List errors"                         "x"   #'flycheck-list-errors)
        (:when (and (featurep! :tools lsp) (not (featurep! :tools lsp +eglot)))
         :desc "LSP Code actions"                      "a"   #'lsp-execute-code-action
-        :desc "LSP Organize imports"                  "i"   #'lsp-organize-imports
+        :desc "LSP Organize imports"                  "o"   #'lsp-organize-imports
         :desc "LSP Rename"                            "r"   #'lsp-rename
         (:after lsp-mode
          :desc "LSP"                                   "l"   lsp-command-map)
@@ -55,10 +57,8 @@
          :desc "Jump to symbol in any workspace"     "J"   #'helm-lsp-global-workspace-symbol))
        (:when (featurep! :tools lsp +eglot)
         :desc "LSP Execute code action"              "a" #'eglot-code-actions
-        :desc "LSP Format buffer/region"             "F" #'eglot-format
         :desc "LSP Rename"                           "r" #'eglot-rename
-        :desc "LSP Find declaration"                 "j" #'eglot-find-declaration
-        :desc "LSP Find implementation"              "J" #'eglot-find-implementation))
+        :desc "LSP Find declaration"                 "j" #'eglot-find-declaration))
 
       ;;; <leader> f --- file
       (:prefix-map ("f" . "file")
@@ -118,8 +118,7 @@
        :desc "Look up in all docsets"       "K" #'+lookup/in-all-docsets
        :desc "Search project"               "p" #'+default/search-project
        :desc "Search other project"         "P" #'+default/search-other-project
-       :desc "Search buffer"                "s" #'swiper-isearch
-       :desc "Search buffer for thing at point" "S" #'swiper-isearch-thing-at-point
+       :desc "Search buffer"                "s" #'+default/search-buffer
        :desc "Dictionary"                   "t" #'+lookup/dictionary-definition
        :desc "Thesaurus"                    "T" #'+lookup/synonyms)
 
@@ -140,8 +139,8 @@
         (cond ((featurep! :completion ivy)   #'ivy-bibtex)
               ((featurep! :completion helm)  #'helm-bibtex)))
 
-       :desc "Toggle org-clock"               "c" #'+org/toggle-clock
-       :desc "Cancel org-clock"               "C" #'org-clock-cancel
+       :desc "Toggle last org-clock"          "c" #'+org/toggle-last-clock
+       :desc "Cancel current org-clock"       "C" #'org-clock-cancel
        :desc "Open deft"                      "d" #'deft
        (:when (featurep! :lang org +noter)
         :desc "Org noter"                    "e" #'org-noter)
@@ -278,7 +277,7 @@
        (:when (featurep! :ui minimap)
         :desc "Minimap mode"               "m" #'minimap-mode)
        (:when (featurep! :lang org +present)
-        :desc "org-tree-slide mode"        "p" #'+org-present/start)
+        :desc "org-tree-slide mode"        "p" #'org-tree-slide-mode)
        :desc "Read-only mode"               "r" #'read-only-mode
        (:when (featurep! :checkers spell)
         :desc "Flyspell"                   "s" #'flyspell-mode)
@@ -419,16 +418,9 @@
 (map! "C-'" #'imenu
 
       ;;; Text scaling
-      [C-mouse-4] #'text-scale-increase
-      [C-mouse-5] #'text-scale-decrease
-      [C-down-mouse-2] (cmd! (text-scale-set 0))
       "M-+" #'doom/reset-font-size
       "M-=" #'doom/increase-font-size
       "M--" #'doom/decrease-font-size
-
-      ;;; newlines
-      [remap newline]  #'newline-and-indent
-      "C-j"            #'+default/newline
 
       ;;; search
       (:when (featurep! :completion ivy)

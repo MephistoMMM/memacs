@@ -7,7 +7,9 @@
   "The keys to use for universal repeating motions.
 
 This is a cons cell whose CAR is the key for repeating a motion forward, and
-whose CDR is for repeating backward. They should both be `kbd'-able strings.")
+whose CDR is for repeating backward. They should both be `kbd'-able strings.
+
+Set this to `nil' to disable universal-repeating on these keys.")
 
 (defvar +evil-want-o/O-to-continue-comments t
   "If non-nil, the o/O keys will continue comment lines if the point is on a
@@ -48,12 +50,15 @@ directives. By default, this only recognizes C directives.")
         evil-visual-state-cursor 'hollow
         ;; Only do highlighting in selected window so that Emacs has less work
         ;; to do highlighting them all.
-        evil-ex-interactive-search-highlight 'selected-window)
+        evil-ex-interactive-search-highlight 'selected-window
+        ;; It's infuriating that innocuous "beginning of line" or "end of line"
+        ;; errors will abort macros, so suppress them:
+        evil-kbd-macro-suppress-motion-error t)
 
   ;; Slow this down from 0.02 to prevent blocking in large or folded buffers
   ;; like magit while incrementally highlighting matches.
-  (setq-hook! 'magit-mode-hook evil-ex-hl-update-delay 0.2)
-  (setq-hook! 'so-long-minor-mode-hook evil-ex-hl-update-delay 0.25)
+  (setq-hook! '(magit-mode-hook so-long-minor-mode-hook)
+    evil-ex-hl-update-delay 0.25)
 
   :config
   (evil-select-search-module 'evil-search-module 'evil-search)
@@ -156,6 +161,9 @@ directives. By default, this only recognizes C directives.")
     (when (evil-ex-p)
       (run-at-time 0.1 nil #'helpful-key key-sequence)
       (abort-recursive-edit)))
+
+  ;; Make J (evil-join) remove comment delimiters when joining lines.
+  (advice-add #'evil-join :override #'+evil-join-a)
 
   ;; Make ESC (from normal mode) the universal escaper. See `doom-escape-hook'.
   (advice-add #'evil-force-normal-state :after #'+evil-escape-a)
@@ -328,7 +336,8 @@ directives. By default, this only recognizes C directives.")
             'calc-mode
             'magit-mode
             'ranger-mode
-            'git-rebase-mode)
+            'git-rebase-mode
+            'treemacs-mode)
   (evil-snipe-mode +1)
   (evil-snipe-override-mode +1))
 
@@ -370,42 +379,6 @@ directives. By default, this only recognizes C directives.")
 
 ;;
 ;;; Keybinds
-
-(defmacro set-repeater! (command next-func prev-func)
-  "Makes ; and , the universal repeat-keys in evil-mode.
-To change these keys see `+evil-repeat-keys'."
-  `(defadvice! ,(intern (format "+evil--repeat-%s-a" (doom-unquote command))) (&rest _)
-     :after-while #',command
-     (when +evil-repeat-keys
-       (evil-define-key* 'motion 'local
-         (kbd (car +evil-repeat-keys)) #',next-func
-         (kbd (cdr +evil-repeat-keys)) #',prev-func))))
-
-;; n/N
-(set-repeater! evil-ex-search-next evil-ex-search-next evil-ex-search-previous)
-(set-repeater! evil-ex-search-previous evil-ex-search-next evil-ex-search-previous)
-(set-repeater! evil-ex-search-forward evil-ex-search-next evil-ex-search-previous)
-(set-repeater! evil-ex-search-backward evil-ex-search-next evil-ex-search-previous)
-
-;; f/F/t/T/s/S
-(after! evil-snipe
-  (setq evil-snipe-repeat-keys nil
-        evil-snipe-override-evil-repeat-keys nil) ; causes problems with remapped ;
-  (set-repeater! evil-snipe-f evil-snipe-repeat evil-snipe-repeat-reverse)
-  (set-repeater! evil-snipe-F evil-snipe-repeat evil-snipe-repeat-reverse)
-  (set-repeater! evil-snipe-t evil-snipe-repeat evil-snipe-repeat-reverse)
-  (set-repeater! evil-snipe-T evil-snipe-repeat evil-snipe-repeat-reverse)
-  (set-repeater! evil-snipe-s evil-snipe-repeat evil-snipe-repeat-reverse)
-  (set-repeater! evil-snipe-S evil-snipe-repeat evil-snipe-repeat-reverse)
-  (set-repeater! evil-snipe-x evil-snipe-repeat evil-snipe-repeat-reverse)
-  (set-repeater! evil-snipe-X evil-snipe-repeat evil-snipe-repeat-reverse))
-
-;; */#
-(set-repeater! evil-visualstar/begin-search-forward
-               evil-ex-search-next evil-ex-search-previous)
-(set-repeater! evil-visualstar/begin-search-backward
-               evil-ex-search-previous evil-ex-search-next)
-
 
 ;; Keybinds that have no Emacs+evil analogues (i.e. don't exist):
 ;;   zq - mark word at point as good word
@@ -505,7 +478,7 @@ To change these keys see `+evil-repeat-keys'."
       :nv "zn"    #'+evil:narrow-buffer
       :n  "zN"    #'doom/widen-indirectly-narrowed-buffer
       :n  "zx"    #'kill-current-buffer
-      :n  "ZX"    #'bury-buffer
+      :n  "ZX"    #'doom/save-and-kill-buffer
       ;; don't leave visual mode after shifting
       :v  "<"     #'+evil/visual-dedent  ; vnoremap < <gv
       :v  ">"     #'+evil/visual-indent  ; vnoremap > >gv

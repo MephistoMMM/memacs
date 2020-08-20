@@ -12,6 +12,7 @@
   :commands rustic-run-cargo-command rustic-cargo-outdated
   :init
   (after! org-src
+    (defalias 'org-babel-execute:rust #'org-babel-execute:rustic)
     (add-to-list 'org-src-lang-modes '("rust" . rustic)))
   :config
   (set-docsets! 'rustic-mode "Rust")
@@ -68,7 +69,7 @@
 
 (use-package! racer
   :unless (featurep! +lsp)
-  :hook (rustic-mode . racer-mode)
+  :hook (rustic-mode-local-vars . racer-mode)
   :init
   ;; HACK Fix #2132: `racer' depends on `rust-mode', which tries to modify
   ;;      `auto-mode-alist'. We make extra sure that doesn't stick, especially

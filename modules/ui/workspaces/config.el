@@ -163,6 +163,7 @@ stored in `persp-save-dir'.")
             ("O" counsel-projectile-switch-project-action "jump to a project buffer or file")
             ("f" counsel-projectile-switch-project-action-find-file "jump to a project file")
             ("d" counsel-projectile-switch-project-action-find-dir "jump to a project directory")
+            ("D" counsel-projectile-switch-project-action-dired "open project in dired")
             ("b" counsel-projectile-switch-project-action-switch-to-buffer "jump to a project buffer")
             ("m" counsel-projectile-switch-project-action-find-file-manually "find file manually from project root")
             ("w" counsel-projectile-switch-project-action-save-all-buffers "save all project buffers")
@@ -195,10 +196,19 @@ stored in `persp-save-dir'.")
       (defun +workspaces-delete-all-posframes-h (&rest _)
         (posframe-delete-all))))
 
-  ;; Fix #1525: Ignore dead buffers in PERSP's buffer list
-  (defun +workspaces-dead-buffer-p (buf)
-    (not (buffer-live-p buf)))
-  (add-hook 'persp-filter-save-buffers-functions #'+workspaces-dead-buffer-p)
+
+  (add-hook! 'persp-filter-save-buffers-functions
+    (defun +workspaces-dead-buffer-p (buf)
+      ;; Fix #1525: Ignore dead buffers in PERSP's buffer list
+      (not (buffer-live-p buf)))
+    (defun +workspaces-remote-buffer-p (buf)
+      ;; And don't save TRAMP buffers; they're super slow to restore
+      (let ((dir (buffer-local-value 'default-directory buf)))
+        (ignore-errors (file-remote-p dir)))))
+
+  ;; Otherwise, buffers opened via bookmarks aren't treated as "real" and are
+  ;; excluded from the buffer list.
+  (add-hook 'bookmark-after-jump-hook #'+workspaces-add-current-buffer-h)
 
   ;;
   ;; eshell

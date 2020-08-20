@@ -34,11 +34,12 @@ dashboard reloading is inhibited.")
 
 Possible values:
 
-  'last-project  the `doom-project-root' of the last open buffer
-  'last          the `default-directory' of the last open buffer
-  a FUNCTION     a function run with the `default-directory' of the last
+  'last-project  The `doom-project-root' of the last open buffer. Falls back
+                 to `default-directory' if not in a project.
+  'last          The `default-directory' of the last open buffer
+  a FUNCTION     A function run with the `default-directory' of the last
                  open buffer, that returns a directory path
-  a STRING       a fixed path
+  a STRING       A fixed path
   nil            `default-directory' will never change")
 
 (defvar +doom-dashboard-menu-sections
@@ -182,6 +183,8 @@ PLIST can have the following properties:
   ;; Don't scroll to follow cursor
   (setq-local scroll-preserve-screen-position nil)
   (setq-local auto-hscroll-mode nil)
+  ;; Line numbers are ugly with large margins
+  (setq-local display-line-numbers-type nil)
   (cl-loop for (car . _cdr) in fringe-indicator-alist
            collect (cons car nil) into alist
            finally do (setq fringe-indicator-alist alist))
@@ -367,9 +370,8 @@ controlled by `+doom-dashboard-pwd-policy'."
           ((null lastcwd)
            default-directory)
           ((eq policy 'last-project)
-           (let ((cwd default-directory))
-             (or (doom-project-root lastcwd)
-                 cwd)))
+           (or (doom-project-root lastcwd)
+               lastcwd))
           ((eq policy 'last)
            lastcwd)
           ((warn "`+doom-dashboard-pwd-policy' has an invalid value of '%s'"

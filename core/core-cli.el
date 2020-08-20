@@ -18,6 +18,9 @@
 (require 'core-packages)
 (doom-initialize-core-packages)
 
+;; Don't generate superfluous files when writing temp buffers
+(setq make-backup-files nil)
+
 
 ;;
 ;;; Variables
@@ -166,23 +169,44 @@ COMMAND, and passes ARGS to it."
                (doom--cli-process cli (remq nil args)))
     (user-error "Couldn't find any %S command" command)))
 
+(defun doom-cli--execute-after (lines)
+  (let ((post-script (concat doom-local-dir ".doom.sh"))
+        (coding-system-for-write 'utf-8-unix)
+        (coding-system-for-read  'utf-8-unix))
+    (with-temp-file post-script
+      (insert "#!/usr/bin/env sh\n"
+              "_postscript() {\n"
+              "rm -f " (shell-quote-argument post-script) "\n"
+              (if (stringp lines)
+                  lines
+                (string-join
+                 (if (listp (car-safe lines))
+                     (cl-loop for line in (doom-enlist lines)
+                              collect (mapconcat #'shell-quote-argument (remq nil line) " "))
+                   (list (mapconcat #'shell-quote-argument (remq nil lines) " ")))
+                 "\n"))
+              "\n}\n"
+              (save-match-data
+                (cl-loop for env in process-environment
+                         if (string-match "^\\([a-zA-Z0-9_]+\\)=\\(.+\\)$" env)
+                         concat (format "%s=%s \\\n"
+                                        (match-string 1 env)
+                                        (shell-quote-argument (match-string 2 env)))))
+              (format "PATH=\"%s%s$PATH\" \\\n" (concat doom-emacs-dir "bin/") path-separator)
+              "_postscript $@\n"))
+    (set-file-modes post-script #o700)))
+
+(defun doom-cli-execute-lines-after (&rest lines)
+  "TODO"
+  (doom-cli--execute-after (string-join lines "\n")))
+
 (defun doom-cli-execute-after (&rest args)
   "Execute shell command ARGS after this CLI session quits.
 
 This is particularly useful when the capabilities of Emacs' batch terminal are
 insufficient (like opening an instance of Emacs, or reloading Doom after a 'doom
 upgrade')."
-  (let ((post-script (concat doom-local-dir ".doom.sh")))
-    (with-temp-file post-script
-      (insert "#!/usr/bin/env sh\n"
-              "rm -f " (prin1-to-string post-script) "\n"
-              "exec " (mapconcat #'shell-quote-argument (remq nil args) " ")
-              "\n"))
-    (let* ((current-mode (file-modes post-script))
-           (add-mode (logand ?\111 (default-file-modes))))
-      (or (/= (logand ?\111 current-mode) 0)
-          (zerop add-mode)
-          (set-file-modes post-script (logior current-mode add-mode))))))
+  (doom-cli--execute-after args))
 
 (defmacro defcli! (name speclist &optional docstring &rest body)
   "Defines a CLI command.

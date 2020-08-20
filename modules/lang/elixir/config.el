@@ -14,7 +14,7 @@
   ;; a subset of them (defined below).
   (provide 'smartparens-elixir)
   :config
-  (set-pretty-symbols! 'elixir-mode
+  (set-ligatures! 'elixir-mode
     ;; Functional
     :def "def"
     :lambda "fn"
@@ -37,7 +37,12 @@
     (sp-local-pair "fn " " end" :unless '(sp-in-comment-p sp-in-string-p)))
 
   (when (featurep! +lsp)
-    (add-hook 'elixir-mode-local-vars-hook #'lsp!)))
+    (add-hook 'elixir-mode-local-vars-hook #'lsp!))
+
+  (after! highlight-numbers
+    (puthash 'elixir-mode
+             "\\_<-?[[:digit:]]+\\(?:_[[:digit:]]\\{3\\}\\)*\\_>"
+             highlight-numbers-modelist)))
 
 
 (use-package! flycheck-credo

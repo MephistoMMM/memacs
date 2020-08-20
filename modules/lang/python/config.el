@@ -13,7 +13,7 @@ called.")
 
 
 ;;
-;; Packages
+;;; Packages
 
 (use-package! python
   :mode ("[./]flake8\\'" . conf-mode)
@@ -31,7 +31,7 @@ called.")
   (set-repl-handler! 'python-mode #'+python/open-repl :persist t)
   (set-docsets! 'python-mode "Python 3" "NumPy" "SciPy")
 
-  (set-pretty-symbols! 'python-mode
+  (set-ligatures! 'python-mode
     ;; Functional
     :def "def"
     :lambda "lambda"
@@ -198,7 +198,7 @@ called.")
 
 
 ;;
-;; Environment management
+;;; Environment management
 
 (use-package! pipenv
   :commands pipenv-project-p
@@ -247,7 +247,7 @@ called.")
   (pyenv-mode +1)
   (when (executable-find "pyenv")
     (add-to-list 'exec-path (expand-file-name "shims" (or (getenv "PYENV_ROOT") "~/.pyenv"))))
-  (add-hook 'python-mode-hook #'+python-pyenv-mode-set-auto-h)
+  (add-hook 'python-mode-local-vars-hook #'+python-pyenv-mode-set-auto-h)
   (add-hook 'doom-switch-buffer-hook #'+python-pyenv-mode-set-auto-h))
 
 
@@ -291,23 +291,6 @@ called.")
   :after python)
 
 
-(use-package! lsp-python-ms
-  :when (and (featurep! +lsp) (not (featurep! :tools lsp +eglot)))
-  :after lsp-clients
-  :preface
-  (after! python
-    (setq lsp-python-ms-python-executable-cmd python-shell-interpreter))
-  :init
-  ;; HACK If you don't have python installed, then opening python buffers with
-  ;;      this on causes a "wrong number of arguments: nil 0" error, because of
-  ;;      careless usage of `cl-destructuring-bind'. This silences that error,
-  ;;      since we may still want to write some python on a system without
-  ;;      python installed!
-  (defadvice! +python--silence-errors-a (orig-fn &rest args)
-    :around #'lsp-python-ms--extra-init-params
-    (ignore-errors (apply orig-fn args))))
-
-
 (use-package! cython-mode
   :when (featurep! +cython)
   :mode "\\.p\\(yx\\|x[di]\\)\\'"
@@ -323,3 +306,21 @@ called.")
   :when (featurep! +cython)
   :when (featurep! :checkers syntax)
   :after cython-mode)
+
+
+;;
+;;; LSP
+
+(when! (and (featurep! +lsp)
+            (not (featurep! :tools lsp +eglot)))
+
+  (use-package! lsp-python-ms
+    :unless (featurep! +pyright)
+    :after lsp-mode
+    :preface
+    (after! python
+      (setq lsp-python-ms-python-executable-cmd python-shell-interpreter)))
+
+  (use-package! lsp-pyright
+    :when (featurep! +pyright)
+    :after lsp-mode))

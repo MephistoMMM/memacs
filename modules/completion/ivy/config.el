@@ -46,6 +46,11 @@ results buffer.")
     [remap persp-switch-to-buffer]        #'+ivy/switch-workspace-buffer
     [remap evil-show-jumps]               #'+ivy/jump-list)
   :config
+  ;; The default sorter is much to slow and the default for `ivy-sort-max-size'
+  ;; is way too big (30,000). Turn it down so big repos affect project
+  ;; navigation less.
+  (setq ivy-sort-max-size 7500)
+
   ;; Counsel changes a lot of ivy's state at startup; to control for that, we
   ;; need to load it as early as possible. Some packages (like `ivy-prescient')
   ;; require this.
@@ -69,7 +74,7 @@ results buffer.")
   ;; Highlight each ivy candidate including the following newline, so that it
   ;; extends to the right edge of the window
   (setf (alist-get 't ivy-format-functions-alist)
-        #'ivy-format-function-line)
+        #'+ivy-format-function-line-or-arrow)
 
   ;; Integrate `ivy' with `better-jumper'; ensure a jump point is registered
   ;; before jumping to new locations with ivy
@@ -282,11 +287,11 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
     "Change `counsel-file-jump' to use fd or ripgrep, if they are available."
     :override #'counsel--find-return-list
     (cl-destructuring-bind (find-program . args)
-        (cond ((executable-find doom-projectile-fd-binary)
-               (append (list doom-projectile-fd-binary
-                             "--color=never" "-E" ".git"
-                             "--type" "file" "--type" "symlink" "--follow")
-                       (if IS-WINDOWS '("--path-separator=/"))))
+        (cond ((when-let (fd (executable-find (or doom-projectile-fd-binary "fd")))
+                 (append (list fd
+                               "--color=never" "-E" ".git"
+                               "--type" "file" "--type" "symlink" "--follow")
+                         (if IS-WINDOWS '("--path-separator=/")))))
               ((executable-find "rg")
                (append (list "rg" "--files" "--follow" "--color=never" "--hidden" "--no-messages")
                        (cl-loop for dir in projectile-globally-ignored-directories
@@ -300,10 +305,9 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
        (cons find-program args)
        (lambda ()
          (goto-char (point-min))
-         (let ((offset (if (member find-program (list "rg" doom-projectile-fd-binary)) 0 2))
-               files)
+         (let (files)
            (while (< (point) (point-max))
-             (push (buffer-substring (+ offset (line-beginning-position)) (line-end-position))
+             (push (buffer-substring (line-beginning-position) (line-end-position))
                    files)
              (forward-line 1))
            (nreverse files)))))))

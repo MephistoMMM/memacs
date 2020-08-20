@@ -50,9 +50,6 @@
                                (not (memq (char-after) (list ?\( ?\[ ?\{ ?\} ?\] ?\))))))
                       #'yas-insert-snippet)
 
-      ;; Smarter newlines
-      :i [remap newline] #'newline-and-indent  ; auto-indent on newline
-
       (:after help :map help-mode-map
        :n "o"       #'link-hint-open-link)
       (:after helpful :map helpful-mode-map
@@ -116,8 +113,8 @@
 
 ;;; :completion
 (map! (:when (featurep! :completion company)
-       :i "C-@"      #'+company/complete
-       :i "C-SPC"    #'+company/complete
+       :i "C-@"      (cmds! (not (minibufferp)) #'+company/complete)
+       :i "C-SPC"    (cmds! (not (minibufferp)) #'+company/complete)
        (:after company
         (:map company-active-map
          "C-w"     nil  ; don't interfere with `evil-delete-backward-word'
@@ -142,11 +139,7 @@
          "C-j"     #'company-select-next-or-abort
          "C-k"     #'company-select-previous-or-abort
          "C-s"     (cmd! (company-search-abort) (company-filter-candidates))
-         [escape]  #'company-search-abort))
-       ;; TAB auto-completion in term buffers
-       (:after comint :map comint-mode-map
-        "TAB" #'company-complete
-        [tab] #'company-complete))
+         [escape]  #'company-search-abort)))
 
       (:when (featurep! :completion ivy)
         (:after ivy
@@ -329,9 +322,9 @@
 
       ;;; <leader> c --- code
       (:prefix-map ("c" . "code")
-        (:unless (featurep! :tools lsp +eglot)
+       (:when (and (featurep! :tools lsp) (not (featurep! :tools lsp +eglot)))
           :desc "LSP Execute code action" "a" #'lsp-execute-code-action
-          :desc "LSP Organize imports" "i" #'lsp-organize-imports
+          :desc "LSP Organize imports" "o" #'lsp-organize-imports
           (:when (featurep! :completion ivy)
             :desc "Jump to symbol in current workspace" "j"   #'lsp-ivy-workspace-symbol
             :desc "Jump to symbol in any workspace"     "J"   #'lsp-ivy-global-workspace-symbol)
@@ -343,10 +336,8 @@
            :desc "LSP"                                   "l"   lsp-command-map))
         (:when (featurep! :tools lsp +eglot)
           :desc "LSP Execute code action" "a" #'eglot-code-actions
-          :desc "LSP Format buffer/region" "F" #'eglot-format
           :desc "LSP Rename" "r" #'eglot-rename
-          :desc "LSP Find declaration" "j" #'eglot-find-declaration
-          :desc "LSP Find implementation" "J" #'eglot-find-implementation)
+          :desc "LSP Find declaration" "j" #'eglot-find-declaration)
         :desc "Compile"                               "c"   #'compile
         :desc "Recompile"                             "C"   #'recompile
         :desc "Jump to definition"                    "d"   #'+lookup/definition
@@ -354,8 +345,10 @@
         :desc "Evaluate buffer/region"                "e"   #'+eval/buffer-or-region
         :desc "Evaluate & replace region"             "E"   #'+eval:replace-region
         :desc "Format buffer/region"                  "f"   #'+format/region-or-buffer
+        :desc "Find implementations"                  "i"   #'+lookup/implementations
         :desc "Jump to documentation"                 "k"   #'+lookup/documentation
         :desc "Send to repl"                          "s"   #'+eval/send-region-to-repl
+        :desc "Find type definition"                  "t"   #'+lookup/type-definition
         :desc "Delete trailing whitespace"            "w"   #'delete-trailing-whitespace
         :desc "Delete trailing newlines"              "W"   #'doom/delete-trailing-newlines
         :desc "List errors"                           "x"   #'flymake-show-diagnostics-buffer
@@ -390,7 +383,7 @@
       (:prefix-map ("f" . "file")
        :desc "Open project editorconfig"   "c"   #'editorconfig-find-current-editorconfig
        :desc "Copy this file"              "C"   #'doom/copy-this-file
-       :desc "Find directory"              "d"   #'dired
+       :desc "Find directory"              "d"   #'+default/dired
        :desc "Delete this file"            "D"   #'doom/delete-this-file
        :desc "Find file in emacs.d"        "e"   #'+default/find-in-emacsd
        :desc "Browse emacs.d"              "E"   #'+default/browse-emacsd
@@ -486,8 +479,8 @@
         (cond ((featurep! :completion ivy)   #'ivy-bibtex)
               ((featurep! :completion helm)  #'helm-bibtex)))
 
-       :desc "Toggle org-clock"             "c" #'+org/toggle-clock
-       :desc "Cancel org-clock"             "C" #'org-clock-cancel
+       :desc "Toggle last org-clock"        "c" #'+org/toggle-last-clock
+       :desc "Cancel current org-clock"     "C" #'org-clock-cancel
        :desc "Open deft"                    "d" #'deft
        (:when (featurep! :lang org +noter)
         :desc "Org noter"                  "e" #'org-noter)
@@ -681,10 +674,11 @@
    :desc "Jump to visible link"         "l" #'link-hint-open-link
    :desc "Jump to link"                 "L" #'ffap-menu
    :desc "Jump list"                    "j" #'evil-show-jumps
-   :desc "Jump to mark"                 "m" #'evil-show-marks
+   :desc "Jump to bookmark"             "m" #'bookmark-jump
    :desc "Search project"               "/" #'+default/search-project
    :desc "Search project for thing at point" "?" #'+default/search-project-for-symbol-at-point
    :desc "Search other project"         "o" #'+default/search-other-project
+   :desc "Jump to mark"                 "r" #'evil-show-marks
    :desc "Search buffer"                "s" #'swiper-isearch
    :desc "Search buffer for thing at point" "S" #'swiper-isearch-thing-at-point)
 

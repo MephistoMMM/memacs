@@ -162,7 +162,7 @@ we have to clean it up ourselves."
 
 
 (use-package! fd-dired
-  :when (executable-find doom-projectile-fd-binary)
+  :when doom-projectile-fd-binary
   :defer t
   :init
   (global-set-key [remap find-dired] #'fd-dired)
@@ -173,6 +173,8 @@ we have to clean it up ourselves."
 (map! :after dired
       :map (dired-mode-map ranger-mode-map)
       :ng ")" #'dired-git-info-mode)
+(setq dgi-commit-message-format "%h %cs %s"
+      dgi-auto-hide-details-p nil)
 (after! wdired
   ;; Temporarily disable `dired-git-info-mode' when entering wdired, due to
   ;; reported incompatibilities.

@@ -41,7 +41,8 @@ Used by `+lookup/online'.")
   "Function to use to open search urls.")
 
 (defvar +lookup-definition-functions
-  '(+lookup-xref-definitions-backend-fn
+  '(+lookup-dictionary-definition-backend-fn
+    +lookup-xref-definitions-backend-fn
     +lookup-dumb-jump-backend-fn
     +lookup-project-search-backend-fn
     +lookup-evil-goto-definition-backend-fn)
@@ -73,7 +74,8 @@ argument: the identifier at point. See `set-lookup-handlers!' about adding to
 this list.")
 
 (defvar +lookup-references-functions
-  '(+lookup-xref-references-backend-fn
+  '(+lookup-thesaurus-definition-backend-fn
+    +lookup-xref-references-backend-fn
     +lookup-project-search-backend-fn)
   "Functions for `+lookup/references' to try, before resorting to `dumb-jump'.
 Stops at the first function to return non-nil or change the current
@@ -184,20 +186,6 @@ Dictionary.app behind the scenes to get definitions.")
         dash-docs-min-length 2
         dash-docs-browser-func #'eww)
 
-  ;; Before `gnutls' is loaded, `gnutls-algorithm-priority' is treated as a
-  ;; lexical variable, which breaks `+lookup*fix-gnutls-error'
-  (defvar gnutls-algorithm-priority)
-  (defadvice! +lookup--fix-gnutls-error-a (orig-fn url)
-    "Fixes integer-or-marker-p errors emitted from Emacs' url library,
-particularly, the `url-retrieve-synchronously' call in
-`dash-docs-read-json-from-url'. This is part of a systemic issue with Emacs 26's
-networking library (fixed in Emacs 27+, apparently).
-
-See https://github.com/magit/ghub/issues/81"
-    :around #'dash-docs-read-json-from-url
-    (let ((gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-      (funcall orig-fn url)))
-
   (cond ((featurep! :completion helm)
          (require 'helm-dash nil t))
         ((featurep! :completion ivy)
@@ -215,12 +203,6 @@ See https://github.com/magit/ghub/issues/81"
   (setq define-word-displayfn-alist
         (cl-loop for (service . _) in define-word-services
                  collect (cons service #'+eval-display-results-in-popup))))
-
-
-(when (featurep! +dictionary)
-  (define-key! text-mode-map
-    [remap +lookup/definition] #'+lookup/dictionary-definition
-    [remap +lookup/references] #'+lookup/synonyms))
 
 
 ;;;###package synosaurus

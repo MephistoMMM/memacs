@@ -19,7 +19,7 @@
                 "gofmt"
               "goimports"))))
 
-  (set-pretty-symbols! 'go-mode
+  (set-ligatures! 'go-mode
     :null "nil"
     :def  "func"
     :true "true"
