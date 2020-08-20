@@ -53,42 +53,29 @@
 ;; You can also try 'gd' (or 'C-c g d') to jump to their definition and see how
 ;; they are implemented.
 
-(use-package! smart-input-source
-  :init
-  ;; set the english input source
-  (setq-default smart-input-source-other "com.sogou.inputmethod.sogou.pinyin")
-  ;; set the default other language input source for all buffer
-  (setq smart-input-source-english "com.apple.keylayout.ABC")
-
-  :config
-  ;; Input source specific cursor color
-  (defvar original-cursor-background nil)
-  (add-hook 'smart-input-source-set-english-hook
-            (lambda ()
-              (when original-cursor-background
-                (set-cursor-color original-cursor-background))))
-  (add-hook 'smart-input-source-set-other-hook
-            (lambda ()
-              (unless original-cursor-background
-                (setq original-cursor-background
-                      (or (cdr (assq 'cursor-color default-frame-alist))
-                          (face-background 'cursor)
-                          "Red")))
-              (set-cursor-color "green")))
-
-  ;; (push 'YOUR-COMMAND smart-input-source-preserve-save-triggers)
-
-  ;; enable the /respect/ mode
-  (smart-input-source-global-respect-mode t)
-
-  ;; enable the /follow context/ and /inline english/ mode for all buffers
-  (smart-input-source-global-follow-context-mode t)
-  (smart-input-source-global-inline-mode t)
-
-  ;; enable the /follow context/ and /inline english/ mode for specific buffers
+(use-package! sis
   ;; :hook
   ;; (((text-mode prog-mode) . smart-input-source-follow-context-mode)
   ;;  ((text-mode prog-mode) . smart-input-source-inline-english-mode))
+  :config
+  (sis-ism-lazyman-config
+  
+   ;; English input source may be: "ABC", "US" or another one.
+   ;; "com.apple.keylayout.US"
+   "com.apple.keylayout.ABC"
+
+   ;; Other language input source: "rime", "sogou" or another one.
+   ;; "im.rime.inputmethod.Squirrel.Rime"
+   "com.sogou.inputmethod.sogou.pinyin")
+
+    ;; enable the /cursor color/ mode
+  (sis-global-cursor-color-mode t)
+  ;; enable the /respect/ mode
+  (sis-global-respect-mode t)
+  ;; enable the /follow context/ mode for all buffers
+  (sis-global-follow-context-mode t)
+  ;; enable the /inline english/ mode for all buffers
+  (sis-global-inline-mode t)
   )
 
 (use-package! kana)

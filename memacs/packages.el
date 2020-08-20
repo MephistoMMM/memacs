@@ -53,3 +53,6 @@
 
 (package! kana
   :recipe (:host github :repo "chenyanming/kana"))
+
+(package! smart-input-source
+  :recipe (:host github :repo "laishulu/emacs-smart-input-source"))

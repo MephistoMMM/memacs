@@ -4,6 +4,7 @@
 (package! swiper :pin "9bb68419f1088ee4d8f2b76f84995fa02bceeed3")
 (package! ivy)
 (package! ivy-hydra)
+(package! ivy-avy)
 (package! counsel)
 
 (package! amx :pin "ccfc92c600df681df5e8b5fecec328c462ceb71e")
