@@ -31,6 +31,9 @@ shift $((OPTIND-1))
 [ $# -gt 0 ] && str="$*" || str=$(cat)
 
 
+# Fix incompatible terminals that cause odd 'not a valid terminal' errors
+[ $TERM -eq "alacritty" ] && export TERM=xterm-256color
+
 if [ $daemon ]; then
   emacsclient -a "" \
     -c -F '((name . "doom-capture") (width . 70) (height . 25) (transient . t))' \
