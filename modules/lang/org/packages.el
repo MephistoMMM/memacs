@@ -77,6 +77,7 @@
   (package! org-re-reveal :pin "7fe39d5d03ccc75d2811445d25cbbb473b53de76"))
 (when (featurep! +roam)
   (package! org-roam :pin "c33867e6bc282ff0a69d4ef4a020db82604039bb")
+  (package! org-roam-server :pin "fe0364ef63...")
   (when (featurep! :completion company)
     (package! company-org-roam :pin "1132663bd68022aa7ea005ff53c7c7571890769d")))
 

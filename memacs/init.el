@@ -195,7 +195,7 @@
        :config
        (lib +spacemacs)    ; BASE module
        ;;literate
-       (default +bindings +smartparens))
+       (default +bindings))
 
 (add-load-path! (concat (expand-file-name "~") "/.emacs.d/.local/straight/repos/doom-modeline") )
 (use-package! doom-modeline
