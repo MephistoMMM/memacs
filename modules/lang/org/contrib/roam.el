@@ -88,7 +88,7 @@
   :when (featurep! :completion company)
   :after org-roam
   :config
-  (set-company-backend! 'org-mode '(company-org-roam company-yasnippet company-dabbrev)))
+  (set-company-backend! 'org-mode '(company-yasnippet company-org-roam company-dabbrev)))
 
 (use-package! org-roam-server
   :after org-roam

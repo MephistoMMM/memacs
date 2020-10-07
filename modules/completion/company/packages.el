@@ -5,3 +5,5 @@
 (package! company-dict :pin "cd7b8394f6014c57897f65d335d6b2bd65dab1f4")
 (when (featurep! +childframe)
   (package! company-box :pin "d8f71fde7a3301a62f9f6f627aa51610a294f4df"))
+(when (featurep! +tabnine)
+  (package! company-tabnine :pin "e986a4ad0d0e0174b08f1fb94c4f804a98a344e4"))

@@ -150,3 +150,47 @@ https://github.com/sebastiencs/company-box/issues/44"
       (if (symbol-value mode)
           (add-to-list 'company-dict-minor-mode-list mode nil #'eq)
         (setq company-dict-minor-mode-list (delq mode company-dict-minor-mode-list))))))
+
+(defface tabnine-company-box-backend-tabnine-face
+  '((t (:inherit font-lock-constant-face)))
+  "company-box-backends-color for tabnine"
+  :group 'doom-themes)
+
+(defface tabnine-company-box-backend-tabnine-selected-face
+  '((t (:inherit company-box-selection)))
+  "company-box-backends-color for tabnine select"
+  :group 'doom-themes)
+
+(use-package! company-tabnine
+  :when (featurep! +childframe)
+  :after company
+  :init
+  (setq company-tabnine-binaries-folder "~/.local/share/Tabnine")
+  :config
+  (if (featurep! :tools lsp +lsp)
+      (setq +lsp-company-backends '(company-capf :with company-tabnine :separate))
+    (push #'company-tabnine company-backends))
+
+  (setq company-tabnine-max-num-results 3)
+
+  (add-to-list 'company-transformers '+company/sort-by-tabnine t)
+  ;; The free version of TabNine is good enough,
+  ;; and below code is recommended that TabNine not always
+  ;; prompt me to purchase a paid version in a large project.
+  (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
+    (let ((company-message-func (ad-get-arg 0)))
+      (when (and company-message-func
+                 (stringp (funcall company-message-func)))
+        (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
+          ad-do-it))))
+
+  (when (featurep! +childframe)
+    (with-eval-after-load 'company-box
+      (push #'+company/company-box-icons--tabnine company-box-icons-functions)
+      (map-put company-box-backends-colors
+               'company-tabnine
+               '(:all
+                 tabnine-company-box-backend-tabnine-face
+                 :selected
+                 tabnine-company-box-backend-tabnine-selected-face))))
+    )

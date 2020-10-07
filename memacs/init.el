@@ -21,6 +21,7 @@
 
        :completion
        (company            ; the ultimate code completion backend
+        +tabnine
         +childframe)
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
@@ -99,7 +100,7 @@
        ;;gist              ; interacting with github gists
        (lookup           ; helps you navigate your code and documentation
         +docsets)        ; ...or in Dash docsets locally
-       lsp
+       (lsp +lsp)
        magit             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
@@ -195,7 +196,7 @@
        :config
        (lib +spacemacs)    ; BASE module
        ;;literate
-       (default +bindings))
+       (default +bindings +smartparens))
 
 (add-load-path! (concat (expand-file-name "~") "/.emacs.d/.local/straight/repos/doom-modeline") )
 (use-package! doom-modeline
