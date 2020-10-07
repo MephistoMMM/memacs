@@ -45,9 +45,7 @@ stored in `persp-save-dir'.")
         ;; Remove default buffer predicate so persp-mode can put in its own
         (delq! 'buffer-predicate default-frame-alist 'assq)
         (require 'persp-mode)
-        (if (daemonp)
-            (add-hook 'after-make-frame-functions #'persp-mode-start-and-remove-from-make-frame-hook)
-          (persp-mode +1)))))
+        (persp-mode +1))))
   :config
   (setq persp-autokill-buffer-on-remove 'kill-weak
         persp-reset-windows-on-nil-window-conf nil
@@ -238,8 +236,9 @@ stored in `persp-save-dir'.")
     (defun +workspaces-reload-indirect-buffers-h (&rest _)
       (dolist (ibc +workspaces--indirect-buffers-to-restore)
         (cl-destructuring-bind (buffer-name . base-buffer-name) ibc
-          (when (buffer-live-p (get-buffer base-buffer-name))
-            (when (get-buffer buffer-name)
-              (setq buffer-name (generate-new-buffer-name buffer-name)))
-            (make-indirect-buffer bb buffer-name t))))
+          (let ((base-buffer (get-buffer base-buffer-name)))
+            (when (buffer-live-p base-buffer)
+              (when (get-buffer buffer-name)
+                (setq buffer-name (generate-new-buffer-name buffer-name)))
+              (make-indirect-buffer base-buffer buffer-name t)))))
       (setq +workspaces--indirect-buffers-to-restore nil))))

@@ -27,6 +27,7 @@
 ;; cursor color is concerned).
 (advice-add #'x-apply-session-resources :override #'ignore)
 
-;; Prevent unwanted runtime builds; packages are compiled ahead-of-time when
-;; they are installed and site files are compiled when gccemacs is installed.
+;; Prevent unwanted runtime builds in gccemacs (native-comp); packages are
+;; compiled ahead-of-time when they are installed and site files are compiled
+;; when gccemacs is installed.
 (setq comp-deferred-compilation nil)

@@ -536,6 +536,10 @@ display-line-numbers-mode."
 (add-hook! '(prog-mode-hook text-mode-hook conf-mode-hook)
            #'memacs-display-line-numbers)
 
+;; Fix #2742: cursor is off by 4 characters in `artist-mode'
+;; REVIEW: Reported upstream https://debbugs.gnu.org/cgi/bugreport.cgi?bug=43811
+(add-hook 'artist-mode-hook #'doom-disable-line-numbers-h)
+
 
 ;;
 ;;; Theme & font

@@ -396,7 +396,7 @@ directives. By default, this only recognizes C directives.")
       ;; implement dictionary keybinds
       ;; evil already defines 'z=' to `ispell-word' = correct word at point
       (:when (featurep! :checkers spell)
-       :n  "zq"   #'+spell/add-word
+       :n  "zg"   #'+spell/add-word
        :n  "zw"   #'+spell/remove-word
        :m  "[s"   #'+spell/previous-error
        :m  "]s"   #'+spell/next-error)
@@ -518,7 +518,8 @@ directives. By default, this only recognizes C directives.")
        "o"       #'doom/window-enlargen
        ;; Delete window
        "d"       #'evil-window-delete
-       "C-C"     #'ace-delete-window)
+       "C-C"     #'ace-delete-window
+       "T"       #'tear-off-window)
 
       ;; text objects
       :textobj "a" #'evil-inner-arg                    #'evil-outer-arg

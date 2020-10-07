@@ -50,7 +50,7 @@ symbol and CDR is the value to set it to when `doom-debug-mode' is activated.")
                  (set-default var enabled)
                (add-to-list 'doom--debug-vars-undefined var)))))
     (when (fboundp 'explain-pause-mode)
-      (explain-pause-mode enabled))
+      (explain-pause-mode (if enabled +1 -1)))
     ;; Watch for changes in `doom-debug-variables', or when packages load (and
     ;; potentially define one of `doom-debug-variables'), in case some of them
     ;; aren't defined when `doom-debug-mode' is first loaded.
@@ -323,7 +323,11 @@ Some items are not supported by the `nsm.el' module."
                       package--init-file-ensured t
                       package-user-dir ,package-user-dir
                       package-archives ',package-archives
-                      user-emacs-directory ,doom-emacs-dir)
+                      user-emacs-directory ,doom-emacs-dir
+                      comp-deferred-compilation nil
+                      comp-eln-load-path ',(bound-and-true-p comp-eln-load-path)
+                      comp-async-env-modifier-form ',(bound-and-true-p comp-async-env-modifier-form)
+                      comp-deferred-compilation-black-list ',(bound-and-true-p comp-deferred-compilation-black-list))
                 (with-eval-after-load 'undo-tree
                   ;; undo-tree throws errors because `buffer-undo-tree' isn't
                   ;; correctly initialized
