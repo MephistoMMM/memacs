@@ -103,4 +103,9 @@
         org-roam-server-network-arrows nil
         org-roam-server-network-label-truncate t
         org-roam-server-network-label-truncate-length 60
-        org-roam-server-network-label-wrap-length 20))
+        org-roam-server-network-label-wrap-length 20)
+  ;; smartparens cause error while major mode changing in org-mode
+  (if (boundp 'sp-ignore-modes-list)
+      (add-to-list 'sp-ignore-modes-list 'org-mode)
+    (setq sp-ignore-modes-list '(org-mode)))
+  )
