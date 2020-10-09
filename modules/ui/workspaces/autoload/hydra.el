@@ -21,8 +21,8 @@
  [_1_.._9_]^^     nth/new workspace   [_c_]   new workspace
  [_C-1_.._C-9_]^^ nth/new workspace   [_D_]   close current workspace
  [_<tab>_]^^^^    last workspace      [_r_]   rename current workspace
- [_h_/_l_]^^      circle workspace    [_S_]   save all workspaces/save by names
- [_n_/_p_]^^      circle workspace    [_L_]   load workspaces from file
+ [_h_/_l_]^^      circle workspace    [_S_]   save session
+ [_n_/_p_]^^      circle workspace    [_L_]   load session from file
  [_b_]^^^^        buffer in workspace [_R_]   resote last session
  [_w_]^^^^        switch workspace    [_X_]   kill current session
  ^^^^^^                               [_q_]   quit
@@ -57,13 +57,13 @@
         ("D" +workspace/delete :exit t)
         ("h" +workspace/switch-left)
         ("l" +workspace/switch-right)
-        ("L" +workspace/load :exit t)
+        ("L" doom/load-session :exit t)
         ("n" +workspace/switch-right)
         ("p" +workspace/switch-left)
         ;; TODO: ("o" +layouts/select-custom-layout :exit t)
         ("r" +workspace/rename :exit t)
         ("R" +workspace/restore-last-session :exit t)
-        ("S" +workspace/save :exit t)
+        ("S" doom/save-session :exit t)
         ("w" +workspace/switch-to :exit t)
         ("X" +workspace/kill-session :exit t)
         ("q" nil :exit t))
