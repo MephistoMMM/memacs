@@ -87,12 +87,15 @@ Used in org file template")
   "Modifies org-export to place exported files in a different directory"
   :around #'org-export-output-file-name
   (unless (null memacs--org-export-directory)
-      (setq pub-dir memacs--org-export-directory)
-      (when (not (file-directory-p pub-dir))
-        (make-directory pub-dir)))
-  (let ((output (funcall orig-fn extension subtreep pub-dir)))
-    (setq memacs--org-export-directory nil)
-    output))
+    (setq pub-dir memacs--org-export-directory)
+    (when (not (file-directory-p pub-dir))
+      (make-directory pub-dir)))
+  (funcall orig-fn extension subtreep pub-dir))
+
+(defadvice! +org-export-attach-export-links-a (orig-fn &rest _)
+  "Modifies org-attach-expand-links to my own implement"
+  :around #'org-attach-expand-links
+  (memacs-org-attach-expand-links _))
 
 ;; Helps
 (setq memacs-mission-helper-help-list

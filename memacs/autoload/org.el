@@ -98,12 +98,47 @@
 (defun +memacs-org-export-dispatch (&optional arg)
   "Change exported destination to the special path."
   (interactive "P")
+  ;; let org-attach init
+  (unless (boundp 'org-attach-expand-links)
+    (org-toggle-inline-images))
   (let ((dest (read-directory-name "Export to Directory: "
                                    nil default-directory nil)))
-    (setq memacs--org-export-directory (if (string-suffix-p "/" dest)
-                                           dest (concat dest "/")))
-    (org-export-dispatch))
+    (let ((memacs-org-export-attachment-filepath-a #'memacs--copy-to-destination-statics-dir)
+          (memacs--org-export-directory (if (string-suffix-p "/" dest)
+                                            dest (concat dest "/"))))
+      (org-export-dispatch)))
   )
+
+(defvar memacs-org-export-attachment-filepath-a nil
+  "Point cut for getting the file path of attachment.")
+
+;; HACK rewrite function in org-mode
+(defun memacs-org-attach-expand-links (_)
+  "Expand links in current buffer.
+It is meant to be added to `org-export-before-parsing-hook'."
+  (doom-log "run org-attach-expand-links with %s" memacs-org-export-attachment-filepath-a)
+  (save-excursion
+    (while (re-search-forward "attachment:" nil t)
+      (let ((link (org-element-context)))
+        (when (and (eq 'link (org-element-type link))
+                   (string-equal "attachment"
+                                 (org-element-property :type link)))
+          (let* ((description (and (org-element-property :contents-begin link)
+                                   (buffer-substring-no-properties
+                                    (org-element-property :contents-begin link)
+                                    (org-element-property :contents-end link))))
+                 (file (org-element-property :path link))
+                 (filepath (org-attach-expand file))
+                 (new-link (org-link-make-string
+                            (concat "file:"
+                                    (if  memacs-org-export-attachment-filepath-a
+                                        (funcall memacs-org-export-attachment-filepath-a file filepath)
+                                      filepath))
+                            description)))
+            (goto-char (org-element-property :end link))
+            (skip-chars-backward " \t")
+            (delete-region (org-element-property :begin link) (point))
+            (insert new-link)))))))
 
 ;; export files in dired or directory
 (defmacro export-org-in-dired! (type org-export-func)
@@ -119,16 +154,37 @@
                         (file-expand-wildcards "*.org")))))
            (dest (read-directory-name "Export to Directory: "
                                       nil default-directory nil))
-           )
-       (setq memacs--org-export-directory dest)
-       (mapc
-        (lambda (f)
-          (with-current-buffer
-              (find-file-noselect f)
-            (,org-export-func)))
-        files))
+           (let ((memacs-org-export-attachment-filepath-a memacs--copy-to-destination-statics-dir)
+                 (memacs--org-export-directory dest))
+             (mapc
+              (lambda (f)
+                (with-current-buffer
+                    (find-file-noselect f)
+                  (,org-export-func)))
+              files))
+           ))
      )
   )
+
+(defun memacs--copy-to-destination-statics-dir (filename filepath)
+  "A aspect for copy src file to statics dir in destination."
+  (doom-log "copy %s(%s) to statics" filepath filename)
+  (let ((statics-dir (concat memacs--org-export-directory "statics/")))
+    (if (not (file-exists-p filepath))
+        ;; return nil if image does not exist
+        nil
+      ;; modify url and copy image file if image exists
+      (unless (file-exists-p statics-dir)
+        (make-directory statics-dir))
+      (let ((dest (concat statics-dir filename))
+            (relative-path (concat "./statics/" filename)))
+        (unless (file-exists-p dest)
+          (copy-file filepath dest))
+        relative-path))))
+
+(defun memacs--export-to-Internet (filename filepath)
+  "A aspect for change path to url in the internet."
+  (concat custom-link-attachment-export-host "/statics/" filename))
 
 ;; export html
 
