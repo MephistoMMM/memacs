@@ -83,6 +83,12 @@ Used in org file template")
     ))
 
 ;; Export
+(defun memacs-org-export-add-header (_)
+  "Add header in current buffer."
+  (save-excursion
+    (goto-char (point-min))
+    (insert "#+SETUPFILE: ~/Dropbox/dotconf/export_setup.org\n")))
+
 (defadvice! +org-export-output-file-name-a (orig-fn extension &optional subtreep pub-dir)
   "Modifies org-export to place exported files in a different directory"
   :around #'org-export-output-file-name
@@ -96,6 +102,8 @@ Used in org file template")
   "Modifies org-attach-expand-links to my own implement"
   :around #'org-attach-expand-links
   (memacs-org-attach-expand-links _))
+
+(add-hook 'org-export-before-parsing-hook 'memacs-org-export-add-header)
 
 ;; Helps
 (setq memacs-mission-helper-help-list
