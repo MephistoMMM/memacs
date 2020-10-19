@@ -9,8 +9,7 @@ Used in org file template")
 (setq org-directory "~/Dropbox/org"
       +org-capture-work-directory "~/Documents/works"
       org-attach-id-dir (expand-file-name "~/Dropbox/org/statics/")
-      org-download-image-dir (expand-file-name "~/Dropbox/org/statics/")
-      org-roam-db-location (expand-file-name "~/.local/roam/org-roam.db"))
+      org-download-image-dir (expand-file-name "~/Dropbox/org/statics/"))
 
 ;; Roam
 (setq org-roam-buffer-width 0.2)

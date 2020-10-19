@@ -1,5 +1,5 @@
 ;;; lang/java/+lsp.el -*- lexical-binding: t; -*-
-;;;###if (featurep! +lsp)
+;;;###if (and (featurep! +lsp) (not (featurep! :tools lsp +eglot)))
 
 (defvar java-lombok-jar-path (expand-file-name "~/.local/share/lombok-1.18.10.jar")
   "The path of lombok.jar")

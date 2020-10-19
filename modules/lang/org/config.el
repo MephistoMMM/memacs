@@ -135,7 +135,7 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 
   ;; Previews are rendered with the incorrect background
   (plist-put org-format-latex-options :scale 1.5) ; larger previews
-  (plist-put org-format-latex-options :background 'default) ; larger previews
+  (plist-put org-format-latex-options :background 'default) ; match the background
 
   ;; HACK Face specs fed directly to `org-todo-keyword-faces' don't respect
   ;;      underlying faces like the `org-todo' face does, so we define our own
@@ -495,13 +495,14 @@ the exported output (i.e. formatters)."
     :around #'org-export-to-file
     (if (not org-export-in-background)
         (apply orig-fn args)
-      (setq org-export-async-init-file (make-temp-file "doom-org-async-export"))
-      (with-temp-file org-export-async-init-file
-        (prin1 `(progn (setq org-export-async-debug ,debug-on-error
-                             load-path ',load-path)
-                       (load ,user-init-file nil t))
-               (current-buffer)))
-      (apply orig-fn args))))
+      (let ((user-init-file (or org-export-async-init-file user-init-file)))
+        (setq org-export-async-init-file (make-temp-file "doom-org-async-export"))
+        (with-temp-file org-export-async-init-file
+          (prin1 `(progn (setq org-export-async-debug ,debug-on-error
+                               load-path ',load-path)
+                         (load ,user-init-file nil t))
+                 (current-buffer)))
+        (apply orig-fn args)))))
 
 
 (defun +org-init-habit-h ()
@@ -530,6 +531,14 @@ the exported output (i.e. formatters)."
   (setf (alist-get 'file org-link-frame-setup) #'find-file)
   ;; Open directory links in dired
   (add-to-list 'org-file-apps '(directory . emacs))
+
+  ;; Some uses of `org-fix-tags-on-the-fly' occur without a check on
+  ;; `org-auto-align-tags', such as in `org-self-insert-command' and
+  ;; `org-delete-backward-char'.
+  ;; TODO Should be reported/PR'ed upstream
+  (defadvice! +org--respect-org-auto-align-tags-a (&rest _)
+    :before-while #'org-fix-tags-on-the-fly
+    org-auto-align-tags)
 
   ;; HACK Org is known to use a lot of unicode symbols (and large org files tend
   ;;      to be especially memory hungry). Compounded with
