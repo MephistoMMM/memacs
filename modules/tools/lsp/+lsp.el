@@ -54,7 +54,7 @@ Can be a list of backends; accepts any value `company-backends' accepts.")
 
   (defadvice! +lsp--respect-user-defined-checkers-a (orig-fn &rest args)
     "Ensure user-defined `flycheck-checker' isn't overwritten by `lsp'."
-    :around #'lsp-diagnostics--flycheck-enable
+    :around #'lsp-diagnostics-flycheck-enable
     (if flycheck-checker
         (let ((old-checker flycheck-checker))
           (apply orig-fn args)
@@ -98,8 +98,8 @@ server getting expensively restarted when reverting buffers."
             (run-at-time
              (if (numberp +lsp-defer-shutdown) +lsp-defer-shutdown 3)
              nil (lambda (workspace)
-                   (let ((lsp--cur-workspace workspace))
-                     (unless (lsp--workspace-buffers lsp--cur-workspace)
+                   (with-lsp-workspace workspace
+                     (unless (lsp--workspace-buffers workspace)
                        (let ((lsp-restart 'ignore))
                          (funcall orig-fn))
                        (+lsp-optimization-mode -1))))

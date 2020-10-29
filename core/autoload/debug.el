@@ -12,7 +12,8 @@
     init-file-debug
     jka-compr-verbose
     url-debug
-    use-package-verbose)
+    use-package-verbose
+    (message-log-max . 16384))
   "A list of variable to toggle on `doom-debug-mode'.
 
 Each entry can be a variable symbol or a cons cell whose CAR is the variable
@@ -212,16 +213,12 @@ branch and commit."
 
 ;;;###autoload
 (defun doom/info (&optional raw)
-  "Collects some debug information about your Emacs session, formats it into
-markdown and copies it to your clipboard, ready to be pasted into bug reports!"
+  "Collects some debug information about your Emacs session, formats it and
+copies it to your clipboard, ready to be pasted into bug reports!"
   (interactive "P")
-  (let ((buffer (get-buffer-create "*doom-info*"))
+  (let ((buffer (get-buffer-create "*doom info*"))
         (info (doom-info)))
     (with-current-buffer buffer
-      (or (not doom-interactive-p)
-          (eq major-mode 'markdown-mode)
-          (not (fboundp 'markdown-mode))
-          (markdown-mode))
       (erase-buffer)
       (if raw
           (progn
@@ -235,7 +232,7 @@ markdown and copies it to your clipboard, ready to be pasted into bug reports!"
                   (let ((sexp (prin1-to-string (sexp-at-point))))
                     (delete-region beg end)
                     (insert sexp))))))
-        (insert "<details>\n\n```\n")
+        (insert "```\n")
         (dolist (group info)
           (insert! "%-8s%-10s %s\n"
                    ((upcase (symbol-name (car group)))
@@ -244,12 +241,12 @@ markdown and copies it to your clipboard, ready to be pasted into bug reports!"
           (dolist (spec (cddr group))
             (insert! (indent 8 "%-10s %s\n")
                      ((car spec) (cdr spec)))))
-        (insert "```\n</details>"))
+        (insert "```\n"))
       (if (not doom-interactive-p)
           (print! (buffer-string))
-        (switch-to-buffer buffer)
+        (pop-to-buffer buffer)
         (kill-new (buffer-string))
-        (print! (green "Copied markdown to clipboard"))))))
+        (print! (green "Copied your doom info to clipboard"))))))
 
 ;;;###autoload
 (defun doom/am-i-secure ()
@@ -320,6 +317,7 @@ Some items are not supported by the `nsm.el' module."
                       process-environment ',doom--initial-process-environment
                       exec-path ',doom--initial-exec-path
                       init-file-debug t
+                      doom--initial-load-path load-path
                       load-path ',load-path
                       package--init-file-ensured t
                       package-user-dir ,package-user-dir

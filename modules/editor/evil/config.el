@@ -321,7 +321,8 @@ directives. By default, this only recognizes C directives.")
 (use-package! evil-nerd-commenter
   :commands (evilnc-comment-operator
              evilnc-inner-comment
-             evilnc-outer-commenter))
+             evilnc-outer-commenter)
+  :general ([remap comment-line] #'evilnc-comment-or-uncomment-lines))
 
 
 (use-package! evil-snipe
@@ -359,6 +360,16 @@ directives. By default, this only recognizes C directives.")
              evil-Surround-edit
              evil-surround-region)
   :config (global-evil-surround-mode 1))
+
+
+(use-package! evil-textobj-anyblock
+  :defer t
+  :config
+  (setq evil-textobj-anyblock-blocks
+        '(("(" . ")")
+          ("{" . "}")
+          ("\\[" . "\\]")
+          ("<" . ">"))))
 
 
 (use-package! evil-traces
@@ -533,6 +544,7 @@ directives. By default, this only recognizes C directives.")
       :textobj "i" #'evil-indent-plus-i-indent         #'evil-indent-plus-a-indent
       :textobj "j" #'evil-indent-plus-i-indent-up-down #'evil-indent-plus-a-indent-up-down
       :textobj "k" #'evil-indent-plus-i-indent-up      #'evil-indent-plus-a-indent-up
+      :textobj "q" #'+evil:inner-any-quote             #'+evil:outer-any-quote
       :textobj "u" #'+evil:inner-url-txtobj            #'+evil:outer-url-txtobj
       :textobj "x" #'evil-inner-xml-attr               #'evil-outer-xml-attr
 

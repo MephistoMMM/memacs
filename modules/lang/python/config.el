@@ -181,18 +181,19 @@
 
 
 (use-package! python-pytest
-  :defer t
+  :commands python-pytest-dispatch
   :init
   (map! :after python
         :localleader
         :map python-mode-map
         :prefix ("t" . "test")
+        "a" #'python-pytest
         "f" #'python-pytest-file-dwim
         "F" #'python-pytest-file
         "t" #'python-pytest-function-dwim
         "T" #'python-pytest-function
         "r" #'python-pytest-repeat
-        "p" #'python-pytest-popup))
+        "p" #'python-pytest-dispatch))
 
 
 ;;

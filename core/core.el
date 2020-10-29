@@ -39,7 +39,7 @@
 ;; path/io functions. You get a minor speed up by nooping this. However, this
 ;; may cause problems on builds of Emacs where its site lisp files aren't
 ;; byte-compiled and we're forced to load the *.el.gz files (e.g. on Alpine)
-(unless noninteractive
+(unless (or noninteractive (daemonp))
   (defvar doom--initial-file-name-handler-alist file-name-handler-alist)
 
   (setq file-name-handler-alist nil)
@@ -136,7 +136,8 @@ Use this for files that change often, like cache files. Must end with a slash.")
 Defaults to ~/.config/doom, ~/.doom.d or the value of the DOOMDIR envvar;
 whichever is found first. Must end in a slash.")
 
-(defconst doom-autoloads-file (concat doom-local-dir "autoloads.el")
+(defconst doom-autoloads-file
+  (concat doom-local-dir "autoloads." emacs-version ".el")
   "Where `doom-reload-core-autoloads' stores its core autoloads.
 
 This file is responsible for informing Emacs where to find all of Doom's
@@ -166,7 +167,7 @@ users).")
 ;;; Emacs core configuration
 
 ;; lo', longer logs ahoy, so to reliably locate lapses in doom's logic later
-(setq message-log-max 8192)
+(setq message-log-max 4096)
 
 ;; Reduce debug output, well, unless we've asked for it.
 (setq debug-on-error doom-debug-p

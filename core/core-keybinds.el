@@ -28,11 +28,12 @@ and Emacs states, and for non-evil users.")
 ;;; Keybind settings
 
 (cond (IS-MAC
-       (setq mac-command-modifier     'super
-             mac-option-modifier      'meta
-             ns-command-modifier      'super
-             ns-option-modifier       'meta
-             ns-right-option-modifier 'none))
+       (setq mac-command-modifier      'super
+             ns-command-modifier       'super
+             mac-option-modifier       'meta
+             ns-option-modifier        'meta
+             mac-right-option-modifier 'none
+             ns-right-option-modifier  'none))
       (IS-WINDOWS
        (setq w32-lwindow-modifier 'super
              w32-rwindow-modifier 'super)))
@@ -185,7 +186,7 @@ localleader prefix."
 (use-package! which-key
   :hook (doom-first-input . which-key-mode)
   :init
-  (setq which-key-sort-order #'which-key-prefix-then-key-order
+  (setq which-key-sort-order #'which-key-key-order-alpha
         which-key-sort-uppercase-first nil
         which-key-add-column-padding 1
         which-key-max-display-columns nil
