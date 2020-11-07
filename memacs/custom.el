@@ -7,7 +7,7 @@
  '(auth-sources
    '("~/Dropbox/dotconf/authinfo.gpg" "~/.authinfo.gpg" "~/.netrc"))
  '(safe-local-variable-values
-   '((eval push "rocksdb" lsp-file-watch-ignored)
+   '((lsp-file-watch-ignored "[/\\\\]\\.git$" "[/\\\\]\\.hg$" "[/\\\\]\\.bzr$" "[/\\\\]_darcs$" "[/\\\\]\\.svn$" "[/\\\\]_FOSSIL_$" "[/\\\\]\\.idea$" "[/\\\\]\\.ensime_cache$" "[/\\\\]\\.eunit$" "[/\\\\]node_modules$" "[/\\\\]\\.fslckout$" "[/\\\\]\\.tox$" "[/\\\\]dist$" "[/\\\\]dist-newstyle$" "[/\\\\]\\.stack-work$" "[/\\\\]\\.bloop$" "[/\\\\]\\.metals$" "[/\\\\]target$" "[/\\\\]\\.ccls-cache$" "[/\\\\]\\.vscode$" "[/\\\\]\\.deps$" "[/\\\\]build-aux$" "[/\\\\]autom4te.cache$" "[/\\\\]\\.reference$" "rocksdb")
      (eval setq-local org-roam-directory
            (concat
             (locate-dominating-file default-directory ".dir-locals.el")
