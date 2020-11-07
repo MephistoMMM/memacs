@@ -557,13 +557,19 @@
         "C-M-b"     #'sp-backward-sexp
         "C-M-d"     #'sp-splice-sexp
         "C-M-k"     #'sp-kill-sexp
-        "C-M-t"     #'sp-transpose-sexp
-        "C-<right>" #'sp-forward-slurp-sexp
-        "M-<right>" #'sp-forward-barf-sexp
-        "C-<left>"  #'sp-backward-slurp-sexp
-        "M-<left>"  #'sp-backward-barf-sexp)
+        "C-M-t"     #'sp-transpose-sexp)
 
       ;;; treemacs
       (:when (featurep! :ui treemacs)
         "<f9>"   #'+treemacs/toggle
         "<C-f9>" #'treemacs-find-file))
+
+(map! :leader
+      (:when (featurep! :editor fold)
+       (:prefix ("C-f" . "fold")
+        "C-d"     #'vimish-fold-delete
+        "C-a C-d" #'vimish-fold-delete-all
+        "C-f"     #'+fold/toggle
+        "C-a C-f" #'+fold/close-all
+        "C-u"     #'+fold/open
+        "C-a C-u" #'+fold/open-all)))
