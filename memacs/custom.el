@@ -7,7 +7,8 @@
  '(auth-sources
    '("~/Dropbox/dotconf/authinfo.gpg" "~/.authinfo.gpg" "~/.netrc"))
  '(safe-local-variable-values
-   '((eval setq-local org-roam-directory
+   '((eval push "rocksdb" lsp-file-watch-ignored)
+     (eval setq-local org-roam-directory
            (concat
             (locate-dominating-file default-directory ".dir-locals.el")
             "roam")))))
