@@ -1,7 +1,6 @@
 # -*- mode: snippet -*-
 # name: Org template                      
 # --
-#+SETUPFILE: `memacs-org-export-setup-file`
 #+TITLE: ${1:`
 (string-join
  (mapcar #'capitalize
@@ -17,5 +16,6 @@
           "[^[:word:]0-9]+"
           )) " " )
 `}
+#+DATE:    `(format-time-string "%Y-%m-%d")`
 
 $0
