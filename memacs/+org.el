@@ -11,9 +11,6 @@ Used in org file template")
       org-attach-id-dir (expand-file-name "~/Dropbox/org/statics/")
       org-download-image-dir (expand-file-name "~/Dropbox/org/statics/"))
 
-;; Roam
-(setq org-roam-buffer-width 0.2)
-
 ;; Agenda View
 (setq memacs-org-agenda-todo-view
       `(" " "test Agenda"
@@ -50,6 +47,9 @@ Used in org file template")
   (concat
    ;; "#+SETUPFILE: " memacs-org-export-setup-file "\n"
    "#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n"))
+
+(setq org-roam-buffer-width 0.2
+      org-roam-db-location (expand-file-name "~/.local/roam/org-roam.db"))
 
 (setq org-roam-capture-templates
   `(

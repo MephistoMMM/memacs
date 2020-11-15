@@ -81,9 +81,6 @@ directives. By default, this only recognizes C directives.")
   ;; Start help-with-tutorial in emacs state
   (advice-add #'help-with-tutorial :after (lambda (&rest _) (evil-emacs-state +1)))
 
-  ;; Allows you to click buttons without initiating a selection
-  (define-key evil-motion-state-map [down-mouse-1] nil)
-
   ;; Done in a hook to ensure the popup rules load as late as possible
   (add-hook! 'doom-init-modules-hook
     (defun +evil--init-popup-rules-h ()
@@ -97,7 +94,7 @@ directives. By default, this only recognizes C directives.")
   (defvar +evil--default-cursor-color "#ffffff")
   (defvar +evil--emacs-cursor-color "#ff9999")
 
-  (add-hook! 'doom-load-theme-hook
+  (add-hook! 'doom-load-theme-hook :append
     (defun +evil-update-cursor-color-h ()
       (setq +evil--default-cursor-color (face-background 'cursor)
             +evil--emacs-cursor-color (face-foreground 'warning))))

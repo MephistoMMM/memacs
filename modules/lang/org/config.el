@@ -235,7 +235,16 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
   (add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images)
 
   (after! python
-    (setq org-babel-python-command python-shell-interpreter)))
+    (setq org-babel-python-command python-shell-interpreter))
+
+  ;; NOTE Backported from Emacs 27.1
+  ;; DEPRECATED Remove when 26.x support is dropped
+  (unless EMACS27+
+    (defadvice! +org--dont-suppress-window-changes-a (orig-fn &rest args)
+      :around #'org-babel-execute:emacs-lisp
+      (letf! ((#'current-window-configuration #'ignore)
+              (#'set-window-configuration #'ignore))
+        (apply orig-fn args)))))
 
 
 (defun +org-init-babel-lazy-loader-h ()
@@ -494,17 +503,19 @@ the exported output (i.e. formatters)."
       (apply orig-fn args)))
 
   (defadvice! +org--fix-async-export-a (orig-fn &rest args)
-    :around #'org-export-to-file
-    (if (not org-export-in-background)
-        (apply orig-fn args)
-      (let ((user-init-file (or org-export-async-init-file user-init-file)))
-        (setq org-export-async-init-file (make-temp-file "doom-org-async-export"))
-        (with-temp-file org-export-async-init-file
-          (prin1 `(progn (setq org-export-async-debug ,debug-on-error
-                               load-path ',load-path)
-                         (load ,user-init-file nil t))
-                 (current-buffer)))
-        (apply orig-fn args)))))
+    :around '(org-export-to-file org-export-as)
+    (let ((old-async-init-file org-export-async-init-file)
+          (org-export-async-init-file (make-temp-file "doom-org-async-export")))
+      (with-temp-file org-export-async-init-file
+        (prin1 `(progn (setq org-export-async-debug
+                             ,(or org-export-async-debug
+                                  debug-on-error)
+                             load-path ',load-path)
+                       (load ,(or old-async-init-file user-init-file)
+                             nil t)
+                       (delete-file ,org-export-async-init-file))
+               (current-buffer)))
+      (apply orig-fn args))))
 
 
 (defun +org-init-habit-h ()
