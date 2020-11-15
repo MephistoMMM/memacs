@@ -76,9 +76,9 @@
     :pin "0582f57517c97a4c7bfeb58762138c78883f94c5"))
 (when (featurep! +roam)
   (package! org-roam :pin "a7cf48ea895ee5aae93ad6d5b4550fb803f6ef8a")
-  (package! org-roam-server :pin "fe0364ef63...")
+  (package! org-roam-server)
   (when (featurep! :completion company)
-    (package! company-org-roam :pin "1132663bd68022aa7ea005ff53c7c7571890769d")))
+    (package! company-org-roam)))
 
 ;;; Babel
 (package! ob-async :pin "de1cd6c93242a4cb8773bbe115b7be3d4dd6b97e")
