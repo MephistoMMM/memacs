@@ -181,7 +181,8 @@ https://github.com/sebastiencs/company-box/issues/44"
   (setq company-tabnine-binaries-folder "~/.local/share/Tabnine")
   :config
   (if (featurep! :tools lsp +lsp)
-      (setq +lsp-company-backends '(company-capf :with company-tabnine :separate))
+      (setq +lsp-company-backends '(company-capf :with company-tabnine :separate
+                                                 :with company-yasnippet))
     (push #'company-tabnine company-backends))
 
   (setq company-tabnine-max-num-results 3)

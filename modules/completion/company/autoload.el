@@ -165,6 +165,8 @@ C-x C-l."
   "The first two candidates will be from company-lsp, the following two
 candidates will be from company-tabnine, others keeping their own origin order."
   (if (or (functionp company-backend)
+        (not (let ((capf (car company-backends)))
+                (and (listp capf) (memq 'company-tabnine capf))))
          (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
       candidates
     (let ((candidates-table (make-hash-table :test #'equal))
