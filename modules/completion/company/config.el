@@ -9,8 +9,9 @@
         company-tooltip-align-annotations t
         company-require-match 'never
         company-global-modes '(not erc-mode message-mode help-mode gud-mode)
-        company-frontends '(company-pseudo-tooltip-frontend
-                            company-echo-metadata-frontend)
+        company-frontends
+        '(company-pseudo-tooltip-frontend  ; always show candidates in overlay tooltip
+          company-echo-metadata-frontend)  ; show selected candidate docs in echo area
 
         ;; Buffer-local backends will be computed when loading a major mode, so
         ;; only specify a global default here.
@@ -122,6 +123,17 @@
             (ElispFeature  . ,(all-the-icons-material "stars"                    :face 'all-the-icons-orange))
             (ElispFace     . ,(all-the-icons-material "format_paint"             :face 'all-the-icons-pink)))))
 
+  ;; HACK Fix oversized scrollbar in some odd cases
+  ;; REVIEW `resize-mode' is deprecated and may stop working in the future.
+  ;; TODO PR me upstream?
+  (setq x-gtk-resize-child-frames 'resize-mode)
+
+  ;; Disable tab-bar in company-box child frames
+  ;; TODO PR me upstream!
+  (add-to-list 'company-box-frame-parameters '(tab-bar-lines . 0))
+
+  ;; Don't show documentation in echo area, because company-box displays its own
+  ;; in a child frame.
   (delq! 'company-echo-metadata-frontend company-frontends)
 
   (defun +company-box-icons--elisp-fn (candidate)
@@ -131,13 +143,6 @@
               ((boundp sym)   'ElispVariable)
               ((featurep sym) 'ElispFeature)
               ((facep sym)    'ElispFace)))))
-
-  (defadvice! +company-remove-scrollbar-a (orig-fn &rest args)
-    "This disables the company-box scrollbar, because:
-https://github.com/sebastiencs/company-box/issues/44"
-    :around #'company-box--update-scrollbar
-    (letf! ((#'display-buffer-in-side-window #'ignore))
-      (apply orig-fn args)))
 
   ;; `company-box' performs insufficient frame-live-p checks. Any command that
   ;; "cleans up the session" will break company-box.

@@ -60,8 +60,6 @@ results buffer.")
         ivy-wrap t
         ivy-fixed-height-minibuffer t
         projectile-completion-system 'ivy
-        ;; disable magic slash on non-match
-        ivy-magic-slash-non-match-action nil
         ;; don't show recent files in switch-buffer
         ivy-use-virtual-buffers nil
         ;; ...but if that ever changes, show their full path
@@ -288,12 +286,10 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
     :override #'counsel--find-return-list
     (cl-destructuring-bind (find-program . args)
         (cond ((when-let (fd (executable-find (or doom-projectile-fd-binary "fd")))
-                 (append (list fd
-                               "--color=never" "-E" ".git"
-                               "--type" "file" "--type" "symlink" "--follow")
+                 (append (list fd "-H" "--color=never" "--type" "file" "--type" "symlink" "--follow")
                          (if IS-WINDOWS '("--path-separator=/")))))
               ((executable-find "rg")
-               (append (list "rg" "--files" "--follow" "--color=never" "--hidden" "--no-messages")
+               (append (list "rg" "--files" "--follow" "--color=never" "--hidden" "-g!.git" "--no-messages")
                        (cl-loop for dir in projectile-globally-ignored-directories
                                 collect "--glob"
                                 collect (concat "!" dir))
@@ -374,7 +370,7 @@ evil-ex-specific constructs, so we disable it solely in evil-ex."
   :init (setq ivy-flx-limit 10000))
 
 (use-package! ivy-avy
-   :after ivy)
+  :after ivy)
 
 (use-package! ivy-prescient
   :when (featurep! +prescient)

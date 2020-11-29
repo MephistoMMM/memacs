@@ -19,6 +19,9 @@ relative to `+doom-dashboard-banner-dir'. If nil, always use the ASCII banner.")
 (defvar +doom-dashboard-banner-dir (concat (dir!) "/banners/")
   "Where to look for `+doom-dashboard-banner-file'.")
 
+(defvar +doom-dashboard-ascii-banner-fn #'doom-dashboard-draw-ascii-banner-fn
+  "The function used to generate the ASCII banner on Doom's dashboard.")
+
 (defvar +doom-dashboard-banner-padding '(0 . 4)
   "Number of newlines to pad the banner with, above and below, respectively.")
 
@@ -381,12 +384,8 @@ controlled by `+doom-dashboard-pwd-policy'."
 ;;
 ;;; Widgets
 
-(defun doom-dashboard-widget-banner ()
-  (let ((point (point)))
-    (mapc (lambda (line)
-            (insert (propertize (+doom-dashboard--center +doom-dashboard--width line)
-                                'face 'doom-dashboard-banner) " ")
-            (insert "\n"))
+(defun doom-dashboard-draw-ascii-banner-fn ()
+  (let* ((banner
           '("=================     ===============     ===============   ========  ========"
             "\\\\ . . . . . . .\\\\   //. . . . . . .\\\\   //. . . . . . .\\\\  \\\\. . .\\\\// . . //"
             "||. . ._____. . .|| ||. . ._____. . .|| ||. . ._____. . .|| || . . .\\/ . . .||"
@@ -405,7 +404,23 @@ controlled by `+doom-dashboard-pwd-policy'."
             "||.=='    _-'                                                     `' |  /==.||"
             "=='    _-'                         E M A C S                          \\/   `=="
             "\\   _-'                                                                `-_   /"
-            "`''                                                                      ``'"))
+            " `''                                                                      ``'"))
+         (longest-line (apply #'max (mapcar #'length banner))))
+    (put-text-property
+     (point)
+     (dolist (line banner (point))
+       (insert (+doom-dashboard--center
+                +doom-dashboard--width
+                (concat
+                 line (make-string (max 0 (- longest-line (length line)))
+                                   32)))
+               "\n"))
+     'face 'doom-dashboard-banner)))
+
+(defun doom-dashboard-widget-banner ()
+  (let ((point (point)))
+    (when (functionp +doom-dashboard-ascii-banner-fn)
+      (funcall +doom-dashboard-ascii-banner-fn))
     (when (and (display-graphic-p)
                (stringp fancy-splash-image)
                (file-readable-p fancy-splash-image))

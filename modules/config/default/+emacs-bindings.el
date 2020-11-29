@@ -66,8 +66,8 @@
        :desc "Copy this file"              "C"   #'doom/copy-this-file
        :desc "Find directory"              "d"   #'dired
        :desc "Delete this file"            "D"   #'doom/delete-this-file
-       :desc "Find file in emacs.d"        "e"   #'+default/find-in-emacsd
-       :desc "Browse emacs.d"              "E"   #'+default/browse-emacsd
+       :desc "Find file in emacs.d"        "e"   #'doom/find-file-in-emacsd
+       :desc "Browse emacs.d"              "E"   #'doom/browse-in-emacsd
        :desc "Find file"                   "f"   #'find-file
        :desc "Find file from here"         "F"   #'+default/find-file-under-here
        :desc "Locate file"                 "l"   #'locate
@@ -173,6 +173,8 @@
          :desc "Insert"                        "i" #'org-roam-insert
          :desc "Insert (skipping org-capture)" "I" #'org-roam-insert-immediate
          :desc "Org Roam"                      "r" #'org-roam
+         :desc "Tag"                           "t" #'org-roam-tag-add
+         :desc "Un-tag"                        "T" #'org-roam-tag-delete
          (:prefix ("d" . "by date")
           :desc "Arbitrary date" "d" #'org-roam-dailies-date
           :desc "Today"          "t" #'org-roam-dailies-today
