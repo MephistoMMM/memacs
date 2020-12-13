@@ -23,7 +23,7 @@ directives. By default, this only recognizes C directives.")
 ;; Set these defaults before `evil'; use `defvar' so they can be changed prior
 ;; to loading.
 (defvar evil-want-C-g-bindings t)
-(defvar evil-want-C-i-jump (or (daemonp) (display-graphic-p)))
+(defvar evil-want-C-i-jump nil)
 (defvar evil-want-C-u-scroll t)  ; moved the universal arg to <leader> u
 (defvar evil-want-C-u-delete t)
 (defvar evil-want-C-w-scroll t)
@@ -122,6 +122,14 @@ directives. By default, this only recognizes C directives.")
 
 
   ;; --- evil hacks -------------------------
+  (after! eldoc
+    ;; Allow eldoc to trigger directly after changing modes
+    (eldoc-add-command 'evil-normal-state
+                       'evil-insert
+                       'evil-change
+                       'evil-delete
+                       'evil-replace))
+
   (unless noninteractive
     (setq save-silently t)
     (add-hook! 'after-save-hook
@@ -403,6 +411,8 @@ directives. By default, this only recognizes C directives.")
 ;;   zu{q,w} - undo last marking
 
 (map! :v  "@"     #'+evil:apply-macro
+      :m  [C-i]   #'evil-jump-forward
+      :m  [tab]   #'evil-jump-item
 
       ;; implement dictionary keybinds
       ;; evil already defines 'z=' to `ispell-word' = correct word at point

@@ -91,7 +91,8 @@ possible."
       delete-old-versions t ; clean up after itself
       kept-old-versions 5
       kept-new-versions 5
-      backup-directory-alist (list (cons "." (concat doom-cache-dir "backup/"))))
+      backup-directory-alist (list (cons "." (concat doom-cache-dir "backup/")))
+      tramp-backup-directory-alist backup-directory-alist)
 
 ;; But turn on auto-save, so we have a fallback in case of crashes or lost data.
 ;; Use `recover-file' or `recover-session' to recover them.
@@ -102,6 +103,7 @@ possible."
       auto-save-include-big-deletions t
       ;; ...but have directories set up in case we use it.
       auto-save-list-file-prefix (concat doom-cache-dir "autosave/")
+      tramp-auto-save-directory  (concat doom-cache-dir "tramp-autosave/")
       auto-save-file-name-transforms
       (list (list "\\`/[^/]*:\\([^/]*/\\)*\\([^/]*\\)\\'"
                   ;; Prefix tramp autosaves to prevent conflicts with local ones
@@ -331,6 +333,7 @@ files, so we replace calls to `pp' with the much faster `prin1'."
   (when-let (socket (getenv "EMACS_SOCKET_DIR"))
     (setq server-socket-dir socket))
   :config
+  (setq server-auth-dir (concat doom-emacs-dir "server/"))
   (unless (server-running-p)
     (server-start)))
 
@@ -431,6 +434,9 @@ files, so we replace calls to `pp' with the much faster `prin1'."
   ;; a better *help* buffer
   :commands helpful--read-symbol
   :init
+  ;; Make `apropos' et co search more extensively. They're more useful this way.
+  (setq apropos-do-all t)
+
   (global-set-key [remap describe-function] #'helpful-callable)
   (global-set-key [remap describe-command]  #'helpful-command)
   (global-set-key [remap describe-variable] #'helpful-variable)
@@ -500,13 +506,20 @@ files, so we replace calls to `pp' with the much faster `prin1'."
   (dolist (key '(:unmatched-expression :no-matching-tag))
     (setf (alist-get key sp-message-alist) nil))
 
+  (add-hook! 'eval-expression-minibuffer-setup-hook
+    (defun doom-init-smartparens-in-eval-expression-h ()
+      "Enable `smartparens-mode' in the minibuffer for `eval-expression'.
+This includes everything that calls `read--expression', e.g.
+`edebug-eval-expression' Only enable it if
+`smartparens-global-mode' is on."
+      (when smartparens-global-mode (smartparens-mode +1))))
   (add-hook! 'minibuffer-setup-hook
     (defun doom-init-smartparens-in-minibuffer-maybe-h ()
-      "Enable `smartparens-mode' in the minibuffer, during `eval-expression',
-`pp-eval-expression' or `evil-ex'."
-      (and (memq this-command '(eval-expression pp-eval-expression evil-ex))
-           smartparens-global-mode
-           (smartparens-mode))))
+      "Enable `smartparens' for non-`eval-expression' commands.
+Only enable `smartparens-mode' if `smartparens-global-mode' is
+on."
+      (when (and smartparens-global-mode (memq this-command '(evil-ex)))
+        (smartparens-mode +1))))
 
   ;; You're likely writing lisp in the minibuffer, therefore, disable these
   ;; quote pairs, which lisps doesn't use for strings:
@@ -544,8 +557,8 @@ files, so we replace calls to `pp' with the much faster `prin1'."
   (add-to-list 'so-long-variable-overrides '(save-place-alist . nil))
   ;; Text files could possibly be too long too
   (add-to-list 'so-long-target-modes 'text-mode)
-  ;; But disable everything else that may be unnecessary/expensive for large
-  ;; or wide buffers.
+  ;; But disable everything else that may be unnecessary/expensive for large or
+  ;; wide buffers.
   (appendq! so-long-minor-modes
             '(flycheck-mode
               flyspell-mode
@@ -561,20 +574,11 @@ files, so we replace calls to `pp' with the much faster `prin1'."
               hl-fill-column-mode))
   (defun doom-buffer-has-long-lines-p ()
     ;; HACK Fix #2183: `so-long-detected-long-line-p' tries to parse comment
-    ;;      syntax, but in some buffers comment state isn't initialized,
-    ;;      leading to a wrong-type-argument: stringp error.
+    ;;      syntax, but in some buffers comment state isn't initialized, leading
+    ;;      to a wrong-type-argument: stringp error.
     (unless (bound-and-true-p visual-line-mode)
-      (let ((so-long-skip-leading-comments (bound-and-true-p comment-use-syntax))
-            ;; HACK If visual-line-mode is on, then false positives are more
-            ;;      likely, so up the threshold. More so in text-mode, since long
-            ;;      paragraphs are the norm.
-            (so-long-threshold
-             (if visual-line-mode
-                 (* so-long-threshold
-                    (if (derived-mode-p 'text-mode)
-                        4
-                      2))
-               so-long-threshold)))
+      (let ((so-long-skip-leading-comments
+             (bound-and-true-p comment-use-syntax)))
         (so-long-detected-long-line-p))))
   (setq so-long-predicate #'doom-buffer-has-long-lines-p))
 

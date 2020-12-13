@@ -40,6 +40,15 @@ and Emacs states, and for non-evil users.")
   (setq w32-lwindow-modifier 'super
         w32-rwindow-modifier 'super)))
 
+;; HACK Fixes Emacs' disturbing inability to distinguish C-i from TAB.
+(define-key key-translation-map [?\C-i]
+  (cmd! (if (and (not (cl-position 'tab    (this-single-command-raw-keys)))
+                 (not (cl-position 'kp-tab (this-single-command-raw-keys)))
+                 (display-graphic-p))
+            [C-i] [?\C-i])))
+;; However, ensure <C-i> falls back to the old keybind if it has no binding.
+(global-set-key [C-i] [?\C-i])
+
 
 ;;
 ;;; Universal, non-nuclear escape
@@ -69,15 +78,20 @@ all hooks after it are ignored.")
   (interactive)
   (cond ((minibuffer-window-active-p (minibuffer-window))
          ;; quit the minibuffer if open.
+         (setq this-command 'abort-recursive-edit)
          (abort-recursive-edit))
         ;; Run all escape hooks. If any returns non-nil, then stop there.
         ((run-hook-with-args-until-success 'doom-escape-hook))
         ;; don't abort macros
         ((or defining-kbd-macro executing-kbd-macro) nil)
         ;; Back to the default
-        ((keyboard-quit))))
+        ((setq this-command 'keyboard-quit)
+         (keyboard-quit))))
 
 (global-set-key [remap keyboard-quit] #'doom/escape)
+
+(with-eval-after-load 'eldoc
+  (eldoc-add-command 'doom/escape))
 
 
 ;;
