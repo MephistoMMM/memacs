@@ -32,8 +32,6 @@
            ispell-extra-args '("--sug-mode=ultra"
                                "--run-together"))
 
-     (unless ispell-dictionary
-       (setq ispell-dictionary "english"))
      (unless ispell-aspell-dict-dir
        (setq ispell-aspell-dict-dir
              (ispell-get-aspell-config-value "dict-dir")))
@@ -147,7 +145,7 @@
       (add-hook! 'spell-fu-mode-hook
         (defun +spell-init-excluded-faces-h ()
           "Set `spell-fu-faces-exclude' according to `+spell-excluded-faces-alist'."
-          (when-let (excluded (alist-get major-mode +spell-excluded-faces-alist))
+          (when-let (excluded (cdr (cl-find-if #'derived-mode-p +spell-excluded-faces-alist :key #'car)))
             (setq-local spell-fu-faces-exclude excluded))))
 
       ;; TODO custom `spell-fu-check-range' function to reduce false positives

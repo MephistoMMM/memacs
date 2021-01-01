@@ -489,7 +489,12 @@ files, so we replace calls to `pp' with the much faster `prin1'."
     ;; correct this vile injustice.
     (setq sp-show-pair-from-inside t)
     ;; ...and stay highlighted until we've truly escaped the pair!
-    (setq sp-cancel-autoskip-on-backward-movement nil))
+    (setq sp-cancel-autoskip-on-backward-movement nil)
+    ;; Smartparens conditional binds a key to C-g when sp overlays are active
+    ;; (even if they're invisible). This disruptively changes the behavior of
+    ;; C-g in insert mode, requiring two presses of the key to exit insert mode.
+    ;; I don't see the point of this keybind, so...
+    (setq sp-pair-overlay-keymap (make-sparse-keymap)))
 
   ;; The default is 100, because smartparen's scans are relatively expensive
   ;; (especially with large pair lists for some modes), we reduce it, as a
@@ -498,9 +503,6 @@ files, so we replace calls to `pp' with the much faster `prin1'."
   ;; No pair has any business being longer than 4 characters; if they must, set
   ;; it buffer-locally. It's less work for smartparens.
   (setq sp-max-pair-length 4)
-  ;; This isn't always smart enough to determine when we're in a string or not.
-  ;; See https://github.com/Fuco1/smartparens/issues/783.
-  (setq sp-escape-quotes-after-insert nil)
 
   ;; Silence some harmless but annoying echo-area spam
   (dolist (key '(:unmatched-expression :no-matching-tag))
@@ -573,11 +575,11 @@ on."
               highlight-indent-guides-mode
               hl-fill-column-mode))
   (defun doom-buffer-has-long-lines-p ()
-    ;; HACK Fix #2183: `so-long-detected-long-line-p' tries to parse comment
-    ;;      syntax, but in some buffers comment state isn't initialized, leading
-    ;;      to a wrong-type-argument: stringp error.
     (unless (bound-and-true-p visual-line-mode)
       (let ((so-long-skip-leading-comments
+             ;; HACK Fix #2183: `so-long-detected-long-line-p' tries to parse
+             ;;      comment syntax, but comment state may not be initialized,
+             ;;      leading to a wrong-type-argument: stringp error.
              (bound-and-true-p comment-use-syntax)))
         (so-long-detected-long-line-p))))
   (setq so-long-predicate #'doom-buffer-has-long-lines-p))
