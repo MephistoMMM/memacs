@@ -27,6 +27,6 @@
 
 
 (use-package! org-fancy-priorities ; priority icons
-  :hook (org-mode . org-fancy-priorities-mode)
+  :hook (org-agenda-mode . org-fancy-priorities-mode)
   :config (setq org-fancy-priorities-list '("☢" "☕" "■")))
 ;; ("❗" "⬆" "⬇" "☕")

@@ -94,6 +94,24 @@ at the values with which this function was called."
   (lambda (&rest pre-args)
     (apply fn (append pre-args args))))
 
+(defun doom-lookup-key (keys &optional keymap)
+  "Like `lookup-key', but search active keymaps if KEYMAP is omitted."
+  (if keymap
+      (lookup-key keymap keys)
+    (cl-loop for keymap
+             in (append (cl-loop for alist in emulation-mode-map-alists
+                                 append (mapcar #'cdr
+                                                (if (symbolp alist)
+                                                    (if (boundp alist) (symbol-value alist))
+                                                  alist)))
+                        (list (current-local-map))
+                        (mapcar #'cdr minor-mode-overriding-map-alist)
+                        (mapcar #'cdr minor-mode-map-alist)
+                        (list (current-global-map)))
+             if (keymapp keymap)
+             if (lookup-key keymap keys)
+             return it)))
+
 
 ;;
 ;;; Sugars
@@ -652,6 +670,19 @@ REMOTE is non-nil, search on the remote host indicated by
               (let (file-name-handler-alist)
                 (file-name-quote default-directory))))
         (locate-file command exec-path exec-suffixes 1)))))
+
+(unless (fboundp 'exec-path)
+  ;; DEPRECATED Backported from Emacs 27.1
+  (defun exec-path ()
+    "Return list of directories to search programs to run in remote subprocesses.
+The remote host is identified by `default-directory'.  For remote
+hosts that do not support subprocesses, this returns `nil'.
+If `default-directory' is a local directory, this function returns
+the value of the variable `exec-path'."
+    (let ((handler (find-file-name-handler default-directory 'exec-path)))
+      (if handler
+          (funcall handler 'exec-path)
+        exec-path))))
 
 (provide 'core-lib)
 ;;; core-lib.el ends here
