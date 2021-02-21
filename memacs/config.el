@@ -66,7 +66,7 @@
 
    ;; Other language input source: "rime", "sogou" or another one.
    ;; "im.rime.inputmethod.Squirrel.Rime"
-   "com.sogou.inputmethod.sogou.pinyin")
+   "com.apple.inputmethod.SCIM.ITABC")
 
     ;; enable the /cursor color/ mode
   (sis-global-cursor-color-mode t)

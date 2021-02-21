@@ -28,6 +28,7 @@
        (ivy                ; a search engine for love and life
         +icons
         +childframe)
+       ;; snails
 
        :ui
        ;;deft              ; notational velocity for Emacs

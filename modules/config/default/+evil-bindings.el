@@ -45,6 +45,7 @@
                       (and (featurep! :completion company +tng)
                            (+company-has-completion-p))
                       #'company-complete-common)
+      :i "C-【" #'evil-force-normal-state
       :v [tab] (cmds! (and (bound-and-true-p yas-minor-mode)
                            (or (eq evil-visual-selection 'line)
                                (not (memq (char-after) (list ?\( ?\[ ?\{ ?\} ?\] ?\))))))
