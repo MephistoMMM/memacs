@@ -279,8 +279,8 @@ those directories. The first returned path is always `doom-private-dir'."
                (:if (if (eval (cadr m) t)
                         (push (caddr m) mplist)
                       (prependq! mplist (cdddr m))))
-               (test (if (or (eval (cadr m) t)
-                             (eq test :unless))
+               (test (if (xor (eval (cadr m) t)
+                              (eq test :unless))
                          (prependq! mplist (cddr m))))))
             ((catch 'doom-modules
                (let* ((module (if (listp m) (car m) m))
@@ -302,10 +302,11 @@ those directories. The first returned path is always `doom-private-dir'."
                                mplist)
                          (push (car key) mplist))
                        (throw 'doom-modules t))))
-                 (push (funcall fn category module
-                                :flags (if (listp m) (cdr m))
-                                :path (doom-module-locate-path category module))
-                       results))))))
+                 (let ((path (doom-module-locate-path category module)))
+                   (push (funcall fn category module
+                                  :flags (if (listp m) (cdr m))
+                                  :path (if (stringp path) (file-truename path)))
+                         results)))))))
     (unless doom-interactive-p
       (setq doom-inhibit-module-warnings t))
     (nreverse results)))
@@ -331,7 +332,7 @@ This value is cached. If REFRESH-P, then don't use the cached value."
       use-package-minimum-reported-time (if doom-debug-p 0 0.1)
       use-package-expand-minimally doom-interactive-p)
 
-;; A common mistake for new users is that they inadvertantly install their
+;; A common mistake for new users is that they inadvertently install their
 ;; packages with package.el, by copying over old `use-package' declarations with
 ;; an :ensure t property. Doom doesn't use package.el, so this will throw an
 ;; error that will confuse beginners, so we disable `:ensure'.

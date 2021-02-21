@@ -77,7 +77,7 @@ uses a straight or package.el command directly).")
 ;;
 ;;; Straight
 
-(setq straight-base-dir doom-local-dir
+(setq straight-base-dir (file-truename doom-local-dir)
       straight-repository-branch "develop"
       ;; Since byte-code is rarely compatible across different versions of
       ;; Emacs, it's best we build them in separate directories, per emacs
@@ -110,6 +110,25 @@ uses a straight or package.el command directly).")
   :around #'straight--lockfile-read-all
   (append (apply orig-fn args) ; lockfiles still take priority
           (doom-package-pinned-list)))
+
+(defadvice! doom--byte-compile-in-same-session-a (recipe)
+  "Straight recompiles packages from an Emacs child process. This is sensible,
+but many packages don't properly load their macro dependencies, causing errors,
+which we can't possibly police, so I revert straight to its old strategy of
+compiling in the same session."
+  :override #'straight--build-compile
+  (straight--with-plist recipe (package)
+    ;; These two `let' forms try very, very hard to make byte-compilation an
+    ;; invisible process. Lots of packages have byte-compile warnings; I
+    ;; don't need to know about them and neither do straight.el users.
+    (letf! (;; Prevent Emacs from asking the user to save all their
+            ;; files before compiling.
+            (#'save-some-buffers #'ignore))
+      (quiet!
+       ;; Note that there is in fact no `byte-compile-directory' function.
+       (byte-recompile-directory
+        (straight--build-dir package)
+        0 'force)))))
 
 
 ;;
@@ -278,12 +297,15 @@ processed."
       (copy-sequence deps))))
 
 (defun doom-package-depending-on (package &optional noerror)
-  "Return a list of packages that depend on the package named NAME."
-  (cl-check-type name symbol)
+  "Return a list of packages that depend on PACKAGE.
+
+If PACKAGE (a symbol) isn't installed, throw an error, unless NOERROR is
+non-nil."
+  (cl-check-type package symbol)
   ;; can't get dependencies for built-in packages
-  (unless (or (doom-package-build-recipe name)
+  (unless (or (doom-package-build-recipe package)
               noerror)
-    (error "Couldn't find %s, is it installed?" name))
+    (error "Couldn't find %s, is it installed?" package))
   (cl-loop for pkg in (hash-table-keys straight--build-cache)
            for deps = (doom-package-dependencies pkg)
            if (memq package deps)
@@ -493,8 +515,8 @@ elsewhere."
          (when-let (recipe (plist-get plist :recipe))
            (cl-destructuring-bind
                (&key local-repo _files _flavor
-                     _build _pre-build _post-build _no-byte-compile _includes
-                     _no-native-compile _no-autoloads _type _repo _host _branch
+                     _build _pre-build _post-build _includes
+                     _type _repo _host _branch
                      _remote _nonrecursive _fork _depth)
                recipe
              ;; Expand :local-repo from current directory

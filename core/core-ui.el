@@ -203,8 +203,8 @@ or if the current buffer is read-only or not file-visiting."
       ;; for tall lines.
       auto-window-vscroll nil
       ;; mouse
-      mouse-wheel-scroll-amount '(5 ((shift) . 2))
-      mouse-wheel-progressive-speed nil)  ; don't accelerate scrolling
+      mouse-wheel-scroll-amount '(2 ((shift) . hscroll))
+      mouse-wheel-scroll-amount-horizontal 2)
 
 ;; Remove hscroll-margin in shells, otherwise it causes jumpiness
 (setq-hook! '(eshell-mode-hook term-mode-hook) hscroll-margin 0)
@@ -401,7 +401,9 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
   ;; Highlights the current line
   :hook (doom-first-buffer . global-hl-line-mode)
   :init
-  (defvar global-hl-line-modes '(prog-mode text-mode conf-mode special-mode)
+  (defvar global-hl-line-modes
+    '(prog-mode text-mode conf-mode special-mode
+      org-agenda-mode)
     "What modes to enable `hl-line-mode' in.")
   :config
   ;; HACK I reimplement `global-hl-line-mode' so we can white/blacklist modes in
@@ -511,6 +513,8 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
                        all-the-icons-wicon all-the-icons-alltheicon)
            ""))))
 
+;; Hide the mode line in completion popups and MAN pages because they serve
+;; little purpose there, and is better hidden.
 ;;;###package hide-mode-line-mode
 (add-hook! '(completion-list-mode-hook Man-mode-hook)
            #'hide-mode-line-mode)
@@ -525,7 +529,9 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 
 ;;;###package rainbow-delimiters
 ;; Helps us distinguish stacked delimiter pairs, especially in parentheses-drunk
-;; languages like Lisp.
+;; languages like Lisp. I reduce it from it's default of 9 to reduce the
+;; complexity of the font-lock keyword and hopefully buy us a few ms of
+;; performance.
 (setq rainbow-delimiters-max-face-count 3)
 
 
@@ -536,10 +542,10 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 (defvar memacs-display-line-numbers-by-default nil
   "By default, hide line numbers.")
 
-;; Explicitly define a width to reduce computation
+;; Explicitly define a width to reduce the cost of on-the-fly computation
 (setq-default display-line-numbers-width 3)
 
-;; Show absolute line numbers for narrowed regions makes it easier to tell the
+;; Show absolute line numbers for narrowed regions to make it easier to tell the
 ;; buffer is narrowed, and where you are, exactly.
 (setq-default display-line-numbers-widen t)
 
@@ -618,7 +624,7 @@ behavior). Do not set this directly, this is let-bound in `doom-init-theme-h'.")
                               charset
                               doom-chinese-font)))
         (when (fboundp 'set-fontset-font)
-          (dolist (font (cons doom-unicode-font doom-unicode-extra-fonts))
+          (dolist (font (remq nil (cons doom-unicode-font doom-unicode-extra-fonts)))
             (set-fontset-font t 'unicode font nil 'prepend)))
         (run-hooks 'after-setting-font-hook))
     ((debug error)
@@ -656,7 +662,7 @@ behavior). Do not set this directly, this is let-bound in `doom-init-theme-h'.")
         ;; `load-theme' doesn't disable previously enabled themes, which seems
         ;; like what you'd want. You could always use `enable-theme' to activate
         ;; multiple themes instead.
-        (mapc #'disable-theme (remq theme (remq 'use-package custom-enabled-themes)))
+        (mapc #'disable-theme (remq theme custom-enabled-themes))
         (run-hooks 'doom-load-theme-hook))
       result)))
 
@@ -668,7 +674,7 @@ behavior). Do not set this directly, this is let-bound in `doom-init-theme-h'.")
     "Disable other themes when loading a new one."
     :before #'load-theme
     (unless no-enable
-      (mapc #'disable-theme (remq 'use-package custom-enabled-themes))))
+      (mapc #'disable-theme custom-enabled-themes)))
 
   ;; DEPRECATED Not needed in Emacs 27
   (defadvice! doom--prefer-compiled-theme-a (orig-fn &rest args)

@@ -73,7 +73,7 @@ directives. By default, this only recognizes C directives.")
   (define-key evil-motion-state-map "," nil)
 
   ;; stop copying each visual state move to the clipboard:
-  ;; https://bitbucket.org/lyro/evil/issue/336/osx-visual-state-copies-the-region-on
+  ;; https://github.com/emacs-evil/evil/issues/336
   ;; grokked from:
   ;; http://stackoverflow.com/questions/15873346/elisp-rename-macro
   (advice-add #'evil-visual-update-x-selection :override #'ignore)
@@ -412,7 +412,6 @@ directives. By default, this only recognizes C directives.")
 
 (map! :v  "@"     #'+evil:apply-macro
       :m  [C-i]   #'evil-jump-forward
-      :m  [tab]   #'evil-jump-item
 
       ;; implement dictionary keybinds
       ;; evil already defines 'z=' to `ispell-word' = correct word at point
