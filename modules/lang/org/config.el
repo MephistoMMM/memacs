@@ -110,7 +110,6 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
         org-fontify-done-headline t
         org-fontify-quote-and-verse-blocks t
         org-fontify-whole-heading-line t
-        org-footnote-auto-label 'plain
         org-hide-leading-stars t
         org-image-actual-width nil
         org-imenu-depth 8
@@ -122,11 +121,7 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
           (?C . success))
         org-startup-indented t
         org-tags-column 0
-        org-use-sub-superscripts '{}
-        ;; HACK Speed up regexp for priority faces by making it a little less
-        ;;      greedy than the default.
-        ;; REVIEW May be upstreamed at some point. Keep an eye out.
-        org-priority-regexp "^\\*+.*\\(\\[#\\([A-Z0-9]+\\)\\] ?\\)")
+        org-use-sub-superscripts '{})
 
   (setq org-refile-targets
         '((nil :maxlevel . 3)
@@ -148,14 +143,17 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
   (with-no-warnings
     (custom-declare-face '+org-todo-active  '((t (:inherit (bold font-lock-constant-face org-todo)))) "")
     (custom-declare-face '+org-todo-project '((t (:inherit (bold font-lock-doc-face org-todo)))) "")
-    (custom-declare-face '+org-todo-onhold  '((t (:inherit (bold warning org-todo)))) ""))
+    (custom-declare-face '+org-todo-onhold  '((t (:inherit (bold warning org-todo)))) "")
+    (custom-declare-face '+org-todo-cancel  '((t (:inherit (bold error org-todo)))) ""))
   (setq org-todo-keywords
         '((sequence
            "TODO(t)"  ; A task that needs doing & is ready to do
            "PROJ(p)"  ; A project, which usually contains other tasks
+           "LOOP(r)"  ; A recurring task
            "STRT(s)"  ; A task that is in progress
            "WAIT(w)"  ; Something external is holding up this task
            "HOLD(h)"  ; This task is paused/on hold because of me
+           "IDEA(i)"  ; An unconfirmed and unapproved task or notion
            "|"
            "DONE(d)"  ; Task successfully completed
            "KILL(k)") ; Task was cancelled, aborted or is no longer applicable
@@ -164,14 +162,21 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
            "[-](S)"   ; Task is in progress
            "[?](W)"   ; Task is being held up or paused
            "|"
-           "[X](D)")) ; Task was completed
+           "[X](D)")  ; Task was completed
+          (sequence
+           "|"
+           "OKAY(o)"
+           "YES(y)"
+           "NO(n)"))
         org-todo-keyword-faces
         '(("[-]"  . +org-todo-active)
           ("STRT" . +org-todo-active)
           ("[?]"  . +org-todo-onhold)
           ("WAIT" . +org-todo-onhold)
           ("HOLD" . +org-todo-onhold)
-          ("PROJ" . +org-todo-project)))
+          ("PROJ" . +org-todo-project)
+          ("NO"   . +org-todo-cancel)
+          ("KILL" . +org-todo-cancel)))
 
   (defadvice! +org-display-link-in-eldoc-a (&rest _)
     "Display full link in minibuffer when cursor/mouse is over it."
@@ -208,6 +213,34 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 
   ;; I prefer C-c C-c over C-c ' (more consistent)
   (define-key org-src-mode-map (kbd "C-c C-c") #'org-edit-src-exit)
+
+  ;; Don't process babel results asynchronously when exporting org, as they
+  ;; won't likely complete in time, and will instead output an ob-async hash
+  ;; instead of the wanted evaluation results.
+  (after! ob
+    (add-to-list 'org-babel-default-lob-header-args '(:sync)))
+
+  (defadvice! +org-babel-disable-async-if-needed-a (orig-fn &optional fn arg info params)
+    "Disable ob-async when leaving it on would cause errors or issues.
+
+Such as when exporting org documents or executing babel blocks with :session
+parameters (which ob-async does not support), in which case this advice forces
+these blocks to run synchronously.
+
+Also adds support for a `:sync' parameter to override `:async'."
+    :around #'ob-async-org-babel-execute-src-block
+    (if (null fn)
+        (funcall orig-fn fn arg info params)
+      (let* ((info (or info (org-babel-get-src-block-info)))
+             (params (org-babel-merge-params (nth 2 info) params)))
+        (cond ((or (assq :sync params)
+                   (not (assq :async params))
+                   (member (car info) ob-async-no-async-languages-alist))
+               (funcall fn arg info params))
+              ((not (member (cdr (assq :session params)) '("none" nil)))
+               (message "Org babel :: :session is incompatible with :async. Executing synchronously!")
+               nil)
+              ((funcall orig-fn fn arg info params))))))
 
   (defadvice! +org-fix-newline-and-indent-in-src-blocks-a (&optional indent _arg _interactive)
     "Mimic `newline-and-indent' in src blocks w/ lang-appropriate indentation."
@@ -286,7 +319,9 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
                        ((stringp lang) (intern lang))))
            (lang (or (cdr (assq lang +org-babel-mode-alist))
                      lang)))
-      (+org--babel-lazy-load lang (assq :async (nth 2 info)))
+      (+org--babel-lazy-load
+       lang (and (not (assq :sync (nth 2 info)))
+                 (assq :async (nth 2 info))))
       t))
 
   (advice-add #'org-babel-do-load-languages :override #'ignore))
@@ -549,6 +584,7 @@ the exported output (i.e. formatters)."
   (setf (alist-get 'file org-link-frame-setup) #'find-file)
   ;; Open directory links in dired
   (add-to-list 'org-file-apps '(directory . emacs))
+  (add-to-list 'org-file-apps '(remote . emacs))
 
   ;; Some uses of `org-fix-tags-on-the-fly' occur without a check on
   ;; `org-auto-align-tags', such as in `org-self-insert-command' and
@@ -613,6 +649,7 @@ can grow up to be fully-fledged org-mode buffers."
           (add-hook 'doom-switch-buffer-hook #'+org--restart-mode-h
                     nil 'local)))))
 
+  (defvar recentf-exclude)
   (defadvice! +org--exclude-agenda-buffers-from-recentf-a (orig-fn file)
     "Prevent temporarily opened agenda buffers from polluting recentf."
     :around #'org-get-agenda-file-buffer
@@ -701,7 +738,6 @@ between the two."
         "I" #'org-toggle-inline-images
         "n" #'org-store-link
         "o" #'org-set-property
-        "p" #'org-priority
         "q" #'org-set-tags-command
         "t" #'org-todo
         "T" #'org-todo-list
@@ -807,7 +843,7 @@ between the two."
          "O" #'+org/refile-to-other-buffer
          "v" #'+org/refile-to-visible
          "r" #'org-refile) ; to all `org-refile-targets'
-        (:prefix ("s" . "Tree/Subtree")
+        (:prefix ("s" . "tree/subtree")
          "a" #'org-toggle-archive-tag
          "b" #'org-tree-to-indirect-buffer
          "d" #'org-cut-subtree
@@ -820,18 +856,18 @@ between the two."
          "s" #'org-sparse-tree
          "A" #'org-archive-subtree
          "N" #'widen
-         "S" #'org-sort
-         (:prefix ("p" . "Org Priority")
-          "d" #'org-priority-down
-          "p" #'org-priority
-          "u" #'org-priority-up))
+         "S" #'org-sort)
+        (:prefix ("p" . "priority")
+         "d" #'org-priority-down
+         "p" #'org-priority
+         "u" #'org-priority-up)
         (:prefix ("w" . "wrapper")
-         "r" '+org/wrap-resume
-         "q" '+org/wrap-quote
-         "l" '+org/wrap-link
-         "o" '+org/wrap-ordered-list
-         "u" '+org/wrap-unordered-list
-         "s" '+org/wrap-source-code))
+         "r" #'+org/wrap-resume
+         "q" #'+org/wrap-quote
+         "l" #'+org/wrap-link
+         "o" #'+org/wrap-ordered-list
+         "u" #'+org/wrap-unordered-list
+         "s" #'+org/wrap-source-code))
 
   (map! :after org-agenda
         :map org-agenda-mode-map
@@ -847,6 +883,10 @@ between the two."
          "o" #'org-agenda-clock-out
          "r" #'org-agenda-clockreport-mode
          "s" #'org-agenda-show-clocking-issues)
+        (:prefix ("p" . "priority")
+         "d" #'org-agenda-priority-down
+         "p" #'org-agenda-priority
+         "u" #'org-agenda-priority-up)
         "q" #'org-agenda-set-tags
         "r" #'org-agenda-refile
         "t" #'org-agenda-todo))
@@ -861,7 +901,7 @@ between the two."
       ("^\\*Org Agenda"     :ignore t)
       ("^\\*Org Src"        :size 0.4  :quit nil :select t :autosave t :modeline t :ttl nil)
       ("^\\*Org-Babel")
-      ("^CAPTURE-.*\\.org$" :size 0.25 :quit nil :select t :autosave t))))
+      ("^CAPTURE-.*\\.org$" :size 0.25 :quit nil :select t :autosave ignore))))
 
 
 (defun +org-init-protocol-lazy-loader-h ()
@@ -994,61 +1034,70 @@ compelling reason, so..."
              #'+org-cycle-only-current-subtree-h
              ;; Clear babel results if point is inside a src block
              #'+org-clear-babel-results-h)
-  (map! :map evil-org-mode-map
-        :ni [C-return]   #'+org/insert-item-below
-        :ni [C-S-return] #'+org/insert-item-above
-        ;; navigate table cells (from insert-mode)
-        :i  "C-l"     (cmds! (org-at-table-p) #'org-table-next-field
+  (let-alist evil-org-movement-bindings
+    (let ((Cright  (concat "C-" .right))
+          (Cleft   (concat "C-" .left))
+          (Cup     (concat "C-" .up))
+          (Cdown   (concat "C-" .down))
+          (CSright (concat "C-S-" .right))
+          (CSleft  (concat "C-S-" .left))
+          (CSup    (concat "C-S-" .up))
+          (CSdown  (concat "C-S-" .down)))
+      (map! :map evil-org-mode-map
+            :ni [C-return]   #'+org/insert-item-below
+            :ni [C-S-return] #'+org/insert-item-above
+            ;; navigate table cells (from insert-mode)
+            :i Cright (cmds! (org-at-table-p) #'org-table-next-field
                              #'org-end-of-line)
-        :i  "C-h"     (cmds! (org-at-table-p) #'org-table-previous-field
+            :i Cleft  (cmds! (org-at-table-p) #'org-table-previous-field
                              #'org-beginning-of-line)
-        :i  "C-k"     (cmds! (org-at-table-p) #'+org/table-previous-row
+            :i Cup    (cmds! (org-at-table-p) #'+org/table-previous-row
                              #'org-up-element)
-        :i  "C-j"     (cmds! (org-at-table-p) #'org-table-next-row
+            :i Cdown  (cmds! (org-at-table-p) #'org-table-next-row
                              #'org-down-element)
-        :nevmi "M-l"   #'evil-avy-goto-line
-        :ni "C-S-l"   #'org-shiftright
-        :ni "C-S-h"   #'org-shiftleft
-        :ni "C-S-k"   #'org-shiftup
-        :ni "C-S-j"   #'org-shiftdown
-        ;; more intuitive RET keybinds
-        :n [return]   #'+org/dwim-at-point
-        :n "RET"      #'+org/dwim-at-point
-        :i [return]   (cmd! (org-return electric-indent-mode))
-        :i "RET"      (cmd! (org-return electric-indent-mode))
-        :i [S-return] #'+org/shift-return
-        :i "S-RET"    #'+org/shift-return
-        ;; more vim-esque org motion keys (not covered by evil-org-mode)
-        :m "]h"  #'org-forward-heading-same-level
-        :m "[h"  #'org-backward-heading-same-level
-        :m "]l"  #'org-next-link
-        :m "[l"  #'org-previous-link
-        :m "]c"  #'org-babel-next-src-block
-        :m "[c"  #'org-babel-previous-src-block
-        :n "gQ"  #'org-fill-paragraph
-        ;; sensible vim-esque folding keybinds
-        :n "za"  #'+org/toggle-fold
-        :n "zA"  #'org-shifttab
-        :n "zc"  #'+org/close-fold
-        :n "zC"  #'outline-hide-subtree
-        :n "zm"  #'+org/hide-next-fold-level
-        :n "zM"  #'+org/close-all-folds
-        :n "zn"  #'org-tree-to-indirect-buffer
-        :n "zo"  #'+org/open-fold
-        :n "zO"  #'outline-show-subtree
-        :n "zr"  #'+org/show-next-fold-level
-        :n "zR"  #'+org/open-all-folds
-        :n "zi"  #'org-toggle-inline-images
+            :nevmi "M-l"  #'evil-avy-goto-line
+            :ni CSright   #'org-shiftright
+            :ni CSleft    #'org-shiftleft
+            :ni CSup      #'org-shiftup
+            :ni CSdown    #'org-shiftdown
+            ;; more intuitive RET keybinds
+            :n [return]   #'+org/dwim-at-point
+            :n "RET"      #'+org/dwim-at-point
+            :i [return]   (cmd! (org-return electric-indent-mode))
+            :i "RET"      (cmd! (org-return electric-indent-mode))
+            :i [S-return] #'+org/shift-return
+            :i "S-RET"    #'+org/shift-return
+            ;; more vim-esque org motion keys (not covered by evil-org-mode)
+            :m "]h"  #'org-forward-heading-same-level
+            :m "[h"  #'org-backward-heading-same-level
+            :m "]l"  #'org-next-link
+            :m "[l"  #'org-previous-link
+            :m "]c"  #'org-babel-next-src-block
+            :m "[c"  #'org-babel-previous-src-block
+            :n "gQ"  #'org-fill-paragraph
+            ;; sensible vim-esque folding keybinds
+            :n "za"  #'+org/toggle-fold
+            :n "zA"  #'org-shifttab
+            :n "zc"  #'+org/close-fold
+            :n "zC"  #'outline-hide-subtree
+            :n "zm"  #'+org/hide-next-fold-level
+            :n "zM"  #'+org/close-all-folds
+            :n "zn"  #'org-tree-to-indirect-buffer
+            :n "zo"  #'+org/open-fold
+            :n "zO"  #'outline-show-subtree
+            :n "zr"  #'+org/show-next-fold-level
+            :n "zR"  #'+org/open-all-folds
+            :n "zi"  #'org-toggle-inline-images
 
-        :map org-read-date-minibuffer-local-map
-        "C-h"   (cmd! (org-eval-in-calendar '(calendar-backward-day 1)))
-        "C-l"   (cmd! (org-eval-in-calendar '(calendar-forward-day 1)))
-        "C-k"   (cmd! (org-eval-in-calendar '(calendar-backward-week 1)))
-        "C-j"   (cmd! (org-eval-in-calendar '(calendar-forward-week 1)))
-        "C-S-h" (cmd! (org-eval-in-calendar '(calendar-backward-month 1)))
-        "C-S-l" (cmd! (org-eval-in-calendar '(calendar-forward-month 1)))
-        "C-S-k" (cmd! (org-eval-in-calendar '(calendar-backward-year 1)))
-        "C-S-j" (cmd! (org-eval-in-calendar '(calendar-forward-year 1)))))
+            :map org-read-date-minibuffer-local-map
+            Cleft    (cmd! (org-eval-in-calendar '(calendar-backward-day 1)))
+            Cright   (cmd! (org-eval-in-calendar '(calendar-forward-day 1)))
+            Cup      (cmd! (org-eval-in-calendar '(calendar-backward-week 1)))
+            Cdown    (cmd! (org-eval-in-calendar '(calendar-forward-week 1)))
+            CSleft   (cmd! (org-eval-in-calendar '(calendar-backward-month 1)))
+            CSright  (cmd! (org-eval-in-calendar '(calendar-forward-month 1)))
+            CSup     (cmd! (org-eval-in-calendar '(calendar-backward-year 1)))
+            CSdown   (cmd! (org-eval-in-calendar '(calendar-forward-year 1)))))))
 
 
 (use-package! evil-org-agenda

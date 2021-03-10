@@ -1,6 +1,7 @@
 ;;; core-editor.el -*- lexical-binding: t; -*-
 
-(defvar doom-detect-indentation-excluded-modes '(fundamental-mode so-long-mode)
+(defvar doom-detect-indentation-excluded-modes
+  '(fundamental-mode pascal-mode so-long-mode)
   "A list of major modes in which indentation should be automatically
 detected.")
 
@@ -297,15 +298,29 @@ or file path may exist now."
         savehist-autosave-interval nil     ; save on kill only
         savehist-additional-variables
         '(kill-ring                        ; persist clipboard
+          register-alist                   ; persist macros
           mark-ring global-mark-ring       ; persist marks
           search-ring regexp-search-ring)) ; persist searches
   (add-hook! 'savehist-save-hook
-    (defun doom-unpropertize-kill-ring-h ()
+    (defun doom-savehist-unpropertize-variables-h ()
       "Remove text properties from `kill-ring' for a smaller savehist file."
-      (setq kill-ring (cl-loop for item in kill-ring
-                               if (stringp item)
-                               collect (substring-no-properties item)
-                               else if item collect it)))))
+      (setq kill-ring
+            (mapcar #'substring-no-properties
+                    (cl-remove-if-not #'stringp kill-ring))
+            register-alist
+            (cl-loop for (reg . item) in register-alist
+                     if (stringp item)
+                     collect (cons reg (substring-no-properties item))
+                     else collect (cons reg item))))
+    (defun doom-savehist-remove-unprintable-registers-h ()
+      "Remove unwriteable registers (e.g. containing window configurations).
+Otherwise, `savehist' would discard `register-alist' entirely if we don't omit
+the unwritable tidbits."
+      ;; Save new value in the temp buffer savehist is running
+      ;; `savehist-save-hook' in. We don't want to actually remove the
+      ;; unserializable registers in the current session!
+      (setq-local register-alist
+                  (cl-remove-if-not #'savehist-printable register-alist)))))
 
 
 (use-package! saveplace
@@ -423,8 +438,23 @@ files, so we replace calls to `pp' with the much faster `prin1'."
   (setq dtrt-indent-max-lines 2000)
 
   ;; always keep tab-width up-to-date
-  (push '(t tab-width) dtrt-indent-hook-generic-mapping-list))
+  (push '(t tab-width) dtrt-indent-hook-generic-mapping-list)
 
+  (defvar dtrt-indent-run-after-smie)
+  (defadvice! doom--fix-broken-smie-modes-a (orig-fn arg)
+    "Some smie modes throw errors when trying to guess their indentation, like
+`nim-mode'. This prevents them from leaving Emacs in a broken state."
+    :around #'dtrt-indent-mode
+    (let ((dtrt-indent-run-after-smie dtrt-indent-run-after-smie))
+      (letf! ((defun symbol-config--guess (beg end)
+                (funcall symbol-config--guess beg (min end 10000)))
+              (defun smie-config-guess ()
+                (condition-case e (funcall smie-config-guess)
+                  (error (setq dtrt-indent-run-after-smie t)
+                         (message "[WARNING] Indent detection: %s"
+                                  (error-message-string e))
+                         (message ""))))) ; warn silently
+        (funcall orig-fn arg)))))
 
 (use-package! helpful
   ;; a better *help* buffer

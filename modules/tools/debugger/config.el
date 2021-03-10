@@ -13,7 +13,7 @@
     (realgud:trepan2   :modes (python-mode))
     (realgud:trepan3k  :modes (python-mode))
     (realgud:trepanjs  :modes (javascript-mode js2-mode js3-mode))
-    (realgud:trepanpl  :modes (perl-mode perl6-mode))
+    (realgud:trepanpl  :modes (perl-mode perl6-mode raku-mode))
     (realgud:zshdb     :modes (sh-mode))))
 
 (defvar +debugger--dap-alist
@@ -38,6 +38,12 @@
 (setq gdb-show-main t
       gdb-many-windows t)
 
+(use-package! projectile-variable
+  :defer t
+  :commands (projectile-variable-put
+             projectile-variable-get
+             projectile-variable-alist
+             projectile-variable-plist))
 
 (use-package! realgud
   :defer t

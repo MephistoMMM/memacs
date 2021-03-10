@@ -33,14 +33,14 @@ envvar will enable this at startup.")
   (setenv "HOME" (getenv "USERPROFILE"))
   (setq abbreviated-home-dir nil))
 
-;; Contrary to what many Emacs users have in their configs, you really don't
-;; need more than this to make UTF-8 the default coding system:
+;; Contrary to what many Emacs users have in their configs, you don't need more
+;; than this to make UTF-8 the default coding system:
 (when (fboundp 'set-charset-priority)
   (set-charset-priority 'unicode))       ; pretty
 (prefer-coding-system 'utf-8)            ; pretty
 (setq locale-coding-system 'utf-8)       ; please
-;; The clipboard's on Windows could be in a wider (or thinner) encoding than
-;; utf-8 (likely UTF-16), so let Emacs/the OS decide what encoding to use there.
+;; The clipboard's on Windows could be in a wider encoding than utf-8 (likely
+;; utf-16), so let Emacs/the OS decide what encoding to use there.
 (unless IS-WINDOWS
   (setq selection-coding-system 'utf-8)) ; with sugar on top
 
@@ -172,7 +172,7 @@ users).")
   ;; things ahead-of-time in a non-interactive session.
   (defun doom--comp-use-all-cores-a ()
     (if (zerop comp-async-jobs-number)
-        (setq comp-num-cpus (doom-num-cpus))
+        (setq comp-num-cpus (doom-system-cpus))
       comp-async-jobs-number))
   (advice-add #'comp-effective-async-max-jobs :override #'doom--comp-use-all-cores-a))
 
@@ -425,7 +425,7 @@ intervals."
       (let ((req (pop packages)))
         (unless (featurep req)
           (doom-log "Incrementally loading %s" req)
-          (condition-case e
+          (condition-case-unless-debug e
               (or (while-no-input
                     ;; If `default-directory' is a directory that doesn't exist
                     ;; or is unreadable, Emacs throws up file-missing errors, so

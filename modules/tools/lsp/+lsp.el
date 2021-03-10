@@ -1,11 +1,16 @@
 ;;; tools/lsp/+lsp.el -*- lexical-binding: t; -*-
 
-(defvar +lsp-company-backends 'company-capf
+(defvar +lsp-company-backends (if (featurep! :editor snippets)
+                                  '(:separate company-capf company-yasnippet)
+                                'company-capf)
   "The backends to prepend to `company-backends' in `lsp-mode' buffers.
 Can be a list of backends; accepts any value `company-backends' accepts.")
 
 (defvar +lsp-prompt-to-install-server t
-  "If non-nil, prompt to install a server if no server is present.")
+  "If non-nil, prompt to install a server if no server is present.
+
+If set to `quiet', suppress the install prompt and don't visibly inform the user
+about it (it will be logged to *Messages* however).")
 
 
 ;;
@@ -54,11 +59,11 @@ Can be a list of backends; accepts any value `company-backends' accepts.")
 
   (set-popup-rule! "^\\*lsp-help" :size 0.35 :quit t :select t)
   (set-lookup-handlers! 'lsp-mode :async t
+    ;; NOTE :definitions and :references aren't needed. LSP is integrated into
+    ;;      xref, which the lookup module has first class support for.
     :documentation #'lsp-describe-thing-at-point
-    :definition #'lsp-find-definition
     :implementations #'lsp-find-implementation
-    :type-definition #'lsp-find-type-definition
-    :references #'lsp-find-references)
+    :type-definition #'lsp-find-type-definition)
 
   (defadvice! +lsp--respect-user-defined-checkers-a (orig-fn &rest args)
     "Ensure user-defined `flycheck-checker' isn't overwritten by `lsp'."
@@ -115,14 +120,20 @@ server getting expensively restarted when reverting buffers."
 
   (defadvice! +lsp-dont-prompt-to-install-servers-maybe-a (orig-fn &rest args)
     :around #'lsp
-    (lsp--require-packages)
     (when (buffer-file-name)
+      (require 'lsp-mode)
+      (lsp--require-packages)
       (if (or (lsp--filter-clients
                (-andfn #'lsp--matching-clients?
                        #'lsp--server-binary-present?))
-              +lsp-prompt-to-install-server)
+              (not (memq +lsp-prompt-to-install-server '(nil quiet))))
           (apply orig-fn args)
-        (lsp--info "No language server available for %S" major-mode)))))
+        ;; HACK `lsp--message' overrides `inhibit-message', so use `quiet!'
+        (let ((doom-debug-p
+               (or doom-debug-p
+                   (not (eq +lsp-prompt-to-install-server 'quiet)))))
+          (doom-shut-up-a #'lsp--info "No language server available for %S"
+                          major-mode))))))
 
 
 (use-package! lsp-ui
@@ -139,7 +150,10 @@ server getting expensively restarted when reverting buffers."
         ;; Don't show symbol definitions in the sideline. They are pretty noisy,
         ;; and there is a bug preventing Flycheck errors from being shown (the
         ;; errors flash briefly and then disappear).
-        lsp-ui-sideline-show-hover nil)
+        lsp-ui-sideline-show-hover nil
+        ;; Some icons don't scale correctly on Emacs 26, so disable them there.
+        lsp-ui-sideline-actions-icon  ; DEPRECATED Remove later
+        (if EMACS27+ lsp-ui-sideline-actions-icon-default))
 
   (map! :map lsp-ui-peek-mode-map
         "j"   #'lsp-ui-peek--select-next

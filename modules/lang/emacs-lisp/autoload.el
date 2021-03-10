@@ -11,12 +11,14 @@ to a pop up buffer."
    (string-trim-right
     (condition-case-unless-debug e
         (let ((result
-               (let ((debug-on-error t))
-                 (eval (read (format "(progn %s)" (buffer-substring-no-properties beg end)))
-                       `((buffer-file-name . ,(buffer-file-name (buffer-base-buffer)))
-                         (doom--current-module
-                          . ,(ignore-errors
-                               (doom-module-from-path buffer-file-name))))))))
+               (let ((buffer-file-name
+                      (buffer-file-name (buffer-base-buffer)))
+                     (doom--current-module
+                      (ignore-errors (doom-module-from-path buffer-file-name)))
+                     (debug-on-error t))
+                 (eval (read (format "(progn %s)"
+                                     (buffer-substring-no-properties beg end)))
+                       lexical-binding))))
           (require 'pp)
           (replace-regexp-in-string "\\\\n" "\n" (pp-to-string result)))
       (error (error-message-string e))))
@@ -61,9 +63,7 @@ to a pop up buffer."
 (defun +emacs-lisp-lookup-definition (_thing)
   "Lookup definition of THING."
   (if-let (module (+emacs-lisp--module-at-point))
-      ;; FIXME: this is probably a bug in `counsel'. See
-      ;; https://github.com/abo-abo/swiper/pull/2752.
-      (progn (doom/help-modules (car module) (cadr module) 'visit-dir) 'deferred)
+      (doom/help-modules (car module) (cadr module) 'visit-dir)
     (call-interactively #'elisp-def)))
 
 ;;;###autoload

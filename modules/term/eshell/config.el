@@ -33,6 +33,7 @@ buffer.")
     ("l"  "ls -lh $*")
     ("ll" "ls -lah $*")
     ("gg" "magit-status")
+    ("cdp" "cd-to-project")
     ("clear" "clear-scrollback")) ; more sensible than default
   "An alist of default eshell aliases, meant to emulate useful shell utilities,
 like fasd and bd. Note that you may overwrite these in your
@@ -71,7 +72,9 @@ You should use `set-eshell-alias!' to change this.")
         eshell-prompt-function #'+eshell-default-prompt-fn
         ;; em-glob
         eshell-glob-case-insensitive t
-        eshell-error-if-no-glob t)
+        eshell-error-if-no-glob t
+        ;; Shell config
+        eshell-term-name "xterm-256color")
 
   ;; Consider eshell buffers real
   (add-hook 'eshell-mode-hook #'doom-mark-buffer-as-real-h)

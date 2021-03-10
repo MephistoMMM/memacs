@@ -55,7 +55,7 @@ in."
            emacs-version))
    ((= emacs-major-version 26)
     (warn! (concat "Emacs %s detected. Doom is dropping Emacs 26.x support very soon. Consider "
-                   "upgrading to Emacs 27.x.")
+                   "upgrading to Emacs 27.1.")
            emacs-version)))
 
   (print! (start "Checking for Emacs config conflicts..."))
@@ -67,8 +67,7 @@ in."
 
   (when EMACS27+
     (print! (start "Checking for great Emacs features..."))
-    (unless (and (functionp 'json-serialize)
-                 (string-match-p "\\_<JSON\\_>" system-configuration-features))
+    (unless (functionp 'json-serialize)
       (warn! "Emacs was not built with native JSON support")
       (explain! "Users will see a substantial performance gain by building Emacs with "
                 "jansson support (i.e. a native JSON library), particularly LSP users. "

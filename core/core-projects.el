@@ -34,7 +34,8 @@ debian, and derivatives). On most it's 'fd'.")
         projectile-globally-ignored-file-suffixes '(".elc" ".pyc" ".o")
         projectile-kill-buffers-filter 'kill-only-files
         projectile-known-projects-file (concat doom-cache-dir "projectile.projects")
-        projectile-ignored-projects '("~/" "/tmp"))
+        projectile-ignored-projects (list "~/" temporary-file-directory)
+        projectile-ignored-project-function #'doom-project-ignored-p)
 
   (global-set-key [remap evil-jump-to-tag] #'projectile-find-tag)
   (global-set-key [remap find-tag]         #'projectile-find-tag)
@@ -117,6 +118,9 @@ c) are not valid projectile projects."
       (when (and (bound-and-true-p projectile-projects-cache)
                  projectile-enable-caching
                  doom-interactive-p)
+        (setq projectile-known-projects
+              (cl-remove-if #'projectile-ignored-project-p
+                            projectile-known-projects))
         (projectile-cleanup-known-projects)
         (cl-loop with blacklist = (mapcar #'file-truename doom-projectile-cache-blacklist)
                  for proot in (hash-table-keys projectile-projects-cache)
@@ -125,7 +129,8 @@ c) are not valid projectile projects."
                             doom-projectile-cache-limit)
                         (member (substring proot 0 -1) blacklist)
                         (and doom-projectile-cache-purge-non-projects
-                             (not (doom-project-p proot))))
+                             (not (doom-project-p proot)))
+                        (projectile-ignored-project-p proot))
                  do (doom-log "Removed %S from projectile cache" proot)
                  and do (remhash proot projectile-projects-cache)
                  and do (remhash proot projectile-projects-cache-time)

@@ -1,6 +1,6 @@
 ;;; ui/zen/config.el -*- lexical-binding: t; -*-
 
-(defvar +zen-mixed-pitch-modes '(markdown-mode org-mode org-journal-mode)
+(defvar +zen-mixed-pitch-modes '(adoc-mode rst-mode markdown-mode org-mode)
   "What major-modes to enable `mixed-pitch-mode' in with `writeroom-mode'.")
 
 (defvar +zen-text-scale 2
@@ -8,7 +8,6 @@
 
 (defvar +zen-window-divider-size 4
   "Pixel size of window dividers when `writeroom-mode' is active.")
-
 
 (defvar +zen--old-window-divider-size nil)
 
@@ -18,9 +17,11 @@
 
 (after! writeroom-mode
   ;; Users should be able to activate writeroom-mode in one buffer (e.g. an org
-  ;; buffer) and code in another. Fullscreening/maximizing will be opt-in.
+  ;; buffer) and code in another. No global behavior should be applied.
+  ;; Fullscreening/maximizing will be opt-in.
+  (defvar +zen--old-writeroom-global-effects writeroom-global-effects)
+  (setq writeroom-global-effects nil)
   (setq writeroom-maximize-window nil)
-  (remove-hook 'writeroom-global-effects #'writeroom-set-fullscreen)
 
   (add-hook! 'writeroom-mode-hook
     (defun +zen-enable-text-scaling-mode-h ()
@@ -37,8 +38,9 @@
                         window-divider-default-right-width)
                   window-divider-default-bottom-width +zen-window-divider-size
                   window-divider-default-right-width +zen-window-divider-size)
-          (setq window-divider-default-bottom-width (car +zen--old-window-divider-size)
-                window-divider-default-right-width (cdr +zen--old-window-divider-size)))
+          (when +zen--old-window-divider-size
+            (setq window-divider-default-bottom-width (car +zen--old-window-divider-size)
+                  window-divider-default-right-width (cdr +zen--old-window-divider-size))))
         (window-divider-mode +1))))
 
   ;; Adjust margins when text size is changed
@@ -67,6 +69,4 @@
             'org-todo-keyword-outd
             'org-todo
             'org-done
-            'font-lock-comment-face
-            'line-number
-            'line-number-current-line))
+            'font-lock-comment-face))

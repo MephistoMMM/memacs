@@ -30,6 +30,7 @@ directives. By default, this only recognizes C directives.")
 (defvar evil-want-C-w-delete t)
 (defvar evil-want-Y-yank-to-eol t)
 (defvar evil-want-abbrev-expand-on-insert-exit nil)
+(defvar evil-respect-visual-line-mode t)
 
 (use-package! evil
   :hook (doom-init-modules . evil-mode)
@@ -172,7 +173,7 @@ directives. By default, this only recognizes C directives.")
       (abort-recursive-edit)))
 
   ;; Make J (evil-join) remove comment delimiters when joining lines.
-  (advice-add #'evil-join :override #'+evil-join-a)
+  (advice-add #'evil-join :around #'+evil-join-a)
 
   ;; Prevent gw (`evil-fill') and gq (`evil-fill-and-move') from squeezing
   ;; spaces. It doesn't in vim, so it shouldn't in evil.
@@ -481,11 +482,13 @@ directives. By default, this only recognizes C directives.")
       :v  "g-"    #'evil-numbers/dec-at-pt-incremental
       :v  "g+"    #'evil-numbers/inc-at-pt
       (:when (featurep! :tools lookup)
-        :nv "K"   #'+lookup/documentation
-        :nv "gd"  #'+lookup/definition
-        :nv "gD"  #'+lookup/definition-other-window
-        :nv "gr"  #'+lookup/references
-        :nv "gf"  #'+lookup/file)
+       :nv "K"   #'+lookup/documentation
+       :nv "gd"  #'+lookup/definition
+       :nv "gD"  #'+lookup/definition-other-window
+       :nv "gr"  #'+lookup/references
+       :nv "gf"  #'+lookup/file
+       :nv "gI"  #'+lookup/implementations
+       :nv "gA"  #'+lookup/assignments)
       (:when (featurep! :tools eval)
         :nv "ge"  #'+eval:region
         :n  "gE"  #'+eval/buffer
@@ -521,6 +524,9 @@ directives. By default, this only recognizes C directives.")
        "C-k"     #'evil-window-up
        "C-l"     #'evil-window-right
        "C-w"     #'other-window
+       ;; Extra split commands
+       "S"       #'+evil/window-split-and-follow
+       "V"       #'+evil/window-vsplit-and-follow
        ;; Swapping windows
        "H"       #'+evil/window-move-left
        "J"       #'+evil/window-move-down
