@@ -71,7 +71,8 @@ employed so that flycheck still does *some* helpful linting.")
 
   (add-hook! 'emacs-lisp-mode-hook
              ;; Allow folding of outlines in comments
-             #'outline-minor-mode
+             ;; its keymap override my avy commonds
+             ;; #'outline-minor-mode
              ;; Make parenthesis depth easier to distinguish at a glance
              #'rainbow-delimiters-mode
              ;; Make quoted symbols easier to distinguish from free variables
