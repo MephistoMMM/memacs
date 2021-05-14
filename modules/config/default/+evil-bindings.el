@@ -42,7 +42,8 @@
                            (bound-and-true-p yas-minor-mode)
                            (yas-maybe-expand-abbrev-key-filter 'yas-expand))
                       #'yas-expand
-                      (featurep! :completion company +tng)
+                      (and (bound-and-true-p company-mode)
+                           (featurep! :completion company +tng))
                       #'company-indent-or-complete-common)
       :i "C-【" #'evil-force-normal-state
       :m [tab] (cmds! (and (bound-and-true-p yas-minor-mode)
@@ -57,9 +58,14 @@
                       ;; mode-local ones for modes that don't have an evil
                       ;; keybinding scheme or users who don't have :editor (evil
                       ;; +everywhere) enabled.
-                      (doom-lookup-key
-                       [tab] (list (current-local-map)
-                                   (evil-get-auxiliary-keymap (current-local-map) evil-state)))
+                      (or (doom-lookup-key
+                           [tab]
+                           (list (evil-get-auxiliary-keymap (current-local-map) evil-state)
+                                 (current-local-map)))
+                          (doom-lookup-key
+                           (kbd "TAB")
+                           (list (evil-get-auxiliary-keymap (current-local-map) evil-state)))
+                          (doom-lookup-key (kbd "TAB") (list (current-local-map))))
                       it
                       (fboundp 'evil-jump-item)
                       #'evil-jump-item)
@@ -349,6 +355,12 @@
         (:when (featurep! :completion helm)
          :desc "Jump to symbol in current workspace" "j"   #'helm-lsp-workspace-symbol
          :desc "Jump to symbol in any workspace"     "J"   #'helm-lsp-global-workspace-symbol)
+        (:when (featurep! :ui treemacs +lsp)
+         :desc "Errors list"                         "X"   #'lsp-treemacs-errors-list
+         :desc "Incoming call hierarchy"             "y"   #'lsp-treemacs-call-hierarchy
+         :desc "Outgoing call hierarchy"             "Y"   (cmd!! #'lsp-treemacs-call-hierarchy t)
+         :desc "References tree"                     "R"   (cmd!! #'lsp-treemacs-references t)
+         :desc "Symbols"                             "S"   #'lsp-treemacs-symbols)
         :desc "LSP"                                  "l"   #'+default/lsp-command-map
         :desc "LSP Rename"                           "r"   #'lsp-rename)
        (:when (featurep! :tools lsp +eglot)
@@ -421,7 +433,7 @@
       ;;; <leader> g --- git/version control
       (:prefix-map ("g" . "git")
        :desc "Revert file"                 "R"   #'vc-revert
-       :desc "Copy link to remote"         "y"   #'browse-at-remote-kill
+       :desc "Copy link to remote"         "y"   #'+vc/browse-at-remote-kill
        :desc "Copy link to homepage"       "Y"   #'+vc/browse-at-remote-kill-homepage
        (:when (featurep! :ui hydra)
         :desc "SMerge"                    "m"   #'+vc/smerge-hydra/body)
@@ -454,7 +466,7 @@
          :desc "Find issue"                "i"   #'forge-visit-issue
          :desc "Find pull request"         "p"   #'forge-visit-pullreq)
         (:prefix ("o" . "open in browser")
-         :desc "Browse file or region"     "o"   #'browse-at-remote
+         :desc "Browse file or region"     "o"   #'+vc/browse-at-remote
          :desc "Browse homepage"           "h"   #'+vc/browse-at-remote-homepage
          :desc "Browse remote"             "r"   #'forge-browse-remote
          :desc "Browse commit"             "c"   #'forge-browse-commit
@@ -694,6 +706,7 @@
   ;;; C-s --- search
  (:prefix-map ("C-s" . "search")
    :desc "Search buffer"                "b" #'swiper
+   :desc "Search all open buffers"      "B" #'swiper-all
    :desc "Search current directory"     "d" #'+default/search-cwd
    :desc "Search other directory"       "D" #'+default/search-other-cwd
    :desc "Locate file"                  "f" #'locate
@@ -702,12 +715,18 @@
    :desc "Jump to link"                 "L" #'ffap-menu
    :desc "Jump list"                    "j" #'evil-show-jumps
    :desc "Jump to bookmark"             "m" #'bookmark-jump
+   :desc "Look up online"               "o" #'+lookup/online
+   :desc "Look up online (w/ prompt)"   "O" #'+lookup/online-select
+   :desc "Look up in local docsets"     "k" #'+lookup/in-docsets
+   :desc "Look up in all docsets"       "K" #'+lookup/in-all-docsets
    :desc "Search project"               "/" #'+default/search-project
    :desc "Search project for thing at point" "?" #'+default/search-project-for-symbol-at-point
-   :desc "Search other project"         "o" #'+default/search-other-project
+   :desc "Search other project"         "P" #'+default/search-other-project
    :desc "Jump to mark"                 "r" #'evil-show-marks
    :desc "Search buffer"                "s" #'swiper-isearch
-   :desc "Search buffer for thing at point" "S" #'swiper-isearch-thing-at-point)
+   :desc "Search buffer for thing at point" "S" #'swiper-isearch-thing-at-point
+   :desc "Dictionary"                   "t" #'+lookup/dictionary-definition
+   :desc "Thesaurus"                    "T" #'+lookup/synonyms)
 
  ;;; M-y --- yank
  :nmei "M-y" #'counsel-yank-pop

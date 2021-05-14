@@ -81,10 +81,49 @@
   ;; HACK Fix #1107: flickering pdfs when evil-mode is enabled
   (setq-hook! 'pdf-view-mode-hook evil-normal-state-cursor (list nil))
 
+  ;; HACK Refresh FG/BG for pdfs when `pdf-view-midnight-colors' is changed by a
+  ;;      theme or with `setq!'.
+  ;; TODO PR this upstream?
+  (defun +pdf-reload-midnight-minor-mode-h ()
+    (when pdf-view-midnight-minor-mode
+      (pdf-info-setoptions
+       :render/foreground (car pdf-view-midnight-colors)
+       :render/background (cdr pdf-view-midnight-colors)
+       :render/usecolors t)
+      (pdf-cache-clear-images)
+      (pdf-view-redisplay t)))
+  (put 'pdf-view-midnight-colors 'custom-set
+       (lambda (sym value)
+         (set-default sym value)
+         (dolist (buffer (doom-buffers-in-mode 'pdf-view-mode))
+           (with-current-buffer buffer
+             (if (get-buffer-window buffer)
+                 (+pdf-reload-midnight-minor-mode-h)
+               ;; Defer refresh for buffers that aren't visible, to avoid
+               ;; blocking Emacs for too long while changing themes.
+               (add-hook 'doom-switch-buffer-hook #'+pdf-reload-midnight-minor-mode-h
+                         nil 'local))))))
+
   ;; Add retina support for MacOS users
   (eval-when! IS-MAC
-    (defvar +pdf--scaled-p nil)
+    (defun +pdf-view-create-page-a (page &optional window)
+      "Create an image of PAGE for display on WINDOW."
+      :override #'pdf-view-create-page
+      (let* ((size (pdf-view-desired-image-size page window))
+             (width (if (not (pdf-view-use-scaling-p))
+                        (car size)
+                      (* 2 (car size))))
+             (data (pdf-cache-renderpage
+                    page width width))
+             (hotspots (pdf-view-apply-hotspot-functions
+                        window page size)))
+        (pdf-view-create-image data
+                               :width width
+                               :scale (if (pdf-view-use-scaling-p) 0.5 1)
+                               :map hotspots
+                               :pointer 'arrow)))
 
+    (defvar +pdf--scaled-p nil)
     (defadvice! +pdf--scale-up-on-retina-display-a (orig-fn &rest args)
       "Scale up the PDF on retina displays."
       :around #'pdf-util-frame-scale-factor
@@ -103,8 +142,7 @@
     (defadvice! +pdf--use-scaling-on-ns-a ()
       :before-until #'pdf-view-use-scaling-p
       (and (eq (framep-on-display) 'ns)
-           EMACS27+
-           pdf-view-use-scaling))
+           EMACS27+))
 
     (defadvice! +pdf--supply-width-to-create-image-calls-a (orig-fn &rest args)
       :around '(pdf-annot-show-annotation
@@ -114,7 +152,13 @@
                (apply create-image file-or-data type data-p
                       :width (car (pdf-view-image-size))
                       props))
-        (apply orig-fn args)))))
+        (apply orig-fn args))))
+
+  ;; Silence "File *.pdf is large (X MiB), really open?" prompts for pdfs
+  (defadvice! +pdf-suppress-large-file-prompts-a (orig-fn size op-type filename &optional offer-raw)
+    :around #'abort-if-file-too-large
+    (unless (string-match-p "\\.pdf\\'" filename)
+      (funcall orig-fn size op-type filename offer-raw))))
 
 
 (use-package! saveplace-pdf-view

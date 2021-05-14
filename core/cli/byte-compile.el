@@ -21,6 +21,13 @@ and your private config files, respectively. To recompile your packages, use
                        doom-core-dir))
                (when private-p
                  (list doom-private-dir)))
+     (or (y-or-n-p
+          (concat "WARNING: Changes made to your config after compiling it won't take effect until\n"
+                  "this command is rerun or you run 'doom clean'! It will also make error backtraces\n"
+                  "much more difficult to decipher.\n\n"
+                  "If you intend to use it anyway, remember this or it will come back to bite you!\n\n"
+                  "Continue anyway?"))
+         (user-error "Aborted"))
      (append (list (doom-glob doom-emacs-dir "init.el")
                    doom-core-dir)
              (cl-remove-if-not
@@ -94,7 +101,8 @@ If RECOMPILE-P is non-nil, only recompile out-of-date files."
             (noninteractive t)
             doom-interactive-p)
         (doom-initialize 'force)
-        (quiet! (doom-initialize-packages))))
+        (quiet! (doom-initialize-packages))
+        (quiet! (doom-initialize-modules))))
 
     (if (null targets)
         (print! (info "No targets to %scompile" (if recompile-p "re" "")))

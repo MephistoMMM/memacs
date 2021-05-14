@@ -1,7 +1,8 @@
 ;;; lang/org/config.el -*- lexical-binding: t; -*-
 
 (defvar +org-babel-mode-alist
-  '((cpp . C)
+  '((c . C)
+    (cpp . C)
     (C++ . C)
     (D . C)
     (elisp . emacs-lisp)
@@ -275,6 +276,12 @@ Also adds support for a `:sync' parameter to override `:async'."
   (after! python
     (setq org-babel-python-command python-shell-interpreter))
 
+  (after! ob-ditaa
+    ;; TODO Should be fixed upstream
+    (let ((default-directory (org-find-library-dir "org-contribdir")))
+      (setq org-ditaa-jar-path     (expand-file-name "scripts/ditaa.jar")
+            org-ditaa-eps-jar-path (expand-file-name "scripts/DitaaEps.jar"))))
+
   ;; NOTE Backported from Emacs 27.1
   ;; DEPRECATED Remove when 26.x support is dropped
   (unless EMACS27+
@@ -535,10 +542,10 @@ relative to `org-directory', unless it is an absolute path."
             (mathjax . t)
             (variable . "revealjs-url=https://revealjs.com"))))
 
-  (defadvice! +org--dont-trigger-save-hooks-on-export-a (orig-fn &rest args)
-    "`org-export-to-file' triggers save hooks, which may inadvertantly change
-the exported output (i.e. formatters)."
-    :around #'org-export-to-file
+  (defadvice! +org--dont-trigger-save-hooks-a (orig-fn &rest args)
+    "Exporting and tangling trigger save hooks; inadvertantly triggering
+mutating hooks on exported output, like formatters."
+    :around '(org-export-to-file org-babel-tangle)
     (let (before-save-hook after-save-hook)
       (apply orig-fn args)))
 
@@ -551,9 +558,10 @@ the exported output (i.e. formatters)."
                              ,(or org-export-async-debug
                                   debug-on-error)
                              load-path ',load-path)
-                       (load ,(or old-async-init-file user-init-file)
-                             nil t)
-                       (delete-file ,org-export-async-init-file))
+                       (unwind-protect
+                           (load ,(or old-async-init-file user-init-file)
+                                 nil t)
+                         (delete-file load-file-name)))
                (current-buffer)))
       (apply orig-fn args))))
 
@@ -625,7 +633,8 @@ the exported output (i.e. formatters)."
     (quiet! (org-mode-restart))
     (delq! (current-buffer) org-agenda-new-buffers)
     (remove-hook 'doom-switch-buffer-hook #'+org--restart-mode-h
-                 'local))
+                 'local)
+    (run-hooks 'find-file-hook))
 
   (add-hook! 'org-agenda-finalize-hook
     (defun +org-exclude-agenda-buffers-from-workspace-h ()
@@ -655,8 +664,8 @@ can grow up to be fully-fledged org-mode buffers."
     :around #'org-get-agenda-file-buffer
     (let ((recentf-exclude (list (lambda (_file) t)))
           (doom-inhibit-large-file-detection t)
-          find-file-hook
-          org-mode-hook)
+          org-mode-hook
+          find-file-hook)
       (funcall orig-fn file)))
 
   ;; HACK With https://code.orgmode.org/bzg/org-mode/commit/48da60f4, inline
@@ -901,7 +910,7 @@ between the two."
       ("^\\*Org Agenda"     :ignore t)
       ("^\\*Org Src"        :size 0.4  :quit nil :select t :autosave t :modeline t :ttl nil)
       ("^\\*Org-Babel")
-      ("^CAPTURE-.*\\.org$" :size 0.25 :quit nil :select t :autosave ignore))))
+      ("^\\*Capture\\*$\\|CAPTURE-.*$" :size 0.25 :quit nil :select t :autosave ignore))))
 
 
 (defun +org-init-protocol-lazy-loader-h ()

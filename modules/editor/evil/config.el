@@ -30,14 +30,13 @@ directives. By default, this only recognizes C directives.")
 (defvar evil-want-C-w-delete t)
 (defvar evil-want-Y-yank-to-eol t)
 (defvar evil-want-abbrev-expand-on-insert-exit nil)
-(defvar evil-respect-visual-line-mode t)
+(defvar evil-respect-visual-line-mode nil)
 
 (use-package! evil
   :hook (doom-init-modules . evil-mode)
   :demand t
   :preface
-  (setq evil-want-visual-char-semi-exclusive t
-        evil-ex-search-vim-style-regexp t
+  (setq evil-ex-search-vim-style-regexp t
         evil-ex-substitute-global nil
         evil-ex-visual-char-range t  ; column range for ex commands
         evil-mode-line-format 'nil

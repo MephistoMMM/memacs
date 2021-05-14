@@ -39,8 +39,8 @@
      "l" #'evil-avy-goto-line
      "w" #'evil-avy-goto-word-or-subword-1
      "W" #'evil-avy-goto-word-0
-     "t" #'evil-avy-goto-char-timer
-     "T" (λ!! #'evil-avy-goto-char-timer t)
+     "SPC" (cmd! (let ((current-prefix-arg t)) (evil-avy-goto-char-timer)))
+     "/" #'evil-avy-goto-char-timer
      "r" #'avy-resume)
    :nmeiv "M-l" #'evil-avy-goto-line
    ))
@@ -263,7 +263,7 @@ Continues comments if executed from a commented line. Consults
   (interactive "*")
   (when (and +default-want-RET-continue-comments
              (doom-point-in-comment-p)
-             (fboundp comment-line-break-function))
+             (functionp comment-line-break-function))
     (funcall comment-line-break-function nil)
     t))
 
