@@ -28,7 +28,8 @@
   (remove-hook 'rustic-mode-hook #'flycheck-mode)
   (remove-hook 'rustic-mode-hook #'flymake-mode-off)
   (unless (featurep! +lsp)
-    (add-to-list 'flycheck-checkers 'rustic-clippy))
+    (after! flycheck
+      (add-to-list 'flycheck-checkers 'rustic-clippy)))
 
   ;; HACK `rustic-lsp' sets up lsp-mode/eglot too early. We move it to
   ;;      `rustic-mode-local-vars-hook' so file/dir local variables can be used
@@ -44,21 +45,22 @@
   (map! :map rustic-mode-map
         :localleader
         (:prefix ("b" . "build")
-          :desc "cargo audit"    "a" #'+rust/cargo-audit
-          :desc "cargo build"    "b" #'rustic-cargo-build
-          :desc "cargo bench"    "B" #'rustic-cargo-bench
-          :desc "cargo check"    "c" #'rustic-cargo-check
-          :desc "cargo clippy"   "C" #'rustic-cargo-clippy
-          :desc "cargo doc"      "d" #'rustic-cargo-doc
-          :desc "cargo fmt"      "f" #'rustic-cargo-fmt
-          :desc "cargo new"      "n" #'rustic-cargo-new
-          :desc "cargo outdated" "o" #'rustic-cargo-outdated
-          :desc "cargo run"      "r" #'rustic-cargo-run)
+          :desc "cargo audit"      "a" #'+rust/cargo-audit
+          :desc "cargo build"      "b" #'rustic-cargo-build
+          :desc "cargo bench"      "B" #'rustic-cargo-bench
+          :desc "cargo check"      "c" #'rustic-cargo-check
+          :desc "cargo clippy"     "C" #'rustic-cargo-clippy
+          :desc "cargo doc"        "d" #'rustic-cargo-build-doc
+          :desc "cargo doc --open" "D" #'rustic-cargo-doc
+          :desc "cargo fmt"        "f" #'rustic-cargo-fmt
+          :desc "cargo new"        "n" #'rustic-cargo-new
+          :desc "cargo outdated"   "o" #'rustic-cargo-outdated
+          :desc "cargo run"        "r" #'rustic-cargo-run)
         (:prefix ("t" . "cargo test")
           :desc "all"          "a" #'rustic-cargo-test
           :desc "current test" "t" #'rustic-cargo-current-test))
 
-  ;; If lsp/elgot isn't available, it attempts to install lsp-mode via
+  ;; If lsp/eglot isn't available, it attempts to install lsp-mode via
   ;; package.el. Doom manages its own dependencies through straight so disable
   ;; this behavior to avoid package-not-initialized errors.
   (defadvice! +rust--dont-install-packages-a (&rest _)

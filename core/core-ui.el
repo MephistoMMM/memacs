@@ -48,7 +48,8 @@ Must be a `font-spec', a font object, an XFT font string, or an XLFD string. See
 
 The defaults on macOS and Linux are Apple Color Emoji and Symbola, respectively.
 
-An omitted font size means to inherit `doom-font''s size.")
+WARNING: if you specify a size for this font it will hard-lock any usage of this
+font to that size. It's rarely a good idea to do so!")
 
 (defvar doom-emoji-fallback-font-families
   '("Apple Color Emoji"
@@ -255,29 +256,29 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
            (message "Can't kill the fallback buffer.")
            t)
           ((doom-real-buffer-p buf)
-           (let ((visible-p (delq (selected-window) (get-buffer-window-list buf nil t)))
-                 (doom-inhibit-switch-buffer-hooks t)
-                 (inhibit-redisplay t)
-                 buffer-list-update-hook)
+           (let ((visible-p (delq (selected-window) (get-buffer-window-list buf nil t))))
              (unless visible-p
                (when (and (buffer-modified-p buf)
                           (not (y-or-n-p
                                 (format "Buffer %s is modified; kill anyway?"
                                         buf))))
                  (user-error "Aborted")))
-             (when (or ;; if there aren't more real buffers than visible buffers,
-                    ;; then there are no real, non-visible buffers left.
-                    (not (cl-set-difference (doom-real-buffer-list)
-                                            (doom-visible-buffers)))
-                    ;; if we end up back where we start (or previous-buffer
-                    ;; returns nil), we have nowhere left to go
-                    (memq (switch-to-prev-buffer nil t) (list buf 'nil)))
-               (switch-to-buffer (doom-fallback-buffer)))
-             (unless visible-p
-               (with-current-buffer buf
-                 (restore-buffer-modified-p nil))
-               (kill-buffer buf))
-             (run-hooks 'buffer-list-update-hook)
+             (let ((inhibit-redisplay t)
+                   (doom-inhibit-switch-buffer-hooks t)
+                   buffer-list-update-hook)
+               (when (or ;; if there aren't more real buffers than visible buffers,
+                      ;; then there are no real, non-visible buffers left.
+                      (not (cl-set-difference (doom-real-buffer-list)
+                                              (doom-visible-buffers)))
+                      ;; if we end up back where we start (or previous-buffer
+                      ;; returns nil), we have nowhere left to go
+                      (memq (switch-to-prev-buffer nil t) (list buf 'nil)))
+                 (switch-to-buffer (doom-fallback-buffer)))
+               (unless visible-p
+                 (with-current-buffer buf
+                   (restore-buffer-modified-p nil))
+                 (kill-buffer buf)))
+             (run-hooks 'doom-switch-buffer-hook 'buffer-list-update-hook)
              t)))))
 
 
@@ -423,8 +424,8 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
   ;;      which users expect to control hl-line in Emacs.
   (define-globalized-minor-mode global-hl-line-mode hl-line-mode
     (lambda ()
-      (and (not hl-line-mode)
-           (cond ((null global-hl-line-modes) nil)
+      (and (cond (hl-line-mode nil)
+                 ((null global-hl-line-modes) nil)
                  ((eq global-hl-line-modes t))
                  ((eq (car global-hl-line-modes) 'not)
                   (not (derived-mode-p global-hl-line-modes)))
@@ -542,7 +543,7 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 ;; languages like Lisp. I reduce it from it's default of 9 to reduce the
 ;; complexity of the font-lock keyword and hopefully buy us a few ms of
 ;; performance.
-(setq rainbow-delimiters-max-face-count 3)
+(setq rainbow-delimiters-max-face-count 4)
 
 
 ;;
@@ -604,12 +605,16 @@ display-line-numbers-mode."
       (when doom-unicode-font
         (set-fontset-font t 'unicode doom-unicode-font))))
   (apply #'custom-set-faces
-         (append (when doom-font
-                   `((fixed-pitch ((t (:font ,doom-font))))))
-                 (when doom-serif-font
-                   `((fixed-pitch-serif ((t (:font ,doom-serif-font))))))
-                 (when doom-variable-pitch-font
-                   `((variable-pitch ((t (:font ,doom-variable-pitch-font))))))))
+         (let ((attrs '(:weight unspecified :slant unspecified :width unspecified)))
+           (append (when doom-font
+                     `((fixed-pitch ((t (:font ,doom-font ,@attrs))))))
+                   (when doom-serif-font
+                     `((fixed-pitch-serif ((t (:font ,doom-serif-font ,@attrs))))))
+                   (when doom-variable-pitch-font
+                     `((variable-pitch ((t (:font ,doom-variable-pitch-font ,@attrs)))))))))
+  ;; Never save these settings to `custom-file'
+  (dolist (sym '(fixed-pitch fixed-pitch-serif variable-pitch))
+    (put sym 'saved-face nil))
   (cond
    (doom-font
     ;; I avoid `set-frame-font' at startup because it is expensive; doing extra,

@@ -305,6 +305,7 @@ config.el instead."
 ;; so we use `gcmh' to stave off the GC while we're using Emacs, and provoke it
 ;; when it's idle.
 (setq gcmh-idle-delay 5  ; default is 15s
+      gcmh-high-cons-threshold (* 16 1024 1024)  ; 16mb
       gcmh-verbose doom-debug-p)
 
 ;; Emacs "updates" its ui more often than it needs to, so slow it down slightly
@@ -398,6 +399,14 @@ config.el instead."
     (setq-local doom-inhibit-local-var-hooks t)
     (doom-run-hooks (intern-soft (format "%s-local-vars-hook" major-mode)))))
 
+;; If the user has disabled `enable-local-variables', then
+;; `hack-local-variables-hook' is never triggered, so we trigger it at the end
+;; of `after-change-major-mode-hook':
+(defun doom-run-local-var-hooks-maybe-h ()
+  "Run `doom-run-local-var-hooks-h' if `enable-local-variables' is disabled."
+  (unless enable-local-variables
+    (doom-run-local-var-hooks-h)))
+
 
 ;;
 ;;; Incremental lazy-loading
@@ -450,6 +459,7 @@ intervals."
                     ;; or is unreadable, Emacs throws up file-missing errors, so
                     ;; we set it to a directory we know exists and is readable.
                     (let ((default-directory doom-emacs-dir)
+                          (inhibit-message t)
                           file-name-handler-alist)
                       (require req nil t))
                     t)
@@ -521,8 +531,6 @@ Meant to be used with `run-hook-wrapped'."
   (doom-log "Running doom hook: %s" hook)
   (condition-case-unless-debug e
       (funcall hook)
-    (user-error
-     (warn "Warning: %s" (error-message-string e)))
     (error
      (signal 'doom-hook-error (list hook e))))
   ;; return nil so `run-hook-wrapped' won't short circuit
@@ -536,7 +544,11 @@ Is used as advice to replace `run-hooks'."
         (run-hook-wrapped hook #'doom-run-hook)
       (doom-hook-error
        (unless debug-on-error
-         (lwarn hook :error "Error running hook %S because: %s" (cadr e) (caddr e)))
+         (lwarn hook :error "Error running hook %S because: %s"
+                (if (symbolp (cadr e))
+                    (symbol-name (cadr e))
+                  (cadr e))
+                (caddr e)))
        (signal 'doom-hook-error (cons hook (cdr e)))))))
 
 (defun doom-run-hook-on (hook-var trigger-hooks)
@@ -639,8 +651,9 @@ to least)."
     ;; Load shell environment, optionally generated from 'doom env'. No need
     ;; to do so if we're in terminal Emacs, where Emacs correctly inherits
     ;; your shell environment.
-    (if (or (display-graphic-p)
-            (daemonp))
+    (if (and (or (display-graphic-p)
+                 (daemonp))
+             doom-env-file)
         (doom-load-envvars-file doom-env-file 'noerror))
 
     ;; Loads `use-package' and all the helper macros modules (and users) can use
@@ -655,7 +668,8 @@ to least)."
     (eval-after-load 'straight '(doom-initialize-packages))
 
     ;; Bootstrap the interactive session
-    (add-hook 'after-change-major-mode-hook #'doom-run-local-var-hooks-h)
+    (add-hook 'after-change-major-mode-hook #'doom-run-local-var-hooks-maybe-h 100)
+    (add-hook 'hack-local-variables-hook #'doom-run-local-var-hooks-h)
     (add-hook 'emacs-startup-hook #'doom-load-packages-incrementally-h)
     (add-hook 'window-setup-hook #'doom-display-benchmark-h)
     (doom-run-hook-on 'doom-first-buffer-hook '(find-file-hook doom-switch-buffer-hook))

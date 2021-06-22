@@ -134,9 +134,7 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
         org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps nil)
 
-  ;; Previews are rendered with the incorrect background
   (plist-put org-format-latex-options :scale 1.5) ; larger previews
-  (plist-put org-format-latex-options :background 'default) ; match the background
 
   ;; HACK Face specs fed directly to `org-todo-keyword-faces' don't respect
   ;;      underlying faces like the `org-todo' face does, so we define our own
@@ -483,7 +481,7 @@ relative to `org-directory', unless it is an absolute path."
                    (and IS-WINDOWS (string-prefix-p "\\\\" path))
                    (file-exists-p path))
                'org-link
-             'error)))
+             '(warning org-link))))
 
   ;; Add custom link types
   (pushnew! org-link-abbrev-alist
@@ -659,11 +657,14 @@ can grow up to be fully-fledged org-mode buffers."
                     nil 'local)))))
 
   (defvar recentf-exclude)
-  (defadvice! +org--exclude-agenda-buffers-from-recentf-a (orig-fn file)
+  (defadvice! +org--optimize-backgrounded-agenda-buffers-a (orig-fn file)
     "Prevent temporarily opened agenda buffers from polluting recentf."
     :around #'org-get-agenda-file-buffer
     (let ((recentf-exclude (list (lambda (_file) t)))
           (doom-inhibit-large-file-detection t)
+          org-startup-indented
+          org-startup-folded
+          vc-handled-backends
           org-mode-hook
           find-file-hook)
       (funcall orig-fn file)))
@@ -1004,7 +1005,9 @@ compelling reason, so..."
   :config
   (setq org-clock-persist 'history
         ;; Resume when clocking into task with open clock
-        org-clock-in-resume t)
+        org-clock-in-resume t
+        ;; Remove log if task was clocked for 0:00 (accidental clocking)
+        org-clock-out-remove-zero-time-clocks t)
   (add-hook 'kill-emacs-hook #'org-clock-save))
 
 

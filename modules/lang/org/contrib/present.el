@@ -30,16 +30,14 @@ headings as titles, and you have more freedom to place them wherever you like.")
   :commands org-tree-slide-mode
   :config
   (org-tree-slide-simple-profile)
-  (setq org-tree-slide-skip-outline-level 2
-        org-tree-slide-activate-message " "
+  (setq org-tree-slide-activate-message " "
         org-tree-slide-deactivate-message " "
         org-tree-slide-modeline-display nil
         org-tree-slide-heading-emphasis t)
 
   (add-hook 'org-tree-slide-after-narrow-hook #'org-display-inline-images)
-  (add-hook! 'org-tree-slide-mode-hook
-             #'+org-present-hide-blocks-h
-             #'+org-present-prettify-slide-h)
+  (add-hook 'org-tree-slide-mode-hook #'+org-present-prettify-slide-h)
+  (add-hook 'org-tree-slide-play-hook #'+org-present-hide-blocks-h)
 
   (when (featurep! :editor evil)
     (map! :map org-tree-slide-mode-map
