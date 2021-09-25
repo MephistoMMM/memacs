@@ -76,7 +76,6 @@
     :pin "cf8e64bd8504737912b39e4153390cffbf443ed7"))
 (when (featurep! +roam)
   (package! org-roam :pin "8ad57b121831eda8d226faa14ff2ba7ab652849c")
-  (package! org-roam-server)
   (when (featurep! :completion company)
     (package! company-org-roam)))
 
