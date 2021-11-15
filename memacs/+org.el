@@ -18,6 +18,10 @@ Used in org file template")
                  ((org-agenda-span 'day)
                   (org-agenda-start-day "+0d")
                   (org-deadline-warning-days 365)))
+         (todo "PROJ"
+               ((org-agenda-overriding-header "Projects")
+                (org-agenda-files '(,(expand-file-name "proj.org" +org-capture-work-directory)))
+                ))
          (todo "TODO"
                ((org-agenda-overriding-header "To Refile")
                 (org-agenda-files '(,(+org-capture-work-todo-file)))))
@@ -27,10 +31,6 @@ Used in org file template")
          (alltodo ""
                ((org-agenda-overriding-header "In Progress")
                 (org-agenda-files '(,(expand-file-name "next.org" +org-capture-work-directory)))
-                ))
-         (todo "PROJ"
-               ((org-agenda-overriding-header "Projects")
-                (org-agenda-files '(,(expand-file-name "proj.org" +org-capture-work-directory)))
                 ))
          ;; (todo "TODO"
          ;;       ((org-agenda-overriding-header "One-off Tasks")
@@ -137,6 +137,25 @@ Used in org file template")
                   (ivy-completing-read "Meeting type: " memacs-org-meeting-types)
                   (format-time-string "%Y%m%d")))
         ))
+
+(setq +org-capture-work-project-todo-template
+      (concat "* PROJ %^{Task}\n"
+              "** 启动\n"
+                "*** 目标\n"
+                "- 时间: \n"
+                "- 成本: \n"
+                "- 质量: \n"
+                "*** 范围\n"
+                "- 产品范围: \n"
+                "- 项目范围: \n"
+                "*** 可交付成果\n"
+                "*** 关键里程碑\n"
+                "*** 风险\n"
+                "*** 团队分工\n"
+              "** 计划\n"
+              "** 风险控制\n"
+              "** 收尾\n"))
+
 
 
 (map! :leader

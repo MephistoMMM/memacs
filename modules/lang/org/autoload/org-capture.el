@@ -163,3 +163,8 @@ project."
 (defun +org-capture-work-todo-file ()
   "Return filename of tode.org in work directory."
   (expand-file-name +org-capture-todo-file +org-capture-work-directory))
+
+;;;###autoload
+(defun +org-capture-work-proj-file ()
+  "Return filename of proj.org in work directory."
+  (expand-file-name +org-capture-proj-file +org-capture-work-directory))
