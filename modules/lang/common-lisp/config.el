@@ -16,6 +16,13 @@
 (use-package! sly
   :hook (lisp-mode-local-vars . sly-editing-mode)
   :init
+  ;; I moved this hook to `lisp-mode-local-vars', so it only affects
+  ;; `lisp-mode', and not every other derived lisp mode (like `fennel-mode').
+  ;; We run it twice because the hook is both autoloaded and evaluated at
+  ;; load-time, so it must be removed twice.
+  (after! (:or emacs sly)
+    (remove-hook 'lisp-mode-hook #'sly-editing-mode))
+
   (after! lisp-mode
     (set-repl-handler! 'lisp-mode #'sly-mrepl)
     (set-eval-handler! 'lisp-mode #'sly-eval-region)
@@ -66,7 +73,7 @@
       "Attempt to auto-start sly when opening a lisp buffer."
       (cond ((or (doom-temp-buffer-p (current-buffer))
                  (sly-connected-p)))
-            ((executable-find inferior-lisp-program)
+            ((executable-find (car (split-string inferior-lisp-program)))
              (let ((sly-auto-start 'always))
                (sly-auto-start)
                (add-hook 'kill-buffer-hook #'+common-lisp--cleanup-sly-maybe-h nil t)))

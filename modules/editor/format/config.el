@@ -34,19 +34,22 @@ select buffers.")
 ;;
 ;;; Bootstrap
 
+(add-to-list 'doom-debug-variables 'format-all-debug)
+
 (defun +format-enable-on-save-maybe-h ()
   "Enable formatting on save in certain major modes.
 
 This is controlled by `+format-on-save-enabled-modes'."
-  (cond ((eq major-mode 'fundamental-mode))
-        ((string-prefix-p " " (buffer-name)))
-        ((booleanp +format-on-save-enabled-modes)
-         +format-on-save-enabled-modes)
-        ((if (eq (car-safe +format-on-save-enabled-modes) 'not)
-             (memq major-mode (cdr +format-on-save-enabled-modes))
-           (not (memq major-mode +format-on-save-enabled-modes))))
-        ((not (require 'format-all nil t)))
-        ((format-all-mode +1))))
+  (or (cond ((eq major-mode 'fundamental-mode))
+            ((string-prefix-p " " (buffer-name)))
+            ((and (booleanp +format-on-save-enabled-modes)
+                  (not +format-on-save-enabled-modes)))
+            ((and (listp +format-on-save-enabled-modes)
+                  (if (eq (car +format-on-save-enabled-modes) 'not)
+                      (memq major-mode (cdr +format-on-save-enabled-modes))
+                    (not (memq major-mode +format-on-save-enabled-modes)))))
+            ((not (require 'format-all nil t))))
+      (format-all-mode +1)))
 
 (when (featurep! +onsave)
   (add-hook 'after-change-major-mode-hook #'+format-enable-on-save-maybe-h))
@@ -71,14 +74,16 @@ This is controlled by `+format-on-save-enabled-modes'."
 
 ;; Don't pop up imposing warnings about missing formatters, but still log it in
 ;; to *Messages*.
-(defadvice! +format--all-buffer-from-hook-a (orig-fn &rest args)
+(defadvice! +format--all-buffer-from-hook-a (fn &rest args)
   :around #'format-all-buffer--from-hook
   (letf! (defun format-all-buffer--with (formatter mode-result)
-           (and (condition-case-unless-debug e
-                    (format-all--formatter-executable formatter)
-                  (error
-                   (message "Warning: cannot reformat buffer because %S isn't installed"
-                            (gethash formatter format-all--executable-table))
-                   nil))
-                (funcall format-all-buffer--with formatter mode-result)))
-    (apply orig-fn args)))
+           (when (or (eq formatter 'lsp)
+                     (eq formatter 'eglot)
+                     (condition-case-unless-debug e
+                         (format-all--formatter-executable formatter)
+                       (error
+                        (message "Warning: cannot reformat buffer because %S isn't installed"
+                                 (gethash formatter format-all--executable-table))
+                        nil)))
+             (funcall format-all-buffer--with formatter mode-result)))
+    (apply fn args)))

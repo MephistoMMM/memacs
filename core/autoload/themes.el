@@ -40,9 +40,7 @@ all themes. It will apply to all themes once they are loaded."
        (when (or (get 'doom-theme 'previous-themes)
                  (null doom-theme))
          (funcall #',fn))
-       ;; TODO Append to `doom-load-theme-hook' with DEPTH instead when Emacs
-       ;;      26.x support is dropped.
-       (add-hook 'doom-customize-theme-hook #',fn 'append))))
+       (add-hook 'doom-customize-theme-hook #',fn 100))))
 
 ;;;###autoload
 (defmacro custom-set-faces! (&rest specs)
@@ -56,11 +54,20 @@ doom-themes' API without worry."
 
 ;;;###autoload
 (defun doom/reload-theme ()
-  "Reload the current color theme."
+  "Reload the current Emacs theme."
   (interactive)
+  (unless doom-theme
+    (user-error "No theme is active"))
   (let ((themes (copy-sequence custom-enabled-themes)))
-    (load-theme doom-theme t)
+    (mapc #'disable-theme custom-enabled-themes)
+    (let (doom-load-theme-hook)
+      (mapc #'enable-theme (reverse themes)))
+    (doom-run-hooks 'doom-load-theme-hook)
     (doom/reload-font)
     (message "%s %s"
-             (propertize "Reloaded themes:" 'face 'bold)
+             (propertize
+              (format "Reloaded %d theme%s:"
+                      (length themes)
+                      (if (cdr themes) "s" ""))
+              'face 'bold)
              (mapconcat #'prin1-to-string themes ", "))))

@@ -12,3 +12,9 @@
   :defer t
   :config
   (add-to-list 'ivy-re-builders-alist '(ivy-bibtex . ivy--regex-plus)))
+
+
+(use-package! citar
+  :when (featurep! :completion vertico)
+  :after embark
+  :defer t)

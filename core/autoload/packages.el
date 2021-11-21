@@ -31,7 +31,7 @@
   "Return a PACKAGE and its PLIST in 'username/repo@commit' format."
   (format "%s@%s"
           (plist-get (doom--package-merge-recipes package plist) :repo)
-          (substring-no-properties (plist-get plist :pin) 0 7)))
+          (substring-no-properties (plist-get plist :pin) 0 12)))
 
 (defun doom--package-at-point (&optional point)
   "Return the package and plist from the (package! PACKAGE PLIST...) at point."
@@ -198,5 +198,108 @@ each package."
 ;;; Bump commits
 
 ;;;###autoload
+(defun doom/bumpify-diff (&optional interactive)
+  "Copy user/repo@hash -> user/repo@hash's of changed packages to clipboard.
+
+Must be run from a magit diff buffer."
+  (interactive (list 'interactive))
+  (save-window-excursion
+    (magit-diff-staged)
+    (unless (eq major-mode 'magit-diff-mode)
+      (user-error "Not in a magit diff buffer"))
+    (let (targets lines)
+      (save-excursion
+        (while (re-search-forward "^modified +\\(.+\\)$" nil t)
+          (cl-pushnew (doom-module-from-path (match-string 1)) targets
+                      :test #'equal)))
+      (while (re-search-forward "^-" nil t)
+        (let ((file (magit-file-at-point))
+              before after)
+          (save-window-excursion
+            (call-interactively #'magit-diff-visit-file)
+            (or (looking-at-p "(package!")
+                (re-search-forward "(package! " (line-end-position) t)
+                (re-search-backward "(package! "))
+            (let ((buffer-file-name file))
+              (cl-destructuring-bind (&key package plist _beg _end)
+                  (doom--package-at-point)
+                (setq before (doom--package-to-bump-string package plist)))))
+          (re-search-forward "^+")
+          (save-window-excursion
+            (call-interactively #'magit-diff-visit-file)
+            (or (looking-at-p "(package!")
+                (re-search-forward "(package! " (line-end-position) t)
+                (re-search-backward "(package! "))
+            (let ((buffer-file-name file))
+              (cl-destructuring-bind (&key package plist _beg _end)
+                  (doom--package-at-point)
+                (setq after (doom--package-to-bump-string package plist)))))
+          (cl-pushnew (format "%s -> %s" before after) lines)))
+      (if (null lines)
+          (user-error "No bumps to bumpify")
+        (prog1 (funcall (if interactive #'kill-new #'identity)
+                        (format "bump: %s\n\n%s"
+                                (mapconcat (lambda (x)
+                                             (mapconcat #'symbol-name x " "))
+                                           (cl-loop with alist = ()
+                                                    for (category . module) in targets
+                                                    do (setf (alist-get category alist)
+                                                             (append (alist-get category alist) (list module)))
+                                                    finally return alist)
+                                           " ")
+                                (string-join (sort (reverse lines) #'string-lessp)
+                                             "\n")))
+          (when interactive
+            (message "Copied to clipboard")))))))
+
+;;;###autoload
 (defun doom/commit-bumps ()
-  (interactive))
+  "Create a pre-filled magit commit for currently bumped packages."
+  (interactive)
+  (magit-commit-create
+   (list "-e" "-m" (doom/bumpify-diff))))
+
+
+;;
+;;; Package metadata
+
+;;;###autoload
+(defun doom-package-homepage (package)
+  "Return the url to PACKAGE's homepage (usually a repo)."
+  (doom-initialize-packages)
+  (or (get package 'homepage)
+      (put package 'homepage
+           (cond ((when-let (location (locate-library (symbol-name package)))
+                    (with-temp-buffer
+                      (if (string-match-p "\\.gz$" location)
+                          (jka-compr-insert-file-contents location)
+                        (insert-file-contents (concat (file-name-sans-extension location) ".el")
+                                              nil 0 4096))
+                      (let ((case-fold-search t))
+                        (when (re-search-forward " \\(?:URL\\|homepage\\|Website\\): \\(http[^\n]+\\)\n" nil t)
+                          (match-string-no-properties 1))))))
+                 ((when-let ((recipe (straight-recipes-retrieve package)))
+                    (straight--with-plist (straight--convert-recipe recipe)
+                        (host repo)
+                      (pcase host
+                        (`github (format "https://github.com/%s" repo))
+                        (`gitlab (format "https://gitlab.com/%s" repo))
+                        (`bitbucket (format "https://bitbucket.com/%s" (plist-get plist :repo)))
+                        (`git repo)
+                        (_ nil)))))
+                 ((or package-archive-contents
+                      (progn (package-refresh-contents)
+                             package-archive-contents))
+                  (pcase (ignore-errors (package-desc-archive (cadr (assq package package-archive-contents))))
+                    (`nil nil)
+                    ("org" "https://orgmode.org")
+                    ((or "melpa" "melpa-mirror")
+                     (format "https://melpa.org/#/%s" package))
+                    ("gnu"
+                     (format "https://elpa.gnu.org/packages/%s.html" package))
+                    (archive
+                     (if-let (src (cdr (assoc package package-archives)))
+                         (format "%s" src)
+                       (user-error "%S isn't installed through any known source (%s)"
+                                   package archive)))))
+                 ((user-error "Can't get homepage for %S package" package))))))

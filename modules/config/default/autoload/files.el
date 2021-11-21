@@ -34,9 +34,7 @@
 (defun +default/find-file-under-here ()
   "Perform a recursive file search from the current directory."
   (interactive)
-  (if (featurep! :completion ivy)
-      (call-interactively #'counsel-file-jump)
-    (cmd! (doom-project-find-file default-directory))))
+  (doom-project-find-file default-directory))
 
 ;;;###autoload
 (defun +default/discover-projects (arg)
@@ -52,9 +50,10 @@ If prefix ARG is non-nil, prompt for the search path."
                  (funcall projectile-add-known-project project-root)
                  (message "Added %S to known project roots" project-root)))
         (dolist (dir projectile-project-search-path)
-          (if (not (file-accessible-directory-p dir))
-              (message "%S was inaccessible and couldn't searched" dir)
-            (projectile-discover-projects-in-directory dir)))))))
+          (cl-destructuring-bind (dir . depth) (if (consp dir) dir (cons dir nil))
+            (if (not (file-accessible-directory-p dir))
+                (message "%S was inaccessible and couldn't be searched" dir)
+              (projectile-discover-projects-in-directory dir depth))))))))
 
 ;;;###autoload
 (defun +default/dired (arg)

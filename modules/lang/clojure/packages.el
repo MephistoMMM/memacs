@@ -1,9 +1,21 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; lang/clojure/packages.el
 
-(package! clojure-mode :pin "a14671e03c867c9d759ee9e59cdc5cecbf271245")
-(package! cider :pin "4278d7cf0b54af5cc84f4a521ee1ed6e81a96adc")
-(package! clj-refactor :pin "9f3e7357117e96135de051b78deabc0a327c7b06")
+;; HACK Fix #5577. Paredit is a cider dependency. We install paredit ourselves
+;;      to get it from emacsmirror, because the original upstream is a custom
+;;      git server with shallow clones disabled.
+(package! paredit
+  :recipe (:host github :repo "emacsmirror/paredit")
+  :pin "8330a41e8188fe18d3fa805bb9aa529f015318e8")
 
+;; HACK Forward declare these clj-refactor/cider deps so that their deps are
+;;      byte-compiled first.
+(package! parseclj :pin "a8c4cf30fb68b66ae51541462a8b21753229a6e5")
+(package! parseedn :pin "e5ba280d1fb7b408d54062d4eac545326e850172")
+
+;;; Core packages
+(package! clojure-mode :pin "e1dc7caee76d117a366f8b8b1c2da7e6400636a8")
+(package! clj-refactor :pin "4cb75bd6a2fcb376455e8b4f3edee509f87b86b8")
+(package! cider :pin "7228402c093a7660a6bee6e4c1c69cce81703013")
 (when (featurep! :checkers syntax)
   (package! flycheck-clj-kondo :pin "a558bda44c4cb65b69fa53df233e8941ebd195c5"))

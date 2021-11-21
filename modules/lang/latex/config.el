@@ -100,16 +100,26 @@ If no viewers are found, `latex-preview-pane' is used.")
     (add-hook! '(tex-mode-local-vars-hook
                  latex-mode-local-vars-hook)
                #'lsp!))
-  (map! :map latex-mode-map
+  (map! :localleader
+        :map latex-mode-map
+        :desc "View"          "v" #'TeX-view
+        :desc "Compile"       "c" #'TeX-command-run-all
+        :desc "Run a command" "m" #'TeX-command-master)
+  (map! :after latex
         :localleader
-        :desc "View" "v" #'TeX-view))
+        :map LaTeX-mode-map
+        :desc "View"          "v" #'TeX-view
+        :desc "Compile"       "c" #'TeX-command-run-all
+        :desc "Run a command" "m" #'TeX-command-master))
 
 
 (use-package! tex-fold
   :when (featurep! +fold)
-  :hook (TeX-mode . TeX-fold-buffer)
+  :hook (TeX-mode . +latex-TeX-fold-buffer-h)
   :hook (TeX-mode . TeX-fold-mode)
   :config
+  (defun +latex-TeX-fold-buffer-h ()
+    (run-with-idle-timer 0 nil 'TeX-fold-buffer))
   ;; Fold after all auctex macro insertions
   (advice-add #'TeX-insert-macro :after #'+latex-fold-last-macro-a)
   ;; Fold after cdlatex macro insertions
@@ -120,7 +130,8 @@ If no viewers are found, `latex-preview-pane' is used.")
     (add-hook! 'TeX-fold-mode-hook
       (defun +latex-fold-snippet-contents-h ()
         (add-hook! 'yas-after-exit-snippet-hook :local
-          (TeX-fold-region yas-snippet-beg yas-snippet-end)))))
+          (when (and yas-snippet-beg yas-snippet-end)
+            (TeX-fold-region yas-snippet-beg yas-snippet-end))))))
 
   (add-hook! 'mixed-pitch-mode-hook
     (defun +latex-fold-set-variable-pitch-h ()
@@ -162,19 +173,19 @@ Math faces should stay fixed by the mixed-pitch blacklist, this is mostly for
     (add-to-list 'LaTeX-indent-environment-list `(,env +latex-indent-item-fn)))
 
   ;; Fix #1849: allow fill-paragraph in itemize/enumerate
-  (defadvice! +latex--re-indent-itemize-and-enumerate-a (orig-fn &rest args)
+  (defadvice! +latex--re-indent-itemize-and-enumerate-a (fn &rest args)
     :around #'LaTeX-fill-region-as-para-do
     (let ((LaTeX-indent-environment-list
            (append LaTeX-indent-environment-list
                    '(("itemize"   +latex-indent-item-fn)
                      ("enumerate" +latex-indent-item-fn)))))
-      (apply orig-fn args)))
-  (defadvice! +latex--dont-indent-itemize-and-enumerate-a (orig-fn &rest args)
+      (apply fn args)))
+  (defadvice! +latex--dont-indent-itemize-and-enumerate-a (fn &rest args)
     :around #'LaTeX-fill-region-as-paragraph
     (let ((LaTeX-indent-environment-list LaTeX-indent-environment-list))
       (delq! "itemize" LaTeX-indent-environment-list 'assoc)
       (delq! "enumerate" LaTeX-indent-environment-list 'assoc)
-      (apply orig-fn args))))
+      (apply fn args))))
 
 
 (use-package! preview
