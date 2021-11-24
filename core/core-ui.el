@@ -650,8 +650,9 @@ display-line-numbers-mode."
                 'server-after-make-frame-hook
               'after-init-hook)))
   (add-hook hook #'doom-init-fonts-h -100)
-  (add-hook hook #'doom-init-extra-fonts-h -100)
   (add-hook hook #'doom-init-theme-h -90))
+
+(add-hook 'doom-init-ui-hook #'doom-init-extra-fonts-h)
 
 ;; Initialize UI as late as possible. `window-buffer-change-functions' runs
 ;; once, when the scratch/dashboard buffer is first displayed.
