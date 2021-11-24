@@ -25,6 +25,12 @@ ob-shell.el when executed.")
 take one argument (the language specified in the src block, as a string). Stops
 at the first function to return non-nil.")
 
+(defvar +org-capture-proj-file "proj.org"
+  "Default target for project entries.
+
+Is relative to `org-directory', unless it is absolute. Is used in Doom's default
+`org-capture-templates'.")
+
 (defvar +org-capture-todo-file "inbox.org"
   "Default target for todo entries.
 
@@ -403,8 +409,11 @@ I like:
           ;; `+org-capture-changelog-file' and `+org-capture-notes-file'.
           ("p" "Templates for projects")
           ("pt" "Project-local todo" entry  ; {project-root}/todo.org
-           (file +org-capture-project-todo-file)
-           "* TODO [#%^{level|A|B}] %?\n%i\n%a" :prepend t)
+           (file +org-capture-work-proj-file)
+            (function (lambda ()(if (boundp '+org-capture-work-project-todo-template)
+                +org-capture-work-project-todo-template
+              "* TODO [#%^{level|A|B}] %?\n%i\n%a")))
+           :empty-lines 1)
           ("pn" "Project-local notes" entry  ; {project-root}/notes.org
            (file+headline +org-capture-project-notes-file "Inbox")
            "* %U %?\n%i\n%a" :prepend t)
