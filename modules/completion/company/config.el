@@ -204,13 +204,14 @@
   (setq company-tabnine-binaries-folder "~/.local/share/Tabnine")
   :config
   (if (featurep! :tools lsp +lsp)
-      (setq +lsp-company-backends '(company-capf :with company-tabnine :separate
-                                                 :with company-yasnippet))
+      (setq +lsp-company-backends '(company-tabnine :separate company-capf company-yasnippet))
     (push #'company-tabnine company-backends))
 
-  (setq company-tabnine-max-num-results 3)
+  (setq company-tabnine-max-num-results 3
+        company-tabnine--disable-next-transform nil)
 
-  (add-to-list 'company-transformers '+company/sort-by-tabnine t)
+  (advice-add #'company--transform-candidates :around #'+company/company--transform-candidates)
+  (advice-add #'company-tabnine :around #'+company/company-tabnine)
   ;; The free version of TabNine is good enough,
   ;; and below code is recommended that TabNine not always
   ;; prompt me to purchase a paid version in a large project.

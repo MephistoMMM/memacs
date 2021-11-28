@@ -14,13 +14,13 @@
     :map           "↦"
     ;; Types
     :null          "∅"
-    :true          "𝕋"
-    :false         "𝔽"
-    :int           "ℤ"
-    :float         "ℝ"
-    :str           "𝕊"
-    :bool          "𝔹"
-    :list          "𝕃"
+    :true          "Τ"
+    :false         "Ϝ"
+    :int           "Ζ"
+    :float         "Ɍ"
+    :str           "Ѕ"
+    :bool          "Ɓ"
+    :list          "Ꮮ"
     ;; Flow
     :not           "￢"
     :in            "∈"
@@ -36,7 +36,7 @@
     :intersect     "∩"
     :diff          "∖"
     :tuple         "⨂"
-    :pipe          "" ;; FIXME: find a non-private char
+    :pipe          "ǀ" ;; FIXME: find a non-private char
     :dot           "•")
   "Maps identifiers to symbols, recognized by `set-ligatures'.
 
