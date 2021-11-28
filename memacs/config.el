@@ -53,6 +53,51 @@
 ;; You can also try 'gd' (or 'C-c g d') to jump to their definition and see how
 ;; they are implemented.
 
+(when (and IS-MAC (fboundp 'mac-auto-operator-composition-mode))
+  (setq +ligatures-extra-symbols
+        '(;; org
+          :name          "»"
+          :src_block     "»"
+          :src_block_end "«"
+          :quote         "“"
+          :quote_end     "”"
+          ;; Functional
+          :lambda        "λ"
+          :def           "ƒ"
+          :composition   "∘"
+          :map           "↦"
+          ;; Types
+          :null          "🀆"
+          :true          "🌕"
+          :false         "🌑"
+          :int           "Ƶ"
+          :float         "Ɍ"
+          :str           "Ѕ"
+          :bool          "🌗"
+          :list          "Ꮮ"
+          :empty-set     "∅"
+          ;; Flow
+          :not           "￢"
+          :in            "∈"
+          :not-in        "∉"
+          :and           "∧"
+          :or            "∨"
+          :for           "∀"
+          :while         "♺"
+          :some          "∃"
+          :return        "⮑"
+          :yield         "⟻"
+          ;; Other
+          :local         "⚲"
+          :do            "❯"
+          :union         "⋃"
+          :intersect     "∩"
+          :diff          "∖"
+          :tuple         "⨂"
+          :pipe          "ǀ" ;; FIXME: find a non-private char
+          :dot           "•")
+        ))
+
 (use-package! sis
   ;; :hook
   ;; (((text-mode prog-mode) . smart-input-source-follow-context-mode)

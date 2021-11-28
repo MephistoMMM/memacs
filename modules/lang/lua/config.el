@@ -18,6 +18,25 @@
   (set-repl-handler! 'lua-mode #'+lua/open-repl)
   (set-company-backend! 'lua-mode '(company-lua company-yasnippet))
 
+  (set-ligatures! 'lua-mode
+    :def "function"
+    :src_block     "then"
+    :src_block_end "end"
+    :and "and"
+    :or "or"
+    :not "not"
+    :return "return"
+    :for "for"
+    :while "while"
+    :null "nil"
+    :empty-set "{}"
+    :true "true"
+    :false "false"
+    :yield "require"
+    :local "local"
+    :do "do"
+    :in "in")
+
   (when (featurep! +lsp)
     (add-hook 'lua-mode-local-vars-hook #'lsp!)
 
