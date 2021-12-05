@@ -19,11 +19,21 @@ More specifically, this accepts one of the following symbols (see
 OR a shell command string such as
 
   \"path/to/some/shell-script.sh\"
-  \"offlineimap && notmuch new && afew -a -t\"
-  \"mbsync %s -a && notmuch new && afew -a -t\"")
+  \"offlineimap && notmuch new && afew -n -t\"
+  \"mbsync %s -a && notmuch new && afew -n -t\"")
 
 (defvar +notmuch-mail-folder "~/.mail/account.gmail"
   "Where your email folder is located (for use with gmailieer).")
+
+(defvar +notmuch-delete-tags '("+trash" "-inbox" "-unread")
+  "Tags applied to mark email for deletion.
+
+When replacing the +trash tag by a different tag such as
++deleted, you will need to update the notmuch-saved-searches
+variable accordingly.")
+
+(defvar +notmuch-spam-tags '("+spam" "-inbox" "-unread")
+  "Tags applied to mark email as spam.")
 
 
 ;;
@@ -31,9 +41,6 @@ OR a shell command string such as
 
 (use-package! notmuch
   :defer t
-  :init
-  (after! org
-    (add-to-list 'org-modules 'ol-notmuch))
   :config
   (set-company-backend! 'notmuch-message-mode
     'notmuch-company '(company-ispell company-yasnippet))
@@ -88,7 +95,7 @@ OR a shell command string such as
                notmuch-tree-mode-hook
                notmuch-search-mode-hook)
              #'hide-mode-line-mode)
- 
+
   (map! :localleader
         :map (notmuch-hello-mode-map notmuch-search-mode-map notmuch-tree-mode-map notmuch-show-mode-map)
         :desc "Compose email"   "c" #'+notmuch/compose

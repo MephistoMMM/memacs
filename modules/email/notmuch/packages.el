@@ -21,6 +21,8 @@
 
 (when (featurep! +org)
   (package! org-mime :pin "eb21c02ba8f97fe69c14dc657a7883b982664649"))
+(when (featurep! :lang org)
+  (package! ol-notmuch :pin "126fb446d8fa9e54cf21103afaf506fd81273c02"))
 (when (featurep! :completion ivy)
   (package! counsel-notmuch :pin "a4a1562935e4180c42524c51609d1283e9be0688"))
 (when (featurep! :completion helm)
