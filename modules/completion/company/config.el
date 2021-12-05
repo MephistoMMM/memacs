@@ -8,6 +8,7 @@
   :hook (doom-first-input . global-company-mode)
   :init
   (setq company-minimum-prefix-length 2
+        company-idle-delay 0.3
         company-tooltip-limit 14
         company-tooltip-align-annotations t
         company-require-match 'never
@@ -204,7 +205,7 @@
   (setq company-tabnine-binaries-folder "~/.local/share/Tabnine")
   :config
   (if (featurep! :tools lsp +lsp)
-      (setq +lsp-company-backends '(company-tabnine :separate company-capf company-yasnippet))
+      (setq +lsp-company-backends '(:separate company-capf company-tabnine company-yasnippet))
     (push #'company-tabnine company-backends))
 
   (setq company-tabnine-max-num-results 3

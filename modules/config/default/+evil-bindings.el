@@ -139,8 +139,8 @@
          "C-w"     nil  ; don't interfere with `evil-delete-backward-word'
          "C-n"     #'company-select-next
          "C-p"     #'company-select-previous
-         "C-j"     #'company-select-next
-         "C-k"     #'company-select-previous
+         "C-j"     nil  ; don't interfere with avy-jump
+         "C-k"     #'company-abort
          "C-h"     #'company-show-doc-buffer
          "C-u"     #'company-previous-page
          "C-d"     #'company-next-page
