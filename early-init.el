@@ -41,8 +41,8 @@
                                  old-file-name-handler-alist))))
     (add-hook 'emacs-startup-hook #'doom-reset-file-handler-alist-h 101))
 
-  ;; Emacs really shouldn't be displaying anything until it has fully started
-  ;; up. This saves a bit of time.
+  ;; Premature redisplays can substantially affect startup times and produce
+  ;; ugly flashes of unstyled Emacs.
   (setq-default inhibit-redisplay t
                 inhibit-message t)
   (add-hook 'window-setup-hook

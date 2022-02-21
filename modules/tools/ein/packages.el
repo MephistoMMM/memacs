@@ -1,4 +1,4 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; tools/ein/packages.el
 
-(package! ein :pin "0600c286bd7b0812f4908d7df1be279b6b65923f")
+(package! ein :pin "6063cee7fb0bdefa22fb05e4b17e58631f8187d6")

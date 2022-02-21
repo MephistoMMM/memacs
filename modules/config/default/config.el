@@ -66,6 +66,16 @@
       (setq-local epa-file-encrypt-to (default-value 'epa-file-encrypt-to)))))
 
 
+(after! woman
+  ;; The woman-manpath default value does not necessarily match man. If we have
+  ;; man available but aren't using it for performance reasons, we can extract
+  ;; it's manpath.
+  (when (executable-find "man")
+    (setq woman-manpath
+          (split-string (cdr (doom-call-process "man" "--path"))
+                        path-separator t))))
+
+
 (use-package! drag-stuff
   :defer t
   :init
@@ -220,7 +230,17 @@
       (map! :map markdown-mode-map
             :ig "*" (general-predicate-dispatch nil
                       (looking-at-p "\\*\\* *")
-                      (cmd! (forward-char 2)))))))
+                      (cmd! (forward-char 2)))))
+
+    ;; Removes haskell-mode trailing braces
+    (after! smartparens-haskell
+      (sp-with-modes '(haskell-mode haskell-interactive-mode)
+        (sp-local-pair "{-" "-}" :actions :rem)
+        (sp-local-pair "{-#" "#-}" :actions :rem)
+        (sp-local-pair "{-@" "@-}" :actions :rem)
+        (sp-local-pair "{-" "-")
+        (sp-local-pair "{-#" "#-")
+        (sp-local-pair "{-@" "@-")))))
 
 
 ;;
