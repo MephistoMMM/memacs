@@ -316,6 +316,7 @@ Also adds support for a `:sync' parameter to override `:async'."
   ;; Refresh inline images after executing src blocks (useful for plantuml or
   ;; ipython, where the result could be an image)
   (add-hook 'org-babel-after-execute-hook #'org-redisplay-inline-images)
+  (add-hook 'org-babel-after-execute-hook #'+org-babel-results-ansi-h)
 
   (after! python
     (unless org-babel-python-command
