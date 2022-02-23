@@ -46,39 +46,48 @@ Used in org file template")
   "Common head for org-roam capture."
   (concat
    ;; "#+SETUPFILE: " memacs-org-export-setup-file "\n"
-   "#+TITLE: ${title}\n#+DATE: %<%Y-%m-%d>\n"))
+   "#+TITLE: ${title}
+#+TITLE_CN: ${title_cn}
+#+DATE: %<%Y-%m-%d>
+"))
+
+(setq org-roam-db-node-include-function
+      (lambda ()
+        (not (member "ATTACH" (org-get-tags)))))
 
 (setq org-roam-buffer-width 0.2
       org-roam-db-location (expand-file-name "~/.local/roam/org-roam.db"))
 
 (setq org-roam-capture-templates
   `(
-    ("d" "draft" plain #'org-roam-capture--get-point
-      "%?" :file-name "draft/%<%Y%m%d%H%M%S>-${slug}" :head ,(memacs-org-roam-common-head) :unnarrowed t)
-    ("p" "Programming" plain #'org-roam-capture--get-point
-      "%?"
-      :file-name "prog/%(memacs-org-roam-complete-program-languages)/${slug}"
-      :head ,(memacs-org-roam-common-head) :unnarrowed t)
-    ("o" "OS" plain #'org-roam-capture--get-point
-      "%?"
-      :file-name "os/%^{OS|linux|macOS}/${slug}"
-      :head ,(memacs-org-roam-common-head) :unnarrowed t)
-    ("a" "Algorithm" plain #'org-roam-capture--get-point
-      "%?"
-      :file-name "algorithm/${slug}"
-      :head ,(memacs-org-roam-common-head) :unnarrowed t)
-    ("s" "Software" plain #'org-roam-capture--get-point
-      "%?"
-      :file-name "software/%(memacs-org-roam-complete-software-directories)/${slug}"
-      :head ,(memacs-org-roam-common-head) :unnarrowed t)
-    ("w" "Wiki" plain #'org-roam-capture--get-point
-      "%?"
-      :file-name "wiki/${slug}"
-      :head ,(memacs-org-roam-common-head) :unnarrowed t)
-    ("t" "Thoughts" plain #'org-roam-capture--get-point
-      "%?"
-      :file-name "thought/${slug}"
-      :head ,(memacs-org-roam-common-head) :unnarrowed t)
+    ("d" "draft" plain "%?"
+     :target (file+head "draft/%<%Y%m%d%H%M%S>-${slug}"
+                        ,(memacs-org-roam-common-head))
+     :unnarrowed t)
+    ("p" "Programming" plain "%?"
+     :target (file+head "prog/%(memacs-org-roam-complete-program-languages)/${slug}"
+                        ,(memacs-org-roam-common-head))
+     :unnarrowed t)
+    ("o" "OS" plain "%?"
+     :target (file+head "os/%^{OS|linux|macOS}/${slug}"
+                        ,(memacs-org-roam-common-head))
+     :unnarrowed t)
+    ("a" "Algorithm" plain "%?"
+     :target (file+head "algorithm/${slug}"
+                        ,(memacs-org-roam-common-head))
+     :unnarrowed t)
+    ("s" "Software" plain "%?"
+     :target (file+head "software/%(memacs-org-roam-complete-software-directories)/${slug}"
+                        ,(memacs-org-roam-common-head))
+     :unnarrowed t)
+    ("w" "Wiki" plain "%?"
+     :target (file+head "wiki/${slug}"
+                        ,(memacs-org-roam-common-head))
+     :unnarrowed t)
+    ("t" "Thoughts" plain "%?"
+     :target (file+head "thought/${slug}"
+                        ,(memacs-org-roam-common-head))
+     :unnarrowed t)
     ))
 
 ;; Export

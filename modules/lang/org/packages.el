@@ -91,6 +91,8 @@
   (when (featurep! :completion company)
     (package! company-org-roam)))
  ((featurep! +roam2)
+  (package! websocket :pin "fda4455333309545c0787a79d73c19ddbeb57980")
+  (package! org-roam-ui :pin "309fe3c58c7081de4e2c9c64f7b40ea291926048")
   (package! org-roam
     ;; FIXME A :recipe isn't strictly necessary, but without it, our package
     ;;       bumper fails to distinguish between org-roam v1 and v2.
