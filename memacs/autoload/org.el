@@ -241,3 +241,44 @@ It is meant to be added to `org-export-before-parsing-hook'."
                          conditions nil nil
                          (car history)
                          history-symbol)))
+
+;;;###autoload
+(defun +org-export-parse-and-replace-tables ()
+  "Parse org buffer and replace tables to latex format."
+  (when (memacs-org-export-table-latex-converter-existp)
+    (let ((tree (org-element-parse-buffer 'greater-element))
+          (offset 0))
+      (dolist (item (org-element-map tree 'table #'identity))
+        (setq offset (+ offset
+                        (memacs-org-export-replace-table-item
+                         (- (org-element-property :begin item) offset)
+                         (- (org-element-property :end item) offset)))
+              ))))
+  )
+
+(defun memacs-org-export-replace-table-item (begin end)
+  "Delete table and insert new content."
+  (goto-char begin)
+  (let ((new-content (memacs-org-export-table-latex-converter begin end)))
+    (insert new-content)
+    (- (- end begin) (length new-content)))
+  )
+
+(defun memacs-org-export-table-latex-converter-existp ()
+  "Check if latex converter exits."
+  (executable-find "gorg-util"))
+
+(defun memacs-org-export-table-latex-converter (begin end)
+  "The converter used to converter table content to latex format."
+  (let ((result (call-process-region
+                 begin end "gorg-util" t
+                 (generate-new-buffer "*GORG_UTIL*") nil
+                 "-i"))
+        (content (with-current-buffer "*GORG_UTIL*"
+                   (buffer-string))))
+    (kill-buffer "*GORG_UTIL*")
+    (if (= 0 result)
+        content
+      (message "Error to execute gorg-util: %s" content)
+      "")
+    ))

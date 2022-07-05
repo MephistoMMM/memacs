@@ -11,6 +11,10 @@ Used in org file template")
       org-attach-id-dir (expand-file-name "~/Dropbox/org/statics/")
       org-download-image-dir (expand-file-name "~/Dropbox/org/statics/"))
 
+;; Export
+(setq org-pandoc-options-for-latex-pdf
+      '((pdf-engine . "/Library/TeX/texbin/xelatex")))
+
 ;; Agenda View
 (setq memacs-org-agenda-todo-view
       `(" " "test Agenda"
@@ -61,41 +65,48 @@ Used in org file template")
 (setq org-roam-capture-templates
   `(
     ("d" "draft" plain "%?"
-     :target (file+head "draft/%<%Y%m%d%H%M%S>-${slug}"
+     :target (file+head "draft/%<%Y%m%d%H%M%S>-${slug}.org"
                         ,(memacs-org-roam-common-head))
      :unnarrowed t)
     ("p" "Programming" plain "%?"
-     :target (file+head "prog/%(memacs-org-roam-complete-program-languages)/${slug}"
+     :target (file+head "prog/%(memacs-org-roam-complete-program-languages)/${slug}.org"
                         ,(memacs-org-roam-common-head))
      :unnarrowed t)
     ("o" "OS" plain "%?"
-     :target (file+head "os/%^{OS|linux|macOS}/${slug}"
+     :target (file+head "os/%^{OS|linux|macOS}/${slug}.org"
                         ,(memacs-org-roam-common-head))
      :unnarrowed t)
     ("a" "Algorithm" plain "%?"
-     :target (file+head "algorithm/${slug}"
+     :target (file+head "algorithm/${slug}.org"
                         ,(memacs-org-roam-common-head))
      :unnarrowed t)
     ("s" "Software" plain "%?"
-     :target (file+head "software/%(memacs-org-roam-complete-software-directories)/${slug}"
+     :target (file+head "software/%(memacs-org-roam-complete-software-directories)/${slug}.org"
                         ,(memacs-org-roam-common-head))
      :unnarrowed t)
     ("w" "Wiki" plain "%?"
-     :target (file+head "wiki/${slug}"
+     :target (file+head "wiki/${slug}.org"
                         ,(memacs-org-roam-common-head))
      :unnarrowed t)
     ("t" "Thoughts" plain "%?"
-     :target (file+head "thought/${slug}"
+     :target (file+head "thought/${slug}.org"
                         ,(memacs-org-roam-common-head))
      :unnarrowed t)
     ))
 
 ;; Export
-(defun memacs-org-export-add-header (_)
+(defun memacs-org-export-add-header (backend)
   "Add header in current buffer."
-  (save-excursion
-    (goto-char (point-min))
-    (insert "#+SETUPFILE: ~/Dropbox/dotconf/export_setup.org\n")))
+  (let ((setupfile (concat "export_setup_" (symbol-name backend) ".org")))
+    (when (file-exists-p! setupfile "~/Dropbox/dotconf/")
+      (save-excursion
+        (goto-char (point-min))
+        (insert "#+SETUPFILE: " "~/Dropbox/dotconf/" setupfile "\n"))
+      ))
+  (case backend
+    ('pandoc (+org-export-parse-and-replace-tables))
+    ('latex (+org-export-parse-and-replace-tables)))
+  )
 
 (defadvice! +org-export-output-file-name-a (orig-fn extension &optional subtreep pub-dir)
   "Modifies org-export to place exported files in a different directory"
