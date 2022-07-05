@@ -282,3 +282,37 @@ It is meant to be added to `org-export-before-parsing-hook'."
       (message "Error to execute gorg-util: %s" content)
       "")
     ))
+
+;;;###autoload
+(defun +memacs/open-convenient-frame (&optional initial-input)
+  "Opens the window in a floating frame that cleans itself up once
+you're done. This can be called from an external shell script."
+  (interactive)
+  (when (and initial-input (string-empty-p initial-input))
+    (setq initial-input nil))
+  (let* ((frame-title-format "")
+         (frame (make-frame +memacs-convenient-frame-parameters)))
+    (select-frame-set-input-focus frame)  ; fix MacOS not focusing new frames
+    (with-selected-frame frame
+      (condition-case ex
+          (let ((buffer (generate-new-buffer "*MEMACS-CONVENIENT*")))
+            (set-window-buffer nil buffer)
+            (with-current-buffer buffer
+              (org-mode)
+              (when (stringp initial-input)
+                (remove-text-properties 0 (length initial-input) '(read-only t) initial-input)
+                (insert initial-input))
+              ))
+        ('error
+         (message "memacs-convenient: %s" (error-message-string ex))
+         (delete-frame frame))))))
+
+(defvar +memacs-convenient-frame-parameters
+  `((name . "memacs-convenient-frame")
+    (width . 100)
+    (height . 25)
+    (transient . t)
+    ,@(when IS-LINUX
+        `((window-system . ,(if (boundp 'pgtk-initialized) 'pgtk 'x))
+          (display . ,(or (getenv "DISPLAY") ":0"))))
+    ,(if IS-MAC '(menu-bar-lines . 1))))
