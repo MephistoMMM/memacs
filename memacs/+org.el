@@ -49,7 +49,6 @@ Used in org file template")
 (defmacro memacs-org-roam-common-head ()
   "Common head for org-roam capture."
   (concat
-   ;; "#+SETUPFILE: " memacs-org-export-setup-file "\n"
    "#+TITLE: ${title}
 #+TITLE_CN: ${title_cn}
 #+DATE: %<%Y-%m-%d>

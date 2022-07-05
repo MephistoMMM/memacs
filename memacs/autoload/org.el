@@ -283,6 +283,20 @@ It is meant to be added to `org-export-before-parsing-hook'."
       "")
     ))
 
+(defvar +memacs-convenient-frame-default-directory
+  (expand-file-name "~/Desktop/")
+  "Default directory of convenient frame's buffer.")
+
+(defvar +memacs-convenient-frame-parameters
+  `((name . "memacs-convenient-frame")
+    (width . 100)
+    (height . 25)
+    (transient . t)
+    ,@(when IS-LINUX
+        `((window-system . ,(if (boundp 'pgtk-initialized) 'pgtk 'x))
+          (display . ,(or (getenv "DISPLAY") ":0"))))
+    ,(if IS-MAC '(menu-bar-lines . 1))))
+
 ;;;###autoload
 (defun +memacs/open-convenient-frame (&optional initial-input)
   "Opens the window in a floating frame that cleans itself up once
@@ -298,6 +312,8 @@ you're done. This can be called from an external shell script."
           (let ((buffer (generate-new-buffer "*MEMACS-CONVENIENT*")))
             (set-window-buffer nil buffer)
             (with-current-buffer buffer
+              (setq-local default-directory
+                          +memacs-convenient-frame-default-directory)
               (org-mode)
               (when (stringp initial-input)
                 (remove-text-properties 0 (length initial-input) '(read-only t) initial-input)
@@ -306,13 +322,3 @@ you're done. This can be called from an external shell script."
         ('error
          (message "memacs-convenient: %s" (error-message-string ex))
          (delete-frame frame))))))
-
-(defvar +memacs-convenient-frame-parameters
-  `((name . "memacs-convenient-frame")
-    (width . 100)
-    (height . 25)
-    (transient . t)
-    ,@(when IS-LINUX
-        `((window-system . ,(if (boundp 'pgtk-initialized) 'pgtk 'x))
-          (display . ,(or (getenv "DISPLAY") ":0"))))
-    ,(if IS-MAC '(menu-bar-lines . 1))))

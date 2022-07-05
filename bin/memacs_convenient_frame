@@ -28,6 +28,7 @@ esac
 # Fix incompatible terminals that cause odd 'not a valid terminal' errors
 [ "$TERM" = "alacritty" ] && export TERM=xterm-256color
 
+str=$(sed 's/\\/\\\\/g' <<< $str | sed 's/"/\\"/g')
 # Non-daemon servers flicker a lot if frames are created from terminal, so we do
 # it internally instead.
 emacsclient -a "" \
