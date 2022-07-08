@@ -8,4 +8,5 @@
          nil (list (if (featurep! +ascii) 'ascii)
                    (if (featurep! +github) 'github)
                    (if (featurep! +unicode) 'unicode))))
+
   (emojify-set-emoji-styles emojify-styles))

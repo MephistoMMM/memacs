@@ -1,38 +1,9 @@
 ;;; core/cli/ci.el -*- lexical-binding: t; -*-
 
-(defcli! ci (&optional target &rest args)
-  "TODO"
-  (unless target
-    (user-error "No CI target given"))
-  (if-let (fn (intern-soft (format "doom-cli--ci-%s" target)))
-      (apply fn args)
-    (user-error "No known CI target: %S" target)))
-
-
 ;;
-;;;
+;;; Variables
 
-
-(defun doom-cli--ci-deploy-hooks (&optional noforce)
-  (let* ((default-directory doom-emacs-dir)
-         (dir (cdr (doom-call-process "git" "rev-parse" "--git-path" "hooks"))))
-    (make-directory dir 'parents)
-    (dolist (hook '("commit-msg" "pre-push"))
-      (let ((file (doom-path dir hook)))
-        (unless (and (file-exists-p file) noforce)
-          (with-temp-file file
-            (insert "#!/usr/bin/env sh\n"
-                    (doom-path doom-emacs-dir "bin/doom")
-                    " --nocolor ci hook-" hook
-                    " \"$@\""))
-          (set-file-modes file #o700)
-          (print! (success "Created %s") (relpath file)))))))
-
-
-;;
-;;; Git hooks
-
-(defvar doom-cli-commit-trailer-keys
+(defvar doom-ci-commit-trailer-keys
   '(("Fix" ref hash url)
     ("Ref" ref hash url)
     ("Close" ref)
@@ -44,47 +15,54 @@
 
 Accapted value types can be one or more of ref, hash, url, username, or name.")
 
-(defvar doom-cli-commit-trailer-types
+(defvar doom-ci-commit-trailer-types
   '((ref      . "^\\(https?://[^ ]+\\|[^/]+/[^/]+\\)?#[0-9]+$")
     (hash     . "^\\(https?://[^ ]+\\|[^/]+/[^/]+@\\)?[a-z0-9]\\{12\\}$")
     (url      . "^https?://")
-    (name     . "^[a-zA-Z0-9-_ \\.]+<[^@]+@[^.]+\\.[^>]+>$")
+    (name     . "^[a-zA-Z0-9-_ \\.']+<[^@]+@[^.]+\\.[^>]+>$")
     (username . "^@[^a-zA-Z0-9_-]+$"))
   "An alist of valid trailer keys and their accepted value types.
 
 Accapted value types can be one or more of ref, hash, url, username, or name.")
 
-(defvar doom-cli-commit-types
-  '(bump dev docs feat fix merge module nit perf refactor release revert test tweak)
+(defvar doom-ci-commit-types
+  '(bump dev docs feat fix merge nit perf refactor release revert test tweak)
   "A list of valid commit types.")
 
-(defvar doom-cli-commit-scopes
-  (list "cli"
-        "ci"
-        "lib"
-        (fn! (scope (&key type))
-          (when (and (memq type '(bump merge module release revert))
-                     scope)
-            (user-error "%s commits should never have a scope" type)))
-        (fn! (scope _)
-          (seq-find (doom-rpartial
-                     #'doom-glob (if (string-prefix-p ":" scope)
-                                     (format "%s" (substring scope 1))
-                                   (format "*/%s" scope)))
-                    doom-modules-dirs)))
-  "A list of valid commit scopes as strings or functions.
+(defvar doom-ci-commit-scopeless-types '(bump merge release revert)
+  "A list of commit types whose scopes should be passed in its BODY.
 
-Functions should take two arguments: a single scope (symbol) and a commit plist
-representing the current commit being checked against. See
-`doom-cli-commit-core-rules' for possible values.")
+  Don't: \"bump(SCOPE): ...\"
+  Do:    \"bump: SCOPE\"")
 
-(defvar doom-cli-commit-rules
-  (list (fn! (&key subject)
+(defvar doom-ci-commit-scopes '("ci" doom-ci-enforce-scopeless-types)
+  "A list of valid commit scopes as strings, predicate functions, or lists.
+
+These are checked against each item in the comma-delimited scope field of the
+current commit's message. E.g. 'fix(foo,bar,baz): ...' => foo, bar and baz
+
+Each element of this list can be one of:
+
+- A string, compared literally against the scope's name.
+- A function predicate, taking two arguments (a scope as a symbol, and a plist
+  containing information about the current commit--see `doom-ci-commit-scopes'
+  for more about its structure). These predicates should:
+  - Return non-nil to immediately pass a scope.
+  - Throw a `user-error' to immediately fail the scope.
+  - Return nil to continue with the checks in this list.
+- A list, denoting type-specific scopes. Its CAR is the type as a symbol, and
+  its CDR is a nested list of scopes as strings/predicates. E.g.
+
+    '(docs \"faq\" \"install\" check-docs)")
+
+(defvar doom-ci-commit-rules
+  ;; TODO Extract into named functions
+  (list (lambda! (&key subject)
           "If a fixup/squash commit, don't lint this commit"
           (when (string-match "^\\(\\(?:fixup\\|squash\\)!\\|FIXUP\\|WIP\\) " subject)
             (skip! (format "Found %S commit, skipping commit" (match-string 1 subject)))))
 
-        (fn! (&key type subject)
+        (lambda! (&key type subject)
           "Test SUBJECT length"
           (let ((len (length subject)))
             (cond ((memq type '(bump revert)))
@@ -99,52 +77,48 @@ representing the current commit being checked against. See
                    (warn! "Subject is %d characters; <=50 is ideal"
                           len)))))
 
-        (fn! (&key type)
+        (lambda! (&key type)
           "Ensure commit has valid type"
-          (or (memq type doom-cli-commit-types)
+          (or (memq type doom-ci-commit-types)
               (if type
                   (fail! "Invalid commit type: %s" type)
                 (fail! "Commit has no detectable type"))))
 
-        (fn! (&key summary)
+        (lambda! (&key summary)
           "Ensure commit has a summary"
           (when (or (not (stringp summary))
                     (string-blank-p summary))
             (fail! "Commit has no summary")))
 
-        (fn! (&key type summary subject)
+        (lambda! (&key type summary subject)
           "Ensure summary isn't needlessly capitalized"
           (and (stringp summary)
                (string-match-p "^[A-Z][^-A-Z.]" summary)
                (fail! "%S in summary should not be capitalized"
                       (car (split-string summary " ")))))
 
-        (fn! (&key type scopes summary)
-          "Complain about scoped types that are incompatible with scopes"
-          (and (memq type '(bump revert merge module release))
-               scopes
-               (fail! "Scopes for %s commits should go after the colon, not before"
-                      type)))
-
-        (fn! (&rest plist &key type scopes)
+        (lambda! (&rest plist &key type scopes)
           "Ensure scopes are valid"
           (dolist (scope scopes)
             (condition-case e
-                (or (cl-loop for rule in doom-cli-commit-scopes
-                             if (or (and (stringp rule)
-                                         (string= rule scope))
-                                    (and (functionp rule)
-                                         (funcall rule scope plist)))
-                             return t)
-                    (fail! "Invalid scope: %s" scope))
-              (user-error (fail! "%s" (error-message-string))))))
+                (letf! (defun* check-rule (rule)
+                         (or (and (stringp rule)
+                                  (string= rule scope))
+                             (and (functionp rule)
+                                  (funcall rule scope plist))
+                             (and (listp rule)
+                                  (eq type (car rule))
+                                  (seq-find #'check-rule (cdr rule)))))
+                  (or (seq-find #'check-rule doom-ci-commit-scopes)
+                      (fail! "Invalid scope: %s" scope)))
+              (user-error (fail! "%s" (error-message-string e))))))
 
-        (fn! (&key scopes)
+        (lambda! (&key scopes)
           "Esnure scopes are sorted correctly"
           (unless (equal scopes (sort (copy-sequence scopes) #'string-lessp))
             (fail! "Scopes are not in lexicographical order")))
 
-        (fn! (&key type body)
+        (lambda! (&key type body)
           "Enforce 72 character line width for BODY"
           (catch 'result
             (with-temp-buffer
@@ -162,7 +136,7 @@ representing the current commit being checked against. See
                    (re-search-backward "^\\(?:#\\| +\\)" nil t)
                    (throw 'result (fail! "Line(s) in commit body exceed 72 characters"))))))))
 
-        (fn! (&key bang body type)
+        (lambda! (&key bang body type)
           "Ensure ! is accompanied by a 'BREAKING CHANGE:' in BODY"
           (if bang
               (cond ((not (string-match-p "^BREAKING CHANGE:" body))
@@ -173,7 +147,7 @@ representing the current commit being checked against. See
               (fail! "'BREAKING CHANGE:' present in body, but missing '!' after %S"
                      type))))
 
-        (fn! (&key type body)
+        (lambda! (&key type body)
           "Ensure bump commits have package ref lines"
           (and (eq type 'bump)
                (let ((bump-re "\\(?:https?://.+\\|[^/]+\\)/[^/]+@\\([a-z0-9]+\\)"))
@@ -181,7 +155,7 @@ representing the current commit being checked against. See
                                       body)))
                (fail! "Bump commit is missing commit hash diffs")))
 
-        (fn! (&key body)
+        (lambda! (&key body)
           "Ensure commit hashes in bump lines are 12 characters long"
           (with-temp-buffer
             (insert body)
@@ -195,9 +169,9 @@ representing the current commit being checked against. See
                        (length refs) (string-join (nreverse refs) ", "))))))
 
         ;; TODO Add bump validations for revert: type.
-        (fn! (&key body trailers)
+        (lambda! (&key body trailers)
           "Validate commit trailers."
-          (let* ((keys   (mapcar #'car doom-cli-commit-trailer-keys))
+          (let* ((keys   (mapcar #'car doom-ci-commit-trailer-keys))
                  (key-re (regexp-opt keys t))
                  (lines
                   ;; Scan BODY because invalid trailers won't be in TRAILERS.
@@ -219,13 +193,13 @@ representing the current commit being checked against. See
                        (truncate-string-to-width (string-trim line) 16 nil nil "…")
                        (match-string 1 line))))
             (pcase-dolist (`(,key . ,value) trailers)
-              (if (and (not (memq 'name (cdr (assoc key doom-cli-commit-trailer-keys))))
+              (if (and (not (memq 'name (cdr (assoc key doom-ci-commit-trailer-keys))))
                        (string-match-p " " value))
                   (fail! "Found %S, but only one value allowed per trailer"
                          (truncate-string-to-width (concat key ": " value) 20 nil nil "…"))
-                (when-let (allowed-types (cdr (assoc key doom-cli-commit-trailer-keys)))
+                (when-let (allowed-types (cdr (assoc key doom-ci-commit-trailer-keys)))
                   (or (cl-loop for type in allowed-types
-                               if (cdr (assq type doom-cli-commit-trailer-types))
+                               if (cdr (assq type doom-ci-commit-trailer-types))
                                if (string-match-p it value)
                                return t)
                       (fail! "%S expects one of %s, but got %S"
@@ -268,25 +242,112 @@ as `format'.
 
 Note: warnings are not considered failures.")
 
-(defun doom-cli--ci-hook-commit-msg (file)
+
+;;
+;;; Commands
+
+;;; doom ci
+(defcli! (:before ci) (&args _)
+  (when-let*
+      ((repo-root
+        (if-let* ((result (sh! "git" "rev-parse" "--show-toplevel"))
+                  ((zerop (car result))))
+            (cdr result)
+          default-directory))
+       (local-config
+        (car (or (doom-glob repo-root "ci.el")
+                 (doom-glob doom-private-dir "ci.el")))))
+    (load local-config nil t t)
+    (print! (item "Loaded %S") local-config)))
+
+(defcli! ci ()
+  "Commands that automate development processes."
+  :partial t)
+
+(defcli! (ci deploy-hooks) ((force ("--force")))
+  "TODO"
+  (let* ((repo-path (sh! "git" "rev-parse" "--show-toplevel"))
+         (repo-path (if (zerop (car repo-path))
+                        (cdr repo-path)
+                      (user-error "Cannot locate a git repo in %s"
+                                  (file-relative-name default-directory))))
+         (submodule-p (string-empty-p (cdr (sh! "git" "rev-parse" "show-superproject-working-tree"))))
+         (config-hooks-path (cdr (sh! "git" "config" "core.hooksPath")))
+         (hooks-path (cdr (sh! "git" "rev-parse" "--git-path" "hooks"))))
+    (unless (string-empty-p config-hooks-path)
+      (or force
+          (y-or-n-p
+           (format (concat "Detected non-standard core.hookPath: %S\n\n"
+                           "Install Doom's commit-msg and pre-push git hooks anyway?")
+                   hooks-path))
+          (user-error "Aborted")))
+    (make-directory hooks-path 'parents)
+    (print-group!
+     (dolist (hook '("commit-msg" "pre-push"))
+       (let* ((hook (doom-path hooks-path hook))
+              (overwrite-p (file-exists-p hook)))
+         (with-temp-file hook
+           (insert "#!/usr/bin/env sh\n"
+                   (doom-path doom-emacs-dir "bin/doom")
+                   " --no-color ci hook " (file-name-base hook)
+                   " \"$@\""))
+         (set-file-modes hook #o700)
+         (print! (success "%s %s")
+                 (if overwrite-p "Overwrote" "Created")
+                 (path hook)))))))
+
+(defcli! (ci lint-commits) (from &optional to)
+  "TODO"
+  (with-temp-buffer
+    (insert
+     (cdr (doom-call-process
+           "git" "log"
+           (format "%s...%s" from (or to (concat from "~1"))))))
+    (doom-ci--lint
+     (let (commits)
+       (while (re-search-backward "^commit \\([a-z0-9]\\{40\\}\\)" nil t)
+         (push (cons (match-string 1)
+                     (replace-regexp-in-string
+                      "^    " ""
+                      (save-excursion
+                        (buffer-substring-no-properties
+                         (search-forward "\n\n")
+                         (if (re-search-forward "\ncommit \\([a-z0-9]\\{40\\}\\)" nil t)
+                             (match-beginning 0)
+                           (point-max))))))
+               commits))
+       commits))))
+
+;;; TODO
+(defstub! (ci run-tests))
+
+;;; doom ci hook
+(defcli! (ci hook commit-msg) (file)
+  "Run git commit-msg hook.
+
+Lints the current commit message."
   (with-temp-buffer
     (insert-file-contents file)
-    (doom-cli--ci--lint
-     (list (cons
-            "CURRENT"
-            (buffer-substring (point-min)
-                              (if (re-search-forward "^# Please enter the commit message" nil t)
-                                  (match-beginning 0)
-                                (point-max))))))))
+    (doom-ci--lint
+     `(("CURRENT" .
+        ,(buffer-substring
+          (point-min)
+          (if (re-search-forward "^# Please enter the commit message" nil t)
+              (match-beginning 0)
+            (point-max))))))))
 
-(defun doom-cli--ci-hook-pre-push (_remote _url)
+(defcli! (ci hook pre-push) (remote url)
+  "Run git pre-push hook.
+
+Prevents pushing if there are unrebased or WIP commits."
   (with-temp-buffer
-    (let ((z40 "0000000000000000000000000000000000000000")
+    (let ((z40 (make-string 40 ?0))
           line error)
       (while (setq line (ignore-errors (read-from-minibuffer "")))
         (catch 'continue
-          (cl-destructuring-bind (local-ref local-sha remote-ref remote-sha)
+          (seq-let (local-ref local-sha remote-ref remote-sha)
               (split-string line " ")
+            ;; TODO Extract this branch detection to a variable
             (unless (or (string-match-p "^refs/heads/\\(master\\|main\\)$" remote-ref)
                         (equal local-sha z40))
               (throw 'continue t))
@@ -294,7 +355,7 @@ Note: warnings are not considered failures.")
              (mapc (lambda (commit)
                      (seq-let (hash msg) (split-string commit "\t")
                        (setq error t)
-                       (print! (info "%S commit in %s"
+                       (print! (item "%S commit in %s"
                                      (car (split-string msg " "))
                                      (substring hash 0 12)))))
                    (split-string
@@ -308,13 +369,20 @@ Note: warnings are not considered failures.")
                     "\n" t))
              (when error
                (print! (error "Aborting push due to unrebased WIP, squash!, or fixup! commits"))
-               (throw 'exit 1)))))))))
+               (exit! 1)))))))))
 
 
 ;;
-;;;
+;;; Helpers
 
-(defun doom-cli--parse-commit (commit-msg)
+(cl-defun doom-ci-enforce-scopeless-types (scope (&key type scopes summary &allow-other-keys))
+  "Complain about scoped commit types that shouldn't be scoped."
+  (when (memq type doom-ci-commit-scopeless-types)
+    (user-error "Scopes for %s commits should go after the colon, not before"
+                type)))
+
+
+(defun doom-ci--parse-commit (commit-msg)
   (with-temp-buffer
     (save-excursion (insert commit-msg))
     (append
@@ -348,7 +416,7 @@ Note: warnings are not considered failures.")
                         (match-string 2)))))
          `(:bumps ,(cl-sort (delete-dups bumps) #'string-lessp :key #'car)))))))
 
-(defun doom-cli--parse-bumps (from end)
+(defun doom-ci--parse-bumps (from end)
   (with-temp-buffer
     (save-excursion
       (insert
@@ -366,13 +434,13 @@ Note: warnings are not considered failures.")
                        (match-string 2)))))
         (cl-sort (delete-dups packages) #'string-lessp :key #'car)))))
 
-(defun doom-cli--ci--lint (commits)
+(defun doom-ci--lint (commits)
   (let ((warnings 0)
         (failures 0))
     (print! (start "Linting %d commits" (length commits)))
     (print-group!
      (pcase-dolist (`(,ref . ,commitmsg) commits)
-       (let* ((commit   (doom-cli--parse-commit commitmsg))
+       (let* ((commit   (doom-ci--parse-commit commitmsg))
               (shortref (substring ref 0 7))
               (subject  (plist-get commit :subject)))
          (cl-block 'linter
@@ -388,34 +456,16 @@ Note: warnings are not considered failures.")
              (print! (start "%s %s") shortref subject)
              (print-group!
               (mapc (doom-rpartial #'apply commit)
-                    doom-cli-commit-rules)))))))
+                    doom-ci-commit-rules)))))))
     (let ((issues (+ warnings failures)))
       (if (= issues 0)
           (print! (success "There were no issues!"))
         (if (> warnings 0) (print! (warn "Warnings: %d" warnings)))
         (if (> failures 0) (print! (warn "Failures: %d" failures)))
-        (print! "\nSee https://docs.doomemacs.org/-/conventions/git-commits")
+        (print! "\nSee https://discourse.doomemacs.org/git-conventions")
         (unless (zerop failures)
-          (throw 'exit 1)))
+          (exit! 1)))
       t)))
 
-(defun doom-cli--ci-lint-commits (from &optional to)
-  (with-temp-buffer
-    (insert
-     (cdr (doom-call-process
-           "git" "log"
-           (format "%s...%s" from (or to (concat from "~1"))))))
-    (doom-cli--ci--lint
-     (let (commits)
-       (while (re-search-backward "^commit \\([a-z0-9]\\{40\\}\\)" nil t)
-         (push (cons (match-string 1)
-                     (replace-regexp-in-string
-                      "^    " ""
-                      (save-excursion
-                        (buffer-substring-no-properties
-                         (search-forward "\n\n")
-                         (if (re-search-forward "\ncommit \\([a-z0-9]\\{40\\}\\)" nil t)
-                             (match-beginning 0)
-                           (point-max))))))
-               commits))
-       commits))))
+(provide 'core-cli-ci)
+;;; ci.el ends here

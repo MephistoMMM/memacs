@@ -19,7 +19,7 @@
 ;;    disable modules, and to reduce the effort required to maintain our copy of
 ;;    `evil-collection-list' (now I can just copy it from time to time).
 
-(when (and doom-interactive-p
+(when (and (not noninteractive)
            (not doom-reloading-p)
            (featurep! +everywhere))
 
@@ -43,8 +43,9 @@
       indent
       image
       kotlin-mode
-      occur
       outline
+      replace
+      shortdoc
       simple
       slime
       lispy)
@@ -90,6 +91,7 @@ variable for an explanation of the defaults (in comments). See
       anaconda-mode
       apropos
       arc-mode
+      atomic-chrome
       auto-package-update
       beginend
       bm
@@ -103,6 +105,7 @@ variable for an explanation of the defaults (in comments). See
       company
       compile
       consult
+      corfu
       (custom cus-edit)
       cus-theme
       daemons
@@ -120,12 +123,14 @@ variable for an explanation of the defaults (in comments). See
       doc-view
       docker
       ebib
+      ebuku
       edbi
       edebug
       ediff
       eglot
       explain-pause-mode
       elfeed
+      eldoc
       elisp-mode
       elisp-refs
       elisp-slime-nav
@@ -177,20 +182,22 @@ variable for an explanation of the defaults (in comments). See
       kotlin-mode
       macrostep
       man
-      magit
+      (magit magit-repos magit-submodule)
+      magit-section
       magit-todos
       markdown-mode
       monky
+      mpc
       mu4e
       mu4e-conversation
       neotree
       newsticker
       notmuch
       nov
-      (occur replace)
       omnisharp
       org
       org-present
+      org-roam
       osx-dictionary
       outline
       p4
@@ -207,6 +214,7 @@ variable for an explanation of the defaults (in comments). See
       racket-describe
       realgud
       reftex
+      replace
       restclient
       rg
       ripgrep
@@ -220,8 +228,11 @@ variable for an explanation of the defaults (in comments). See
       sh-script
       ,@(when EMACS28+ '(shortdoc))
       simple
+      simple-mpc
       slime
       sly
+      snake
+      so-long
       speedbar
       tablist
       tar-mode
@@ -243,6 +254,7 @@ variable for an explanation of the defaults (in comments). See
       view
       vlf
       vterm
+      vundo
       w3m
       wdired
       wgrep
@@ -280,6 +292,7 @@ and complains if a module is loaded too early (during startup)."
     (setq evil-collection-key-blacklist
           (append (list doom-leader-key doom-localleader-key
                         doom-leader-alt-key)
+                  evil-collection-key-blacklist
                   (when (featurep! :tools lookup)
                     '("gd" "gf" "K"))
                   (when (featurep! :tools eval)
@@ -307,7 +320,7 @@ and complains if a module is loaded too early (during startup)."
     (add-transient-hook! 'emacs-lisp-mode
       (+evil-collection-init 'elisp-mode))
     (add-transient-hook! 'occur-mode
-      (+evil-collection-init '(occur replace)))
+      (+evil-collection-init 'replace))
     (add-transient-hook! 'indent-rigidly
       (+evil-collection-init '(indent "indent")))
     (add-transient-hook! 'minibuffer-setup-hook
@@ -316,6 +329,8 @@ and complains if a module is loaded too early (during startup)."
         (evil-collection-minibuffer-insert)))
     (add-transient-hook! 'process-menu-mode
       (+evil-collection-init '(process-menu simple)))
+    (add-transient-hook! 'shortdoc-mode
+      (+evil-collection-init 'shortdoc))
     (add-transient-hook! 'tabulated-list-mode
       (+evil-collection-init 'tabulated-list))
     (add-transient-hook! 'tab-bar-mode

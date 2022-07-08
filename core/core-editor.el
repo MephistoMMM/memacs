@@ -306,6 +306,11 @@ tell you about it. Very annoying. This prevents that."
         (abbreviate-file-name (file-truename (tramp-file-name-localname tfile)))
       file))
 
+  ;; Anything in runtime folders
+  (add-to-list 'recentf-exclude
+               (concat "^" (regexp-quote (or (getenv "XDG_RUNTIME_DIR")
+                                             "/run"))))
+
   ;; Resolve symlinks, strip out the /sudo:X@ prefix in local tramp paths, and
   ;; abbreviate $HOME -> ~ in filepaths (more portable, more readable, & saves
   ;; space)
@@ -445,18 +450,21 @@ files, so this replace calls to `pp' with the much faster `prin1'."
       (apply fn args)))
 
   (defun doom-set-jump-maybe-a (fn &rest args)
-    "Set a jump point if fn returns non-nil."
+    "Set a jump point if fn actually moves the point."
     (let ((origin (point-marker))
           (result
            (let* ((evil--jumps-jumping t)
                   (better-jumper--jumping t))
-             (apply fn args))))
-      (unless result
+             (apply fn args)))
+          (dest (point-marker)))
+      (unless (equal origin dest)
         (with-current-buffer (marker-buffer origin)
           (better-jumper-set-jump
            (if (markerp (car args))
                (car args)
              origin))))
+      (set-marker origin nil)
+      (set-marker dest nil)
       result))
 
   (defun doom-set-jump-h ()
@@ -478,7 +486,7 @@ files, so this replace calls to `pp' with the much faster `prin1'."
 
 (use-package! dtrt-indent
   ;; Automatic detection of indent settings
-  :when doom-interactive-p
+  :unless noninteractive
   ;; I'm not using `global-dtrt-indent-mode' because it has hard-coded and rigid
   ;; major mode checks, so I implement it in `doom-detect-indentation-h'.
   :hook ((change-major-mode-after-body read-only-mode) . doom-detect-indentation-h)
@@ -490,7 +498,7 @@ files, so this replace calls to `pp' with the much faster `prin1'."
                 (memq major-mode doom-detect-indentation-excluded-modes)
                 (member (substring (buffer-name) 0 1) '(" " "*")))
       ;; Don't display messages in the echo area, but still log them
-      (let ((inhibit-message (not doom-debug-p)))
+      (let ((inhibit-message (not init-file-debug)))
         (dtrt-indent-mode +1))))
 
   ;; Enable dtrt-indent even in smie modes so that it can update `tab-width',
@@ -549,7 +557,27 @@ files, so this replace calls to `pp' with the much faster `prin1'."
       (button-type-put
        var-bt 'action
        (lambda (button)
-         (helpful-variable (button-get button 'apropos-symbol)))))))
+         (helpful-variable (button-get button 'apropos-symbol))))))
+
+  (when EMACS29+
+    ;; REVIEW This should be reported upstream to Emacs.
+    (defadvice! doom--find-function-search-for-symbol-save-excursion-a (fn &rest args)
+      "Suppress cursor movement by `find-function-search-for-symbol'.
+
+Addresses an unwanted side-effect in `find-function-search-for-symbol' on Emacs
+29 where the cursor is moved to a variable's definition if it's defined in the
+current buffer."
+      :around #'find-function-search-for-symbol
+      (let (buf pos)
+        (letf! (defun find-library-name (library)
+                 (let ((filename (funcall find-library-name library)))
+                   (with-current-buffer (find-file-noselect filename)
+                     (setq buf (current-buffer)
+                           pos (point)))
+                   filename))
+          (prog1 (apply fn args)
+            (when (buffer-live-p buf)
+              (with-current-buffer buf (goto-char pos)))))))))
 
 
 ;;;###package imenu
@@ -636,7 +664,25 @@ on."
 (use-package! so-long
   :hook (doom-first-file . global-so-long-mode)
   :config
-  (setq so-long-threshold 400) ; reduce false positives w/ larger threshold
+  ;; Emacs 29 introduced faster long-line detection, so they can afford a much
+  ;; larger `so-long-threshold' and its default `so-long-predicate'.
+  (if (fboundp 'buffer-line-statistics)
+      (unless NATIVECOMP
+        (setq so-long-threshold 5000))
+    ;; reduce false positives w/ larger threshold
+    (setq so-long-threshold 400)
+
+    (defun doom-buffer-has-long-lines-p ()
+      (unless (bound-and-true-p visual-line-mode)
+        (let ((so-long-skip-leading-comments
+               ;; HACK Fix #2183: `so-long-detected-long-line-p' calls
+               ;;   `comment-forward' which tries to use comment syntax, which
+               ;;   throws an error if comment state isn't initialized, leading
+               ;;   to a wrong-type-argument: stringp error.
+               ;; DEPRECATED Fixed in Emacs 28.
+               (bound-and-true-p comment-use-syntax)))
+          (so-long-detected-long-line-p))))
+    (setq so-long-predicate #'doom-buffer-has-long-lines-p))
   ;; Don't disable syntax highlighting and line numbers, or make the buffer
   ;; read-only, in `so-long-minor-mode', so we can have a basic editing
   ;; experience in them, at least. It will remain off in `so-long-mode',
@@ -651,26 +697,19 @@ on."
   ;; But disable everything else that may be unnecessary/expensive for large or
   ;; wide buffers.
   (appendq! so-long-minor-modes
-            '(flycheck-mode
-              spell-fu-mode
+            '(spell-fu-mode
               eldoc-mode
-              smartparens-mode
               highlight-numbers-mode
               better-jumper-local-mode
               ws-butler-mode
               auto-composition-mode
               undo-tree-mode
               highlight-indent-guides-mode
-              hl-fill-column-mode))
-  (defun doom-buffer-has-long-lines-p ()
-    (unless (bound-and-true-p visual-line-mode)
-      (let ((so-long-skip-leading-comments
-             ;; HACK Fix #2183: `so-long-detected-long-line-p' tries to parse
-             ;;      comment syntax, but comment state may not be initialized,
-             ;;      leading to a wrong-type-argument: stringp error.
-             (bound-and-true-p comment-use-syntax)))
-        (so-long-detected-long-line-p))))
-  (setq so-long-predicate #'doom-buffer-has-long-lines-p))
+              hl-fill-column-mode
+              ;; These are redundant on Emacs 29+
+              flycheck-mode
+              smartparens-mode
+              smartparens-strict-mode)))
 
 
 (use-package! ws-butler

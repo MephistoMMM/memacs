@@ -9,19 +9,19 @@
 to a pop up buffer."
   (+eval-display-results
    (string-trim-right
-    (condition-case-unless-debug e
-        (let ((result
-               (let ((buffer-file-name
-                      (buffer-file-name (buffer-base-buffer)))
-                     (doom--current-module
-                      (ignore-errors (doom-module-from-path buffer-file-name)))
-                     (debug-on-error t))
-                 (eval (read (format "(progn %s)"
-                                     (buffer-substring-no-properties beg end)))
-                       lexical-binding))))
-          (require 'pp)
-          (replace-regexp-in-string "\\\\n" "\n" (pp-to-string result)))
-      (error (error-message-string e))))
+    (let ((buffer (generate-new-buffer " *+eval-output*"))
+          (debug-on-error t))
+      (unwind-protect
+          (condition-case-unless-debug e
+              (let ((doom--current-module (ignore-errors (doom-module-from-path buffer-file-name))))
+                (eval-region beg end buffer load-read-function)
+                (with-current-buffer buffer
+                  (let ((pp-max-width nil))
+                    (require 'pp)
+                    (pp-buffer)
+                    (replace-regexp-in-string "\\\\n" "\n" (string-trim-left (buffer-string))))))
+            (error (format "ERROR: %s" e)))
+        (kill-buffer buffer))))
    (current-buffer)))
 
 
@@ -106,6 +106,10 @@ if it's callable, `apropos' otherwise."
         (thing (helpful-symbol (intern thing)))
         ((call-interactively #'helpful-at-point))))
 
+;; DEPRECATED Remove when 28 support is dropped.
+(unless (fboundp 'lisp--local-defform-body-p)
+  (fset 'lisp--local-defform-body-p #'ignore))
+
 ;;;###autoload
 (defun +emacs-lisp-indent-function (indent-point state)
   "A replacement for `lisp-indent-function'.
@@ -119,15 +123,17 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
     (goto-char (1+ (elt state 1)))
     (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t)
     (cond ((and (elt state 2)
-                (or (not (looking-at-p "\\sw\\|\\s_"))
-                    (eq (char-after) ?:)))
-           (unless (> (save-excursion (forward-line 1) (point))
-                      calculate-lisp-indent-last-sexp)
-             (goto-char calculate-lisp-indent-last-sexp)
-             (beginning-of-line)
-             (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t))
-           (backward-prefix-chars)
-           (current-column))
+                (or (eq (char-after) ?:)
+                    (not (looking-at-p "\\sw\\|\\s_"))))
+           (if (lisp--local-defform-body-p state)
+               (lisp-indent-defform state indent-point)
+             (unless (> (save-excursion (forward-line 1) (point))
+                        calculate-lisp-indent-last-sexp)
+               (goto-char calculate-lisp-indent-last-sexp)
+               (beginning-of-line)
+               (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t))
+             (backward-prefix-chars)
+             (current-column)))
           ((and (save-excursion
                   (goto-char indent-point)
                   (skip-syntax-forward " ")
@@ -225,7 +231,7 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
         `(("Section" "^[ \t]*;;;;*[ \t]+\\([^\n]+\\)" 1)
           ("Evil commands" "^\\s-*(evil-define-\\(?:command\\|operator\\|motion\\) +\\(\\_<[^ ()\n]+\\_>\\)" 1)
           ("Unit tests" "^\\s-*(\\(?:ert-deftest\\|describe\\) +\"\\([^\")]+\\)\"" 1)
-          ("Package" "^\\s-*(\\(?:;;;###package\\|package!\\|use-package!?\\|after!\\) +\\(\\_<[^ ()\n]+\\_>\\)" 1)
+          ("Package" "^\\s-*\\(?:;;;###package\\|(\\(?:package!\\|use-package!?\\|after!\\)\\) +\\(\\_<[^ ()\n]+\\_>\\)" 1)
           ("Major modes" "^\\s-*(define-derived-mode +\\([^ ()\n]+\\)" 1)
           ("Minor modes" "^\\s-*(define-\\(?:global\\(?:ized\\)?-minor\\|generic\\|minor\\)-mode +\\([^ ()\n]+\\)" 1)
           ("Modelines" "^\\s-*(def-modeline! +\\([^ ()\n]+\\)" 1)
@@ -233,6 +239,7 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
           ("Advice" "^\\s-*(\\(?:def\\(?:\\(?:ine-\\)?advice!?\\)\\) +\\([^ )\n]+\\)" 1)
           ("Macros" "^\\s-*(\\(?:cl-\\)?def\\(?:ine-compile-macro\\|macro\\) +\\([^ )\n]+\\)" 1)
           ("Inline functions" "\\s-*(\\(?:cl-\\)?defsubst +\\([^ )\n]+\\)" 1)
+          ("CLI Command" "^\\s-*(\\(def\\(?:cli\\|alias\\|obsolete\\|autoload\\)! +\\([^\n]+\\)\\)" 1)
           ("Functions" "^\\s-*(\\(?:cl-\\)?def\\(?:un\\|un\\*\\|method\\|generic\\|-memoized!\\) +\\([^ ,)\n]+\\)" 1)
           ("Variables" "^\\s-*(\\(def\\(?:c\\(?:onst\\(?:ant\\)?\\|ustom\\)\\|ine-symbol-macro\\|parameter\\|var\\(?:-local\\)?\\)\\)\\s-+\\(\\(?:\\sw\\|\\s_\\|\\\\.\\)+\\)" 2)
           ("Types" "^\\s-*(\\(cl-def\\(?:struct\\|type\\)\\|def\\(?:class\\|face\\|group\\|ine-\\(?:condition\\|error\\|widget\\)\\|package\\|struct\\|t\\(?:\\(?:hem\\|yp\\)e\\)\\)\\)\\s-+'?\\(\\(?:\\sw\\|\\s_\\|\\\\.\\)+\\)" 2))))
@@ -254,6 +261,8 @@ verbosity when editing a file in `doom-private-dir' or `doom-emacs-dir'."
                   `(progn
                      (setq doom-modules ',doom-modules
                            doom-disabled-packages ',doom-disabled-packages)
+                     (require 'core)
+                     (require 'core-cli-lib)
                      (ignore-errors (load ,user-init-file t t))
                      (setq byte-compile-warnings
                            '(obsolete cl-functions

@@ -7,7 +7,7 @@
   "Command to initialize the jupyter REPL for `+python/open-jupyter-repl'.")
 
 (after! projectile
-  (pushnew! projectile-project-root-files "setup.py" "requirements.txt"))
+  (pushnew! projectile-project-root-files "pyproject.toml" "requirements.txt" "setup.py"))
 
 
 ;;
@@ -21,7 +21,7 @@
         python-indent-guess-indent-offset-verbose nil)
 
   (when (featurep! +lsp)
-    (add-hook 'python-mode-local-vars-hook #'lsp!)
+    (add-hook 'python-mode-local-vars-hook #'lsp! 'append)
     ;; Use "mspyls" in eglot if in PATH
     (when (executable-find "Microsoft.Python.LanguageServer")
       (set-eglot-client! 'python-mode '("Microsoft.Python.LanguageServer"))))
@@ -78,18 +78,95 @@
         (setq-local flycheck-python-pylint-executable "pylint")
         (setq-local flycheck-python-flake8-executable "flake8"))))
 
-  (define-key python-mode-map (kbd "DEL") nil) ; interferes with smartparens
-  (sp-local-pair 'python-mode "'" nil
-                 :unless '(sp-point-before-word-p
-                           sp-point-after-word-p
-                           sp-point-before-same-p))
-
   ;; Affects pyenv and conda
   (when (featurep! :ui modeline)
     (advice-add #'pythonic-activate :after-while #'+modeline-update-env-in-all-windows-h)
     (advice-add #'pythonic-deactivate :after #'+modeline-clear-env-in-all-windows-h))
 
-  (setq-hook! 'python-mode-hook tab-width python-indent-offset))
+  (setq-hook! 'python-mode-hook tab-width python-indent-offset)
+
+  ;; HACK Fix syntax highlighting on Emacs 28.1
+  ;; DEPRECATED Remove when 28.1 support is dropped
+  ;; REVIEW Revisit if a 28.2 is released with a fix
+  (when (= emacs-major-version 28)
+    (defadvice! +python--font-lock-assignment-matcher-a (regexp)
+      :override #'python-font-lock-assignment-matcher
+      (lambda (limit)
+        (cl-loop while (re-search-forward regexp limit t)
+                 unless (or (python-syntax-context 'paren)
+                            (equal (char-after) ?=))
+                 return t)))
+
+    (defadvice! +python--rx-a (&rest regexps)
+      :override #'python-rx
+      `(rx-let ((block-start       (seq symbol-start
+                                        (or "def" "class" "if" "elif" "else" "try"
+                                            "except" "finally" "for" "while" "with"
+                                            ;; Python 3.5+ PEP492
+                                            (and "async" (+ space)
+                                                 (or "def" "for" "with")))
+                                        symbol-end))
+                (dedenter          (seq symbol-start
+                                        (or "elif" "else" "except" "finally")
+                                        symbol-end))
+                (block-ender       (seq symbol-start
+                                        (or
+                                         "break" "continue" "pass" "raise" "return")
+                                        symbol-end))
+                (decorator         (seq line-start (* space) ?@ (any letter ?_)
+                                        (* (any word ?_))))
+                (defun             (seq symbol-start
+                                        (or "def" "class"
+                                            ;; Python 3.5+ PEP492
+                                            (and "async" (+ space) "def"))
+                                        symbol-end))
+                (if-name-main      (seq line-start "if" (+ space) "__name__"
+                                        (+ space) "==" (+ space)
+                                        (any ?' ?\") "__main__" (any ?' ?\")
+                                        (* space) ?:))
+                (symbol-name       (seq (any letter ?_) (* (any word ?_))))
+                (assignment-target (seq (? ?*)
+                                        (* symbol-name ?.) symbol-name
+                                        (? ?\[ (+ (not ?\])) ?\])))
+                (grouped-assignment-target (seq (? ?*)
+                                                (* symbol-name ?.) (group symbol-name)
+                                                (? ?\[ (+ (not ?\])) ?\])))
+                (open-paren        (or "{" "[" "("))
+                (close-paren       (or "}" "]" ")"))
+                (simple-operator   (any ?+ ?- ?/ ?& ?^ ?~ ?| ?* ?< ?> ?= ?%))
+                (not-simple-operator (not (or simple-operator ?\n)))
+                (operator          (or "==" ">=" "is" "not"
+                                       "**" "//" "<<" ">>" "<=" "!="
+                                       "+" "-" "/" "&" "^" "~" "|" "*" "<" ">"
+                                       "=" "%"))
+                (assignment-operator (or "+=" "-=" "*=" "/=" "//=" "%=" "**="
+                                         ">>=" "<<=" "&=" "^=" "|="
+                                         "="))
+                (string-delimiter  (seq
+                                    ;; Match even number of backslashes.
+                                    (or (not (any ?\\ ?\' ?\")) point
+                                        ;; Quotes might be preceded by an
+                                        ;; escaped quote.
+                                        (and (or (not (any ?\\)) point) ?\\
+                                             (* ?\\ ?\\) (any ?\' ?\")))
+                                    (* ?\\ ?\\)
+                                    ;; Match single or triple quotes of any kind.
+                                    (group (or  "\"\"\"" "\"" "'''" "'"))))
+                (coding-cookie (seq line-start ?# (* space)
+                                    (or
+                                     ;; # coding=<encoding name>
+                                     (: "coding" (or ?: ?=) (* space)
+                                      (group-n 1 (+ (or word ?-))))
+                                     ;; # -*- coding: <encoding name> -*-
+                                     (: "-*-" (* space) "coding:" (* space)
+                                      (group-n 1 (+ (or word ?-)))
+                                      (* space) "-*-")
+                                     ;; # vim: set fileencoding=<encoding name> :
+                                     (: "vim:" (* space) "set" (+ space)
+                                      "fileencoding" (* space) ?= (* space)
+                                      (group-n 1 (+ (or word ?-)))
+                                      (* space) ":")))))
+         (rx ,@regexps)))))
 
 
 (use-package! anaconda-mode
@@ -276,7 +353,8 @@
                                 "/usr/bin/anaconda3"
                                 "/usr/local/anaconda3"
                                 "/usr/local/miniconda3"
-                                "/usr/local/Caskroom/miniconda/base")
+                                "/usr/local/Caskroom/miniconda/base"
+                                "~/.conda")
                if (file-directory-p dir)
                return (setq conda-anaconda-home (expand-file-name dir)
                             conda-env-home-directory (expand-file-name dir)))
@@ -316,6 +394,24 @@
   :after cython-mode)
 
 
+(use-package! pip-requirements
+  :defer t
+  :config
+  ;; HACK `pip-requirements-mode' performs a sudden HTTP request to
+  ;;   https://pypi.org/simple, which causes unexpected hangs (see #5998). This
+  ;;   advice defers this behavior until the first time completion is invoked.
+  ;; REVIEW More sensible behavior should be PRed upstream.
+  (defadvice! +python--init-completion-a (&rest args)
+    "Call `pip-requirements-fetch-packages' first time completion is invoked."
+    :before #'pip-requirements-complete-at-point
+    (unless pip-packages (pip-requirements-fetch-packages)))
+  (defadvice! +python--inhibit-pip-requirements-fetch-packages-a (fn &rest args)
+    "No-op `pip-requirements-fetch-packages', which can be expensive."
+    :around #'pip-requirements-mode
+    (letf! ((#'pip-requirements-fetch-packages #'ignore))
+      (apply fn args))))
+
+
 ;;
 ;;; LSP
 
@@ -333,7 +429,6 @@
     :when (featurep! +pyright)
     :after lsp-mode))
 
-(eval-when! (and (featurep! +pyright)
-                 (featurep! :tools lsp +eglot))
-  (after! eglot
-    (add-to-list 'eglot-server-programs '(python-mode . ("pyright-langserver" "--stdio")))))
+;; Tree sitter
+(eval-when! (featurep! +tree-sitter)
+  (add-hook! 'python-mode-local-vars-hook #'tree-sitter!))

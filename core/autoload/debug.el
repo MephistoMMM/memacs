@@ -7,14 +7,15 @@
 (defvar doom-debug-variables
   '(async-debug
     debug-on-error
-    doom-debug-p
+    (debugger . doom-debugger)
+    (doom-print-level . debug)
     garbage-collection-messages
     gcmh-verbose
     init-file-debug
     jka-compr-verbose
+    (message-log-max . 16384)
     url-debug
-    use-package-verbose
-    (message-log-max . 16384))
+    use-package-verbose)
   "A list of variable to toggle on `doom-debug-mode'.
 
 Each entry can be a variable symbol or a cons cell whose CAR is the variable
@@ -31,7 +32,7 @@ symbol and CDR is the value to set it to when `doom-debug-mode' is activated.")
 
 ;;;###autoload
 (define-minor-mode doom-debug-mode
-  "Toggle `debug-on-error' and `doom-debug-p' for verbose logging."
+  "Toggle `debug-on-error' and `init-file-debug' for verbose logging."
   :init-value nil
   :global t
   (let ((enabled doom-debug-mode))
@@ -57,12 +58,114 @@ symbol and CDR is the value to set it to when `doom-debug-mode' is activated.")
     ;; potentially define one of `doom-debug-variables'), in case some of them
     ;; aren't defined when `doom-debug-mode' is first loaded.
     (cond (enabled
+           (message "Debug mode enabled! (Run 'M-x view-echo-area-messages' to open the log buffer)")
+           ;; Produce more helpful (and visible) error messages from errors
+           ;; emitted from hooks (particularly mode hooks), that usually go
+           ;; unnoticed otherwise.
+           (advice-add #'run-hooks :override #'doom-run-hooks)
+           ;; Add time stamps to lines in *Messages*
+           (advice-add #'message :before #'doom--timestamped-message-a)
            (add-variable-watcher 'doom-debug-variables #'doom--watch-debug-vars-h)
            (add-hook 'after-load-functions #'doom--watch-debug-vars-h))
           (t
+           (advice-remove #'run-hooks #'doom-run-hooks)
+           (advice-remove #'message #'doom--timestamped-message-a)
            (remove-variable-watcher 'doom-debug-variables #'doom--watch-debug-vars-h)
-           (remove-hook 'after-load-functions #'doom--watch-debug-vars-h)))
-    (message "Debug mode %s" (if enabled "on" "off"))))
+           (remove-hook 'after-load-functions #'doom--watch-debug-vars-h)
+           (message "Debug mode disabled!")))))
+
+
+;;
+;;; Custom debuggers
+
+(autoload 'backtrace-get-frames "backtrace")
+
+(defun doom-backtrace ()
+  "Return a stack trace as a list of `backtrace-frame' objects."
+  ;; (let* ((n 0)
+  ;;        (frame (backtrace-frame n))
+  ;;        (frame-list nil)
+  ;;        (in-program-stack nil))
+  ;;   (while frame
+  ;;     (when in-program-stack
+  ;;       (push (cdr frame) frame-list))
+  ;;     (when (eq (elt frame 1) debugger)
+  ;;       (setq in-program-stack t))
+  ;;     ;; (when (and (eq (elt frame 1) 'doom-cli-execute)
+  ;;     ;;            (eq (elt frame 2) :doom))
+  ;;     ;;   (setq in-program-stack nil))
+  ;;     (setq n (1+ n)
+  ;;           frame (backtrace-frame n)))
+  ;;   (nreverse frame-list))
+  (cdr (backtrace-get-frames debugger)))
+
+(defun doom-backtrace-write-to-file (backtrace file)
+  "Write BACKTRACE to FILE with appropriate boilerplate."
+  (make-directory (file-name-directory file) t)
+  (let ((doom-print-indent 0))
+    (with-temp-file file
+      (insert ";; -*- lisp-interaction -*-\n")
+      (insert ";; vim: set ft=lisp:\n")
+      (insert (format ";; command=%S\n" command-line-args))
+      (insert (format ";; date=%S\n\n" (format-time-string "%Y-%m-%d %H-%M-%S" before-init-time)))
+      (insert ";;;; ENVIRONMENT\n" (with-output-to-string (doom/version)) "\n")
+      (let ((standard-output (current-buffer))
+            (print-quoted t)
+            (print-escape-newlines t)
+            (print-escape-control-characters t)
+            (print-symbols-bare t)
+            (print-level nil)
+            (print-circle nil)
+            (n -1))
+        (mapc (lambda (frame)
+                (princ (format ";;;; %d\n" (cl-incf n)))
+                (pp (list (cons (backtrace-frame-fun frame)
+                                (backtrace-frame-args frame))
+                          (backtrace-frame-locals frame)))
+                (terpri))
+              backtrace))
+      file)))
+
+(defun doom-debugger (&rest args)
+  "Enter `debugger' in interactive sessions, `doom-cli-debugger' otherwise.
+
+Writes backtraces to file and ensures the backtrace is recorded, so the user can
+always access it."
+  (let ((backtrace (doom-backtrace)))
+    ;; Work around Emacs's heuristic (in eval.c) for detecting errors in the
+    ;; debugger, which would run this handler again on subsequent calls. Taken
+    ;; from `ert--run-test-debugger'.
+    (cl-incf num-nonmacro-input-events)
+    ;; TODO Write backtraces to file
+    ;; TODO Write backtrace to a buffer in case recursive error interupts the
+    ;;   debugger (happens more often than it should).
+    (apply #'debug args)))
+
+
+;;
+;;; Time-stamped *Message* logs
+
+(defun doom--timestamped-message-a (format-string &rest args)
+  "Advice to run before `message' that prepends a timestamp to each message.
+
+Activate this advice with:
+(advice-add 'message :before 'doom--timestamped-message-a)"
+  (when (and (stringp format-string)
+             message-log-max
+             (not (string-equal format-string "%s%s")))
+    (with-current-buffer "*Messages*"
+      (let ((timestamp (format-time-string "[%F %T] " (current-time)))
+            (deactivate-mark nil))
+        (with-silent-modifications
+          (goto-char (point-max))
+          (if (not (bolp))
+              (newline))
+          (insert timestamp))))
+    (let ((window (get-buffer-window "*Messages*")))
+      (when (and window (not (equal (selected-window) window)))
+        (with-current-buffer "*Messages*"
+          (goto-char (point-max))
+          (set-window-point window (point-max)))))))
 
 
 ;;
@@ -91,14 +194,14 @@ symbol and CDR is the value to set it to when `doom-debug-mode' is activated.")
     (let (forms)
       (with-temp-buffer
         (insert-file-contents file)
-        (let (emacs-lisp-mode-hook) (emacs-lisp-mode))
-        (while (re-search-forward (format "(%s " (regexp-quote form)) nil t)
-          (let ((ppss (syntax-ppss)))
-            (unless (or (nth 4 ppss)
-                        (nth 3 ppss))
-              (save-excursion
-                (goto-char (match-beginning 0))
-                (push (sexp-at-point) forms)))))
+        (with-syntax-table emacs-lisp-mode-syntax-table
+          (while (re-search-forward (format "(%s " (regexp-quote form)) nil t)
+            (let ((ppss (syntax-ppss)))
+              (unless (or (nth 4 ppss)
+                          (nth 3 ppss))
+                (save-excursion
+                  (goto-char (match-beginning 0))
+                  (push (sexp-at-point) forms))))))
         (nreverse forms)))))
 
 ;;;###autoload
@@ -142,7 +245,7 @@ ready to be pasted in a bug report on github."
          . ,(mapcar
              #'symbol-name
              (delq
-              nil (list (cond ((not doom-interactive-p) 'batch)
+              nil (list (cond (noninteractive 'batch)
                               ((display-graphic-p) 'gui)
                               ('tty))
                         (if (daemonp) 'daemon)
@@ -155,7 +258,7 @@ ready to be pasted in a bug report on github."
                             'envvar-file)
                         (if (featurep 'exec-path-from-shell)
                             'exec-path-from-shell)
-                        (if (file-symlink-p user-emacs-directory)
+                        (if (file-symlink-p doom-emacs-dir)
                             'symlinked-emacsdir)
                         (if (file-symlink-p doom-private-dir)
                             'symlinked-doomdir)
@@ -182,13 +285,15 @@ ready to be pasted in a bug report on github."
                         collect
                         (let* ((flags (doom-module-get cat (cdr key) :flags))
                                (path  (doom-module-get cat (cdr key) :path))
-                               (module (append (cond ((null path)
-                                                      (list '&nopath))
-                                                     ((file-in-directory-p path doom-private-dir)
-                                                      (list '&user)))
-                                               (if flags
-                                                   `(,(cdr key) ,@flags)
-                                                 (list (cdr key))))))
+                               (module
+                                (append
+                                 (cond ((null path)
+                                        (list '&nopath))
+                                       ((not (file-in-directory-p path doom-modules-dir))
+                                        (list '&user)))
+                                 (if flags
+                                     `(,(cdr key) ,@flags)
+                                   (list (cdr key))))))
                           (if (= (length module) 1)
                               (car module)
                             module)))
@@ -211,10 +316,34 @@ ready to be pasted in a bug report on github."
         (elpa
          ,@(condition-case e
                (progn
-                 (package-initialize)
+                 (unless (bound-and-true-p package--initialized)
+                   (package-initialize))
                  (cl-loop for (name . _) in package-alist
                           collect (format "%s" name)))
              (error (format "<%S>" e))))))))
+
+;;;###autoload
+(defun doom-info-string (&optional width nocolor)
+  "Return the `doom-info' as a compact string.
+
+FILL-COLUMN determines the column at which lines will be broken."
+  (with-temp-buffer
+    (let ((doom-print-backend (unless nocolor doom-print-backend))
+          (doom-print-indent 0))
+      (dolist (spec (cl-remove-if-not #'cdr (doom-info)) (buffer-string))
+        ;; FIXME Refactor this horrible cludge, either here or in `format!'
+        (insert! ((bold "%-10s ") (symbol-name (car spec)))
+                 ("%s\n"
+                  (string-trim-left
+                   (indent
+                    (fill
+                     (if (listp (cdr spec))
+                         (mapconcat (doom-partial #'format "%s")
+                                    (cdr spec)
+                                    " ")
+                       (cdr spec))
+                     (- (or width 80) 11))
+                    11))))))))
 
 
 ;;
@@ -222,130 +351,46 @@ ready to be pasted in a bug report on github."
 
 ;;;###autoload
 (defun doom/version ()
-  "Display the current version and ocmit of Doom & Emacs."
+  "Display the running version of Doom core, module sources, and Emacs."
   (interactive)
-  (let ((default-directory doom-emacs-dir))
-    (print! "Doom emacs\tv%-15s %s"
-            doom-version
-            (or (cdr (doom-call-process "git" "log" "-1" "--format=%D %h %ci"))
-                "n/a")))
-  (let ((default-directory doom-core-dir))
-    (print! "Doom core\tv%-15s %s"
-            doom-core-version
-            (or (cdr (doom-call-process "git" "log" "-1" "--format=%D %h %ci"))
-                "n/a"))))
+  (print! "%s\n%s\n%s"
+          (format "%-13s v%-15s %s"
+                  "GNU Emacs"
+                  emacs-version
+                  emacs-repository-version)
+          (format "%-13s v%-15s %s"
+                  "Doom core"
+                  doom-version
+                  (or (cdr (doom-call-process
+                            "git" "-C" doom-emacs-dir
+                            "log" "-1" "--format=%D %h %ci"))
+                      "n/a"))
+          ;; NOTE This is a placeholder. Our modules will be moved to its own
+          ;;   repo eventually, and Doom core will later be capable of managing
+          ;;   them like package sources.
+          (format "%-13s v%-15s %s"
+                  "Doom modules"
+                  doom-modules-version
+                  (or (cdr (doom-call-process
+                            "git" "-C" doom-modules-dir
+                            "log" "-1" "--format=%D %h %ci"))
+                      "n/a"))))
 
 ;;;###autoload
-(defun doom/info (&optional raw)
+(defun doom/info ()
   "Collects some debug information about your Emacs session, formats it and
 copies it to your clipboard, ready to be pasted into bug reports!"
-  (interactive "P")
-  (let ((buffer (get-buffer-create "*doom info*"))
-        (info (doom-info)))
-    (with-current-buffer buffer
-      (erase-buffer)
-      (if raw
-          (progn
-            (save-excursion
-              (pp info (current-buffer)))
-            (dolist (sym '(modules packages))
-              (when (re-search-forward (format "^ *\\((%s\\)" sym) nil t)
-                (goto-char (match-beginning 1))
-                (cl-destructuring-bind (beg . end)
-                    (bounds-of-thing-at-point 'sexp)
-                  (let ((sexp (prin1-to-string (sexp-at-point))))
-                    (delete-region beg end)
-                    (insert sexp))))))
-        (dolist (spec info)
-          (when (cdr spec)
-            (insert! "%-11s  %s\n"
-                     ((car spec)
-                      (if (listp (cdr spec))
-                          (mapconcat (lambda (x) (format "%s" x))
-                                     (cdr spec) " ")
-                        (cdr spec)))))))
-      (if (not doom-interactive-p)
-          (print! (buffer-string))
-        (with-current-buffer (pop-to-buffer buffer)
-          (setq buffer-read-only t)
-          (goto-char (point-min))
-          (kill-new (buffer-string))
-          (when (y-or-n-p "Your doom-info was copied to the clipboard.\n\nOpen pastebin.com?")
-            (browse-url "https://pastebin.com")))))))
-
-
-;;;###autoload
-(defun doom/am-i-secure ()
-  "Test to see if your root certificates are securely configured in emacs.
-Some items are not supported by the `nsm.el' module."
-  (declare (interactive-only t))
   (interactive)
-  (unless (string-match-p "\\_<GNUTLS\\_>" system-configuration-features)
-    (warn "gnutls support isn't built into Emacs, there may be problems"))
-  (if-let* ((bad-hosts
-             (cl-loop for bad
-                      in '("https://expired.badssl.com/"
-                           "https://wrong.host.badssl.com/"
-                           "https://self-signed.badssl.com/"
-                           "https://untrusted-root.badssl.com/"
-                           ;; "https://revoked.badssl.com/"
-                           ;; "https://pinning-test.badssl.com/"
-                           "https://sha1-intermediate.badssl.com/"
-                           "https://rc4-md5.badssl.com/"
-                           "https://rc4.badssl.com/"
-                           "https://3des.badssl.com/"
-                           "https://null.badssl.com/"
-                           "https://sha1-intermediate.badssl.com/"
-                           ;; "https://client-cert-missing.badssl.com/"
-                           "https://dh480.badssl.com/"
-                           "https://dh512.badssl.com/"
-                           "https://dh-small-subgroup.badssl.com/"
-                           "https://dh-composite.badssl.com/"
-                           "https://invalid-expected-sct.badssl.com/"
-                           ;; "https://no-sct.badssl.com/"
-                           ;; "https://mixed-script.badssl.com/"
-                           ;; "https://very.badssl.com/"
-                           "https://subdomain.preloaded-hsts.badssl.com/"
-                           "https://superfish.badssl.com/"
-                           "https://edellroot.badssl.com/"
-                           "https://dsdtestprovider.badssl.com/"
-                           "https://preact-cli.badssl.com/"
-                           "https://webpack-dev-server.badssl.com/"
-                           "https://captive-portal.badssl.com/"
-                           "https://mitm-software.badssl.com/"
-                           "https://sha1-2016.badssl.com/"
-                           "https://sha1-2017.badssl.com/")
-                      if (condition-case _e
-                             (url-retrieve-synchronously bad)
-                           (error nil))
-                      collect bad)))
-      (error "tls seems to be misconfigured (it got %s)."
-             bad-hosts)
-    (url-retrieve "https://badssl.com"
-                  (lambda (status)
-                    (if (or (not status) (plist-member status :error))
-                        (warn "Something went wrong.\n\n%s" (pp-to-string status))
-                      (message "Your trust roots are set up properly.\n\n%s" (pp-to-string status))
-                      t)))))
-
-
-;;
-;;; Reporting bugs
-
-;;;###autoload
-(defun doom/copy-buffer-contents (buffer-name)
-  "Copy the contents of BUFFER-NAME to your clipboard."
-  (interactive
-   (list (if current-prefix-arg
-             (completing-read "Select buffer: " (mapcar #'buffer-name (buffer-list)))
-           (buffer-name (current-buffer)))))
-  (let ((buffer (get-buffer buffer-name)))
-    (unless (buffer-live-p buffer)
-      (user-error "Buffer isn't live"))
-    (kill-new
-     (with-current-buffer buffer
-       (substring-no-properties (buffer-string))))
-    (message "Contents of %S were copied to the clipboard" buffer-name)))
+  (let ((buffer (get-buffer-create "*doom info*")))
+    (with-current-buffer buffer
+      (setq buffer-read-only t)
+      (with-silent-modifications
+        (erase-buffer)
+        (insert (doom-info-string 86)))
+      (pop-to-buffer buffer)
+      (kill-new (buffer-string))
+      (when (y-or-n-p "Your doom-info was copied to the clipboard.\n\nOpen pastebin.com?")
+        (browse-url "https://pastebin.com")))))
 
 
 ;;

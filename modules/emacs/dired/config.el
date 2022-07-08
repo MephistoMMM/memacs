@@ -3,9 +3,10 @@
 (use-package! dired
   :commands dired-jump
   :init
-  (setq dired-auto-revert-buffer (lambda (dir) (not (file-remote-p dir)))  ; don't prompt to revert; just do it
-        dired-dwim-target t  ; suggest a target for moving/copying intelligently
+  (setq dired-dwim-target t  ; suggest a target for moving/copying intelligently
         dired-hide-details-hide-symlink-targets nil
+        ;; don't prompt to revert, just do it
+        dired-auto-revert-buffer #'dired-buffer-stale-p
         ;; Always copy/delete recursively
         dired-recursive-copies  'always
         dired-recursive-deletes 'top
@@ -49,6 +50,11 @@ Fixes #3939: unsortable dired entries on Windows."
 
   ;; Don't complain about this command being disabled when we use it
   (put 'dired-find-alternate-file 'disabled nil)
+
+  (defadvice! +dired--no-revert-in-virtual-buffers-a (&rest args)
+    "Don't auto-revert in dired-virtual buffers (see `dired-virtual-revert')."
+    :before-while #'dired-buffer-stale-p
+    (not (eq revert-buffer-function #'dired-virtual-revert)))
 
   (map! :map dired-mode-map
         ;; Kill all dired buffers on q
@@ -130,14 +136,41 @@ we have to clean it up ourselves."
         ranger-hide-cursor nil))
 
 
+(use-package! dirvish
+  :when (featurep! +dirvish)
+  :defer t
+  :init (after! dired (dirvish-override-dired-mode))
+  :hook (dired-mode . dired-omit-mode)
+  :config
+  (setq dirvish-cache-dir (concat doom-cache-dir "dirvish/")
+        dirvish-hide-details nil
+        dirvish-attributes '(git-msg)
+        dired-omit-files (concat dired-omit-files "\\|^\\..*$"))
+  (when (featurep! +icons)
+    (push 'all-the-icons dirvish-attributes))
+  (map! :map dirvish-mode-map
+        :n "b" #'dirvish-goto-bookmark
+        :n "z" #'dirvish-show-history
+        :n "f" #'dirvish-file-info-menu
+        :n "F" #'dirvish-toggle-fullscreen
+        :n "l" #'dired-find-file
+        :n "h" #'dired-up-directory
+        :localleader
+        "h" #'dired-omit-mode))
+
+
 (use-package! all-the-icons-dired
   :when (featurep! +icons)
+  :unless (featurep! +dirvish)
   :hook (dired-mode . all-the-icons-dired-mode)
   :config
   ;; HACK Fixes #1929: icons break file renaming in Emacs 27+, because the icon
   ;;      is considered part of the filename, so we disable icons while we're in
   ;;      wdired-mode.
   (defvar +wdired-icons-enabled -1)
+
+  ;; display icons with colors
+  (setq all-the-icons-dired-monochrome nil)
 
   (defadvice! +dired-disable-icons-in-wdired-mode-a (&rest _)
     :before #'wdired-change-to-wdired-mode
@@ -151,6 +184,7 @@ we have to clean it up ourselves."
 
 
 (use-package! dired-x
+  :unless (featurep! +dirvish)
   :unless (featurep! +ranger)
   :hook (dired-mode . dired-omit-mode)
   :config

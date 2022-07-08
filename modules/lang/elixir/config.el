@@ -37,7 +37,7 @@
     (sp-local-pair "fn " " end" :unless '(sp-in-comment-p sp-in-string-p)))
 
   (when (featurep! +lsp)
-    (add-hook 'elixir-mode-local-vars-hook #'lsp!)
+    (add-hook 'elixir-mode-local-vars-hook #'lsp! 'append)
     (after! lsp-mode
       (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]_build\\'")))
 
@@ -99,3 +99,6 @@
         "T" #'exunit-toggle-file-and-test
         "t" #'exunit-toggle-file-and-test-other-window
         "s" #'exunit-verify-single))
+
+(eval-when! (featurep! +tree-sitter)
+  (add-hook! 'elixir-mode-local-vars-hook #'tree-sitter!))

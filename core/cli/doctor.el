@@ -1,9 +1,14 @@
-;;; core/cli/doctor.el -*- lexical-binding: t; -*-
+;;; core/cli/doctor.el --- userland heuristics and Emacs diagnostics -*- lexical-binding: t; -*-
+;;; Commentary:
+;;; Code:
 
-(defvar doom-warnings ())
-(defvar doom-errors ())
+(defvar doom-doctor--warnings ())
+(defvar doom-doctor--errors ())
 
-;;; Helpers
+
+;;
+;;; DSL
+
 (defun elc-check-dir (dir)
   (dolist (file (directory-files-recursively dir "\\.elc$"))
     (when (file-newer-than-file-p (concat (file-name-sans-extension file) ".el")
@@ -14,27 +19,28 @@
   `(unless ,condition
      (error! ,message ,@args)))
 
-
-;;; Logging
 (defmacro error!   (&rest args)
   `(progn (unless inhibit-message (print! (error ,@args)))
-          (push (format! (error ,@args)) doom-errors)))
+          (push (format! (error ,@args)) doom-doctor--errors)))
+
 (defmacro warn!    (&rest args)
   `(progn (unless inhibit-message (print! (warn ,@args)))
-          (push (format! (warn ,@args)) doom-warnings)))
+          (push (format! (warn ,@args)) doom-doctor--warnings)))
+
 (defmacro success! (&rest args)
   `(print! (green ,@args)))
+
 (defmacro section! (&rest args)
   `(print! (bold (blue ,@args))))
 
 (defmacro explain! (&rest args)
-  `(print-group! (print! (autofill ,@args))))
+  `(print-group! (print! (fill (string-join (list ,@args) "\n")))))
 
 
 ;;
 ;;; CLI commands
 
-(defcli! (doctor doc) ()
+(defcli! ((doctor doc)) ()
   "Diagnoses common issues on your system.
 
 The Doom doctor is essentially one big, self-contained elisp shell script that
@@ -43,7 +49,7 @@ Issues that could intefere with Doom Emacs.
 
 Doom modules may optionally have a doctor.el file to run their own heuristics
 in."
-  :bare t
+  :benchmark nil
   (print! "The doctor will see you now...\n")
 
   ;; REVIEW Refactor me
@@ -55,13 +61,13 @@ in."
      ;; There are 2 newlines between each item to fight against
      ;; the (fill-region) call in `doom--output-autofill'
      (explain! "Doom supports this version, but you are using a development version of Emacs! "
-               "Be prepared for possibly weekly breakages that\n\n"
-               "\t- you will have to investigate yourself,\n\n"
-               "\t- might appear, or be solved, on any Emacs update,\n\n"
-               "\t- might depend subtly on upstream packages updates\n\n"
+               "Be prepared for possibly weekly breakages that\n"
+               "\t- you will have to investigate yourself."
+               "\t- might appear, or be solved, on any Emacs update."
+               "\t- might depend subtly on upstream packages updates.\n"
                "You might need to unpin packages to get a fix for a specific commit of Emacs, "
                "and you should be ready to downgrade Emacs if something is just not fixable."))
-    (EMACS28+
+    (EMACS29+
      (warn! "Emacs %s detected" emacs-version)
      (explain! "Doom supports this version, but you are living on the edge! "
                "Be prepared for breakages in future versions of Emacs."))
@@ -102,6 +108,13 @@ in."
               "jansson support (i.e. a native JSON library), particularly LSP users. "
               "You must install a prebuilt Emacs binary with this included, or compile "
               "Emacs with the --with-json option."))
+  (when EMACS28+
+    (unless NATIVECOMP
+      (warn! "Emacs was not built with native compilation support")
+      (explain! "Users will see a substantial performance gain by building Emacs with "
+                "native compilation support, availible in emacs 28+."
+                "You must install a prebuilt Emacs binary with this included, or compile "
+                "Emacs with the --with-native-compilation option.")))
 
   (print! (start "Checking for private config conflicts..."))
   (let* ((xdg-dir (concat (or (getenv "XDG_CONFIG_HOME")
@@ -112,7 +125,7 @@ in."
          (dir (if (file-directory-p xdg-dir)
                   xdg-dir
                 doom-dir)))
-    (when (file-equal-p dir user-emacs-directory)
+    (when (file-equal-p dir doom-emacs-dir)
       (print! (error "Doom was cloned to %S, not ~/.emacs.d or ~/.config/emacs"
                      (path dir)))
       (explain! "Doom's source and your private Doom config have to live in separate directories. "
@@ -127,7 +140,7 @@ in."
       (explain! "The second directory will be ignored, as it has lower precedence.")))
 
   (print! (start "Checking for stale elc files..."))
-  (elc-check-dir user-emacs-directory)
+  (elc-check-dir doom-emacs-dir)
 
   (print! (start "Checking for problematic git global settings..."))
   (if (executable-find "git")
@@ -145,9 +158,12 @@ in."
   (print! (start "Checking Doom Emacs..."))
   (condition-case-unless-debug ex
       (print-group!
-       (let ((doom-interactive-p 'doctor))
-         (doom-initialize 'force)
-         (doom-initialize-modules))
+       (let ((noninteractive nil)
+             kill-emacs-query-functions
+             kill-emacs-hook)
+         (defvar doom-reloading-p nil)
+         (require 'core-start)
+         (doom-initialize-packages))
 
        (print! (success "Initialized Doom Emacs %s") doom-version)
        (print!
@@ -227,8 +243,8 @@ in."
          (maphash (lambda (key plist)
                     (let (doom-local-errors
                           doom-local-warnings)
-                      (let (doom-errors
-                            doom-warnings)
+                      (let (doom-doctor--errors
+                            doom-doctor--warnings)
                         (condition-case-unless-debug ex
                             (let ((doctor-file   (doom-module-path (car key) (cdr key) "doctor.el"))
                                   (packages-file (doom-module-path (car key) (cdr key) "packages.el")))
@@ -240,6 +256,7 @@ in."
                                        unless (or (doom-package-get name :disable)
                                                   (eval (doom-package-get name :ignore))
                                                   (plist-member (doom-package-get name :recipe) :local-repo)
+                                                  (locate-library (symbol-name name))
                                                   (doom-package-built-in-p name)
                                                   (doom-package-installed-p name))
                                        do (print! (error "Missing emacs package: %S") name))
@@ -247,14 +264,14 @@ in."
                                 (load doctor-file 'noerror 'nomessage)))
                           (file-missing (error! "%s" (error-message-string ex)))
                           (error (error! "Syntax error: %s" ex)))
-                        (when (or doom-errors doom-warnings)
+                        (when (or doom-doctor--errors doom-doctor--warnings)
                           (print-group!
                            (print! (start (bold "%s %s")) (car key) (cdr key))
-                           (print! "%s" (string-join (append doom-errors doom-warnings) "\n")))
-                          (setq doom-local-errors doom-errors
-                                doom-local-warnings doom-warnings)))
-                      (appendq! doom-errors doom-local-errors)
-                      (appendq! doom-warnings doom-local-warnings)))
+                           (print! "%s" (string-join (append doom-doctor--errors doom-doctor--warnings) "\n")))
+                          (setq doom-local-errors doom-doctor--errors
+                                doom-local-warnings doom-doctor--warnings)))
+                      (appendq! doom-doctor--errors doom-local-errors)
+                      (appendq! doom-doctor--warnings doom-local-warnings)))
                   doom-modules)))
     (error
      (warn! "Attempt to load DOOM failed\n  %s\n"
@@ -262,15 +279,18 @@ in."
      (setq doom-modules nil)))
 
   ;; Final report
-  (message "")
-  (dolist (msg (list (list doom-errors "error" 'red)
-                     (list doom-warnings "warning" 'yellow)))
+  (terpri)
+  (dolist (msg (list (list doom-doctor--warnings "warning" 'yellow)
+                     (list doom-doctor--errors "error" 'red)))
     (when (car msg)
       (print! (color (nth 2 msg)
                      (if (cdr msg)
                          "There are %d %ss!"
                        "There is %d %s!")
                      (length (car msg)) (nth 1 msg)))))
-  (unless (or doom-errors doom-warnings)
+  (unless (or doom-doctor--errors doom-doctor--warnings)
     (success! "Everything seems fine, happy Emacs'ing!"))
-  t)
+  (exit! :pager? "+G"))
+
+(provide 'core-cli-doctor)
+;;; doctor.el ends here

@@ -15,7 +15,7 @@
   (setq beancount-electric-currency t)
 
   (when (featurep! +lsp)
-    (add-hook 'beancount-mode-local-vars-hook #'lsp!))
+    (add-hook 'beancount-mode-local-vars-hook #'lsp! 'append))
 
   (map! :map beancount-mode-map
         "TAB" (cmds! (and outline-minor-mode (outline-on-heading-p))
@@ -28,6 +28,8 @@
         "q" #'beancount-query
         "x" #'beancount-context
         (:prefix ("i" . "insert")
+         "c" #'+beancount/clone-transaction
+         "C" #'+beancount/clone-this-transaction
          "a" #'beancount-insert-account
          "p" #'beancount-insert-prices
          "d" #'beancount-insert-date)))

@@ -60,7 +60,6 @@ don't have a :trigger property in `+file-templates-alist'.")
     ("/bower\\.json$"          :trigger "__bower.json" :mode json-mode)
     ("/gulpfile\\.js$"         :trigger "__gulpfile.js" :mode js-mode)
     ("/webpack\\.config\\.js$" :trigger "__webpack.config.js" :mode js-mode)
-    ("\\.js\\(?:on\\|hintrc\\)$" :mode json-mode)
     ;; Lua
     ("/main\\.lua$" :trigger "__main.lua" :mode love-mode)
     ("/conf\\.lua$" :trigger "__conf.lua" :mode love-mode)
@@ -143,13 +142,9 @@ must be non-read-only, empty, and there must be a rule in
        (not (member (substring (buffer-name) 0 1) '("*" " ")))
        (not (file-exists-p buffer-file-name))
        (not (buffer-modified-p))
+       (null (buffer-base-buffer))
        (when-let (rule (cl-find-if #'+file-template-p +file-templates-alist))
          (apply #'+file-templates--expand rule))))
-
-(defadvice! +file-templates-inhibit-in-org-capture-a (fn &rest args)
-  :around #'org-capture
-  (let ((+file-templates-inhibit t))
-    (apply fn args)))
 
 
 ;;

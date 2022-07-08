@@ -125,3 +125,42 @@ If REVERSE (the prefix arg) is non-nil, sort the transactions in reverst order."
   (interactive)
   (let (compilation-read-command)
     (beancount--run "bean-report" buffer-file-name "bal")))
+
+;;;###autoload
+(defun +beancount/clone-transaction ()
+  "TODO"
+  (interactive)
+  (save-restriction
+    (widen)
+    (when-let (transaction
+               (completing-read
+                "Clone transaction: "
+                (string-lines (buffer-string))
+                (doom-partial #'string-match-p "^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\} [*!] ")
+                t))
+      (goto-char (point-min))
+      (re-search-forward (concat "^" (regexp-quote transaction)))
+      (+beancount/clone-this-transaction t))))
+
+;;;###autoload
+(defun +beancount/clone-this-transaction (&optional arg)
+  "Copy the current transaction to the bottom of the ledger.
+Updates the date to today"
+  (interactive "P")
+  (if (and (not arg) (looking-at-p "^$"))
+      (call-interactively #'+beancount/clone-transaction)
+    (save-restriction
+      (widen)
+      (let ((transaction
+             (buffer-substring-no-properties
+              (save-excursion
+                (beancount-goto-transaction-begin)
+                (re-search-forward " " nil t)
+                (point))
+              (save-excursion
+                (beancount-goto-transaction-end)
+                (point)))))
+        (goto-char (point-max))
+        (delete-blank-lines)
+        (beancount-insert-date)
+        (insert transaction)))))

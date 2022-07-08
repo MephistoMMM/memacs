@@ -44,6 +44,8 @@ list is returned as-is."
 ;;
 ;;; Public library
 
+(define-obsolete-function-alias 'doom-enlist 'ensure-list "v3.0.0")
+
 (defun doom-unquote (exp)
   "Return EXP unquoted."
   (declare (pure t) (side-effect-free t))
@@ -67,23 +69,6 @@ list is returned as-is."
   (declare (pure t) (side-effect-free t))
   (cl-check-type keyword keyword)
   (substring (symbol-name keyword) 1))
-
-(defmacro doom-log (format-string &rest args)
-  "Log to *Messages* if `doom-debug-p' is on.
-Does not display text in echo area, but still logs to *Messages*. Accepts the
-same arguments as `message'."
-  `(when doom-debug-p
-     (let ((inhibit-message (active-minibuffer-window)))
-       (message
-        ,(concat (propertize "DOOM " 'face 'font-lock-comment-face)
-                 (when (bound-and-true-p doom--current-module)
-                   (propertize
-                    (format "[%s/%s] "
-                            (doom-keyword-name (car doom--current-module))
-                            (cdr doom--current-module))
-                    'face 'warning))
-                 format-string)
-        ,@args))))
 
 (defalias 'doom-partial #'apply-partially)
 
@@ -211,8 +196,8 @@ TRIGGER-HOOK is a list of quoted hooks and/or sharp-quoted functions."
 
 (defun file! ()
   "Return the emacs lisp file this function is called from."
-  (cond ((bound-and-true-p byte-compile-current-file))
-        (load-file-name)
+  (cond (load-in-progress load-file-name)
+        ((bound-and-true-p byte-compile-current-file))
         ((stringp (car-safe current-load-list))
          (car current-load-list))
         (buffer-file-name)
@@ -222,9 +207,8 @@ TRIGGER-HOOK is a list of quoted hooks and/or sharp-quoted functions."
   "Lexically bind ENVVARS in BODY, like `let' but for `process-environment'."
   (declare (indent 1))
   `(let ((process-environment (copy-sequence process-environment)))
-     (dolist (var (list ,@(cl-loop for (var val) in envvars
-                                   collect `(cons ,var ,val))))
-       (setenv (car var) (cdr var)))
+     ,@(cl-loop for (var val) in envvars
+                collect `(setenv ,var ,val))
      ,@body))
 
 (defmacro letf! (bindings &rest body)
@@ -267,7 +251,7 @@ NAME, ARGLIST, and BODY are the same as `defun', `defun*', `defmacro', and
                   ,(if (eq type 'defun*)
                        `(cl-labels ((,@rest)) ,body)
                      `(cl-letf (((symbol-function #',(car rest))
-                                 (fn! ,(cadr rest) ,@(cddr rest))))
+                                 (lambda! ,(cadr rest) ,@(cddr rest))))
                         ,body))))
               (_
                (when (eq (car-safe type) 'function)
@@ -278,22 +262,22 @@ NAME, ARGLIST, and BODY are the same as `defun', `defun*', `defmacro', and
   "Run FORMS without generating any output.
 
 This silences calls to `message', `load', `write-region' and anything that
-writes to `standard-output'. In interactive sessions this won't suppress writing
-to *Messages*, only inhibit output in the echo area."
-  `(if doom-debug-p
+writes to `standard-output'. In interactive sessions this inhibits output to the
+echo-area, but not to *Messages*."
+  `(if init-file-debug
        (progn ,@forms)
-     ,(if doom-interactive-p
-          `(let ((inhibit-message t)
-                 (save-silently t))
-             (prog1 ,@forms (message "")))
-        `(letf! ((standard-output (lambda (&rest _)))
-                 (defun message (&rest _))
-                 (defun load (file &optional noerror nomessage nosuffix must-suffix)
-                   (funcall load file noerror t nosuffix must-suffix))
-                 (defun write-region (start end filename &optional append visit lockname mustbenew)
-                   (unless visit (setq visit 'no-message))
-                   (funcall write-region start end filename append visit lockname mustbenew)))
-           ,@forms))))
+     ,(if noninteractive
+          `(letf! ((standard-output (lambda (&rest _)))
+                   (defun message (&rest _))
+                   (defun load (file &optional noerror nomessage nosuffix must-suffix)
+                     (funcall load file noerror t nosuffix must-suffix))
+                   (defun write-region (start end filename &optional append visit lockname mustbenew)
+                     (unless visit (setq visit 'no-message))
+                     (funcall write-region start end filename append visit lockname mustbenew)))
+             ,@forms)
+        `(let ((inhibit-message t)
+               (save-silently t))
+           (prog1 ,@forms (message ""))))))
 
 (defmacro eval-if! (cond then &rest body)
   "Expands to THEN if COND is non-nil, to BODY otherwise.
@@ -314,7 +298,7 @@ See `eval-if!' for details on this macro's purpose."
 
 
 ;;; Closure factories
-(defmacro fn! (arglist &rest body)
+(defmacro lambda! (arglist &rest body)
   "Returns (cl-function (lambda ARGLIST BODY...))
 The closure is wrapped in `cl-function', meaning ARGLIST will accept anything
 `cl-defun' will. Implicitly adds `&allow-other-keys' if `&key' is present in
@@ -342,6 +326,70 @@ ARGLIST."
                    args)))
          (allow-other-keys arglist))
       ,@body)))
+
+(put 'doom--fn-crawl 'lookup-table
+     '((_  . 0) (_  . 1) (%2 . 2) (%3 . 3) (%4 . 4)
+       (%5 . 5) (%6 . 6) (%7 . 7) (%8 . 8) (%9 . 9)))
+(defun doom--fn-crawl (data args)
+  (cond ((symbolp data)
+         (when-let
+             (pos (cond ((eq data '%*) 0)
+                        ((memq data '(% %1)) 1)
+                        ((cdr (assq data (get 'doom--fn-crawl 'lookup-table))))))
+           (when (and (= pos 1)
+                      (aref args 1)
+                      (not (eq data (aref args 1))))
+             (error "%% and %%1 are mutually exclusive"))
+           (aset args pos data)))
+        ((and (not (eq (car-safe data) '!))
+              (or (listp data)
+                  (vectorp data)))
+         (let ((len (length data))
+               (i 0))
+           (while (< i len)
+             (doom--fn-crawl (elt data i) args)
+             (cl-incf i))))))
+
+(defmacro fn! (&rest args)
+  "Return an lambda with implicit, positional arguments.
+
+The function's arguments are determined recursively from ARGS.  Each symbol from
+`%1' through `%9' that appears in ARGS is treated as a positional argument.
+Missing arguments are named `_%N', which keeps the byte-compiler quiet.  `%' is
+a shorthand for `%1'; only one of these can appear in ARGS.  `%*' represents
+extra `&rest' arguments.
+
+Instead of:
+
+  (lambda (a _ c &rest d)
+    (if a c (cadr d)))
+
+you can use this macro and write:
+
+  (fn! (if %1 %3 (cadr %*)))
+
+which expands to:
+
+  (lambda (%1 _%2 %3 &rest %*)
+    (if %1 %3 (cadr %*)))
+
+This macro was adapted from llama.el (see https://git.sr.ht/~tarsius/llama),
+minus font-locking, the outer function call, and minor optimizations."
+  `(lambda ,(let ((argv (make-vector 10 nil)))
+              (doom--fn-crawl args argv)
+              `(,@(let ((i (1- (length argv)))
+                        (n -1)
+                        sym arglist)
+                    (while (> i 0)
+                      (setq sym (aref argv i))
+                      (unless (and (= n -1) (null sym))
+                        (cl-incf n)
+                        (push (or sym (intern (format "_%%%d" (1+ n))))
+                              arglist))
+                      (cl-decf i))
+                    arglist)
+                ,@(and (aref argv 0) '(&rest %*))))
+     ,@args))
 
 (defmacro cmd! (&rest body)
   "Returns (lambda () (interactive) ,@body)
@@ -397,14 +445,11 @@ See `general-key-dispatch' for what other arguments it accepts in BRANCHES."
                                      defs)
                            (t ,fallback))))))))
 
-(defalias 'kbd! 'general-simulate-key)
+(defalias 'kbd! #'general-simulate-key)
 
 ;; For backwards compatibility
-(defalias 'λ! 'cmd!)
-(defalias 'λ!! 'cmd!!)
-;; DEPRECATED These have been superseded by `cmd!' and `cmd!!'
-(define-obsolete-function-alias 'lambda! 'cmd! "3.0.0")
-(define-obsolete-function-alias 'lambda!! 'cmd!! "3.0.0")
+(defalias 'λ!  #'cmd!)
+(defalias 'λ!! #'cmd!!)
 
 
 ;;; Mutation
@@ -413,11 +458,11 @@ See `general-key-dispatch' for what other arguments it accepts in BRANCHES."
   `(setq ,sym (append ,sym ,@lists)))
 
 (defmacro setq! (&rest settings)
-  "A stripped-down `customize-set-variable' with the syntax of `setq'.
+  "A more sensible `setopt' for setting customizable variables.
 
-This can be used as a drop-in replacement for `setq'. Particularly when you know
-a variable has a custom setter (a :set property in its `defcustom' declaration).
-This triggers setters. `setq' does not."
+This can be used as a drop-in replacement for `setq' and *should* be used
+instead of `setopt'. Unlike `setq', this triggers custom setters on variables.
+Unlike `setopt', this won't needlessly pull in dependencies."
   (macroexp-progn
    (cl-loop for (var val) on settings by 'cddr
             collect `(funcall (or (get ',var 'custom-set) #'set)
@@ -427,11 +472,10 @@ This triggers setters. `setq' does not."
   "`delq' ELT from LIST in-place.
 
 If FETCHER is a function, ELT is used as the key in LIST (an alist)."
-  `(setq ,list
-         (delq ,(if fetcher
-                    `(funcall ,fetcher ,elt ,list)
-                  elt)
-               ,list)))
+  `(setq ,list (delq ,(if fetcher
+                          `(funcall ,fetcher ,elt ,list)
+                        elt)
+                     ,list)))
 
 (defmacro pushnew! (place &rest values)
   "Push VALUES sequentially into PLACE, if they aren't already present.
@@ -507,6 +551,8 @@ This is a wrapper around `eval-after-load' that:
                      (cons 'doom-error doom-core-dir))
                     ((file-in-directory-p source doom-private-dir)
                      (cons 'doom-private-error doom-private-dir))
+                    ((file-in-directory-p source (expand-file-name "cli" doom-core-dir))
+                     (cons 'doom-cli-error (expand-file-name "cli" doom-core-dir)))
                     ((cons 'doom-module-error doom-emacs-dir)))))
     (signal (car err)
             (list (file-relative-name
@@ -528,8 +574,8 @@ If NOERROR is non-nil, don't throw an error if the file doesn't exist."
                    (error "Could not detect path to look for '%s' in"
                           filename)))
          (file (if path
-                  `(expand-file-name ,filename ,path)
-                filename)))
+                   `(expand-file-name ,filename ,path)
+                 filename)))
     `(condition-case-unless-debug e
          (let (file-name-handler-alist)
            (load ,file ,noerror 'nomessage))
@@ -744,7 +790,28 @@ testing advice (when combined with `rotate-text').
 ;;
 ;;; Backports
 
-;; None at the moment!
+;; `format-spec' wasn't autoloaded until 28.1
+(unless (fboundp 'format-spec)
+  (autoload #'format-spec "format-spec"))
+
+;; Introduced in Emacs 28.1
+(unless (fboundp 'ensure-list)
+  (defun ensure-list (object)
+    "Return OBJECT as a list.
+If OBJECT is already a list, return OBJECT itself.  If it's
+not a list, return a one-element list containing OBJECT."
+    (declare (pure t) (side-effect-free t))
+    (if (listp object)
+        object
+      (list object))))
+
+;; Introduced in Emacs 28.1
+(unless (fboundp 'always)
+  (defun always (&rest _arguments)
+    "Do nothing and return t.
+This function accepts any number of ARGUMENTS, but ignores them.
+Also see `ignore'."
+    t))
 
 (provide 'core-lib)
 ;;; core-lib.el ends here

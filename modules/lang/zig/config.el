@@ -13,12 +13,12 @@
   (setq zig-format-on-save nil) ; rely on :editor format instead
 
   (when (featurep! +lsp)
-    (add-hook 'zig-mode-local-vars-hook #'lsp!))
+    (add-hook 'zig-mode-local-vars-hook #'lsp! 'append))
 
   (when (featurep! :checkers syntax)
     (flycheck-define-checker zig
-      "A zig syntax checker using the zig-fmt interpreter."
-      :command ("zig" "fmt" (eval (buffer-file-name)))
+      "A zig syntax checker using zig's `ast-check` command."
+      :command ("zig" "ast-check" (eval (buffer-file-name)))
       :error-patterns
       ((error line-start (file-name) ":" line ":" column ": error: " (message) line-end))
       :modes zig-mode)
@@ -30,3 +30,6 @@
         "f" #'zig-format-buffer
         "r" #'zig-run
         "t" #'zig-test-buffer))
+
+(eval-when! (featurep! +tree-sitter)
+  (add-hook! 'zig-mode-local-vars-hook #'tree-sitter!))

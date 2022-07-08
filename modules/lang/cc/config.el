@@ -280,7 +280,7 @@ If rtags or rdm aren't available, fail silently instead of throwing a breaking e
   :init
   (defvar ccls-sem-highlight-method 'font-lock)
   (after! projectile
-    (add-to-list 'projectile-globally-ignored-directories ".ccls-cache")
+    (add-to-list 'projectile-globally-ignored-directories "^.ccls-cache$")
     (add-to-list 'projectile-project-root-files-bottom-up ".ccls-root")
     (add-to-list 'projectile-project-root-files-top-down-recurring "compile_commands.json"))
   ;; Avoid using `:after' because it ties the :config below to when `lsp-mode'
@@ -304,3 +304,9 @@ If rtags or rdm aren't available, fail silently instead of throwing a breaking e
                                               "-isystem/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
                                               "-isystem/usr/local/include"]
                                   :resourceDir (cdr (doom-call-process "clang" "-print-resource-dir"))))))))
+
+;; Tree sitter
+(eval-when! (featurep! +tree-sitter)
+  (add-hook! '(c-mode-local-vars-hook
+               c++-mode-local-vars-hook)
+             #'tree-sitter!))

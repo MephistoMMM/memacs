@@ -111,76 +111,80 @@ uses a straight or package.el command directly).")
 ;;; Bootstrappers
 
 (defun doom--ensure-straight (recipe pin)
-  (let ((repo-dir (doom-path straight-base-dir "straight/repos/straight.el"))
-        (repo-url (concat "http" (if gnutls-verify-error "s")
-                          "://github.com/"
-                          (or (plist-get recipe :repo) "raxod502/straight.el")))
-        (branch (or (plist-get recipe :branch) straight-repository-branch))
-        (call (if doom-debug-p
+  (letenv! (("GIT_CONFIG" nil)
+            ("GIT_CONFIG_NOSYSTEM" "1")
+            ("GIT_CONFIG_GLOBAL" (or (getenv "DOOMGITCONFIG")
+                                     "/dev/null")))
+    (let ((repo-dir (doom-path straight-base-dir "straight/repos/straight.el"))
+          (repo-url (concat "http" (if gnutls-verify-error "s")
+                            "://github.com/"
+                            (or (plist-get recipe :repo) "radian-software/straight.el")))
+          (branch (or (plist-get recipe :branch) straight-repository-branch))
+          (call (if init-file-debug
+                    (lambda (&rest args)
+                      (print! "%s" (cdr (apply #'doom-call-process args))))
                   (lambda (&rest args)
-                    (print! "%s" (cdr (apply #'doom-call-process args))))
-                (lambda (&rest args)
-                  (apply #'doom-call-process args)))))
-    (unless (file-directory-p repo-dir)
-      (save-match-data
-        (unless (executable-find "git")
-          (user-error "Git isn't present on your system. Cannot proceed."))
-        (let* ((version (cdr (doom-call-process "git" "version")))
-               (version
-                (and (string-match "\\_<[0-9]+\\.[0-9]+\\(\\.[0-9]+\\)\\_>" version)
-                     (match-string 0 version))))
-          (if version
-              (when (version< version "2.23")
-                (user-error "Git %s detected! Doom requires git 2.23 or newer!"
-                            version)))))
-      (print! (start "Installing straight..."))
-      (print-group!
-       (cl-destructuring-bind (depth . options)
-           (doom-enlist straight-vc-git-default-clone-depth)
-         (let ((branch-switch (if (memq 'single-branch options)
-                                  "--single-branch"
-                                "--no-single-branch")))
-           (cond
-            ((eq 'full depth)
-             (funcall call "git" "clone" "--origin" "origin"
-                      branch-switch repo-url repo-dir))
-            ((integerp depth)
-             (if (null pin)
-                 (progn
-                   (when (file-directory-p repo-dir)
-                     (delete-directory repo-dir 'recursive))
-                   (funcall call "git" "clone" "--origin" "origin" repo-url
-                            "--no-checkout" repo-dir
+                    (apply #'doom-call-process args)))))
+      (unless (file-directory-p repo-dir)
+        (save-match-data
+          (unless (executable-find "git")
+            (user-error "Git isn't present on your system. Cannot proceed."))
+          (let* ((version (cdr (doom-call-process "git" "version")))
+                 (version
+                  (and (string-match "\\_<[0-9]+\\.[0-9]+\\(\\.[0-9]+\\)\\_>" version)
+                       (match-string 0 version))))
+            (if version
+                (when (version< version "2.23")
+                  (user-error "Git %s detected! Doom requires git 2.23 or newer!"
+                              version)))))
+        (print! (start "Installing straight..."))
+        (print-group!
+         (cl-destructuring-bind (depth . options)
+             (doom-enlist straight-vc-git-default-clone-depth)
+           (let ((branch-switch (if (memq 'single-branch options)
+                                    "--single-branch"
+                                  "--no-single-branch")))
+             (cond
+              ((eq 'full depth)
+               (funcall call "git" "clone" "--origin" "origin"
+                        branch-switch repo-url repo-dir))
+              ((integerp depth)
+               (if (null pin)
+                   (progn
+                     (when (file-directory-p repo-dir)
+                       (delete-directory repo-dir 'recursive))
+                     (funcall call "git" "clone" "--origin" "origin" repo-url
+                              "--no-checkout" repo-dir
+                              "--depth" (number-to-string depth)
+                              branch-switch
+                              "--no-tags"
+                              "--branch" straight-repository-branch))
+                 (make-directory repo-dir 'recursive)
+                 (let ((default-directory repo-dir))
+                   (funcall call "git" "init")
+                   (funcall call "git" "branch" "-m" straight-repository-branch)
+                   (funcall call "git" "remote" "add" "origin" repo-url
+                            "--master" straight-repository-branch)
+                   (funcall call "git" "fetch" "origin" pin
                             "--depth" (number-to-string depth)
-                            branch-switch
-                            "--no-tags"
-                            "--branch" straight-repository-branch))
-               (make-directory repo-dir 'recursive)
-               (let ((default-directory repo-dir))
-                 (funcall call "git" "init")
-                 (funcall call "git" "branch" "-m" straight-repository-branch)
-                 (funcall call "git" "remote" "add" "origin" repo-url
-                          "--master" straight-repository-branch)
-                 (funcall call "git" "fetch" "origin" pin
-                          "--depth" (number-to-string depth)
-                          "--no-tags")
-                 (funcall call "git" "reset" "--hard" pin)))))))))
-    (require 'straight (concat repo-dir "/straight.el"))
-    (doom-log "Initializing recipes")
-    (mapc #'straight-use-recipes
-          '((org-elpa :local-repo nil)
-            (melpa              :type git :host github
-                                :repo "melpa/melpa"
-                                :build nil)
-            (gnu-elpa-mirror    :type git :host github
-                                :repo "emacs-straight/gnu-elpa-mirror"
-                                :build nil)
-            (el-get             :type git :host github
-                                :repo "dimitri/el-get"
-                                :build nil)
-            (emacsmirror-mirror :type git :host github
-                                :repo "emacs-straight/emacsmirror-mirror"
-                                :build nil)))))
+                            "--no-tags")
+                   (funcall call "git" "reset" "--hard" pin)))))))))
+      (require 'straight (concat repo-dir "/straight.el"))
+      (doom-log "Initializing recipes")
+      (mapc #'straight-use-recipes
+            '((org-elpa :local-repo nil)
+              (melpa              :type git :host github
+                                  :repo "melpa/melpa"
+                                  :build nil)
+              (gnu-elpa-mirror    :type git :host github
+                                  :repo "emacs-straight/gnu-elpa-mirror"
+                                  :build nil)
+              (el-get             :type git :host github
+                                  :repo "dimitri/el-get"
+                                  :build nil)
+              (emacsmirror-mirror :type git :host github
+                                  :repo "emacs-straight/emacsmirror-mirror"
+                                  :build nil))))))
 
 (defun doom--ensure-core-packages (packages)
   (doom-log "Installing core packages")
@@ -476,8 +480,8 @@ Accepts the following properties:
        be installed or uninstalled. Use this to pin 2nd order dependencies.
  :recipe RECIPE
    Specifies a straight.el recipe to allow you to acquire packages from external
-   sources. See https://github.com/raxod502/straight.el#the-recipe-format for
-   details on this recipe.
+   sources. See https://github.com/radian-software/straight.el#the-recipe-format
+   for details on this recipe.
  :disable BOOL
    Do not install or update this package AND disable all of its `use-package!'
    and `after!' blocks.
@@ -496,48 +500,47 @@ Returns t if package is successfully registered, and nil if it was disabled
 elsewhere."
   (declare (indent defun))
   (when (and recipe (keywordp (car-safe recipe)))
-    (plist-put! plist :recipe `(quote ,recipe)))
+    (cl-callf plist-put plist :recipe `(quote ,recipe)))
   ;; :built-in t is basically an alias for :ignore (locate-library NAME)
   (when built-in
     (when (and (not ignore)
                (equal built-in '(quote prefer)))
       (setq built-in `(locate-library ,(symbol-name name) nil (get 'load-path 'initial-value))))
-    (plist-delete! plist :built-in)
-    (plist-put! plist :ignore built-in))
+    (cl-callf map-delete plist :built-in)
+    (cl-callf plist-put plist :ignore built-in))
   `(let* ((name ',name)
           (plist (cdr (assq name doom-packages))))
      ;; Record what module this declaration was found in
      (let ((module-list (plist-get plist :modules))
            (module ',(doom-module-from-path)))
        (unless (member module module-list)
-         (plist-put! plist :modules
-                     (append module-list
-                             (list module)
-                             (when (file-in-directory-p ,(dir!) doom-private-dir)
-                               '((:private . modules)))
-                             nil))))
+         (cl-callf plist-put plist :modules
+                   (append module-list
+                           (list module)
+                           (when (file-in-directory-p ,(dir!) doom-private-dir)
+                             '((:private . modules)))
+                           nil))))
      ;; Merge given plist with pre-existing one
-     (doplist! ((prop val) (list ,@plist) plist)
-       (unless (null val)
-         (plist-put! plist prop val)))
+     (cl-loop for (key value) on (list ,@plist) by 'cddr
+              when value
+              do (cl-callf plist-put plist key value))
      ;; Some basic key validation; throws an error on invalid properties
      (condition-case e
          (when-let (recipe (plist-get plist :recipe))
            (cl-destructuring-bind
                (&key local-repo _files _flavor
                      _build _pre-build _post-build _includes
-                     _type _repo _host _branch
+                     _type _repo _host _branch _protocol
                      _remote _nonrecursive _fork _depth)
                recipe
              ;; Expand :local-repo from current directory
              (when local-repo
-               (plist-put!
-                plist :recipe
-                (plist-put recipe :local-repo
-                           (let ((local-path (expand-file-name local-repo ,(dir!))))
-                             (if (file-directory-p local-path)
-                                 local-path
-                               local-repo)))))))
+               (cl-callf plist-put plist :recipe
+                         (plist-put recipe :local-repo
+                                    (let ((local-path (expand-file-name local-repo ,(dir!))))
+                                      (if (file-directory-p local-path)
+                                          local-path
+                                        local-repo)))))))
        (error
         (signal 'doom-package-error
                 (cons ,(symbol-name name)

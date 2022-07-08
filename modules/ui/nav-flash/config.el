@@ -13,6 +13,7 @@
 ;;
 ;;; Packages
 
+;; DEPRECATED To be replaced with pulsar.el when Emacs 28 support is dropped
 (use-package! nav-flash
   :defer t
   :init
@@ -21,6 +22,7 @@
   (add-hook! '(imenu-after-jump-hook
                better-jumper-post-jump-hook
                counsel-grep-post-action-hook
+               consult-after-jump-hook
                dumb-jump-after-jump-hook)
              #'+nav-flash-blink-cursor-maybe-h)
 

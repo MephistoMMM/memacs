@@ -9,7 +9,7 @@
   :preface
   (setq lsp-java-server-install-dir (concat doom-user-dot-local-dir "share/eclipse.jdt.ls/server/")
         lsp-java-workspace-dir (concat doom-etc-dir "java-workspace"))
-  (add-hook! 'java-mode-local-vars-hook #'lsp!)
+  (add-hook 'java-mode-local-vars-hook #'lsp! 'append)
   :config
   (when (file-exists-p java-lombok-jar-path)
     (add-to-list 'lsp-java-vmargs (concat "-javaagent:" java-lombok-jar-path)))

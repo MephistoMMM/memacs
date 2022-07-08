@@ -22,7 +22,7 @@
 (use-package! lsp-sourcekit
   :when (featurep! +lsp)
   :after swift-mode
-  :init (add-hook 'swift-mode-local-vars-hook #'lsp!)
+  :init (add-hook 'swift-mode-local-vars-hook #'lsp! 'append)
   :config
   (setq lsp-sourcekit-executable
         (cl-find-if #'executable-find
@@ -31,3 +31,7 @@
                           "sourcekit"
                           "/Library/Developer/Toolchains/swift-latest.xctoolchain/usr/bin/sourcekit-lsp"
                           "/Library/Developer/Toolchains/swift-latest.xctoolchain/usr/bin/sourcekit"))))
+
+;; Tree sitter
+(eval-when! (featurep! +tree-sitter)
+  (add-hook! 'swift-mode-local-vars-hook #'tree-sitter!))

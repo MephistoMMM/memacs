@@ -1,8 +1,12 @@
 ;;; lang/org/contrib/roam2.el -*- lexical-binding: t; -*-
 ;;;###if (featurep! +roam2)
 
-(defvar +org-roam-open-buffer-on-find-file t
-  "If non-nil, open the org-roam buffer when opening an org roam file.")
+(defvar +org-roam-auto-backlinks-buffer nil
+  "If non-nil, open and close the org-roam backlinks buffer automatically.
+
+This ensures the backlinks buffer is always present so long as an org roam file
+is visible. Once they are all closed or killed, the backlinks buffer will be
+closed.")
 
 (defvar +org-roam-link-to-org-use-id 'create-if-interactive
   "`org-roam-directory' local value for `org-id-link-to-org-use-id'.
@@ -20,7 +24,6 @@ of org-mode to properly utilize ID links.")
   ;; for these variables. If not, default values will be set in the :config
   ;; section.
   (defvar org-roam-directory nil)
-  (defvar org-roam-db-location nil)
 
   :init
   (doom-load-packages-incrementally
@@ -45,99 +48,117 @@ the database. See `+org-init-roam-h' for the launch process."
     "Setup `org-roam' but don't immediately initialize its database.
 Instead, initialize it when it will be actually needed."
     (letf! ((#'org-roam-db-sync #'ignore))
-      (org-roam-setup))
-    (defadvice! +org-roam-try-init-db-a (&rest _)
-      "Try to initialize org-roam database at the last possible safe moment.
+      (org-roam-db-autosync-enable)))
+
+  (defadvice! +org-roam-try-init-db-a (&rest _)
+    "Try to initialize org-roam database at the last possible safe moment.
 In case of failure, fail gracefully."
-      :before #'org-roam-db-query
-      (message "Initializing org-roam database...")
-      (let ((run-cleanup-p t))
-        (unwind-protect
-            ;; Try to build the binary if it doesn't exist. In case of failure
-            ;; this will error, run the cleanup and exit, and in case of success
-            ;; this will return nil and sync the database.
-            (setq run-cleanup-p (emacsql-sqlite-ensure-binary))
-          (when run-cleanup-p
-            (setq org-roam--sqlite-available-p nil)
-            (org-roam-teardown)
-            (message (concat "EmacSQL failied to build SQLite binary for org-roam; "
-                             "see *Compile-Log* buffer for details.\n"
-                             "To try reinitialize org-roam, run \"M-x org-roam-setup\"")))))
-      (advice-remove 'org-roam-db-query #'+org-roam-try-init-db-a)
-      (org-roam-db-sync)))
+    :before #'org-roam-db-query
+    (message "Initializing org-roam database...")
+    (let ((run-cleanup-p t))
+      (unwind-protect
+          ;; Try to build the binary if it doesn't exist. In case of failure
+          ;; this will error, run the cleanup and exit, and in case of success
+          ;; this will return nil and sync the database.
+          (setq run-cleanup-p (emacsql-sqlite-ensure-binary))
+        (when run-cleanup-p
+          (setq org-roam--sqlite-available-p nil)
+          (org-roam-teardown)
+          (message (concat "EmacSQL failied to build SQLite binary for org-roam; "
+                           "see *Compile-Log* buffer for details.\n"
+                           "To try reinitialize org-roam, run \"M-x org-roam-setup\"")))))
+    (advice-remove 'org-roam-db-query #'+org-roam-try-init-db-a)
+    (org-roam-db-sync))
 
   (setq org-roam-directory
         (thread-first (or org-roam-directory "roam")
           (expand-file-name org-directory)
           (file-truename)
           (file-name-as-directory))
-        org-roam-db-location
-        (or org-roam-db-location
-            (concat doom-etc-dir "org-roam.db"))
         org-roam-node-display-template
-        "${doom-hierarchy:*} ${doom-tags:45}"
+        (format "${doom-hierarchy:*} %s %s"
+                (propertize "${doom-type:12}" 'face 'font-lock-keyword-face)
+                (propertize "${doom-tags:42}" 'face 'org-tag))
         org-roam-completion-everywhere t
-        org-roam-mode-section-functions
-        #'(org-roam-backlinks-section
-           org-roam-reflinks-section))
+        org-roam-db-gc-threshold most-positive-fixnum
+        ;; Reverse the default to favor faster searchers over slower ones.
+        org-roam-list-files-commands '(fd fdfind rg find))
+
+  (add-to-list 'org-roam-node-template-prefixes '("doom-tags" . "#"))
+  (add-to-list 'org-roam-node-template-prefixes '("doom-type" . "@"))
+
+  ;; REVIEW Remove when addressed upstream. See org-roam/org-roam#2066.
+  (defadvice! +org--roam-fix-completion-width-for-vertico-a (fn &rest args)
+    "Fixes completion candidate width for vertico users."
+    :around #'org-roam-node-read--to-candidate
+    (letf! (defun org-roam-node--format-entry (template node &optional width)
+             (funcall org-roam-node--format-entry template node
+                      (if (bound-and-true-p vertico-mode)
+                          (if (minibufferp)
+                              (window-width)
+                            (1- (frame-width)))
+                        width)))
+      (apply fn args)))
 
   (setq-hook! 'org-roam-find-file-hook
     org-id-link-to-org-use-id +org-roam-link-to-org-use-id)
 
-  ;; Normally, the org-roam buffer doesn't open until you explicitly call
-  ;; `org-roam'. If `+org-roam-open-buffer-on-find-file' is non-nil, the
-  ;; org-roam buffer will be opened for you whenever you visit a file in
-  ;; `org-roam-directory'.
+  ;; Normally, the org-roam buffer won't open until `org-roam-buffer-toggle' is
+  ;; explicitly called. If `+org-roam-open-buffer-on-find-file' is non-nil, the
+  ;; org-roam buffer will automatically open whenever a file in
+  ;; `org-roam-directory' is visited and closed when no org-roam buffers remain.
   (add-hook! 'org-roam-find-file-hook :append
-    (defun +org-roam-open-with-buffer-maybe-h ()
-      (and +org-roam-open-buffer-on-find-file
-           (not org-roam-capture--node) ;; don't proc for roam capture buffers
-           (not org-capture-mode) ;; don't proc for normal capture buffers
-           (not (eq 'visible (org-roam-buffer--visibility)))
-           (org-roam-buffer-toggle))))
+    (defun +org-roam-enable-auto-backlinks-buffer-h ()
+      (add-hook 'doom-switch-buffer-hook #'+org-roam-manage-backlinks-buffer-h)))
 
   (set-popup-rules!
     `((,(regexp-quote org-roam-buffer) ; persistent org-roam buffer
-       :side right :width .33 :height .5 :ttl nil :modeline nil :quit nil :slot 1)
+       :side right :width 0.33 :height 0.5 :ttl nil :modeline nil :quit nil :slot 1)
       ("^\\*org-roam: " ; node dedicated org-roam buffer
-       :side right :width .33 :height .5 :ttl nil :modeline nil :quit nil :slot 2)))
+       :side right :width 0.33 :height 0.5 :ttl nil :modeline nil :quit nil :slot 2)))
 
+  ;; Soft-wrap lines in the backlinks buffer
   (add-hook 'org-roam-mode-hook #'turn-on-visual-line-mode)
 
-  (map! (:map org-mode-map
-         :localleader
-         :prefix ("m" . "org-roam")
-         "D" #'org-roam-demote-entire-buffer
-         "f" #'org-roam-node-find
-         "F" #'org-roam-ref-find
-         "g" #'org-roam-graph
-         "i" #'org-roam-node-insert
-         "I" #'org-id-get-create
-         "m" #'org-roam-buffer-toggle
-         "M" #'org-roam-buffer-display-dedicated
-         "n" #'org-roam-capture
-         "r" #'org-roam-refile
-         "R" #'org-roam-link-replace-all
-         (:prefix ("d" . "by date")
-          :desc "Goto previous note" "b" #'org-roam-dailies-goto-previous-note
-          :desc "Goto date"          "d" #'org-roam-dailies-goto-date
-          :desc "Capture date"       "D" #'org-roam-dailies-capture-date
-          :desc "Goto next note"     "f" #'org-roam-dailies-goto-next-note
-          :desc "Goto tomorrow"      "m" #'org-roam-dailies-goto-tomorrow
-          :desc "Capture tomorrow"   "M" #'org-roam-dailies-capture-tomorrow
-          :desc "Capture today"      "n" #'org-roam-dailies-capture-today
-          :desc "Goto today"         "t" #'org-roam-dailies-goto-today
-          :desc "Capture today"      "T" #'org-roam-dailies-capture-today
-          :desc "Goto yesterday"     "y" #'org-roam-dailies-goto-yesterday
-          :desc "Capture yesterday"  "Y" #'org-roam-dailies-capture-yesterday
-          :desc "Find directory"     "-" #'org-roam-dailies-find-directory)
-         (:prefix ("o" . "node properties")
-          "a" #'org-roam-alias-add
-          "A" #'org-roam-alias-remove
-          "t" #'org-roam-tag-add
-          "T" #'org-roam-tag-remove
-          "r" #'org-roam-ref-add
-          "R" #'org-roam-ref-remove)))
+  ;; Use a 'roam:X' link's description if X is empty.
+  ;; TODO PR this upstream?
+  (advice-add #'org-roam-link-follow-link :filter-args #'org-roam-link-follow-link-with-description-a)
+  (advice-add #'org-roam-link-replace-at-point :override #'org-roam-link-replace-at-point-a)
+
+  (map! :map org-mode-map
+        :localleader
+        :prefix ("m" . "org-roam")
+        "D" #'org-roam-demote-entire-buffer
+        "f" #'org-roam-node-find
+        "F" #'org-roam-ref-find
+        "g" #'org-roam-graph
+        "i" #'org-roam-node-insert
+        "I" #'org-id-get-create
+        "m" #'org-roam-buffer-toggle
+        "M" #'org-roam-buffer-display-dedicated
+        "n" #'org-roam-capture
+        "r" #'org-roam-refile
+        "R" #'org-roam-link-replace-all
+        (:prefix ("d" . "by date")
+         :desc "Goto previous note" "b" #'org-roam-dailies-goto-previous-note
+         :desc "Goto date"          "d" #'org-roam-dailies-goto-date
+         :desc "Capture date"       "D" #'org-roam-dailies-capture-date
+         :desc "Goto next note"     "f" #'org-roam-dailies-goto-next-note
+         :desc "Goto tomorrow"      "m" #'org-roam-dailies-goto-tomorrow
+         :desc "Capture tomorrow"   "M" #'org-roam-dailies-capture-tomorrow
+         :desc "Capture today"      "n" #'org-roam-dailies-capture-today
+         :desc "Goto today"         "t" #'org-roam-dailies-goto-today
+         :desc "Capture today"      "T" #'org-roam-dailies-capture-today
+         :desc "Goto yesterday"     "y" #'org-roam-dailies-goto-yesterday
+         :desc "Capture yesterday"  "Y" #'org-roam-dailies-capture-yesterday
+         :desc "Find directory"     "-" #'org-roam-dailies-find-directory)
+        (:prefix ("o" . "node properties")
+         "a" #'org-roam-alias-add
+         "A" #'org-roam-alias-remove
+         "t" #'org-roam-tag-add
+         "T" #'org-roam-tag-remove
+         "r" #'org-roam-ref-add
+         "R" #'org-roam-ref-remove))
 
   (when (featurep! :editor evil +everywhere)
     (add-hook! 'org-roam-mode-hook
@@ -169,6 +190,7 @@ sections seems to ignore the detachment."
           :nv "zC"      #'magit-section-hide-children
           :nv "zo"      #'magit-section-show
           :nv "zO"      #'magit-section-show-children
+          :nv "zm"      #'magit-section-show-level-2-all
           :nv "zr"      #'magit-section-show-level-4-all
           :nv "C-j"     #'magit-section-forward
           :nv "C-k"     #'magit-section-backward

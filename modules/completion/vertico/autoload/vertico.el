@@ -27,7 +27,7 @@
                   (unless recursive "--maxdepth 1 ")
                   "--null --line-buffered --color=never --max-columns=1000 "
                   "--path-separator /   --smart-case --no-heading --line-number "
-                  "--hidden -g !.git "
+                  "--hidden -g !.git -g !.svn -g !.hg "
                   (mapconcat #'shell-quote-argument args " ")
                   " ."))
          (prompt (if (stringp prompt) (string-trim prompt) "Search"))
@@ -38,7 +38,7 @@
          (consult-async-split-styles-alist consult-async-split-styles-alist))
     ;; Change the split style if the initial query contains the separator.
     (when query
-      (cl-destructuring-bind (&key type separator initial)
+      (cl-destructuring-bind (&key type separator initial _function)
           (consult--async-split-style)
         (pcase type
           (`separator
@@ -95,16 +95,16 @@ Supports exporting consult-grep to wgrep, file to wdeired, and consult-location 
   (interactive)
   (require 'embark)
   (require 'wgrep)
-  (pcase-let ((`(,type . ,candidates)
-               (run-hook-with-args-until-success 'embark-candidate-collectors)))
-    (pcase type
-      ('consult-grep (let ((embark-after-export-hook #'wgrep-change-to-wgrep-mode))
-                       (embark-export)))
-      ('file (let ((embark-after-export-hook #'wdired-change-to-wdired-mode))
-               (embark-export)))
-      ('consult-location (let ((embark-after-export-hook #'occur-edit-mode))
-                           (embark-export)))
-      (x (user-error "embark category %S doesn't support writable export" x)))))
+  (let* ((edit-command
+          (pcase-let ((`(,type . ,candidates)
+                       (run-hook-with-args-until-success 'embark-candidate-collectors)))
+            (pcase type
+              ('consult-grep #'wgrep-change-to-wgrep-mode)
+              ('file #'wdired-change-to-wdired-mode)
+              ('consult-location #'occur-edit-mode)
+              (x (user-error "embark category %S doesn't support writable export" x)))))
+         (embark-after-export-hook `(,@embark-after-export-hook ,edit-command)))
+    (embark-export)))
 
 ;;;###autoload
 (defun +vertico/embark-preview ()
@@ -205,23 +205,6 @@ targets."
          keymap)
        nil nil t (lambda (binding)
                    (not (string-suffix-p "-argument" (cdr binding))))))))
-
-;;;###autoload
-(defun +vertico/crm-select ()
-  "Enter candidate in `consult-completing-read-multiple'"
-  (interactive)
-  (let ((idx vertico--index))
-    (unless (get-text-property 0 'consult--crm-selected (nth vertico--index vertico--candidates))
-      (setq idx (1+ idx)))
-    (run-at-time 0 nil (cmd! (vertico--goto idx) (vertico--exhibit))))
-  (vertico-exit))
-
-;;;###autoload
-(defun +vertico/crm-exit ()
-  "Enter candidate in `consult-completing-read-multiple'"
-  (interactive)
-  (run-at-time 0 nil #'vertico-exit)
-  (vertico-exit))
 
 ;;;###autoload
 (defun +vertico--consult--fd-builder (input)

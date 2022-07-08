@@ -2,6 +2,6 @@
 ;;; app/rss/packages.el
 
 (package! elfeed :pin "162d7d545ed41c27967d108c04aa31f5a61c8e16")
-(package! elfeed-goodies :pin "95b4ea632fbd5960927952ec8f3394eb88da4752")
+(package! elfeed-goodies :pin "c9d9cd196746add3010d74f43b5c9866562f39fb")
 (when (featurep! +org)
-  (package! elfeed-org :pin "268efdd0121fa61f63b722c30e0951c5d31224a4"))
+  (package! elfeed-org :pin "d28c858303e60dcb3a6eb18ea85ee3cb9e3dd623"))

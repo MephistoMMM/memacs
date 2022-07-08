@@ -2,7 +2,7 @@
 
 (after! elm-mode
   (if (featurep! +lsp)
-      (add-hook 'elm-mode-local-vars-hook #'lsp!)
+      (add-hook 'elm-mode-local-vars-hook #'lsp! 'append)
     (set-company-backend! 'elm-mode 'company-elm))
  
   (set-repl-handler! 'elm-mode #'run-elm-interactive)
@@ -21,3 +21,7 @@
   :when (featurep! :checkers syntax)
   :after elm-mode
   :config (add-to-list 'flycheck-checkers 'elm))
+
+;; Tree sitter
+(eval-when! (featurep! +tree-sitter)
+  (add-hook! 'elm-mode-local-vars-hook #'tree-sitter!))

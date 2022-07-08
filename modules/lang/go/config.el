@@ -30,7 +30,7 @@
     :not "!")
 
   (if (featurep! +lsp)
-      (add-hook 'go-mode-local-vars-hook #'lsp!)
+      (add-hook 'go-mode-local-vars-hook #'lsp! 'append)
     (add-hook 'go-mode-hook #'go-eldoc-setup))
 
   (map! :map go-mode-map
@@ -86,3 +86,7 @@
 (use-package! flycheck-golangci-lint
   :when (featurep! :checkers syntax)
   :hook (go-mode . flycheck-golangci-lint-setup))
+
+;; Tree sitter
+(eval-when! (featurep! +tree-sitter)
+  (add-hook! 'go-mode-local-vars-hook #'tree-sitter!))

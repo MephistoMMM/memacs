@@ -1,6 +1,59 @@
 ;;; lang/fortran/autoload.el -*- lexical-binding: t; -*-
 
 ;;
+;;; Generalised Building
+
+;;;###autoload
+(defun +fortran/build ()
+  "Compile a Fortran project or file.
+
+If the current file is detected to be within an fpm project, then
+building will occur with fpm. Otherwise it will default to ifort
+or gfortran, depending on what feature flags are set."
+  (interactive)
+  (cond ((+fortran--fpm-toml) (+fortran/fpm-build))
+        ((featurep! +intel) (+fortran/ifort-compile))
+        (t (+fortran/gfortran-compile))))
+
+;;;###autoload
+(defun +fortran/run ()
+  "Run a Fortran project or file.
+
+If the current file is detected to be within an fpm project, then
+building will occur with fpm. Otherwise it will default to ifort
+or gfortran, depending on what feature flags are set."
+  (interactive)
+  (cond ((+fortran--fpm-toml) (+fortran/fpm-run))
+        ((featurep! +intel) (+fortran/ifort-run))
+        (t (+fortran/gfortran-run))))
+
+(defun +fortran--exec-name ()
+  "The name of the output executable."
+  (file-name-sans-extension buffer-file-name))
+
+;;
+;;; Intel Fortran
+
+;;;###autoload
+(defun +fortran/ifort-compile ()
+  "Compile the current buffer using ifort."
+  (interactive)
+  (compile (format "ifort %S -o %S"
+                   (buffer-file-name)
+                   (+fortran--exec-name))))
+
+;;;###autoload
+(defun +fortran/ifort-run ()
+  "Run the current buffer using ifort."
+  (interactive)
+  (let ((exec (+fortran--exec-name)))
+    (delete-file exec)
+    (+fortran/ifort-compile)
+    (while (not (file-exists-p exec))
+      (sleep-for 1))
+    (compile (format "%S" exec))))
+
+;;
 ;;; GFortran
 
 (defun +fortran--std ()
@@ -18,23 +71,32 @@
 (defun +fortran/gfortran-compile ()
   "Compile the current buffer using gfortran."
   (interactive)
-  (compile (format "gfortran %s %s"
+  (compile (format "gfortran %s %S -o %S"
                    (+fortran--std)
-                   buffer-file-name)))
+                   buffer-file-name
+                   (+fortran--exec-name))))
 
 ;;;###autoload
 (defun +fortran/gfortran-run ()
   "Run the current buffer using gfortran."
   (interactive)
-  (delete-file "./a.out")
-  (+fortran/gfortran-compile)
-  (while (not (file-exists-p "./a.out"))
-    (sleep-for 1))
-  (compile "./a.out"))
-
+  (let ((exec (+fortran--exec-name)))
+    (delete-file exec)
+    (+fortran/gfortran-compile)
+    (while (not (file-exists-p exec))
+      (sleep-for 1))
+    (compile (format "%S" exec))))
 
 ;;
 ;;; FPM
+
+;;;###autoload
+(defun +fortran--fpm-toml ()
+  "If this is an fpm project, find its toml file."
+  (when-let* ((project-root (doom-project-root))
+              (toml (expand-file-name "fpm.toml" project-root)))
+    (when (file-exists-p toml)
+      toml)))
 
 ;;;###autoload
 (defun +fortran/fpm-build ()

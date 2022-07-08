@@ -26,6 +26,7 @@ employed so that flycheck still does *some* helpful linting.")
 
 (use-package! elisp-mode
   :mode ("\\.Cask\\'" . emacs-lisp-mode)
+  :interpreter ("doomscript" . emacs-lisp-mode)
   :config
   (set-repl-handler! '(emacs-lisp-mode lisp-interaction-mode) #'+emacs-lisp/open-repl)
   (set-eval-handler! '(emacs-lisp-mode lisp-interaction-mode) #'+emacs-lisp-eval)
@@ -119,7 +120,7 @@ employed so that flycheck still does *some* helpful linting.")
         ret)))
 
   (map! :localleader
-        :map emacs-lisp-mode-map
+        :map (emacs-lisp-mode-map lisp-interaction-mode-map)
         :desc "Expand macro" "m" #'macrostep-expand
         (:prefix ("d" . "debug")
           "f" #'+emacs-lisp/edebug-instrument-defun-on

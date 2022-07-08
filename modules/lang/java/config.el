@@ -53,3 +53,6 @@ If the depth is 2, the first two directories are removed: net.lissner.game.")
 ;; antlr4
 (use-package! antlr-mode
   :mode "\\.g4$")
+;; Tree sitter
+(eval-when! (featurep! +tree-sitter)
+  (add-hook! 'java-mode-local-vars-hook #'tree-sitter!))

@@ -6,7 +6,7 @@
 ;;      while it is lexically bound, you get "Defining as dynamic an already
 ;;      lexical var" errors in Emacs 28+).
 ;;;###autoload (defvar projectile-project-root nil)
-;;;###autoload (defvar projectile-enable-caching doom-interactive-p)
+;;;###autoload (defvar projectile-enable-caching (not noninteractive))
 ;;;###autoload (defvar projectile-require-project-root 'prompt)
 
 ;;;###autodef
@@ -72,7 +72,9 @@ they are absolute."
 ;;;###autoload
 (defun doom/add-directory-as-project (dir)
   "Register an arbitrary directory as a project.
-If DIR is not a valid project, a .project file will be created within it. This
+
+Unlike `projectile-add-known-project', if DIR isn't a valid project, a .project
+file will be created within it so that it will always be treated as one. This
 command will throw an error if a parent of DIR is a valid project (which would
 mask DIR)."
   (interactive "D")
@@ -85,7 +87,7 @@ mask DIR)."
                     short-dir (abbreviate-file-name proj-dir)))
       (message "%S was not a project; adding .project file to it"
                short-dir (abbreviate-file-name proj-dir))
-      (projectile-add-known-project directory))))
+      (projectile-add-known-project dir))))
 
 
 ;;

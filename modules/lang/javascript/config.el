@@ -2,7 +2,7 @@
 
 (after! projectile
   (pushnew! projectile-project-root-files "package.json")
-  (pushnew! projectile-globally-ignored-directories "node_modules" "flow-typed"))
+  (pushnew! projectile-globally-ignored-directories "^node_modules$" "^flow-typed$"))
 
 
 ;;
@@ -93,8 +93,10 @@
 (use-package! typescript-mode
   :hook (typescript-mode . rainbow-delimiters-mode)
   :hook (typescript-tsx-mode . rainbow-delimiters-mode)
-  :commands typescript-tsx-mode
   :init
+  (when (featurep! :lang web)
+    (autoload 'typescript-tsx-mode "typescript-mode" nil t))
+
   ;; REVIEW We associate TSX files with `typescript-tsx-mode' derived from
   ;;        `web-mode' because `typescript-mode' does not officially support
   ;;        JSX/TSX. See emacs-typescript/typescript.el#4
@@ -125,7 +127,16 @@
     (define-derived-mode typescript-tsx-mode web-mode "TypeScript-TSX")
     (when (featurep! +lsp)
       (after! lsp-mode
-        (add-to-list 'lsp--formatting-indent-alist '(typescript-tsx-mode . typescript-indent-level)))))
+        (add-to-list 'lsp--formatting-indent-alist '(typescript-tsx-mode . typescript-indent-level))))
+    (when (featurep! +tree-sitter)
+      (after! evil-textobj-tree-sitter
+        (pushnew! evil-textobj-tree-sitter-major-mode-language-alist '(typescript-tsx-mode . "tsx")))
+      (after! tree-sitter
+        (pushnew! tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx)))
+      ;; HACK: the tsx grammer doesn't work with the hightlighting provided by
+      ;;   font-lock-keywords. See emacs-tree-sitter/tree-sitter-langs#23
+      (setq-hook! 'typescript-tsx-mode-hook
+        tree-sitter-hl-use-font-lock-keywords nil)))
 
   (set-docsets! '(typescript-mode typescript-tsx-mode)
     :add "TypeScript" "AngularTS")
@@ -309,3 +320,12 @@ to tide."
 
 (def-project-mode! +javascript-gulp-mode
   :when (locate-dominating-file default-directory "gulpfile.js"))
+
+;; Tree sitter
+(eval-when! (featurep! +tree-sitter)
+  (add-hook! '(js-mode-local-vars-hook
+               js2-mode-local-vars-hook
+               typescript-mode-local-vars-hook
+               typescript-tsx-mode-local-vars-hook
+               rjsx-mode-local-vars-hook)
+             #'tree-sitter!))

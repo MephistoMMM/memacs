@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# This is a shebang interpreter for launching Emacs Lisp scripts with Doom's CLI
+# framework preloaded, plus any environment variables it needs. Use it like so:
+#
+#   #!/usr/bin/env doomscript
+#   (print! "Hello world!")
+#
+# For this to work (and to avoid absolute paths in your shebang line), I
+# recommend having this file in your $PATH:
+#
+#   export PATH="$HOME/.emacs.d/bin:$PATH"
+#
+# This isn't used for bin/doom because of the $PATH/absolute path requirement
+# (and using $BASH_SOURCE to locate it would reduce its POSIX compliance), but
+# this shouldn't be an issue for folks writing their own CLIs.
+
+case "$EMACS" in
+    *term*) EMACS=emacs ;;
+    *) EMACS="${EMACS:-emacs}" ;;
+esac
+
+emacs="$EMACS -q --no-site-file --no-x-resources --no-splash --batch"
+
+TMPDIR="${TMPDIR:-$($emacs --eval '(princ (temporary-file-directory))' 2>/dev/null)}"
+if [ -z "$TMPDIR" ]; then
+    >&2 echo "Error: failed to run Emacs with command '$EMACS'"
+    >&2 echo
+    >&2 echo "Are you sure Emacs is installed and in your \$PATH?"
+    exit 1
+fi
+
+export EMACSDIR="${EMACSDIR:-$(cd $(dirname "$BASH_SOURCE")/.. && pwd)}"
+export __DOOMPID="${__DOOMPID:-$$}"
+export __DOOMSTEP="$((__DOOMSTEP+1))"
+export __DOOMGEOM="${__DOOMGEOM:-`tput cols lines 2>/dev/null`}"
+export __DOOMGPIPE=${__DOOMGPIPE:-$__DOOMPIPE}
+export __DOOMPIPE=; [ -t 0 ] || __DOOMPIPE+=0; [ -t 1 ] || __DOOMPIPE+=1
+
+tmpfile="$TMPDIR/doomscript.${__DOOMPID}"
+
+target="$1"
+shift
+$emacs --load "$EMACSDIR/core/core-cli" \
+       --load "$target" \
+       -- "$@" || exit=$?
+# Execute exit-script, if requested (to simulate execve)
+if [ "${exit:-0}" -eq 254 ]; then
+    sh "${tmpdir}/doom.${__DOOMPID}.${__DOOMSTEP}.sh" "$0" "$@" && true
+    exit="$?"
+fi
+exit $exit

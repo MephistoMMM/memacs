@@ -66,7 +66,7 @@
 
 
 (when (featurep! +lsp)
-  (add-hook 'julia-mode-local-vars-hook #'lsp!))
+  (add-hook 'julia-mode-local-vars-hook #'lsp! 'append))
 
 
 (use-package! lsp-julia
@@ -80,12 +80,7 @@
   (unless lsp-julia-default-environment
     (setq lsp-julia-default-environment
           (or (car (last (doom-glob "~/.julia/environments/v*")))
-              "~/.julia/environments/v1.0")))
-  :config
-  ;; See non-Jedi/lsp-julia#35
-  (setq-hook! 'julia-mode-hook
-    lsp-enable-folding t
-    lsp-folding-range-limit 100))
+              "~/.julia/environments/v1.6"))))
 
 
 (use-package! eglot-jl
@@ -94,8 +89,12 @@
   :after eglot
   :preface
   ;; Prevent auto-install of LanguageServer.jl
-  (setq eglot-jl-language-server-project "~/.julia/environments/v1.0")
+  (setq eglot-jl-language-server-project "~/.julia/environments/v1.6")
   :init
   ;; Prevent timeout while installing LanguageServer.jl
   (setq-hook! 'julia-mode-hook eglot-connect-timeout (max eglot-connect-timeout 60))
   :config (eglot-jl-init))
+
+;; Tree sitter
+(eval-when! (featurep! +tree-sitter)
+  (add-hook! 'julia-mode-local-vars-hook #'tree-sitter!))

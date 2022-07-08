@@ -38,7 +38,7 @@
     (set-repl-handler! 'clojurescript-mode #'+clojure/open-cljs-repl :persist t)
     (set-eval-handler! '(clojure-mode clojurescript-mode clojurec-mode) #'cider-eval-region))
 
-  ;; HACK Fix raxod502/radian#446: CIDER tries to calculate the frame's
+  ;; HACK Fix radian-software/radian#446: CIDER tries to calculate the frame's
   ;;   background too early; sometimes before the initial frame has been
   ;;   initialized, causing errors.
   (defvar cider-docview-code-background-color nil)
@@ -47,9 +47,10 @@
   (add-transient-hook! #'cider-stacktrace-render-cause     (cider--stacktrace-adapt-to-theme))
   :config
   (add-hook 'cider-mode-hook #'eldoc-mode)
-  (set-lookup-handlers! '(cider-mode cider-repl-mode)
-    :definition #'+clojure-cider-lookup-definition
-    :documentation #'cider-doc)
+  (unless (featurep! +lsp)
+    (set-lookup-handlers! '(cider-mode cider-repl-mode)
+      :definition #'+clojure-cider-lookup-definition
+      :documentation #'cider-doc))
   (set-popup-rules!
     '(("^\\*cider-error*" :ignore t)
       ("^\\*cider-repl" :quit nil :ttl nil)
@@ -79,6 +80,14 @@
         ;; prepared for your cursor to suddenly change buffers without warning.
         ;; See https://github.com/clojure-emacs/cider/issues/1872
         cider-repl-pop-to-buffer-on-connect 'display-only)
+
+  (when (featurep! +lsp)
+    (setq cider-eldoc-display-for-symbol-at-point nil
+          cider-font-lock-dynamically nil)
+    (add-hook! 'cider-mode-hook
+      (defun +clojure--cider-disable-completion ()
+        "Use lsp completion instead of cider."
+        (remove-hook 'completion-at-point-functions #'cider-complete-at-point t))))
 
   ;; Error messages emitted from CIDER is silently funneled into *nrepl-server*
   ;; rather than the *cider-repl* buffer. How silly. We might want to see that
@@ -234,13 +243,18 @@
 (use-package! clj-refactor
   :hook (clojure-mode . clj-refactor-mode)
   :config
-  (set-lookup-handlers! 'clj-refactor-mode
-    :references #'cljr-find-usages)
+  (unless (featurep! +lsp)
+    (set-lookup-handlers! 'clj-refactor-mode
+      :references #'cljr-find-usages))
+  (when (featurep! +lsp)
+    (setq cljr-add-ns-to-blank-clj-files nil))
   (map! :map clojure-mode-map
         :localleader
         :desc "refactor" "R" #'hydra-cljr-help-menu/body))
 
 
+;; clojure-lsp already uses clj-kondo under the hood
 (use-package! flycheck-clj-kondo
-  :when (featurep! :checkers syntax)
+  :when (and (featurep! :checkers syntax)
+             (not (featurep! +lsp)))
   :after flycheck)

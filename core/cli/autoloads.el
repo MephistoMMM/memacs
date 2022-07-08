@@ -7,8 +7,7 @@ These packages have silly or destructive autoload files that try to load
 everyone in the universe and their dog, causing errors that make babies cry. No
 one wants that.")
 
-(defvar doom-autoloads-excluded-files
-  '("/bufler/bufler-workspaces-tabs\\.el$")
+(defvar doom-autoloads-excluded-files ()
   "List of regexps whose matching files won't be indexed for autoloads.")
 
 (defvar doom-autoloads-cached-vars
@@ -31,6 +30,9 @@ one wants that.")
 (defun doom-autoloads-reload (&optional file)
   "Regenerates Doom's autoloads and writes them to FILE."
   (unless file
+    ;; TODO Uncomment when profile system is implemented
+    ;; (make-directory doom-profile-dir t)
+    ;; (setq file (expand-file-name "init.el" doom-profile-dir))
     (setq file doom-autoloads-file))
   (print! (start "(Re)generating autoloads file..."))
   (print-group!
@@ -60,7 +62,10 @@ one wants that.")
                   (seq-difference (hash-table-keys straight--build-cache)
                                   doom-autoloads-excluded-packages))
           doom-autoloads-excluded-files
-          'literal))
+          'literal)
+         ;; TODO Uncomment when profile system is implemented
+         ;; `((unless noninteractive (require 'core-start)))
+         )
         (print! (start "Byte-compiling autoloads file..."))
         (doom-autoloads--compile-file file)
         (print! (success "Generated %s")
@@ -86,7 +91,7 @@ one wants that.")
 
 (defun doom-autoloads--compile-file (file)
   (condition-case-unless-debug e
-      (let ((byte-compile-warnings (if doom-debug-p byte-compile-warnings)))
+      (let ((byte-compile-warnings (if init-file-debug byte-compile-warnings)))
         (and (byte-compile-file file)
              (load (byte-compile-dest-file file) nil t)))
     (error
@@ -129,10 +134,10 @@ one wants that.")
         (cond ((and (not module-enabled-p) altform)
                (print (read altform)))
               ((memq definer '(defun defmacro cl-defun cl-defmacro))
-               (if module-enabled-p
-                   (print (make-autoload form file))
-                 (cl-destructuring-bind (_ _ arglist &rest body) form
-                   (print
+               (print
+                (if module-enabled-p
+                    (make-autoload form file)
+                  (seq-let (_ _ arglist &rest body) form
                     (if altform
                         (read altform)
                       (append
@@ -142,21 +147,20 @@ one wants that.")
                                (_ type))
                              symbol arglist
                              (format "THIS FUNCTION DOES NOTHING BECAUSE %s IS DISABLED\n\n%s"
-                                     module
-                                     (if (stringp (car body))
-                                         (pop body)
-                                       "No documentation.")))
+                                     module (if (stringp (car body))
+                                                (pop body)
+                                              "No documentation.")))
                        (cl-loop for arg in arglist
-                                if (and (symbolp arg)
-                                        (not (keywordp arg))
-                                        (not (memq arg cl--lambda-list-keywords)))
+                                if (symbolp arg)
+                                if (not (keywordp arg))
+                                if (not (memq arg cl--lambda-list-keywords))
                                 collect arg into syms
                                 else if (listp arg)
                                 collect (car arg) into syms
                                 finally return (if syms `((ignore ,@syms)))))))))
                (print `(put ',symbol 'doom-module ',module)))
               ((eq definer 'defalias)
-               (cl-destructuring-bind (_ _ target &optional docstring) form
+               (seq-let (_ _ target docstring) form
                  (unless module-enabled-p
                    (setq target #'ignore
                          docstring
@@ -173,16 +177,19 @@ one wants that.")
          ;; to recentf.
          find-file-hook
          write-file-functions
-         ;; Prevent a possible source of crashes when there's a syntax error
-         ;; in the autoloads file
+         ;; Prevent a possible source of crashes when there's a syntax error in
+         ;; the autoloads file.
          debug-on-error
+         ;; Non-nil interferes with autoload generation in Emacs < 29. See
+         ;; radian-software/straight.el#904.
+         (left-margin 0)
          ;; The following bindings are in `package-generate-autoloads'.
-         ;; Presumably for a good reason, so I just copied them
+         ;; Presumably for a good reason, so I just copied them.
          (backup-inhibited t)
          (version-control 'never)
          case-fold-search    ; reduce magic
          autoload-timestamps ; reduce noise in generated files
-         ;; Needed for `autoload-generate-file-autoloads'
+         ;; So `autoload-generate-file-autoloads' knows where to write it
          (generated-autoload-load-name (file-name-sans-extension file))
          (target-buffer (current-buffer))
          (module (doom-module-from-path file))
@@ -196,12 +203,15 @@ one wants that.")
        file target-buffer module module-enabled-p))))
 
 (defun doom-autoloads--scan (files &optional exclude literal)
+  "Scan and return all autoloaded forms in FILES.
+
+Autoloads will be generated from autoload cookies in FILES (except those that
+match one of the regexps in EXCLUDE -- a list of strings). If LITERAL is
+non-nil, treat FILES as pre-generated autoload files instead."
   (require 'autoload)
   (let (autoloads)
     (dolist (file files (nreverse (delq nil autoloads)))
-      (when (and (or (null exclude)
-                     (seq-remove (doom-rpartial #'string-match-p file)
-                                 exclude))
+      (when (and (not (seq-find (doom-rpartial #'string-match-p file) exclude))
                  (file-readable-p file))
         (doom-log "Scanning %s" file)
         (setq file (file-truename file))
@@ -210,15 +220,14 @@ one wants that.")
               (insert-file-contents file)
             (doom-autoloads--scan-file file))
           (save-excursion
-            (let ((filestr (prin1-to-string file)))
-              (while (re-search-forward "\\_<load-file-name\\_>" nil t)
-                ;; `load-file-name' is meaningless in a concatenated
-                ;; mega-autoloads file, so we replace references to it with the
-                ;; file they came from.
-                (let ((ppss (save-excursion (syntax-ppss))))
-                  (or (nth 3 ppss)
-                      (nth 4 ppss)
-                      (replace-match filestr t t))))))
+            (while (re-search-forward "\\_<load-file-name\\_>" nil t)
+              ;; `load-file-name' is meaningless in a concatenated
+              ;; mega-autoloads file, but also essential in isolation, so we
+              ;; replace references to it with the file they came from.
+              (let ((ppss (save-excursion (syntax-ppss))))
+                (or (nth 3 ppss)
+                    (nth 4 ppss)
+                    (replace-match (prin1-to-string file) t t)))))
           (let ((load-file-name file)
                 (load-path
                  (append (list doom-private-dir)

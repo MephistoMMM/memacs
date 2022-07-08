@@ -102,6 +102,10 @@
        :prefix "gz"
        :nv "d" #'evil-mc-make-and-goto-next-match
        :nv "D" #'evil-mc-make-and-goto-prev-match
+       :nv "s" #'evil-mc-skip-and-goto-next-match
+       :nv "S" #'evil-mc-skip-and-goto-prev-match
+       :nv "c" #'evil-mc-skip-and-goto-next-cursor
+       :nv "C" #'evil-mc-skip-and-goto-prev-cursor
        :nv "j" #'evil-mc-make-cursor-move-next-line
        :nv "k" #'evil-mc-make-cursor-move-prev-line
        :nv "m" #'evil-mc-make-all-cursors
@@ -323,37 +327,39 @@
 
       ;;; <leader> b --- buffer
       (:prefix-map ("b" . "buffer")
-        :desc "Toggle narrowing"            "-"   #'doom/toggle-narrow-buffer
-        :desc "Previous buffer"             "["   #'previous-buffer
-        :desc "Next buffer"                 "]"   #'next-buffer
-        (:when (featurep! :ui workspaces)
-          :desc "Switch workspace buffer" "b" #'persp-switch-to-buffer
-          :desc "Switch buffer"           "B" #'switch-to-buffer)
-        (:unless (featurep! :ui workspaces)
-          :desc "Switch buffer"           "b" #'switch-to-buffer)
-        :desc "Clone buffer"                "c"   #'clone-indirect-buffer
-        :desc "Clone buffer other window"   "C"   #'clone-indirect-buffer-other-window
-        :desc "Kill buffer"                 "d"   #'kill-current-buffer
+       :desc "Toggle narrowing"            "-"   #'doom/toggle-narrow-buffer
+       :desc "Previous buffer"             "["   #'previous-buffer
+       :desc "Next buffer"                 "]"   #'next-buffer
+       (:when (featurep! :ui workspaces)
+        :desc "Switch workspace buffer" "b" #'persp-switch-to-buffer
+        :desc "Switch buffer"           "B" #'switch-to-buffer)
+       (:unless (featurep! :ui workspaces)
+        :desc "Switch buffer"           "b" #'switch-to-buffer)
+       :desc "Clone buffer"                "c"   #'clone-indirect-buffer
+       :desc "Clone buffer other window"   "C"   #'clone-indirect-buffer-other-window
+       :desc "Kill buffer"                 "d"   #'kill-current-buffer
         (:when (featurep! :ui doom-dashboard)
         :desc "Dashbord"                    "h"   #'doom/switch-to-dashboard-or-scratch)
-        :desc "ibuffer"                     "i"   #'ibuffer
-        :desc "Kill buffer"                 "k"   #'kill-current-buffer
-        :desc "Kill all buffers"            "K"   #'doom/kill-all-buffers
-        :desc "Switch to last buffer"       "l"   #'evil-switch-to-windows-last-buffer
-        :desc "Set bookmark"                "m"   #'bookmark-set
-        :desc "Delete bookmark"             "M"   #'bookmark-delete
-        :desc "Next buffer"                 "n"   #'next-buffer
-        :desc "New empty buffer"            "N"   #'evil-buffer-new
-        :desc "Kill other buffers"          "O"   #'doom/kill-other-buffers
-        :desc "Previous buffer"             "p"   #'previous-buffer
-        :desc "Revert buffer"               "r"   #'revert-buffer
-        :desc "Save buffer"                 "s"   #'basic-save-buffer
-        :desc "Save all buffers"            "S"   #'evil-write-all
-        :desc "Save buffer as root"         "u"   #'doom/sudo-save-buffer
-        :desc "Pop up scratch buffer"       "x"   #'doom/open-scratch-buffer
-        :desc "Switch to scratch buffer"    "X"   #'doom/switch-to-scratch-buffer
-        :desc "Bury buffer"                 "z"   #'bury-buffer
-        :desc "Kill buried buffers"         "Z"   #'doom/kill-buried-buffers)
+       :desc "ibuffer"                     "i"   #'ibuffer
+       :desc "Kill buffer"                 "k"   #'kill-current-buffer
+       :desc "Kill all buffers"            "K"   #'doom/kill-all-buffers
+       :desc "Switch to last buffer"       "l"   #'evil-switch-to-windows-last-buffer
+       :desc "Set bookmark"                "m"   #'bookmark-set
+       :desc "Delete bookmark"             "M"   #'bookmark-delete
+       :desc "Next buffer"                 "n"   #'next-buffer
+       :desc "New empty buffer"            "N"   #'evil-buffer-new
+       :desc "Kill other buffers"          "O"   #'doom/kill-other-buffers
+       :desc "Previous buffer"             "p"   #'previous-buffer
+       :desc "Revert buffer"               "r"   #'revert-buffer
+       :desc "Rename buffer"               "R"   #'rename-buffer
+       :desc "Save buffer"                 "s"   #'basic-save-buffer
+       :desc "Save all buffers"            "S"   #'evil-write-all
+       :desc "Save buffer as root"         "u"   #'doom/sudo-save-buffer
+       :desc "Pop up scratch buffer"       "x"   #'doom/open-scratch-buffer
+       :desc "Switch to scratch buffer"    "X"   #'doom/switch-to-scratch-buffer
+       :desc "Yank buffer"                 "y"   #'+default/yank-buffer-contents
+       :desc "Bury buffer"                 "z"   #'bury-buffer
+       :desc "Kill buried buffers"         "Z"   #'doom/kill-buried-buffers)
 
       ;;; <leader> c --- code
       (:prefix-map ("c" . "code")
@@ -632,7 +638,8 @@
         :desc "Send project to Transmit"   "U" #'+macos/send-project-to-transmit
         :desc "Send to Launchbar"          "l" #'+macos/send-to-launchbar
         :desc "Send project to Launchbar"  "L" #'+macos/send-project-to-launchbar
-        :desc "Open in iTerm"              "i" #'+macos/open-in-iterm)
+        :desc "Open in iTerm"              "i" #'+macos/open-in-iterm
+        :desc "Open in new iTerm window"   "I" #'+macos/open-in-iterm-new-window)
        (:when (featurep! :tools docker)
         :desc "Docker" "D" #'docker)
        (:when (featurep! :email mu4e)

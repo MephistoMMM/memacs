@@ -182,6 +182,7 @@ Dictionary.app behind the scenes to get definitions.")
 
   (use-package! consult-xref
     :when (featurep! :completion vertico)
+    :defer t
     :init
     (setq xref-show-xrefs-function       #'consult-xref
           xref-show-definitions-function #'consult-xref)))
@@ -196,7 +197,7 @@ Dictionary.app behind the scenes to get definitions.")
   :init
   (add-hook '+lookup-documentation-functions #'+lookup-dash-docsets-backend-fn)
   :config
-  (setq dash-docs-enable-debugging doom-debug-p
+  (setq dash-docs-enable-debugging init-file-debug
         dash-docs-docsets-path (concat doom-etc-dir "docsets/")
         dash-docs-min-length 2
         dash-docs-browser-func #'eww)
