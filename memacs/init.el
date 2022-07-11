@@ -206,9 +206,8 @@
        ;;literate
        (default +bindings +smartparens))
 
-(add-load-path! (concat (expand-file-name "~") "/.emacs.d/.local/straight/repos/doom-modeline") )
-(use-package! doom-modeline
-  :after all-the-icons)
+;(add-load-path! (concat (expand-file-name "~") "/.emacs.d/.local/straight/repos/doom-modeline") )
+;(use-package! doom-modeline :after all-the-icons)
 
 (defvar doom-user-dot-local-dir (expand-file-name "~/.local/")
   "Directory for .local of user")
