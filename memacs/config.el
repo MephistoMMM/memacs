@@ -149,5 +149,5 @@
   :nm "d" #'kana-details)
  )
 
-(when (featurep! :lang org)
+(when (modulep! :lang org)
   (load! "+org"))

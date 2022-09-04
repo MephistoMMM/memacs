@@ -198,21 +198,6 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
     (when-let* ((context (org-element-context))
                 (path (org-element-property :path context)))
       (pcase (org-element-property :type context)
-        ("kbd"
-         (format "%s %s"
-                 (propertize "Key sequence:" 'face 'bold)
-                 (propertize (+org-read-kbd-at-point path context)
-                             'face 'help-key-binding)))
-        ("doom-module"
-         (format "%s %s"
-                 (propertize "Doom module:" 'face 'bold)
-                 (propertize (+org-read-link-description-at-point path)
-                             'face 'org-priority)))
-        ("doom-package"
-         (format "%s %s"
-                 (propertize "Doom package:" 'face 'bold)
-                 (propertize (+org-read-link-description-at-point path)
-                             'face 'org-priority)))
         (type (format "Link: %s" (org-element-property :raw-link context))))))
 
   ;; Automatic indent detection in org files is meaningless
@@ -515,7 +500,7 @@ relative to `org-directory', unless it is an absolute path."
     :after #'org-capture-refile
     (+org-capture-cleanup-frame-h))
 
-  (when (featurep! :ui doom-dashboard)
+  (when (modulep! :ui doom-dashboard)
     (add-hook '+doom-dashboard-inhibit-functions #'+org-capture-frame-p)))
 
 
@@ -551,7 +536,8 @@ relative to `org-directory', unless it is an absolute path."
    :face (lambda (path)
            (if (or (file-remote-p path)
                    ;; filter out network shares on windows (slow)
-                   (and IS-WINDOWS (string-prefix-p "\\\\" path))
+                   (and IS-WINDOWS
+                        (string-prefix-p "\\\\" path))
                    (file-exists-p path))
                'org-link
              '(warning org-link))))
@@ -566,7 +552,9 @@ relative to `org-directory', unless it is an absolute path."
             '("duckduckgo"  . "https://duckduckgo.com/?q=%s")
             '("wikipedia"   . "https://en.wikipedia.org/wiki/%s")
             '("wolfram"     . "https://wolframalpha.com/input/?i=%s")
-            '("doom-repo"   . "https://github.com/hlissner/doom-emacs/%s"))
+            '("doom"        . "https://github.com/hlissner/doom-emacs/%s")
+            `("emacsdir"    . ,(doom-path doom-emacs-dir "%s"))
+            `("doomdir"     . ,(doom-path doom-user-dir "%s")))
 
   (+org-define-basic-link "org" 'org-directory)
   (+org-define-basic-link "doom" 'doom-emacs-dir)
@@ -634,15 +622,15 @@ relative to `org-directory', unless it is an absolute path."
         org-html-validation-link nil
         org-latex-prefer-user-labels t)
 
-  (when (featurep! :lang markdown)
+  (when (modulep! :lang markdown)
     (add-to-list 'org-export-backends 'md))
 
   (use-package! ox-hugo
-    :when (featurep! +hugo)
+    :when (modulep! +hugo)
     :after ox)
 
   (use-package! ox-pandoc
-    :when (featurep! +pandoc)
+    :when (modulep! +pandoc)
     :when (executable-find "pandoc")
     :after ox
     :init
@@ -715,17 +703,28 @@ mutating hooks on exported output, like formatters."
             '("show4levels*" org-startup-folded show4levels*)
             '("show5levels*" org-startup-folded show5levels*))
 
+  ;; TODO Upstream this.
+  (defadvice! +org--recursive-org-persist-mkdir-a (fn &rest args)
+    "`org-persist-write:index' does not recursively create
+`org-persist-directory', which causes an error if it's a parent doesn't exist."
+    :before #'org-persist-write:index
+    (make-directory org-persist-directory t))
+
   (defadvice! +org--more-startup-folded-options-a ()
     "Adds support for 'showNlevels*' startup options.
 Unlike showNlevels, this will also unfold parent trees."
-    :before #'org-set-startup-visibility
+    :before-until #'org-cycle-set-startup-visibility
     (when-let (n (pcase org-startup-folded
                    (`show2levels* 2)
                    (`show3levels* 3)
                    (`show4levels* 4)
                    (`show5levels* 5)))
-      (org-show-all '(headings drawers))
+      (org-fold-show-all '(headings))
       (save-excursion
+        (goto-char (point-max))
+        (save-restriction
+          (narrow-to-region (point-min) (or (re-search-forward org-outline-regexp-bol nil t) (point-max)))
+          (org-fold-hide-drawer-all))
         (goto-char (point-max))
         (let ((regexp (if (and (wholenump n) (> n 0))
                           (format "^\\*\\{%d,%d\\} " (1- n) n)
@@ -734,8 +733,9 @@ Unlike showNlevels, this will also unfold parent trees."
           (while (re-search-backward regexp nil t)
             (when (or (not (wholenump n))
                       (= (org-current-level) n))
-              (org-flag-region (line-end-position) last t 'outline))
-            (setq last (line-end-position 0)))))))
+              (org-fold-core-region (line-end-position) last t 'outline))
+            (setq last (line-end-position 0)))))
+      t))
 
   ;; Some uses of `org-fix-tags-on-the-fly' occur without a check on
   ;; `org-auto-align-tags', such as in `org-self-insert-command' and
@@ -886,13 +886,13 @@ between the two."
         "," #'org-switchb
         "." #'org-goto
         "@" #'org-cite-insert
-        (:when (featurep! :completion ivy)
+        (:when (modulep! :completion ivy)
          "." #'counsel-org-goto
          "/" #'counsel-org-goto-all)
-        (:when (featurep! :completion helm)
+        (:when (modulep! :completion helm)
          "." #'helm-org-in-buffer-headings
          "/" #'helm-org-agenda-files-headings)
-        (:when (featurep! :completion vertico)
+        (:when (modulep! :completion vertico)
          "." #'consult-org-heading
          "/" #'consult-org-agenda)
         "A" #'org-archive-subtree
@@ -923,7 +923,7 @@ between the two."
          "u" #'org-attach-url
          "s" #'org-attach-set-directory
          "S" #'org-attach-sync
-         (:when (featurep! +dragndrop)
+         (:when (modulep! +dragndrop)
           "c" #'org-download-screenshot
           "p" #'org-download-clipboard
           "P" #'org-download-yank))
@@ -949,7 +949,7 @@ between the two."
          (:prefix ("t" . "toggle")
           "f" #'org-table-toggle-formula-debugger
           "o" #'org-table-toggle-coordinate-overlays)
-         (:when (featurep! +gnuplot)
+         (:when (modulep! +gnuplot)
           "p" #'org-plot/gnuplot))
         (:prefix ("c" . "clock")
          "c" #'org-clock-cancel
@@ -974,13 +974,13 @@ between the two."
          "T" #'org-time-stamp-inactive)
         (:prefix ("g" . "goto")
          "g" #'org-goto
-         (:when (featurep! :completion ivy)
+         (:when (modulep! :completion ivy)
           "g" #'counsel-org-goto
           "G" #'counsel-org-goto-all)
-         (:when (featurep! :completion helm)
+         (:when (modulep! :completion helm)
           "g" #'helm-org-in-buffer-headings
           "G" #'helm-org-agenda-files-headings)
-         (:when (featurep! :completion vertico)
+         (:when (modulep! :completion vertico)
           "g" #'consult-org-heading
           "G" #'consult-org-agenda)
          "c" #'org-clock-goto
@@ -1116,7 +1116,7 @@ between the two."
 (use-package! org-clock ; built-in
   :commands org-clock-save
   :init
-  (setq org-clock-persist-file (concat doom-etc-dir "org-clock-save.el"))
+  (setq org-clock-persist-file (concat doom-data-dir "org-clock-save.el"))
   (defadvice! +org--clock-load-a (&rest _)
     "Lazy load org-clock until its commands are used."
     :before '(org-clock-in
@@ -1137,7 +1137,7 @@ between the two."
 
 
 (use-package! org-pdftools
-  :when (featurep! :tools pdf)
+  :when (modulep! :tools pdf)
   :commands org-pdftools-export
   :init
   (after! org
@@ -1167,9 +1167,10 @@ between the two."
 
 
 (use-package! evil-org
-  :when (featurep! :editor evil +everywhere)
+  :when (modulep! :editor evil +everywhere)
   :hook (org-mode . evil-org-mode)
   :hook (org-capture-mode . evil-insert-state)
+  :hook (doom-docs-org-mode . evil-org-mode)
   :init
   (defvar evil-org-retain-visual-state-on-shift t)
   (defvar evil-org-special-o/O '(table-row))
@@ -1249,7 +1250,7 @@ between the two."
 
 
 (use-package! evil-org-agenda
-  :when (featurep! :editor evil +everywhere)
+  :when (modulep! :editor evil +everywhere)
   :hook (org-agenda-mode . evil-org-agenda-mode)
   :config
   (evil-org-agenda-set-keys)
@@ -1273,9 +1274,9 @@ between the two."
   (defvar org-attach-id-dir nil)
   (defvar org-babel-python-command nil)
 
-  (setq org-publish-timestamp-directory (concat doom-cache-dir "org-timestamps/")
-        org-preview-latex-image-directory (concat doom-cache-dir "org-latex/")
-        org-persist-directory (concat doom-cache-dir "org-persist/")
+  (setq org-persist-directory (concat doom-cache-dir "org/persist/")
+        org-publish-timestamp-directory (concat doom-cache-dir "org/timestamps/")
+        org-preview-latex-image-directory (concat doom-cache-dir "org/latex/")
         ;; Recognize a), A), a., A., etc -- must be set before org is loaded.
         org-list-allow-alphabetical t)
 

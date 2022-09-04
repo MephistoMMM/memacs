@@ -7,5 +7,5 @@
 
 (load! "+lib-memacs")
 
-(when (featurep! +spacemacs)
+(when (modulep! +spacemacs)
   (load! "+lib-spacemacs"))

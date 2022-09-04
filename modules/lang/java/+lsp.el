@@ -1,5 +1,5 @@
 ;;; lang/java/+lsp.el -*- lexical-binding: t; -*-
-;;;###if (and (featurep! +lsp) (not (featurep! :tools lsp +eglot)))
+;;;###if (and (modulep! +lsp) (not (modulep! :tools lsp +eglot)))
 
 (defvar java-lombok-jar-path (expand-file-name "~/.local/share/lombok-1.18.10.jar")
   "The path of lombok.jar")
@@ -13,12 +13,12 @@
   :config
   (when (file-exists-p java-lombok-jar-path)
     (add-to-list 'lsp-java-vmargs (concat "-javaagent:" java-lombok-jar-path)))
-  (when (featurep! :tools debugger +lsp)
+  (when (modulep! :tools debugger +lsp)
     (setq lsp-jt-root (concat lsp-java-server-install-dir "java-test/server/")
           dap-java-test-runner (concat lsp-java-server-install-dir "test-runner/junit-platform-console-standalone.jar"))))
 
 (use-package! dap-java
-  :when (featurep! :tools debugger +lsp)
+  :when (modulep! :tools debugger +lsp)
   :commands dap-java-run-test-class dap-java-debug-test-class
   :init
   (map! :after cc-mode ; where `java-mode' is defined
