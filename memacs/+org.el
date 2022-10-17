@@ -9,7 +9,8 @@ Used in org file template")
 (setq org-directory "~/Dropbox/org"
       +org-capture-work-directory "~/Documents/works"
       org-attach-id-dir (expand-file-name "~/Dropbox/org/statics/")
-      org-download-image-dir (expand-file-name "~/Dropbox/org/statics/"))
+      org-download-image-dir (expand-file-name "~/Dropbox/org/statics/")
+      org-roam-directory (expand-file-name "roam" org-directory))
 
 ;; Export
 (setq org-pandoc-options-for-latex-pdf

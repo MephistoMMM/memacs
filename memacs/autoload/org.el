@@ -196,6 +196,7 @@ It is meant to be added to `org-export-before-parsing-hook'."
 (defvar memacs-org-roam-languages
   `(go
     python
+    clojure
     c
     shell
     java
