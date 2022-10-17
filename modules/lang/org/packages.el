@@ -96,6 +96,8 @@
     ;;       bumper fails to distinguish between org-roam v1 and v2.
     :recipe (:host github :repo "org-roam/org-roam")
     :pin "7f453f3fffb924ca4ae3f8d34cabc03fbcae0127")))
+(when IS-MAC
+  (package! org-mac-link :pin "0b18c1d070b9601cc65c40e902169e367e4348c9"))
 
 ;;; Babel
 (package! ob-async :pin "9aac486073f5c356ada20e716571be33a350a982")
