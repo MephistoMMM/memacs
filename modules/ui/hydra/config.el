@@ -15,6 +15,6 @@
     (funcall fn)))
 
 ;; Prevent doom modeline to flash while open
-(unless (featurep! modeline +light)
+(unless (modulep! modeline +light)
   (add-hook! doom-ts-enter #'+modeline-cancel-redisplay)
   (add-hook! doom-ts-exit #'+modeline-recover-redisplay))

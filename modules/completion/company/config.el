@@ -41,13 +41,13 @@
         company-dabbrev-ignore-case nil
         company-dabbrev-downcase nil)
 
-  (when (featurep! +tng)
+  (when (modulep! +tng)
     (add-hook 'global-company-mode-hook #'company-tng-mode))
 
   :config
-  (when (featurep! :editor evil)
+  (when (modulep! :editor evil)
     (add-hook 'company-mode-hook #'evil-normalize-keymaps)
-    (unless (featurep! +childframe)
+    (unless (modulep! +childframe)
       ;; Don't persist company popups when switching back to normal mode.
       ;; `company-box' aborts on mode switch so it doesn't need this.
       (add-hook! 'evil-normal-state-entry-hook
@@ -96,7 +96,7 @@
 
 
 (use-package! company-box
-  :when (featurep! +childframe)
+  :when (modulep! +childframe)
   :hook (company-mode . company-box-mode)
   :config
   (setq company-box-show-single-candidate t
@@ -181,7 +181,7 @@
 (use-package! company-dict
   :defer t
   :config
-  (setq company-dict-dir (expand-file-name "dicts" doom-private-dir))
+  (setq company-dict-dir (expand-file-name "dicts" doom-user-dir))
   (add-hook! 'doom-project-hook
     (defun +company-enable-project-dicts-h (mode &rest _)
       "Enable per-project dictionaries."
@@ -200,12 +200,12 @@
   :group 'doom-themes)
 
 (use-package! company-tabnine
-  :when (featurep! +childframe)
+  :when (modulep! +childframe)
   :after company
   :init
   (setq company-tabnine-binaries-folder "~/.local/share/Tabnine")
   :config
-  (if (featurep! :tools lsp +lsp)
+  (if (modulep! :tools lsp +lsp)
       (setq +lsp-company-backends '(:separate company-capf company-tabnine company-yasnippet))
     (push #'company-tabnine company-backends))
 
@@ -224,7 +224,7 @@
         (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
           ad-do-it))))
 
-  (when (featurep! +childframe)
+  (when (modulep! +childframe)
     (with-eval-after-load 'company-box
       (push #'+company/company-box-icons--tabnine company-box-icons-functions)
       (map-put company-box-backends-colors

@@ -1,5 +1,5 @@
 ;;; ui/workspaces/autoload/hydra.el -*- lexical-binding: t; -*-
-;;;###if (featurep! :ui hydra)
+;;;###if (modulep! :ui hydra)
 
 (defvar +workspace-default-layout-name "main"
   "Previously selected layout.")

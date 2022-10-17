@@ -56,7 +56,7 @@ default/fallback account."
   "Start email client."
   (interactive)
   (require 'mu4e)
-  (if (featurep! :ui workspaces)
+  (if (modulep! :ui workspaces)
       ;; delete current workspace if empty
       ;; this is useful when mu4e is in the daemon
       ;; as otherwise you can accumulate empty workspaces
@@ -67,7 +67,7 @@ default/fallback account."
     (setq +mu4e--old-wconf (current-window-configuration))
     (delete-other-windows)
     (switch-to-buffer (doom-fallback-buffer)))
-  (mu4e~start 'mu4e~main-view)
+  (mu4e)
   ;; (save-selected-window
   ;;   (prolusion-mail-show))
   )
@@ -119,7 +119,10 @@ will also be the width of all other printable characters."
         mu4e-headers-attach-mark     (cons "a" (+mu4e-normalised-icon "file-text-o" :color "silver"))
         mu4e-headers-encrypted-mark  (cons "x" (+mu4e-normalised-icon "lock"))
         mu4e-headers-signed-mark     (cons "s" (+mu4e-normalised-icon "certificate" :height 0.7 :color "dpurple"))
-        mu4e-headers-unread-mark     (cons "u" (+mu4e-normalised-icon "eye-slash" :v-adjust 0.05))))
+        mu4e-headers-unread-mark     (cons "u" (+mu4e-normalised-icon "eye-slash" :v-adjust 0.05))
+        mu4e-headers-list-mark       (cons "l" (+mu4e-normalised-icon "sitemap" :set "faicon"))
+        mu4e-headers-personal-mark   (cons "p" (+mu4e-normalised-icon "user"))
+        mu4e-headers-calendar-mark   (cons "c" (+mu4e-normalised-icon "calendar"))))
 
 (defun +mu4e-colorize-str (str &optional unique herring)
   "Apply a face from `+mu4e-header-colorized-faces' to STR.
@@ -188,6 +191,8 @@ is tomorrow.  With two prefixes, select the deadline."
                   (lev (org-outline-level))
                   (folded-p (invisible-p (point-at-eol)))
                   (from (plist-get msg :from)))
+              (if (consp (car from)) ; Occurs when using mu4e 1.8+.
+                  (setq from (car from)))
               ;; place the subheader
               (when folded-p (show-branches))    ; unfold if necessary
               (org-end-of-meta-data) ; skip property drawer
@@ -321,7 +326,7 @@ When otherwise called, open a dired buffer and enable `dired-mu4e-attach-ctrl-c-
 (defun +mu4e-kill-mu4e-h ()
   ;; (prolusion-mail-hide)
   (cond
-   ((and (featurep! :ui workspaces) (+workspace-exists-p +mu4e-workspace-name))
+   ((and (modulep! :ui workspaces) (+workspace-exists-p +mu4e-workspace-name))
     (+workspace/delete +mu4e-workspace-name))
 
    (+mu4e--old-wconf

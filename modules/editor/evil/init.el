@@ -21,9 +21,9 @@
 
 (when (and (not noninteractive)
            (not doom-reloading-p)
-           (featurep! +everywhere))
+           (modulep! +everywhere))
 
-  (setq evil-collection-company-use-tng (featurep! :completion company +tng)
+  (setq evil-collection-company-use-tng (modulep! :completion company +tng)
         ;; must be set before evil/evil-collection is loaded
         evil-want-keybinding nil)
 
@@ -136,7 +136,7 @@ variable for an explanation of the defaults (in comments). See
       elisp-slime-nav
       embark
       emms
-      ,@(when EMACS29+ '(emoji))
+      ,@(if (> emacs-major-version 28) '(emoji))
       epa
       ert
       eshell
@@ -226,7 +226,7 @@ variable for an explanation of the defaults (in comments). See
       scroll-lock
       selectrum
       sh-script
-      ,@(when EMACS28+ '(shortdoc))
+      ,@(if (> emacs-major-version 27) '(shortdoc))
       simple
       simple-mpc
       slime
@@ -293,9 +293,9 @@ and complains if a module is loaded too early (during startup)."
           (append (list doom-leader-key doom-localleader-key
                         doom-leader-alt-key)
                   evil-collection-key-blacklist
-                  (when (featurep! :tools lookup)
+                  (when (modulep! :tools lookup)
                     '("gd" "gf" "K"))
-                  (when (featurep! :tools eval)
+                  (when (modulep! :tools eval)
                     '("gr" "gR"))
                   '("[" "]" "gz" "<escape>")))
 

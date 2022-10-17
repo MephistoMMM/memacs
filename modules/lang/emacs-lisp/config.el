@@ -8,7 +8,7 @@
 This marks a foldable marker for `outline-minor-mode' in elisp buffers.")
 
 (defvar +emacs-lisp-disable-flycheck-in-dirs
-  (list doom-emacs-dir doom-private-dir)
+  (list doom-emacs-dir doom-user-dir)
   "List of directories to disable `emacs-lisp-checkdoc' in.
 
 This checker tends to produce a lot of false positives in your .emacs.d and
@@ -178,7 +178,7 @@ employed so that flycheck still does *some* helpful linting.")
 
 
 (use-package! flycheck-cask
-  :when (featurep! :checkers syntax)
+  :when (modulep! :checkers syntax)
   :defer t
   :init
   (add-hook! 'emacs-lisp-mode-hook
@@ -186,7 +186,7 @@ employed so that flycheck still does *some* helpful linting.")
 
 
 (use-package! flycheck-package
-  :when (featurep! :checkers syntax)
+  :when (modulep! :checkers syntax)
   :after flycheck
   :config (flycheck-package-setup))
 
