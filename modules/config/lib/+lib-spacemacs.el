@@ -58,3 +58,76 @@ Currently this function infloops when the list is circular."
     (while (and (consp tail) (not (keywordp (car tail))))
       (push (pop tail) result))
     (nreverse result)))
+
+;; BEGIN align functions
+
+;; modified function from http://emacswiki.org/emacs/AlignCommands
+(defun spacemacs/align-repeat (start end regexp &optional justify-right after)
+  "Repeat alignment with respect to the given regular expression.
+If JUSTIFY-RIGHT is non nil justify to the right instead of the
+left. If AFTER is non-nil, add whitespace to the left instead of
+the right."
+  (interactive "r\nsAlign regexp: ")
+  (let* ((ws-regexp (if (string-empty-p regexp)
+                        "\\(\\s-+\\)"
+                      "\\(\\s-*\\)"))
+         (complete-regexp (if after
+                              (concat regexp ws-regexp)
+                            (concat ws-regexp regexp)))
+         (group (if justify-right -1 1)))
+
+    (unless (use-region-p)
+      (save-excursion
+        (while (and
+                (string-match-p complete-regexp (thing-at-point 'line))
+                (= 0 (forward-line -1)))
+          (setq start (point-at-bol))))
+      (save-excursion
+        (while (and
+                (string-match-p complete-regexp (thing-at-point 'line))
+                (= 0 (forward-line 1)))
+          (setq end (point-at-eol)))))
+
+    (align-regexp start end complete-regexp group 1 t)))
+
+;; Modified answer from http://emacs.stackexchange.com/questions/47/align-vertical-columns-of-numbers-on-the-decimal-point
+(defun spacemacs/align-repeat-decimal (start end)
+  "Align a table of numbers on decimal points and dollar signs (both optional)"
+  (interactive "r")
+  (require 'align)
+  (align-region start end nil
+                '((nil (regexp . "\\([\t ]*\\)\\$?\\([\t ]+[0-9]+\\)\\.?")
+                       (repeat . t)
+                       (group 1 2)
+                       (spacing 1 1)
+                       (justify nil t)))
+                nil))
+
+(defmacro spacemacs|create-align-repeat-x (name regexp &optional justify-right default-after)
+  (let* ((new-func (intern (concat "spacemacs/align-repeat-" name)))
+         (new-func-defn
+          `(defun ,new-func (start end switch)
+             (interactive "r\nP")
+             (let ((after (not (eq (if switch t nil) (if ,default-after t nil)))))
+               (spacemacs/align-repeat start end ,regexp ,justify-right after)))))
+    (put new-func 'function-documentation "Created by `spacemacs|create-align-repeat-x'.")
+    new-func-defn))
+
+(spacemacs|create-align-repeat-x "comma" "," nil t)
+(spacemacs|create-align-repeat-x "semicolon" ";" nil t)
+(spacemacs|create-align-repeat-x "colon" ":" nil t)
+(spacemacs|create-align-repeat-x "equal" "=")
+(spacemacs|create-align-repeat-x "space" " ")
+(spacemacs|create-align-repeat-x "math-oper" "[+\\-*/]")
+(spacemacs|create-align-repeat-x "percent" "%")
+(spacemacs|create-align-repeat-x "ampersand" "&")
+(spacemacs|create-align-repeat-x "bar" "|")
+(spacemacs|create-align-repeat-x "left-paren" "(")
+(spacemacs|create-align-repeat-x "right-paren" ")" t)
+(spacemacs|create-align-repeat-x "left-curly-brace" "{")
+(spacemacs|create-align-repeat-x "right-curly-brace" "}" t)
+(spacemacs|create-align-repeat-x "left-square-brace" "\\[")
+(spacemacs|create-align-repeat-x "right-square-brace" "\\]" t)
+(spacemacs|create-align-repeat-x "backslash" "\\\\")
+
+;; END align functions

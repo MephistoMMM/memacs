@@ -130,7 +130,27 @@
  ;;; Leader
  (:leader
   (:prefix-map ("m" . "memacs")
-   :desc "kana"    "k" #'kana))
+   :desc "kana"    "k" #'kana)
+  (:prefix-map ("ma" . "align")
+   :desc "align '%'" "%" #'spacemacs/align-repeat-percent
+   :desc "align '&'" "&" #'spacemacs/align-repeat-ampersand
+   :desc "align '('" "(" #'spacemacs/align-repeat-left-paren
+   :desc "align ')'" ")" #'spacemacs/align-repeat-right-paren
+   :desc "align '{'" "{" #'spacemacs/align-repeat-left-curly-brace
+   :desc "align '}'" "}" #'spacemacs/align-repeat-right-curly-brace
+   :desc "align '['" "[" #'spacemacs/align-repeat-left-square-brace
+   :desc "align ']'" "]" #'spacemacs/align-repeat-right-square-brace
+   :desc "align ','" "," #'spacemacs/align-repeat-comma
+   :desc "align '.'" "." #'spacemacs/align-repeat-decimal
+   :desc "align ':'" ":" #'spacemacs/align-repeat-colon
+   :desc "align ';'" ";" #'spacemacs/align-repeat-semicolon
+   :desc "align '='" "=" #'spacemacs/align-repeat-equal
+   :desc "align '\\'" "\\" #'spacemacs/align-repeat-backslash
+   :desc "align" "a" #'align
+   :desc "align-current" "c" #'align-current
+   :desc "align math oper" "m" #'spacemacs/align-repeat-math-oper
+   :desc "align repeat" "r" #'spacemacs/align-repeat
+   :desc "align '|'" "|" #'spacemacs/align-repeat-bar))
 
  ;;; Kana
  (:after kana :map kana-mode-map
