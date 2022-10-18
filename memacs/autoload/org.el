@@ -237,7 +237,8 @@ It is meant to be added to `org-export-before-parsing-hook'."
 (defun memacs--org-roam-complete-directories (parent-dir message &optional history-symbol)
   "Complete name of directories under `parent-dir'."
   (let ((history (or (symbol-value history-symbol) (list)))
-        (conditions (unless (f-directory? parent-dir) (list-directory parent-dir))))
+        (conditions (when (f-directory? parent-dir)
+                      (directory-files parent-dir nil "^[^.]"))))
     (ivy-completing-read message
                          conditions nil nil
                          (car history)
