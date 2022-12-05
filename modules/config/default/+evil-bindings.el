@@ -207,7 +207,10 @@
         [right]    nil)
        (:after helm-files :map (helm-find-files-map helm-read-file-map)
         [C-return] #'helm-ff-run-switch-other-window
-        "C-w"      #'helm-find-files-up-one-level)
+        "C-w"      #'helm-find-files-up-one-level
+        (:when (modulep! :editor evil +everywhere)
+          "C-h"    #'helm-find-files-up-one-level
+          "C-l"    #'helm-execute-persistent-action))
        (:after helm-locate :map helm-generic-files-map
         [C-return] #'helm-ff-run-switch-other-window)
        (:after helm-buffers :map helm-buffer-map
@@ -535,8 +538,8 @@
        :desc "Search notes for symbol"      "*" #'+default/search-notes-for-symbol-at-point
        :desc "Org agenda"                   "a" #'org-agenda
        (:when (modulep! :tools biblio)
-        :desc "Bibliographic entries"        "b"
-        (cond ((modulep! :completion vertico)  #'citar-open-entry)
+        :desc "Bibliographic notes"        "b"
+        (cond ((modulep! :completion vertico)  #'citar-open-notes)
               ((modulep! :completion ivy)      #'ivy-bibtex)
               ((modulep! :completion helm)     #'helm-bibtex)))
 
@@ -746,6 +749,7 @@
         :desc "Spell checker"              "s" #'flyspell-mode)
        (:when (modulep! :lang org +pomodoro)
         :desc "Pomodoro timer"             "t" #'org-pomodoro)
+       :desc "Visible mode"                 "v" #'visible-mode
        :desc "Soft line wrapping"           "w" #'visual-line-mode
        (:when (modulep! :editor word-wrap)
         :desc "Soft line wrapping"         "w" #'+word-wrap-mode)

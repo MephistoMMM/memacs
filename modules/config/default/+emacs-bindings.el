@@ -157,8 +157,8 @@
        :desc "Search notes for symbol"        "." #'+default/search-notes-for-symbol-at-point
        :desc "Org agenda"                     "a" #'org-agenda
        (:when (modulep! :tools biblio)
-        :desc "Bibliographic entries"        "b"
-        (cond ((modulep! :completion vertico)   #'citar-open-entry)
+        :desc "Bibliographic notes"        "b"
+        (cond ((modulep! :completion vertico)   #'citar-open-notes)
               ((modulep! :completion ivy)       #'ivy-bibtex)
               ((modulep! :completion helm)      #'helm-bibtex)))
 
@@ -321,6 +321,7 @@
        :desc "Frame fullscreen"             "F" #'toggle-frame-fullscreen
        :desc "Indent style"                 "I" #'doom/toggle-indent-style
        :desc "Line numbers"                 "l" #'doom/toggle-line-numbers
+       :desc "Visible mode"                 "v" #'visible-mode
        :desc "Soft line wrapping"           "w" #'visual-line-mode
        (:when (modulep! :editor word-wrap)
         :desc "Soft line wrapping"          "w" #'+word-wrap-mode)
