@@ -10,7 +10,8 @@ Used in org file template")
       +org-capture-work-directory "~/Documents/works"
       org-attach-id-dir (expand-file-name "~/Dropbox/org/statics/")
       org-download-image-dir (expand-file-name "~/Dropbox/org/statics/")
-      org-roam-directory (expand-file-name "roam" org-directory))
+      org-roam-directory (expand-file-name "roam" org-directory)
+      org-agenda-files (list org-directory +org-capture-work-directory))
 
 ;; Export
 (setq org-pandoc-options-for-latex-pdf
@@ -116,6 +117,12 @@ Used in org file template")
     (when (not (file-directory-p pub-dir))
       (make-directory pub-dir)))
   (funcall orig-fn extension subtreep pub-dir))
+
+(defadvice! +org-export-html-src-block-a (orig-fn src-block _contents info)
+  "Put :html-wrap-src-lines to INFO."
+  :around #'org-html-src-block
+  (plist-put info :html-wrap-src-lines t)
+  (funcall orig-fn src-block _contents info))
 
 (defadvice! +org-export-attach-export-links-a (orig-fn &rest _)
   "Modifies org-attach-expand-links to my own implement"
