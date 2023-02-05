@@ -159,8 +159,8 @@ Used in org file template")
         ("Codewar&Golang" go-mode
          (format-time-string "~/Workspace/go/src/codewar_pg/%Y_%m_%d"))
         ("Daily Meeting" org-mode
-         "~/Documents/works/roam/"
-         (format "~/Documents/works/roam/%s_%s.org"
+         "~/Drive/social/roam/"
+         (format "~/Drive/social/roam/%s_%s.org"
                   (ivy-completing-read "Meeting type: " memacs-org-meeting-types)
                   (format-time-string "%Y%m%d")))
         ))
