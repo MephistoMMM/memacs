@@ -1,12 +1,12 @@
 #!/bin/bash
 
-DropBoxBlogPath=~/Dropbox/Blog
+DriveBlogPath=~/Drive/person/Blog
 configPath=static_blog_config.yml
 postPath=posts
 draftPath=drafts
-BlogRoot=~/Documents/Person/Blog
+BlogRoot=~/Documents/Blog
 
-if [ ! -e $DropBoxBlogPath ]; then
+if [ ! -e $DriveBlogPath ]; then
     echo "Please config your dropbox first!"
     exit
 fi
@@ -39,9 +39,9 @@ npm install hexo-generator-search --save
 rm _config.yml
 rm -rf ./source/_posts ./source/_drafts
 mkdir ./source/_drafts
-ln -s $DropBoxBlogPath/$configPath $BlogRoot/$configPath
-ln -s $DropBoxBlogPath/$postPath $BlogRoot/source/_posts
-ln -s $DropBoxBlogPath/$draftPath $BlogRoot/source/_drafts
+ln -s $DriveBlogPath/$configPath $BlogRoot/$configPath
+ln -s $DriveBlogPath/$postPath $BlogRoot/source/_posts
+ln -s $DriveBlogPath/$draftPath $BlogRoot/source/_drafts
 
 # download theme
 echo "Start to download theme..."
