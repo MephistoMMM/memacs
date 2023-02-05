@@ -417,6 +417,8 @@ files, so this replace calls to `pp' with the much faster `prin1'."
   :config
   (when-let (name (getenv "EMACS_SERVER_NAME"))
     (setq server-name name))
+  (when-let (socket (getenv "EMACS_SOCKET_DIR"))
+    (setq server-socket-dir socket))
   (unless (server-running-p)
     (server-start)))
 
