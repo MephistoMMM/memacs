@@ -1,15 +1,15 @@
 ;;; memacs/+org.el -*- lexical-binding: t; -*-
 
-(defvar memacs-org-export-setup-file "~/Dropbox/dotconf/export_setup.org"
+(defvar memacs-org-export-setup-file "~/Drive/dotconf/export_setup.org"
   "Setup file path for org to export as more beautiful result.
 Used in org file template")
 
 ;; Base
 ;; If you intend to use org, it is recommended you change this!
-(setq org-directory "~/Dropbox/org"
-      +org-capture-work-directory "~/Documents/works"
-      org-attach-id-dir (expand-file-name "~/Dropbox/org/statics/")
-      org-download-image-dir (expand-file-name "~/Dropbox/org/statics/")
+(setq org-directory "~/Drive/org"
+      +org-capture-work-directory "~/Drive/social"
+      org-attach-id-dir (expand-file-name "~/Drive/org/statics/")
+      org-download-image-dir (expand-file-name "~/Drive/org/statics/")
       org-roam-directory (expand-file-name "roam" org-directory)
       org-agenda-files (list org-directory +org-capture-work-directory))
 
@@ -99,10 +99,10 @@ Used in org file template")
 (defun memacs-org-export-add-header (backend)
   "Add header in current buffer."
   (let ((setupfile (concat "export_setup_" (symbol-name backend) ".org")))
-    (when (file-exists-p! setupfile "~/Dropbox/dotconf/")
+    (when (file-exists-p! setupfile "~/Drive/dotconf/")
       (save-excursion
         (goto-char (point-min))
-        (insert "#+SETUPFILE: " "~/Dropbox/dotconf/" setupfile "\n"))
+        (insert "#+SETUPFILE: " "~/Drive/dotconf/" setupfile "\n"))
       ))
   (case backend
     ('pandoc (+org-export-parse-and-replace-tables))
@@ -154,7 +154,7 @@ Used in org file template")
 (setq memacs-mission-starter-mission-list
       '(
         ;; config new org file in dropbox
-        ("Dropbox Note Buffer" org-mode
+        ("Drive Note Buffer" org-mode
          (concat org-directory "/notes/") (memacs//mission-start-find-file-name nil))
         ("Codewar&Golang" go-mode
          (format-time-string "~/Workspace/go/src/codewar_pg/%Y_%m_%d"))
