@@ -884,7 +884,19 @@ can grow up to be fully-fledged org-mode buffers."
         (when (buffer-live-p buffer)      ; Ensure buffer is not killed
           (with-current-buffer buffer
             (add-hook 'doom-switch-buffer-hook #'+org--restart-mode-h
-                      nil 'local))))))
+                      nil 'local)))))
+    (defun +org-save-all-agenda-files-h ()
+      "Function to save all buffers of agenda files that are
+currently open, base on `org-agenda-files'."
+      (interactive)
+      (let ((expand-org-agenda-files (org-agenda-files t)))
+        (save-current-buffer
+          (dolist (buffer (buffer-list t))
+            (set-buffer buffer)
+            (when (and (buffer-modified-p buffer)
+                     (member (buffer-file-name)
+                             expand-org-agenda-files))
+              (save-buffer)))))))
 
   (defvar recentf-exclude)
   (defadvice! +org--optimize-backgrounded-agenda-buffers-a (fn file)
