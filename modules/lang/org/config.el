@@ -886,9 +886,8 @@ can grow up to be fully-fledged org-mode buffers."
             (add-hook 'doom-switch-buffer-hook #'+org--restart-mode-h
                       nil 'local)))))
     (defun +org-save-all-agenda-files-h ()
-      "Function to save all buffers of agenda files that are
+      "Save all buffers of agenda files that are
 currently open, base on `org-agenda-files'."
-      (interactive)
       (let ((expand-org-agenda-files (org-agenda-files t)))
         (save-current-buffer
           (dolist (buffer (buffer-list t))
