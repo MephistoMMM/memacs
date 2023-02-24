@@ -6,7 +6,39 @@
   (setq pyim-dcache-directory (concat doom-cache-dir "pyim/"))
   :config
   (setq pyim-page-tooltip t
-        default-input-method "pyim"))
+        default-input-method "pyim")
+
+  (after! evil-escape
+    (defun +chinese--input-method-p ()
+      current-input-method)
+    (add-to-list 'evil-escape-inhibit-functions #'+chinese--input-method-p))
+
+  (when (modulep! +childframe)
+    (setq pyim-page-tooltip 'posframe))
+
+  ;; allow vertico/selectrum search with pinyin
+  (cond ((modulep! :completion vertico)
+         (advice-add #'orderless-regexp
+                     :filter-return
+                     (if (modulep! :editor evil +everywhere)
+                         #'evil-pinyin--build-regexp-string
+                       #'pyim-cregexp-build)))
+        ((modulep! :completion ivy)
+         (setq ivy-re-builders-alist '((t . pyim-cregexp-ivy))))))
+
+
+(use-package! liberime
+  :when (modulep! +rime)
+  :init
+  (setq liberime-auto-build t
+        liberime-user-data-dir (file-name-concat doom-cache-dir "rime")))
+
+
+(use-package! pyim-liberime
+  :when (modulep! +rime)
+  :after liberime
+  :config
+  (setq pyim-default-scheme 'rime))
 
 
 (use-package! pangu-spacing
@@ -20,6 +52,14 @@
   :after avy
   :init (setq ace-pinyin-use-avy t)
   :config (ace-pinyin-global-mode t))
+
+
+(use-package! evil-pinyin
+  :when (modulep! :editor evil +everywhere)
+  :after evil
+  :config
+  (setq-default evil-pinyin-with-search-rule 'always)
+  (global-evil-pinyin-mode 1))
 
 
 ;;

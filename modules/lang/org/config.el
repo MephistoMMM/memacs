@@ -498,7 +498,7 @@ relative to `org-directory', unless it is an absolute path."
 
 (defun +org-init-attachments-h ()
   "Sets up org's attachment system."
-  (setq org-attach-store-link-p t     ; store link after attaching files
+  (setq org-attach-store-link-p 'attached     ; store link after attaching files
         org-attach-use-inheritance t) ; inherit properties from parent nodes
 
   ;; Autoload all these commands that org-attach doesn't autoload itself
@@ -551,58 +551,59 @@ relative to `org-directory', unless it is an absolute path."
   (+org-define-basic-link "doom-docs" 'doom-docs-dir)
   (+org-define-basic-link "doom-modules" 'doom-modules-dir)
 
-  (defadvice! +org-display-link-in-eldoc-a (&rest _)
-    "Display full link in minibuffer when cursor/mouse is over it."
-    :before-until #'org-eldoc-documentation-function
-    (when-let (context (org-element-context))
-      (if-let ((type (org-element-property :type context))
-               (eldocfn (org-link-get-parameter type :eldoc)))
-          (funcall eldocfn context)
-        (when-let (raw-link (org-element-property :raw-link context))
-          (format "Link: %s" raw-link)))))
-
   ;; Add "lookup" links for packages and keystrings; useful for Emacs
   ;; documentation -- especially Doom's!
   (letf! ((defun -call-interactively (fn)
             (lambda (path _prefixarg)
               (funcall
                fn (or (intern-soft path)
-                      (user-error "Can't find documentation for %S" path)))))
-          (defun -eldoc-fn (label face)
-            (lambda (context)
-              (format "%s %s"
-                      (propertize (format "%s:" label) 'face 'bold)
-                      (propertize (+org-link-read-desc-at-point
-                                   (org-element-property :path context) context)
-                                  'face face)))))
+                      (user-error "Can't find documentation for %S" path))))))
     (org-link-set-parameters
      "kbd"
-     :follow (lambda (_) (minibuffer-message "%s" (+org-display-link-in-eldoc-a)))
-     :help-echo #'+org-link-read-kbd-at-point
-     :face 'help-key-binding
-     :eldoc (-eldoc-fn "Key sequence" 'help-key-binding))
+     :follow (lambda (ev)
+               (interactive "e")
+               (minibuffer-message "%s" (+org-link-doom--help-echo-from-textprop
+                                         nil (current-buffer) (posn-point (event-start ev)))))
+     :help-echo #'+org-link-doom--help-echo-from-textprop
+     :face 'help-key-binding)
     (org-link-set-parameters
      "var"
      :follow (-call-interactively #'helpful-variable)
-     :face '(font-lock-variable-name-face underline))
+     :activate-func #'+org-link--var-link-activate-fn
+     :face 'org-code)
     (org-link-set-parameters
      "fn"
      :follow (-call-interactively #'helpful-callable)
-     :face '(font-lock-function-name-face underline))
+     :activate-func #'+org-link--fn-link-activate-fn
+     :face 'org-code)
     (org-link-set-parameters
      "face"
      :follow (-call-interactively #'describe-face)
+     :activate-func #'+org-link--face-link-activate-face
      :face '(font-lock-type-face underline))
+    (org-link-set-parameters
+     "cmd"
+     :follow (-call-interactively #'describe-command)
+     :activate-func #'+org-link--command-link-activate-command
+     :face 'help-key-binding
+     :help-echo #'+org-link-doom--help-echo-from-textprop)
     (org-link-set-parameters
      "doom-package"
      :follow #'+org-link-follow-doom-package-fn
+     :activate-func #'+org-link--doom-package-link-activate-fn
      :face (lambda (_) '(:inherit org-priority :slant italic))
-     :eldoc (-eldoc-fn "Doom package" 'org-priority))
+     :help-echo #'+org-link-doom--help-echo-from-textprop)
     (org-link-set-parameters
      "doom-module"
      :follow #'+org-link-follow-doom-module-fn
+     :activate-func #'+org-link--doom-module-link-activate-fn
      :face #'+org-link--doom-module-link-face-fn
-     :eldoc (-eldoc-fn "Doom module" 'org-priority))
+     :help-echo #'+org-link-doom--help-echo-from-textprop)
+    (org-link-set-parameters
+     "doom-executable"
+     :activate-func #'+org-link--doom-executable-link-activate-fn
+     :help-echo #'+org-link-doom--help-echo-from-textprop
+     :face 'org-verbatim)
     (org-link-set-parameters
      "doom-ref"
      :follow (lambda (link)
@@ -636,21 +637,6 @@ relative to `org-directory', unless it is an absolute path."
                         (string-remove-prefix
                          "@" (+org-link-read-desc-at-point link)))))
      :face (lambda (_) 'org-priority))
-    (org-link-set-parameters
-     "doom-source"
-     :follow (lambda (link)
-               (user-error "-- %S %S %S" source url link)
-               (cl-destructuring-bind (source . url)
-                   (save-match-data
-                     (and (string-match "^\\([^:]+\\):\\(.+\\)$" link)
-                          (cons (match-string 1) (match-string 2))))
-                 (pcase source
-                   ("doom"
-                    (org-link-open (expand-file-name url doom-modules-dir)))
-                   ("contrib"
-                    (browse-url (format "https://docs.doomemacs.org/modules/"
-                                        (replace-regexp-in-string "::\\(.+\\)$" "#\\1" url))))
-                   (_ (user-error "%s is not a valid module source" source))))))
     (org-link-set-parameters
      "doom-changelog"
      :follow (lambda (link)

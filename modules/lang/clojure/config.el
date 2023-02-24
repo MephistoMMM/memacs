@@ -7,6 +7,8 @@
 ;; it should have a lower threshold too.
 (add-to-list 'doom-large-file-size-alist '("\\.\\(?:clj[sc]?\\|dtm\\|edn\\)\\'" . 0.5))
 
+(defvar +clojure-load-clj-refactor-with-lsp nil
+  "Whether or not to include clj-refactor along with clojure-lsp.")
 
 ;;
 ;;; Packages
@@ -27,7 +29,14 @@
                    clojurec-mode
                    clojurescript-mode
                    clojurex-mode))
-        (add-to-list 'lsp-language-id-configuration (cons m "clojure"))))))
+        (add-to-list 'lsp-language-id-configuration (cons m "clojure")))))
+
+  (when (modulep! +tree-sitter)
+    (add-hook! '(clojure-mode-local-vars-hook
+                 clojurec-mode-local-vars-hook
+                 clojurescript-mode-local-vars-hook)
+               :append
+               #'tree-sitter!)))
 
 
 (use-package! cider
@@ -130,7 +139,7 @@
       (defun +clojure--cider-connected-update-modeline ()
         "Update modeline with cider connection state."
         (let* ((connected (cider-connected-p))
-               (face (if connected 'warning 'breakpoint-disabled))
+               (face (if connected 'warning 'shadow))
                (label (if connected "Cider connected" "Cider disconnected")))
           (+clojure--cider-set-modeline face label))))
 
@@ -166,6 +175,8 @@
             "C"  #'cider-connect-cljs
             "m"  #'cider-macroexpand-1
             "M"  #'cider-macroexpand-all
+            "j"  #'jet
+            "f"  #'neil-find-clojure-package
             (:prefix ("d" . "debug")
              "d" #'cider-debug-defun-at-point)
             (:prefix ("e" . "eval")
@@ -241,16 +252,15 @@
 
 
 (use-package! clj-refactor
-  :hook (clojure-mode . clj-refactor-mode)
   :config
-  (unless (modulep! +lsp)
+  (when (or (not (modulep! +lsp))
+            +clojure-load-clj-refactor-with-lsp)
+    (add-hook 'clojure-mode-hook #'clj-refactor-mode)
     (set-lookup-handlers! 'clj-refactor-mode
-      :references #'cljr-find-usages))
-  (when (modulep! +lsp)
-    (setq cljr-add-ns-to-blank-clj-files nil))
-  (map! :map clojure-mode-map
-        :localleader
-        :desc "refactor" "R" #'hydra-cljr-help-menu/body))
+      :references #'cljr-find-usages)
+    (map! :map clojure-mode-map
+          :localleader
+          :desc "refactor" "R" #'hydra-cljr-help-menu/body)))
 
 
 ;; clojure-lsp already uses clj-kondo under the hood
@@ -258,3 +268,14 @@
   :when (and (modulep! :checkers syntax)
              (not (modulep! +lsp)))
   :after flycheck)
+
+
+(use-package! neil
+  :commands (neil-find-clojure-package)
+  :config
+  (setq neil-prompt-for-version-p nil
+        neil-inject-dep-to-project-p t))
+
+
+(use-package! jet
+  :commands (jet))

@@ -101,13 +101,13 @@ orderless."
   :defer t
   :preface
   (define-key!
-    [remap apropos]                       #'consult-apropos
     [remap bookmark-jump]                 #'consult-bookmark
     [remap evil-show-marks]               #'consult-mark
     [remap evil-show-jumps]               #'+vertico/jump-list
     [remap evil-show-registers]           #'consult-register
     [remap goto-line]                     #'consult-goto-line
     [remap imenu]                         #'consult-imenu
+    [remap Info-search]                   #'consult-info
     [remap locate]                        #'consult-locate
     [remap load-theme]                    #'consult-theme
     [remap man]                           #'consult-man
@@ -147,10 +147,10 @@ orderless."
    +default/search-notes-for-symbol-at-point
    +default/search-emacsd
    consult--source-recent-file consult--source-project-recent-file consult--source-bookmark
-   :preview-key (kbd "C-SPC"))
+   :preview-key "C-SPC")
   (consult-customize
    consult-theme
-   :preview-key (list (kbd "C-SPC") :debounce 0.5 'any))
+   :preview-key (list "C-SPC" :debounce 0.5 'any))
   (when (modulep! :lang org)
     (defvar +vertico--consult-org-source
       (list :name     "Org Buffer"
@@ -187,10 +187,15 @@ orderless."
   (when (modulep! :tools docker)
     (defun +vertico--consult-dir-docker-hosts ()
       "Get a list of hosts from docker."
-      (when (require 'docker-tramp nil t)
+      (when (if (>= emacs-major-version 29)
+                (require 'tramp-container nil t)
+              (setq-local docker-tramp-use-names t)
+              (require 'docker-tramp nil t))
         (let ((hosts)
-              (docker-tramp-use-names t))
-          (dolist (cand (docker-tramp--parse-running-containers))
+              (docker-query-fn #'docker-tramp--parse-running-containers))
+          (when (>= emacs-major-version 29)
+            (setq docker-query-fn #'tramp-docker--completion-function))
+          (dolist (cand (funcall docker-query-fn))
             (let ((user (unless (string-empty-p (car cand))
                           (concat (car cand) "@")))
                   (host (car (cdr cand))))
@@ -253,12 +258,13 @@ orderless."
         cons
         '+vertico-embark-target-package-fn
         (nthcdr pos embark-target-finders)))
-  (embark-define-keymap +vertico/embark-doom-package-map
-    "Keymap for Embark package actions for packages installed by Doom."
-    ("h" doom/help-packages)
-    ("b" doom/bump-package)
-    ("c" doom/help-package-config)
-    ("u" doom/help-package-homepage))
+  (defvar-keymap +vertico/embark-doom-package-map
+    :doc "Keymap for Embark package actions for packages installed by Doom."
+    :parent embark-general-map
+    "h" #'doom/help-packages
+    "b" #'doom/bump-package
+    "c" #'doom/help-package-config
+    "u" #'doom/help-package-homepage)
   (setf (alist-get 'package embark-keymap-alist) #'+vertico/embark-doom-package-map)
   (map! (:map embark-file-map
          :desc "Open target with sudo"        "s"   #'doom/sudo-find-file

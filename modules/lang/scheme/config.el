@@ -14,7 +14,10 @@
         geiser-repl-history-filename (concat doom-cache-dir "geiser-history"))
 
   (after! scheme  ; built-in
-    (set-repl-handler! 'scheme-mode #'+scheme/open-repl)
+    (set-repl-handler! 'scheme-mode #'+scheme/open-repl
+      :persist t
+      :send-region #'geiser-eval-region
+      :send-buffer #'geiser-eval-buffer)
     (set-eval-handler! 'scheme-mode #'geiser-eval-region)
     (set-lookup-handlers! '(scheme-mode geiser-repl-mode)
       :definition #'geiser-edit-symbol-at-point
@@ -23,11 +26,11 @@
   (set-popup-rules!
     '(("^\\*[gG]eiser \\(dbg\\|xref\\|messages\\)\\*$" :slot 1 :vslot -1)
       ("^\\*Geiser documentation\\*$" :slot 2 :vslot 2 :select t :size 0.35)
-      ("^\\* [A-Za-z0-9_-]+ REPL \\*" :size 0.3 :quit nil :ttl nil)))
+      ("^\\*Geiser .+ REPL" :size 0.3 :quit nil :ttl nil)))
   
   (map! :localleader
         (:map (scheme-mode-map geiser-repl-mode-map)
-         :desc "Toggle REPL"                  "'"  #'switch-to-geiser
+         :desc "Toggle REPL"                  "'"  #'geiser-repl-switch
          :desc "Connect to external Scheme"   "\"" #'geiser-connect
          :desc "Toggle type of brackets"      "["  #'geiser-squarify
          :desc "Insert lambda"                "\\" #'geiser-insert-lambda

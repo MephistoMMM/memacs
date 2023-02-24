@@ -80,7 +80,7 @@ exist, and `org-link' otherwise."
 (defun +org-link--read-module-spec (module-spec-str)
   (if (string-prefix-p "+" (string-trim-left module-spec-str))
       (let ((title (cadar (org-collect-keywords '("TITLE")))))
-        (if (and title (string-match-p "\\`:[a-z]+ [a-z]+\\'" title))
+        (if (and title (string-match-p "\\`:[a-z]+ [A-Za-z0-9]+\\'" title))
             (+org-link--read-module-spec (concat title " " module-spec-str))
           (list :category nil :module nil :flag (intern module-spec-str))))
     (cl-destructuring-bind (category &optional module flag)
@@ -94,17 +94,75 @@ exist, and `org-link' otherwise."
             :flag flag))))
 
 ;;;###autoload
-(defun +org-link--doom-module-link-face-fn (module-path)
-  (cl-destructuring-bind (&key category module flag)
-      (+org-link--read-module-spec module-path)
-    (if (doom-module-locate-path category module)
-        `(:inherit org-priority
-          :weight bold)
-      'error)))
+(defun +org-link--var-link-activate-fn (start end var _bracketed-p)
+  (when buffer-read-only
+    (add-text-properties
+     start end
+     (list 'display
+           (concat
+            #(" " 0 1
+              (rear-nonsticky
+               t display (raise 0.05)
+               face (:family "github-octicons"
+                     :inherit font-lock-variable-name-face
+                     :height 0.8
+                     :box (:line-width 1 :style none)))
+              1 2 (face (:height 0.2)))
+            var)))))
 
 ;;;###autoload
-(defun +org-link-follow-doom-module-fn (module-path _prefixarg)
-  "TODO"
+(defun +org-link--fn-link-activate-fn (start end fn _bracketed-p)
+  (when buffer-read-only
+    (add-text-properties
+     start end
+     (list 'display
+           (concat
+            #("λ " 0 1 (face (:inherit font-lock-function-name-face
+                              :box (:line-width 1 :style none)
+                              :height 0.9))
+              1 2 (face (:height 0.2)))
+            fn)))))
+
+;;;###autoload
+(defun +org-link--face-link-activate-face (start end face _bracketed-p)
+  (when buffer-read-only
+    (add-text-properties
+     start end
+     (list 'display
+           (concat
+            (propertize
+             ""
+             'rear-nonsticky t
+             'display '(raise -0.02)
+             'face (list '(:family "file-icons" :height 1.0)
+                          (if (facep (intern face))
+                              (intern face)
+                            'default)
+                          '(:underline nil)))
+            #(" " 0 1 (face (:underline nil)))
+            face)))))
+
+(defun +org-link--command-keys (command)
+  "Convert command reference TEXT to key binding representation."
+  (let* ((cmd-prefix (mapcar #'reverse
+                             (split-string (reverse command) " ")))
+         (cmd (intern-soft (car cmd-prefix)))
+         (prefix (and (cdr cmd-prefix)
+                      (string-join (reverse (cdr cmd-prefix)) " ")))
+         (key-binding (where-is-internal cmd nil t))
+         (key-text (if key-binding
+                       (key-description key-binding)
+                     (format "M-x %s" cmd))))
+    (concat prefix (and prefix " ") key-text)))
+
+;;;###autoload
+(defun +org-link--command-link-activate-command (start end command _bracketed-p)
+  (when buffer-read-only
+    (add-text-properties
+     start end (list 'display (+org-link--command-keys command)))))
+
+;;;###autoload
+(defun +org-link--doom-module-link-follow-fn (module-path _arg)
   (cl-destructuring-bind (&key category module flag)
       (+org-link--read-module-spec module-path)
     (when category
@@ -125,10 +183,164 @@ exist, and `org-link' otherwise."
         (recenter)))))
 
 ;;;###autoload
+(defun +org-link--doom-module-link-face-fn (module-path)
+  (cl-destructuring-bind (&key category module flag)
+      (+org-link--read-module-spec module-path)
+    (if (and category (doom-module-locate-path category module))
+        `(:inherit org-priority
+          :weight bold)
+      'error)))
+
+;;;###autoload
+(defun +org-link--doom-module-link-activate-fn (start end module-path _bracketed-p)
+  (when buffer-read-only
+    (cl-destructuring-bind (&key category module flag)
+        (+org-link--read-module-spec module-path)
+      (let ((overall-face
+             (cond
+              ((doom-module-p category module flag)
+               '((:underline nil) org-link org-block bold))
+              ((and category (doom-module-locate-path category module))
+               '(shadow org-block bold))
+              (t '((:strike-through t) error org-block))))
+            (icon-face
+             (if (doom-module-p category module flag) 'success 'error)))
+        (add-text-properties
+         start end
+         (list 'face overall-face
+               'display
+               (concat
+                (propertize
+                 " "
+                 'rear-nonsticky t
+                 'display '(raise -0.02)
+                 'face `(:inherit ,icon-face
+                         :family "FontAwesome"
+                         :height 1.0))
+                module-path)))))))
+
+;;;###autoload
+(defun +org-link--doom-package-link-activate-fn (start end package _bracketed-p)
+  (when buffer-read-only
+    (let ((overall-face
+           (if (locate-library package)
+               '((:underline nil) org-link org-block italic)
+             '(shadow org-block italic)))
+          (pkg-face
+           (cond
+            ((featurep (intern package)) 'success)
+            ((locate-library package) 'warning)
+            (t 'error))))
+      (add-text-properties
+       start end
+       (list 'face overall-face
+             'display
+             (concat
+              (propertize
+               "\uf0c4" ; Octicon package symbol
+               'rear-nonsticky t
+               'display '(raise -0.02)
+               'face `(:family "github-octicons" :height 1.0
+                       :inherit ,pkg-face))
+              " " package))))))
+
+;;;###autoload
 (defun +org-link-follow-doom-package-fn (pkg _prefixarg)
   "TODO"
   (doom/describe-package (intern-soft pkg)))
 
+;;;###autoload
+(defun +org-link--doom-executable-link-activate-fn (start end executable _bracketed-p)
+  (when buffer-read-only
+    (let ((found (executable-find executable)))
+      (add-text-properties
+       start end
+       (list 'display
+             (concat
+              (propertize
+               ""
+               'rear-nonsticky t
+               'display '(raise -0.02)
+               'face (list :family "all-the-icons"
+                           :height 1.0
+                           :inherit (if found 'success 'error)))
+              " "
+              (propertize
+               executable
+               'face (if found 'org-verbatim 'default))))))))
+
+;;
+;;; Help-echo / eldoc
+
+(defadvice! doom-docs--display-docs-link-in-eldoc-a (&rest _)
+  "Display help for doom-*: links in minibuffer when cursor/mouse is over it."
+  :before-until #'org-eldoc-documentation-function
+  (and (bound-and-true-p doom-docs-mode)
+       (eq (get-text-property (point) 'help-echo)
+           #'+org-link-doom--help-echo-from-textprop)
+       (+org-link-doom--help-echo-from-textprop nil (current-buffer) (point))))
+
+(defvar +org-link-doom--help-echo-cache nil)
+
+(defun +org-link-doom--help-echo-from-textprop (_window object pos)
+  (let ((link (with-current-buffer object
+                (save-excursion (goto-char pos) (org-element-context)))))
+    (if (eq (car +org-link-doom--help-echo-cache)
+            (org-element-property :begin link))
+        (cdr +org-link-doom--help-echo-cache)
+      (cdr (setq +org-link-doom--help-echo-cache
+                 (cons (org-element-property :begin link)
+                       (+org-link-doom--help-string link)))))))
+
+(defun +org-link-doom--help-string (link)
+  (if (not buffer-read-only)
+      (format "LINK: %s" (org-element-property :raw-link link))
+    (pcase (org-element-property :type link)
+      ("kbd"
+       (concat
+        "The key sequence "
+        (propertize (+org-link--describe-kbd (org-element-property :path link))
+                    'face 'help-key-binding)))
+      ("cmd"
+       (concat
+        "The command "
+        (propertize (org-element-property :path link) 'face 'font-lock-function-name-face)
+        " can be invoked with the key sequence "
+        (propertize (+org-link--command-keys (org-element-property :path link))
+                    'face 'help-key-binding)))
+      ("doom-package"
+       (concat
+        (propertize "Emacs package " 'face 'bold)
+        (propertize (org-element-property :path link) 'face 'font-lock-keyword-face)
+        ", currently "
+        (cond
+         ((featurep (intern-soft (org-element-property :path link)))
+          (propertize "installed and loaded" 'face 'success))
+         ((locate-library (org-element-property :path link))
+          (propertize "installed but not loaded" 'face 'warning))
+         (t (propertize "not installed" 'face 'error )))))
+      ("doom-module"
+       (concat
+        (propertize "Doom module " 'face 'bold)
+        (propertize (org-element-property :path link) 'face 'font-lock-keyword-face)
+        ", currently "
+        (cl-destructuring-bind (&key category module flag)
+            (+org-link--read-module-spec (org-element-property :path link))
+          (cond
+           ((doom-module-p category module)
+            (propertize "enabled" 'face 'success))
+           ((and category (doom-module-locate-path category module))
+            (propertize "disabled" 'face 'error))
+           (t (propertize "unknown" 'face '(bold error)))))))
+      ("doom-executable"
+       (concat
+        (propertize "System executable " 'face 'bold)
+        (propertize (org-element-property :path link) 'face 'font-lock-keyword-face)
+        ", "
+        (if (executable-find (org-element-property :path link))
+            (propertize "found" 'face 'success)
+          (propertize "not found" 'face 'error))
+        " on PATH")))))
 
 ;;
 ;;; Image data functions (for custom inline images)
