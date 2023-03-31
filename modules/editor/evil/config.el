@@ -59,6 +59,14 @@ directives. By default, this only recognizes C directives.")
               ((modulep! :emacs undo) 'undo-fu)
               ((> emacs-major-version 27) 'undo-redo)))
 
+  ;; Fix #7141
+  (defadvice! +evil--persist-state-a (fn &rest args)
+    "When changing major modes, Evil's state is lost. This advice preserves it."
+    :around #'set-auto-mode
+    (if evil-state
+        (evil-save-state (apply fn args))
+      (apply fn args)))
+
   ;; Slow this down from 0.02 to prevent blocking in large or folded buffers
   ;; like magit while incrementally highlighting matches.
   (setq-hook! '(magit-mode-hook so-long-minor-mode-hook)
@@ -253,6 +261,16 @@ directives. By default, this only recognizes C directives.")
   :init
   (after! evil-surround
     (evil-embrace-enable-evil-surround-integration))
+
+  ;; HACK: This must be done ASAP, before embrace has a chance to
+  ;;   buffer-localize `embrace--pairs-list' (which happens right after it calls
+  ;;   `embrace--setup-defaults'), otherwise any new, global default pairs we
+  ;;   define won't be in scope.
+  (defadvice! +evil--embrace-init-escaped-pairs-a (&rest args)
+    "Add escaped-sequence support to embrace."
+    :after #'embrace--setup-defaults
+    (embrace-add-pair-regexp ?\\ "\\[[{(]" "\\[]})]" #'+evil--embrace-escaped
+                             (embrace-build-help "\\?" "\\?")))
   :config
   (setq evil-embrace-show-help-p nil)
 
@@ -289,15 +307,7 @@ directives. By default, this only recognizes C directives.")
       (set var (delq ?< evil-embrace-evil-surround-keys))
       (set var (delq ?> evil-embrace-evil-surround-keys)))
     (embrace-add-pair-regexp ?< "\\_<[a-z0-9-_]+<" ">" #'+evil--embrace-angle-brackets)
-    (embrace-add-pair ?> "<" ">"))
-
-  ;; Add escaped-sequence support to embrace
-  (setf (alist-get ?\\ (default-value 'embrace--pairs-list))
-        (make-embrace-pair-struct
-         :key ?\\
-         :read-function #'+evil--embrace-escaped
-         :left-regexp "\\[[{(]"
-         :right-regexp "\\[]})]")))
+    (embrace-add-pair ?> "<" ">")))
 
 
 (use-package! evil-escape

@@ -345,7 +345,7 @@ without needing to check if they are available."
   (cl-loop for (cat . mod) in (doom-module-list 'all)
            for readme-path = (or (doom-module-locate-path cat mod "README.org")
                                  (doom-module-locate-path cat mod))
-           for format = (format "%s %s" cat mod)
+           for format = (if mod (format "%s %s" cat mod) (format "%s" cat))
            if (doom-module-p cat mod)
            collect (list format readme-path)
            else if (and cat mod)
@@ -696,14 +696,7 @@ config blocks in your private config."
   (unless (executable-find "rg")
     (user-error "Can't find ripgrep on your system"))
   (cond ((fboundp 'consult--grep)
-         (consult--grep
-          prompt
-          (lambda (input)
-            ;; PERF: avoid converting dirs to string and back when adding them to ripgrep args.
-            (letf! (defun consult--command-split (fn &rest args)
-                     (append (apply consult--command-split args) dirs))
-              (funcall (consult--ripgrep-make-builder) input)))
-          data-directory query))
+         (consult--grep prompt #'consult--ripgrep-make-builder (cons data-directory dirs) query))
         ((fboundp 'counsel-rg)
          (let ((counsel-rg-base-command
                 (if (stringp counsel-rg-base-command)

@@ -39,7 +39,10 @@
                #'tree-sitter!)))
 
 
-(use-package! cider
+;; `cider-mode' is used instead of the typical `cider' package due to the main
+;; library being loaded only when is absolutely needed, which is too late for
+;; our purposes
+(use-package! cider-mode
   ;; NOTE if `org-directory' doesn't exist, `cider-jack' in won't work
   :hook (clojure-mode-local-vars . cider-mode)
   :init
@@ -175,8 +178,6 @@
             "C"  #'cider-connect-cljs
             "m"  #'cider-macroexpand-1
             "M"  #'cider-macroexpand-all
-            "j"  #'jet
-            "f"  #'neil-find-clojure-package
             (:prefix ("d" . "debug")
              "d" #'cider-debug-defun-at-point)
             (:prefix ("e" . "eval")
@@ -252,15 +253,15 @@
 
 
 (use-package! clj-refactor
-  :config
-  (when (or (not (modulep! +lsp))
+  :when (or (not (modulep! +lsp))
             +clojure-load-clj-refactor-with-lsp)
-    (add-hook 'clojure-mode-hook #'clj-refactor-mode)
-    (set-lookup-handlers! 'clj-refactor-mode
-      :references #'cljr-find-usages)
-    (map! :map clojure-mode-map
-          :localleader
-          :desc "refactor" "R" #'hydra-cljr-help-menu/body)))
+  :hook (clojure-mode . clj-refactor-mode)
+  :config
+  (set-lookup-handlers! 'clj-refactor-mode
+    :references #'cljr-find-usages)
+  (map! :map clojure-mode-map
+        :localleader
+        :desc "refactor" "R" #'hydra-cljr-help-menu/body))
 
 
 ;; clojure-lsp already uses clj-kondo under the hood
@@ -274,8 +275,15 @@
   :commands (neil-find-clojure-package)
   :config
   (setq neil-prompt-for-version-p nil
-        neil-inject-dep-to-project-p t))
+        neil-inject-dep-to-project-p t)
+  (map! :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
+        :localleader
+        "f"  #'neil-find-clojure-package))
 
 
 (use-package! jet
-  :commands (jet))
+  :commands (jet)
+  :config
+  (map! :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
+        :localleader
+        "j" #'jet))

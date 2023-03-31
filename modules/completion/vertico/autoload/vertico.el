@@ -26,10 +26,10 @@
                   (if all-files "-uu ")
                   (unless recursive "--maxdepth 1 ")
                   "--null --line-buffered --color=never --max-columns=1000 "
-                  "--path-separator /   --smart-case --no-heading --line-number "
+                  "--path-separator /   --smart-case --no-heading "
+                  "--with-filename --line-number --search-zip "
                   "--hidden -g !.git -g !.svn -g !.hg "
-                  (mapconcat #'shell-quote-argument args " ")
-                  " ."))
+                  (mapconcat #'shell-quote-argument args " ")))
          (prompt (if (stringp prompt) (string-trim prompt) "Search"))
          (query (or query
                     (when (doom-region-active-p)
@@ -54,7 +54,7 @@
                                    "%")
                      :type perl)
                    consult-async-split-style 'perlalt))))))
-    (consult--grep prompt (consult--ripgrep-make-builder) directory query)))
+    (consult--grep prompt #'consult--ripgrep-make-builder directory query)))
 
 ;;;###autoload
 (defun +vertico/project-search (&optional arg initial-query directory)
@@ -112,9 +112,28 @@ Supports exporting consult-grep to wgrep, file to wdeired, and consult-location 
   "Previews candidate in vertico buffer, unless it's a consult command"
   (interactive)
   (unless (bound-and-true-p consult--preview-function)
-    (save-selected-window
-      (let ((embark-quit-after-action nil))
-        (embark-dwim)))))
+    (if (fboundp 'embark-dwim)
+        (save-selected-window
+          (let (embark-quit-after-action)
+            (embark-dwim)))
+      (user-error "Embark not installed, aborting..."))))
+
+;;;###autoload
+(defun +vertico/enter-or-preview ()
+  "Enter directory or embark preview on current candidate."
+  (interactive)
+  (when (> 0 vertico--index)
+    (user-error "No vertico session is currently active"))
+  (if (and (let ((cand (vertico--candidate)))
+             (or (string-suffix-p "/" cand)
+                 (and (vertico--remote-p cand)
+                      (string-suffix-p ":" cand))))
+           (not (equal vertico--base ""))
+           (eq 'file (vertico--metadata-get 'category)))
+      (vertico-insert)
+    (condition-case _
+        (+vertico/embark-preview)
+      (user-error (vertico-directory-enter)))))
 
 (defvar +vertico/find-file-in--history nil)
 ;;;###autoload
@@ -225,9 +244,10 @@ targets."
 (defun +vertico/consult-fd (&optional dir initial)
   (interactive "P")
   (if doom-projectile-fd-binary
-      (let* ((prompt-dir (consult--directory-prompt "Fd" dir))
-             (default-directory (cdr prompt-dir)))
-        (find-file (consult--find (car prompt-dir) (+vertico--consult--fd-make-builder) initial)))
+      (pcase-let* ((`(,prompt ,paths ,dir) (consult--directory-prompt "Fd" dir))
+                   (default-directory dir)
+                   (builder (consult--find-make-builder paths)))
+        (find-file (consult--find prompt builder initial)))
     (consult-find dir initial)))
 
 ;;;###autoload
