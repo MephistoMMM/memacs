@@ -37,6 +37,12 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 `org-capture-templates'.")
 
+(defvar +org-capture-next-file "next.org"
+  "Default target for next entries.
+
+Is relative to `org-directory', unless it is absolute. Is used in Doom's default
+`org-capture-templates'.")
+
 (defvar +org-capture-changelog-file "changelog.org"
   "Default target for changelog entries.
 
@@ -399,16 +405,22 @@ I like:
           ("n" "Personal notes" entry
            (file+headline +org-capture-notes-file "Inbox")
            "* %u %?\n%i\n%a" :prepend t)
-          ("j" "Journal" entry
-           (file+olp+datetree +org-capture-journal-file)
-           "* %U %?\n%i\n%a" :prepend t)
+
+          ("s" "Snippets" plain
+           (file memacs-org-capture-complete-snippets)
+           "#+title: %(memacs-org-capture-complete-snippets-title)
+#+filetags: :%(memacs-org-capture-complete-snippets-lang): \n\n%?")
 
           ("l" "Links" entry
            (file+headline +org-capture-todo-file "Inbox")
            "* TODO [#B] %i\nSCHEDULED: %t\n%?\n%a" :prepend t)
-          ("w" "Work task" entry
-           (file +org-capture-work-todo-file)
+          ("w" "Work next" entry
+           (file +org-capture-work-next-file)
            "* TODO [#%^{level|A|B}] %^{Task}\nSCHEDULED: %t\n%a"
+           :empty-lines 1)
+          ("i" "Work inbox" entry
+           (file +org-capture-work-todo-file)
+           "* TODO [#%^{level|A|B}] %^{Task}\n%a"
            :empty-lines 1)
 
           ;; Will use {project-root}/{todo,notes,changelog}.org, unless a

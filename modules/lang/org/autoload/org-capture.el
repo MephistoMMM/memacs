@@ -164,8 +164,13 @@ project."
 
 ;;;###autoload
 (defun +org-capture-work-todo-file ()
-  "Return filename of tode.org in work directory."
+  "Return filename of inbox.org in work directory."
   (expand-file-name +org-capture-todo-file +org-capture-work-directory))
+
+;;;###autoload
+(defun +org-capture-work-next-file ()
+  "Return filename of next.org in work directory."
+  (expand-file-name +org-capture-next-file +org-capture-work-directory))
 
 ;;;###autoload
 (defun +org-capture-work-proj-file ()

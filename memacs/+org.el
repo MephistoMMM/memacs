@@ -8,6 +8,7 @@ Used in org file template")
 ;; If you intend to use org, it is recommended you change this!
 (setq org-directory "~/Drive/org"
       +org-capture-work-directory "~/Drive/social"
+      +org-snippet-directory (expand-file-name "snippets" org-directory)
       org-attach-id-dir (expand-file-name "~/Drive/org/statics/")
       org-download-image-dir (expand-file-name "~/Drive/org/statics/")
       org-roam-directory (expand-file-name "roam" org-directory)

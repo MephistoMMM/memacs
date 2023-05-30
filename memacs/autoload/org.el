@@ -214,6 +214,8 @@ It is meant to be added to `org-export-before-parsing-hook'."
 
 (defvar memacs--org-roam-complete-software-directories nil)
 (defvar memacs--org-roam-complete-program-languages nil)
+(defvar memacs--org-capture-complete-snippets nil)
+(defvar memacs--org-capture-complete-snippets-context nil)
 
 ;;;###autoload
 (defun memacs-org-roam-complete-software-directories ()
@@ -233,6 +235,35 @@ It is meant to be added to `org-export-before-parsing-hook'."
     (mapcar #'symbol-name memacs-org-roam-languages) nil nil
     (car memacs--org-roam-complete-program-languages)
     'memacs--org-roam-complete-program-languages))
+
+;;;###autoload
+(defun memacs-org-capture-complete-snippets ()
+  "Complete path of snippet file and init context."
+  (interactive)
+  (let* ((snippet-lang (memacs-org-roam-complete-program-languages))
+         (snippet-dir (expand-file-name snippet-lang +org-snippet-directory))
+         (snippet-title (ivy-completing-read "Snippet Title: " nil nil nil
+                                             "" 'memacs--org-capture-complete-snippets)))
+    (setq memacs--org-capture-complete-snippets-context
+          (->> '()
+               (acons 'title snippet-title)
+               (acons 'lang snippet-lang)))
+    (expand-file-name (concat
+                       (replace-regexp-in-string " " "_" (downcase (s-trim snippet-title)))
+                       ".org")
+                      snippet-dir)))
+
+(defun memacs-org-capture-complete-snippets-title ()
+  "Return snippet title in context."
+  (->> memacs--org-capture-complete-snippets-context
+       (assoc 'title)
+       cdr))
+
+(defun memacs-org-capture-complete-snippets-lang ()
+  "Return snippet title in context."
+  (->> memacs--org-capture-complete-snippets-context
+       (assoc 'lang)
+       cdr))
 
 (defun memacs--org-roam-complete-directories (parent-dir message &optional history-symbol)
   "Complete name of directories under `parent-dir'."
