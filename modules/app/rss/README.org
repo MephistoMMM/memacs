@@ -39,7 +39,7 @@ Read RSS feeds in the comfort of Emacs.
 
 * TODO Usage
 #+begin_quote
- 🔨 /This module's usage documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
+ 󱌣 /This module's usage documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
 #+end_quote
 
 - As there isn't currently binding for ~elfeed-update~ you can run it with ~M-x
@@ -47,7 +47,7 @@ Read RSS feeds in the comfort of Emacs.
 
 * TODO Configuration
 #+begin_quote
- 🔨 /This module's configuration documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
+ 󱌣 /This module's configuration documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
 #+end_quote
 
 ** Without +org
@@ -78,7 +78,7 @@ configure feeds to follow:
 - You can "name" feeds as you please with ~org-mode~ ~org-insert-link~ ([[kbd:][C-c C-l]])
   and put name as you want into ~description~.
 - If you don't want to use ~org-directory/elfeed.org~ file you can specify it
-  with ~(setq rmh-elfeed-org-files '("path/to/your/elfeed/file.org))~
+  with ~(setq rmh-elfeed-org-files '("path/to/your/elfeed/file.org"))~
 
 ** Keybindings
 + General
@@ -128,5 +128,5 @@ Hook ~elfeed-update~ to ~elfeed-search-mode-hook~:
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

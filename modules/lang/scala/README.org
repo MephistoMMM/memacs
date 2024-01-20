@@ -87,7 +87,7 @@ coursier bootstrap \
   org.scalameta:metals_2.12:0.9.4 \
   -r bintray:scalacenter/releases \
   -r sonatype:snapshots \
-  -o /usr/local/bin/metals-emacs -f
+  -o /usr/local/bin/metals -f
 #+end_src
 
 **** Arch Linux
@@ -95,14 +95,18 @@ coursier bootstrap \
 yay -S metals
 #+end_src
 
+** Formatter
+
+Formatting is handled using the [[doom-module::editor format]] module via [[https://scalameta.org/scalafmt/docs/installation.html#cli][scalafmt]].
+
 * TODO Usage
 #+begin_quote
- 🔨 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * TODO Configuration
 #+begin_quote
- 🔨 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * Troubleshooting
@@ -119,5 +123,5 @@ yay -S metals
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

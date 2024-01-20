@@ -10,6 +10,12 @@ overrides `completion-styles' during company completion sessions.")
 (defvar +vertico-consult-fd-args nil
   "Shell command and arguments the vertico module uses for fd.")
 
+(defvar +vertico-consult-dir-container-executable "docker"
+  "Command to call for listing container hosts.")
+
+(defvar +vertico-consult-dir-container-args nil
+  "Command to call for listing container hosts.")
+
 ;;
 ;;; Packages
 
@@ -130,9 +136,10 @@ orderless."
     [remap yank-pop]                      #'consult-yank-pop
     [remap persp-switch-to-buffer]        #'+vertico/switch-workspace-buffer)
   :config
-  (defadvice! +vertico--consult-recent-file-a (&rest _args)
-    "`consult-recent-file' needs to have `recentf-mode' on to work correctly"
-    :before #'consult-recent-file
+  (defadvice! +vertico--consult-recentf-a (&rest _args)
+    "`consult-recent-file' needs to have `recentf-mode' on to work correctly.
+`consult-buffer' needs `recentf-mode' to show file candidates."
+    :before (list #'consult-recent-file #'consult-buffer)
     (recentf-mode +1))
 
   (setq consult-project-root-function #'doom-project-root
@@ -197,22 +204,35 @@ orderless."
          ("C-x C-j" . consult-dir-jump-file))
   :config
   (when (modulep! :tools docker)
+    ;; TODO Replace with `tramp-container--completion-function' when we drop support for <29
+    (defun +vertico--consult-dir-container-hosts (host)
+      "Get a list of hosts from HOST."
+      (cl-loop for line in (cdr
+                            (ignore-errors
+                              (apply #'process-lines +vertico-consult-dir-container-executable
+                                     (append +vertico-consult-dir-container-args (list "ps")))))
+               for cand = (split-string line "[[:space:]]+" t)
+               collect (let ((user (unless (string-empty-p (car cand))
+                                     (concat (car cand) "@")))
+                             (hostname (car (last cand))))
+                         (format "/%s:%s%s:/" host user hostname))))
+
+    (defun +vertico--consult-dir-podman-hosts ()
+      (let ((+vertico-consult-dir-container-executable "podman"))
+        (+vertico--consult-dir-container-hosts "podman")))
+
     (defun +vertico--consult-dir-docker-hosts ()
-      "Get a list of hosts from docker."
-      (when (if (>= emacs-major-version 29)
-                (require 'tramp-container nil t)
-              (setq-local docker-tramp-use-names t)
-              (require 'docker-tramp nil t))
-        (let ((hosts)
-              (docker-query-fn #'docker-tramp--parse-running-containers))
-          (when (>= emacs-major-version 29)
-            (setq docker-query-fn #'tramp-docker--completion-function))
-          (dolist (cand (funcall docker-query-fn))
-            (let ((user (unless (string-empty-p (car cand))
-                          (concat (car cand) "@")))
-                  (host (car (cdr cand))))
-              (push (concat "/docker:" user host ":/") hosts)))
-          hosts)))
+      (let ((+vertico-consult-dir-container-executable "docker"))
+        (+vertico--consult-dir-container-hosts "docker")))
+
+    (defvar +vertico--consult-dir-source-tramp-podman
+      `(:name     "Podman"
+        :narrow   ?p
+        :category file
+        :face     consult-file
+        :history  file-name-history
+        :items    ,#'+vertico--consult-dir-podman-hosts)
+      "Podman candiadate source for `consult-dir'.")
 
     (defvar +vertico--consult-dir-source-tramp-docker
       `(:name     "Docker"
@@ -223,13 +243,15 @@ orderless."
         :items    ,#'+vertico--consult-dir-docker-hosts)
       "Docker candiadate source for `consult-dir'.")
 
+    (add-to-list 'consult-dir-sources '+vertico--consult-dir-source-tramp-podman t)
     (add-to-list 'consult-dir-sources '+vertico--consult-dir-source-tramp-docker t))
 
   (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-ssh t)
   (add-to-list 'consult-dir-sources 'consult-dir--source-tramp-local t))
 
 (use-package! consult-flycheck
-  :when (modulep! :checkers syntax)
+  :when (and (modulep! :checkers syntax)
+             (not (modulep! :checkers syntax +flymake)))
   :after (consult flycheck))
 
 
@@ -252,14 +274,16 @@ orderless."
 
   (set-popup-rule! "^\\*Embark Export:" :size 0.35 :ttl 0 :quit nil)
 
-  (defadvice! +vertico--embark-which-key-prompt-a (fn &rest args)
-    "Hide the which-key indicator immediately when using the completing-read prompter."
-    :around #'embark-completing-read-prompter
-    (which-key--hide-popup-ignore-command)
-    (let ((embark-indicators
-           (remq #'embark-which-key-indicator embark-indicators)))
-      (apply fn args)))
-  (cl-nsubstitute #'+vertico-embark-which-key-indicator #'embark-mixed-indicator embark-indicators)
+  (after! which-key
+    (defadvice! +vertico--embark-which-key-prompt-a (fn &rest args)
+      "Hide the which-key indicator immediately when using the completing-read prompter."
+      :around #'embark-completing-read-prompter
+      (which-key--hide-popup-ignore-command)
+      (let ((embark-indicators
+             (remq #'embark-which-key-indicator embark-indicators)))
+        (apply fn args)))
+    (cl-nsubstitute #'+vertico-embark-which-key-indicator #'embark-mixed-indicator embark-indicators))
+
   ;; add the package! target finder before the file target finder,
   ;; so we don't get a false positive match.
   (let ((pos (or (cl-position
@@ -293,7 +317,7 @@ orderless."
         :desc "Cycle marginalia views" "M-A" #'marginalia-cycle)
   :config
   (when (modulep! +icons)
-    (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
+    (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
   (advice-add #'marginalia--project-root :override #'doom-project-root)
   (pushnew! marginalia-command-categories
             '(+default/find-file-under-here . file)

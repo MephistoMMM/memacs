@@ -35,7 +35,7 @@ This is ignored by ccls.")
 (use-package! cc-mode
   :mode ("\\.mm\\'" . objc-mode)
   ;; Use `c-mode'/`c++-mode'/`objc-mode' depending on heuristics
-  :mode ("\\.h\\'" . +cc-c-c++-objc-mode) 
+  :mode ("\\.h\\'" . +cc-c-c++-objc-mode)
   ;; Ensure find-file-at-point recognize system libraries in C modes. It must be
   ;; set up before the likes of irony/lsp are initialized. Also, we use
   ;; local-vars hooks to ensure these only run in their respective major modes,
@@ -48,6 +48,17 @@ This is ignored by ccls.")
   (set-docsets! 'c-mode "C")
   (set-docsets! 'c++-mode "C++" "Boost")
   (set-electric! '(c-mode c++-mode objc-mode java-mode) :chars '(?\n ?\} ?\{))
+  (set-formatter!
+    'clang-format
+    '("clang-format"
+      "-assume-filename"
+      (or (buffer-file-name)
+          (cdr (assoc major-mode
+                      '((c-mode        . ".c")
+                        (c++-mode      . ".cpp")
+                        (cuda-mode     . ".cu")
+                        (protobuf-mode . ".proto"))))))
+    :modes '(c-mode c++-mode protobuf-mode cuda-mode))
   (set-rotate-patterns! 'c++-mode
     :symbols '(("public" "protected" "private")
                ("class" "struct")))
@@ -146,7 +157,8 @@ This is ignored by ccls.")
     :hook (irony-mode . irony-eldoc))
 
   (use-package! flycheck-irony
-    :when (modulep! :checkers syntax)
+    :when (and (modulep! :checkers syntax)
+               (not (modulep! :checkers syntax +flymake)))
     :config (flycheck-irony-setup))
 
   (use-package! company-irony
@@ -228,8 +240,7 @@ If rtags or rdm aren't available, fail silently instead of throwing a breaking e
   ;; than display a jarring confirmation prompt for killing it.
   (add-hook! 'kill-emacs-hook (ignore-errors (rtags-cancel-process)))
 
-  (add-hook 'rtags-jump-hook #'better-jumper-set-jump)
-  (add-hook 'rtags-after-find-file-hook #'recenter))
+  (add-hook 'rtags-jump-hook #'better-jumper-set-jump))
 
 
 ;;
@@ -239,7 +250,12 @@ If rtags or rdm aren't available, fail silently instead of throwing a breaking e
   (add-hook! '(c-mode-local-vars-hook
                c++-mode-local-vars-hook
                objc-mode-local-vars-hook
-               cmake-mode-local-vars-hook)
+               cmake-mode-local-vars-hook
+               ;; HACK Can't use cude-mode-local-vars-hook because cuda-mode
+               ;;   isn't a proper major mode (just a plain function
+               ;;   masquarading as one, so your standard mode hooks won't fire
+               ;;   from switching to cuda-mode).
+               cuda-mode-hook)
              :append #'lsp!)
 
   (map! :after ccls

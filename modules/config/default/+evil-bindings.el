@@ -514,7 +514,10 @@
 
       ;;; <leader> i --- insert
       (:prefix-map ("i" . "insert")
-       :desc "Emoji"                         "e"   #'emojify-insert-emoji
+       (:when (> emacs-major-version 28)
+         :desc "Emoji"                       "e"   #'emoji-search)
+       (:when (modulep! :ui emoji)
+         :desc "Emoji"                       "e"   #'emojify-insert-emoji)
        :desc "Current file name"             "f"   #'+default/insert-file-path
        :desc "Current file path"             "F"   (cmd!! #'+default/insert-file-path t)
        :desc "Evil ex path"                  "p"   (cmd! (evil-ex "R!echo "))
@@ -522,6 +525,30 @@
        :desc "Snippet"                       "s"   #'yas-insert-snippet
        :desc "Unicode"                       "u"   #'insert-char
        :desc "From clipboard"                "y"   #'+default/yank-pop)
+
+      ;;; <leader> l --- live share/collab
+      ;;; TODO Do you like this location for this map? This was the best idea we
+      ;;; could come up with, but we're happy to move it if there's a better
+      ;;; place! Also not sure if we're allowed to say "live share" since that's
+      ;;; a blatant ripoff of VS Code's name for this feature
+      (:when (modulep! :tools collab)
+       (:prefix-map ("l" . "live share/collab")
+        :desc "Switch to a shared buffer"      "b"   #'crdt-switch-to-buffer
+        :desc "Connect to a session"           "c"   #'crdt-connect
+        :desc "Disconnect from session"        "d"   #'crdt-disconnect
+        :desc "Toggle following user's cursor" "f"   #'crdt-follow-user
+        :desc "Stop following user if any"     "F"   #'crdt-stop-follow
+        :desc "Goto another user's cursor"     "g"   #'crdt-goto-user
+        :desc "List shared buffers"            "i"   #'crdt-list-buffers
+        :desc "Kick a user (host only)"        "k"   #'crdt-kill-user
+        :desc "List sessions"                  "l"   #'crdt-list-sessions
+        :desc "Share current buffer"           "s"   #'crdt-share-buffer
+        :desc "Stop sharing current buffer"    "S"   #'crdt-stop-share-buffer
+        :desc "List connected users"           "u"   #'crdt-list-users
+        :desc "Stop a session (host only)"     "x"   #'crdt-stop-session
+        :desc "Copy URL of current session"    "y"   #'crdt-copy-url
+        :desc "Goto next user's cursor"        "]"   #'crdt-goto-next-user
+        :desc "Goto previous user's cursor"    "["   #'crdt-goto-prev-user))
 
       ;;; <leader> n --- notes
       (:prefix-map ("n" . "notes")
@@ -720,7 +747,8 @@
        :desc "Big mode"                     "b" #'doom-big-font-mode
        :desc "Fill Column Indicator"        "c" #'global-display-fill-column-indicator-mode
        :desc "Flymake"                      "f" #'flymake-mode
-       (:when (modulep! :checkers syntax)
+       (:when (and (modulep! :checkers syntax)
+                   (not (modulep! :checkers syntax +flymake)))
         :desc "Flycheck"                   "f" #'flycheck-mode)
        :desc "Frame fullscreen"             "F" #'toggle-frame-fullscreen
        :desc "Evil goggles"                 "g" #'evil-goggles-mode
@@ -767,6 +795,7 @@
    :desc "Search .emacs.d"              "e" #'+default/search-emacsd
    :desc "Locate file"                  "f" #'locate
    :desc "Jump to symbol"               "i" #'imenu
+   :desc "Jump to symbol in open buffers" "I" #'consult-imenu-multi
    :desc "Jump to visible link"         "l" #'link-hint-open-link
    :desc "Jump to link"                 "L" #'ffap-menu
    :desc "Jump list"                    "j" #'evil-show-jumps
@@ -786,8 +815,9 @@
          ((modulep! :completion helm)      #'swiper-isearch-thing-at-point))
    :desc "Dictionary"                   "t" #'+lookup/dictionary-definition
    :desc "Thesaurus"                    "T" #'+lookup/synonyms
-   (:when (fboundp 'vundo)
-     :desc "Undo history"               "u" #'vundo))
+   :desc "Undo history"                 "u"
+   (cond ((modulep! :emacs undo +tree)     #'undo-tree-visualize)
+         ((modulep! :emacs undo)           #'vundo)))
 
  ;;; M-y --- yank
  :nmei "M-y" #'counsel-yank-pop

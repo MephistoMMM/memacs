@@ -1,5 +1,8 @@
 ;;; lang/ocaml/config.el -*- lexical-binding: t; -*-
 
+(after! projectile
+  (pushnew! projectile-project-root-files "dune-project"))
+
 ;;
 ;;; Packages
 
@@ -64,7 +67,9 @@
         "t" #'merlin-type-enclosing)
 
   (use-package! flycheck-ocaml
-    :when (modulep! :checkers syntax)
+    :when (and (modulep! :checkers syntax)
+               (not (modulep! :checkers syntax +flymake)))
+
     :hook (merlin-mode . +ocaml-init-flycheck-h)
     :config
     (defun +ocaml-init-flycheck-h ()
@@ -105,11 +110,9 @@
   :commands ocamlformat
   :hook (tuareg-mode-local-vars . +ocaml-init-ocamlformat-h)
   :config
-  (set-formatter! 'ocamlformat #'ocamlformat
-    :modes '(caml-mode tuareg-mode))
   ;; TODO Fix region-based formatting support
   (defun +ocaml-init-ocamlformat-h ()
-    (setq +format-with 'ocp-indent)
+    (setq-local +format-with 'ocp-indent)
     (when (and (executable-find "ocamlformat")
                (locate-dominating-file default-directory ".ocamlformat"))
       (when buffer-file-name
@@ -118,7 +121,7 @@
                  (setq-local ocamlformat-file-kind 'implementation))
                 ((equal ext ".eliomi")
                  (setq-local ocamlformat-file-kind 'interface)))))
-      (setq +format-with 'ocamlformat))))
+      (setq-local +format-with 'ocamlformat))))
 
 ;; Tree sitter
 (eval-when! (modulep! +tree-sitter)

@@ -133,9 +133,14 @@ rdm &
 rc -J $PROJECT_ROOT  # loads PROJECT_ROOT's compile_commands.json
 #+end_src
 
+** =:editor format=
+The formatter used is [[doom-executable:clang-format]] which should be installed alongside =clang=.
+
+For more info, see [[doom-module::editor format]].
+
 * TODO Usage
 #+begin_quote
- 🔨 /This module's usage documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
+ 󱌣 /This module's usage documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
 #+end_quote
 
 1. Enable this module.
@@ -155,7 +160,7 @@ additional function to get inheritance type hierarchy is added:
 
 * TODO Configure
 #+begin_quote
- 🔨 /This module's configuration documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
+ 󱌣 /This module's configuration documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
 #+end_quote
 
 ** Project compile settings
@@ -274,5 +279,5 @@ lists available options
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

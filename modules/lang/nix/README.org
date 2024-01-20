@@ -22,6 +22,12 @@ Includes:
 - +tree-sitter ::
   Leverages tree-sitter for better syntax highlighting and structural text
   editing. Requires [[doom-module::tools tree-sitter]].
+- +lsp ::
+  Enable an LSP hook for ~nix-mode~. Requires [[doom-module::tools lsp]] and a language
+  server (one of either ~nil~ or ~rnix-lsp~).
+
+  You can still start a nix lsp manually without this flag, this just adds
+  a hook to always start the lsp when loading ~nix-mode~.
 
 ** Packages
 - [[doom-package:company-nixos-options]] if [[doom-module::completion company]]
@@ -50,7 +56,7 @@ This module requires:
 
 * TODO Usage
 #+begin_quote
- 🔨 /This module's usage documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
+ 󱌣 /This module's usage documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
 #+end_quote
 
 ** Keybindings
@@ -66,7 +72,7 @@ This module requires:
 
 * TODO Configuration
 #+begin_quote
- 🔨 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * Troubleshooting
@@ -77,5 +83,5 @@ This module requires:
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

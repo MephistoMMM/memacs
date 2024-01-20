@@ -12,7 +12,9 @@ run Terraform commands directly from Emacs.
 /This module has no dedicated maintainers./ [[doom-contrib-maintainer:][Become a maintainer?]]
 
 ** Module flags
-/This module has no flags./
+- +lsp ::
+  Enable LSP support for ~terraform-mode~. Requires [[doom-module::tools lsp]] and a langserver
+  (supports terraform-ls or terraform-lsp).
 
 ** Packages
 - [[doom-package:company-terraform]] if [[doom-package::completion company]]
@@ -64,7 +66,7 @@ Terraform operations:
 
 * TODO Configuration
 #+begin_quote
-🔨 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * Troubleshooting
@@ -75,5 +77,5 @@ Terraform operations:
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

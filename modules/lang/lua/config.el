@@ -75,13 +75,15 @@ lua-language-server.")
   (add-hook! 'moonscript-mode-hook
              #'+lua-moonscript-fix-single-quotes-h
              #'+lua-moonscript-fontify-interpolation-h)
-  (when (modulep! :checkers syntax)
+  (when (and (modulep! :checkers syntax)
+             (not (modulep! :checkers syntax +flymake)))
     (require 'flycheck-moonscript nil t)))
 
 
 (use-package! fennel-mode
   :when (modulep! +fennel)
-  :defer t
+  :mode "\\.fenneldoc\\'"
+  :hook (fennel-mode . rainbow-delimiters-mode)
   :config
   (set-lookup-handlers! 'fennel-mode
     :definition #'fennel-find-definition

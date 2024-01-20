@@ -355,7 +355,8 @@ Any non-nil value besides the above will be used as the raw value for
                                    ;; parameter, since `other-window' won't.
                                    (window-parameter w 'no-other-window)))
                    (window-list)))
-      (select-window (if (+popup-window-p)
+      (select-window (if (or (+popup-window-p)
+                             (window-parameter nil 'no-other-window))
                          (let ((window (selected-window)))
                            (or (car-safe (cdr (memq window popups)))
                                (car (delq window popups))
@@ -436,9 +437,10 @@ window and return that window."
         (+popup--inhibit-transient t)
         +popup--remember-last)
     (+popup/close window 'force)
-    (if arg
-        (pop-to-buffer buffer)
-      (switch-to-buffer buffer))
+    (let (display-buffer-alist)
+      (if arg
+          (pop-to-buffer buffer)
+        (switch-to-buffer buffer)))
     (selected-window)))
 
 ;;;###autoload

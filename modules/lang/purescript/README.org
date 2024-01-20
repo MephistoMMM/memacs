@@ -26,21 +26,29 @@ This module adds [[https://www.purescript.org/][Purescript]] support to Doom Ema
 # This section will be machine generated. Don't edit it by hand.
 /This module does not have a changelog yet./
 
-* TODO Installation
+* Installation
 [[id:01cffea4-3329-45e2-a892-95a384ab2338][Enable this module in your ~doom!~ block.]]
 
-#+begin_quote
-🔨 /This module's prerequisites are not documented./ [[doom-contrib-module:][Document them?]]
-#+end_quote
+The main tools for PureScript are installed via npm.
+
+** Compiler
+#+begin_src shell
+npm install -g purescript spago
+#+end_src
+
+** Formatter
+#+begin_src sh
+npm install -g purs-tidy
+#+end_src
 
 * TODO Usage
 #+begin_quote
-🔨 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * TODO Configuration
 #+begin_quote
-🔨 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * Troubleshooting
@@ -51,5 +59,5 @@ This module adds [[https://www.purescript.org/][Purescript]] support to Doom Ema
 
 * TODO Appendix
 #+begin_quote
-🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

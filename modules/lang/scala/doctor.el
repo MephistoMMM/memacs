@@ -9,5 +9,9 @@
          "This module requires (:tools tree-sitter)")
 
 (if (and (modulep! +lsp)
-         (not (executable-find "metals-emacs")))
-    (warn! "metals-emacs isn't installed"))
+         (not (executable-find "metals")))
+    (warn! "metals isn't installed"))
+
+(when (modulep! :editor format)
+  (unless (executable-find "scalafmt")
+    (warn! "Couldn't find scalafmt. Formatting will be disabled.")))

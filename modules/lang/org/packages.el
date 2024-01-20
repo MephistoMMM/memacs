@@ -31,32 +31,32 @@
                          (format "(defun org-git-version (&rest _) \"%s-??-%s\")\n"
                                  version (cdr (doom-call-process "git" "rev-parse" "--short" "HEAD")))
                          "(provide 'org-version)\n")))))
-  :pin "fe92a3cedba541482d5954eacb2b13e6f57a39c4")
+  :pin "57b94f3447b9046dac2f9238e24ad902510056cc")
 (package! org-contrib
   :recipe (:host github
            :repo "emacsmirror/org-contrib")
-  :pin "fff6c888065588527b1c1d7dd7e41c29ef767e17")
+  :pin "79286861ae3f4a47fbc66ce97cd527196f60c4a8")
 
 (package! avy)
 (package! htmlize :pin "dd27bc3f26efd728f2b1f01f9e4ac4f61f2ffbf9")
 (package! org-yt
   :recipe (:host github :repo "TobiasZawada/org-yt")
-  :pin "40cc1ac76d741055cbefa13860d9f070a7ade001")
+  :pin "56166f48e04d83668f70ed84706b7a4d8b1e5438")
 (package! ox-clip :pin "ff117cf3c619eef12eccc0ccbfa3f11adb73ea68")
-(package! toc-org :pin "bf2e4b358efbd860ecafe6e74776de0885d9d100")
+(package! toc-org :pin "6d3ae0fc47ce79b1ea06cabe21a3c596395409cd")
 (package! org-cliplink :pin "13e0940b65d22bec34e2de4bc8cba1412a7abfbc")
 
 ;; TODO Adjust when this is added to GNU ELPA
 (when (modulep! +contacts)
   (package! org-contacts
-    :pin "bb4032eb12c20d34555a4e670f28696cf31a7b54"
+    :pin "7f03eafaad2e5746949c0bebb98353e939c51ade"
     :recipe (:host nil
              :type git
              :repo "https://repo.or.cz/org-contacts.git")))
 
 (when (and IS-MAC
            (modulep! :os macos))
-  (package! org-mac-link :pin "0b18c1d070b9601cc65c40e902169e367e4348c9"))
+  (package! org-mac-link :pin "e30171a6e98db90787ab8a23b3a7dc4fd13b10f9"))
 
 (when (modulep! +passwords)
   (package! org-passwords
@@ -69,11 +69,11 @@
     :recipe (:host github :repo "hlissner/evil-org-mode")
     :pin "a9706da260c45b98601bcd72b1d2c0a24a017700"))
 (when (modulep! :tools pdf)
-  (package! org-pdftools :pin "967f48fb5038bba32915ee9da8dc4e8b10ba3376"))
+  (package! org-pdftools :pin "4e420233a153a9c4ab3d1a7e1d7d3211c836f0ac"))
 (when (modulep! :tools magit)
-  (package! orgit :pin "fc40397f7b36fa513d41f3119b7430cb236de9dd")
+  (package! orgit :pin "b60efabc4a1b15d7eacaabc5bdfe6f3c20fee161")
   (when (modulep! :tools magit +forge)
-    (package! orgit-forge :pin "6f424ff3a2df7d9c00c217011949c1367cc15227")))
+    (package! orgit-forge :pin "f595a30aa75af55522b1203cd29198fb9aa3a0a5")))
 (when (modulep! +brain)
   (package! org-brain :pin "2bad7732aae1a3051e2a14de2e30f970bbe43c25"))
 (when (modulep! +dragndrop)
@@ -84,27 +84,27 @@
 (when (modulep! +ipython) ; DEPRECATED
   (package! ob-ipython :pin "7147455230841744fb5b95dcbe03320313a77124"))
 (when (modulep! +jupyter)
-  (package! jupyter :pin "eebeef1293287075f65d27f5442bb151bf27d92a"))
+  (package! jupyter :pin "0a92c0c978ab12bd31a50a7e8b1295f5d1767e20"))
 (when (modulep! +journal)
-  (package! org-journal :pin "2f220a06e3bf6bfa5cda00ebd44817a7b2fd7b76"))
+  (package! org-journal :pin "a306f76ee2b0292946a20530bd9114aefc85a263"))
 (when (modulep! +noter)
-  (package! org-noter :pin "9ead81d42dd4dd5074782d239b2efddf9b8b7b3d"))
+  (package! org-noter :pin "a4296d8338d46b5c863d3d339b50e201172f218c"))
 (when (modulep! +pomodoro)
   (package! org-pomodoro :pin "3f5bcfb80d61556d35fc29e5ddb09750df962cc6"))
 (when (modulep! +pretty)
-  (package! org-appear :pin "eb9f9db40aa529fe4b977235d86494b115281d17")
+  (package! org-appear :pin "81eba5d7a5b74cdb1bad091d85667e836f16b997")
   (package! org-superstar :pin "54c81c27dde2a6dc461bb064e79a8b2089093a2e")
   (package! org-fancy-priorities :pin "7f677c6c14ecf05eab8e0efbfe7f1b00ae68eb1d"))
 (when (modulep! +present)
   (package! centered-window
     :recipe (:host github :repo "anler/centered-window-mode")
     :pin "80965f6c6afe8d918481433984b493de72af5399")
-  (package! org-tree-slide :pin "d6529bc2df727d09014e0e56abf4f15a8e8fc20f")
-  (package! org-re-reveal :pin "91cdd82c47b86990b5eb41fe34446a042194cc83")
+  (package! org-tree-slide :pin "e2599a106a26ce5511095e23df4ea04be6687a8a")
+  (package! org-re-reveal :pin "e7895dae9807df38b6e17b6c24e1e824caad6c46")
   (package! revealjs
     :recipe (:host github :repo "hakimel/reveal.js"
              :files ("css" "dist" "js" "plugin"))
-    :pin "7de6ccb65b98f657f757cb5610613ad9d4f3da2b"))
+    :pin "d5896c968b2406126ca0beafecdffe219230b6b4"))
 (cond
  ((modulep! +roam)
   (package! org-roam
@@ -117,7 +117,7 @@
     ;; FIXME A :recipe isn't strictly necessary, but without it, our package
     ;;       bumper fails to distinguish between org-roam v1 and v2.
     :recipe (:host github :repo "org-roam/org-roam")
-    :pin "74422df546a515bc984c2f3d3a681c09d6f43916")))
+    :pin "5c06471c3a11348342719fd9011486455adeb701")))
 (when IS-MAC
   (package! org-mac-link :pin "0b18c1d070b9601cc65c40e902169e367e4348c9"))
 
@@ -156,16 +156,16 @@
     :recipe (:host github :repo "DEADB17/ob-racket")
     :pin "d8fd51bddb019b0eb68755255f88fc800cfe03cb"))
 (when (modulep! :lang rest)
-  (package! ob-restclient :pin "1b021ce1c67c97fa1aa4d2c0816edb7add129e48"))
+  (package! ob-restclient :pin "1a127eb0165f10bb9d33606aa8529051118805e7"))
 (when (modulep! :lang scala)
   (package! ob-ammonite :pin "39937dff395e70aff76a4224fa49cf2ec6c57cca"))
 
 ;;; Export
 (when (modulep! +pandoc)
-  (package! ox-pandoc :pin "66c32cca4f6047dd7e0f77f10bd565a2d83d4729"))
+  (package! ox-pandoc :pin "0f758517f512e375825679541b5d905be40342eb"))
 (when (modulep! +hugo)
   (package! ox-hugo
     :recipe (:host github :repo "kaushalmodi/ox-hugo" :nonrecursive t)
-    :pin "706b5f622d168bb8e0cf503e0525d2db9177c83e"))
+    :pin "cb1b6cfd7b080e889352150416c1725f11ba937a"))
 (when (modulep! :lang rst)
   (package! ox-rst :pin "99fa790da55b57a3f2e9aa187493ba434a64250e"))

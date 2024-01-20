@@ -168,7 +168,8 @@ selection of all minor-modes, active or not."
                   (location
                    (goto-char location)))
             (ignore-errors
-              (when (outline-invisible-p)
+              (when (memq (get-char-property (point) 'invisible)
+                          '(outline org-fold-outline))
                 (save-excursion
                   (outline-previous-visible-heading 1)
                   (org-show-subtree))))))
@@ -575,7 +576,10 @@ If prefix arg is present, refresh the cache."
                                         (pp-to-string recipe))))
 
            (package--print-help-section "Homepage")
-           (doom--help-insert-button (doom-package-homepage package)))
+           (let ((homepage (doom-package-homepage package)))
+             (if homepage
+                 (doom--help-insert-button homepage)
+               (insert "n/a"))))
 
           (`elpa (insert "[M]ELPA ")
                  (doom--help-insert-button (doom-package-homepage package))

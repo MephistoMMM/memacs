@@ -39,16 +39,23 @@ Includes:
 This module requires Erlang be installed (which includes ~erlang-mode~). Check
 your distribution's package manager or a version management tool such as [[https://github.com/kerl/kerl][kerl]].
 
-For LSP support, install [[https://github.com/erlang/sourcer][sourcer]].
+- [[https://github.com/erlang/sourcer][sourcer]] when [[doom-module::tools lsp]] & [[doom-module:+lsp]]
+- [[https://github.com/sile/efmt][efmt]] when [[doom-module::editor format]]
 
 * TODO Usage
 #+begin_quote
- 🔨 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
+
+** formatter
+By enabling [[doom-module::editor format]], [[doom-package:apheleia]] will be
+used to format the current buffer.
+
+Enable [[doom-module::editor format +onsave]] to format the buffer on save.
 
 * TODO Configuration
 #+begin_quote
- 🔨 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * Troubleshooting
@@ -59,5 +66,5 @@ For LSP support, install [[https://github.com/erlang/sourcer][sourcer]].
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

@@ -221,7 +221,7 @@ workspace."
 ;;;###autoload
 (defun +workspace/rename (new-name)
   "Rename the current workspace."
-  (interactive (list (read-from-minibuffer "New workspace name: ")))
+  (interactive (list (completing-read "New workspace name: " (list (+workspace-current-name)))))
   (condition-case-unless-debug ex
       (let* ((current-name (+workspace-current-name))
              (old-name (+workspace-rename current-name new-name)))
@@ -596,8 +596,9 @@ This be hooked to `projectile-after-switch-project-hook'."
 ;;;###autoload
 (defun +workspaces-load-tab-bar-data-from-file-h (&rest _)
   "Restores the tab bar data from file."
-  (tab-bar-tabs-set (persp-parameter 'tab-bar-tabs))
-  (tab-bar--update-tab-bar-lines t))
+  (when-let ((persp-tab-data (persp-parameter 'tab-bar-tabs)))
+    (tab-bar-tabs-set persp-tab-data)
+    (tab-bar--update-tab-bar-lines t)))
 
 ;;
 ;;; Advice

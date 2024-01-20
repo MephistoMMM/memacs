@@ -7,9 +7,11 @@
   (setq solidity-comment-style 'slash)
   (set-docsets! 'solidity-mode "Solidity")
   (set-company-backend! 'solidity-mode 'company-solidity)
+  (set-formatter! 'prettier-solidity '(npx "prettier" "--stdin-filepath" filepath "--parser=solidity") :modes '(solidity-mode))
 
   (use-package! solidity-flycheck  ; included with solidity-mode
-    :when (modulep! :checkers syntax)
+    :when (and (modulep! :checkers syntax)
+               (not (modulep! :checkers syntax +flymake)))
     :config
     (setq flycheck-solidity-solc-addstd-contracts t)
     (when (funcall flycheck-executable-find solidity-solc-path)

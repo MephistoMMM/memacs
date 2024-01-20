@@ -42,7 +42,8 @@
                "read-patch-directory" "replace-first-line-matching"
                "request-contacts-maybe" "rfc822-phrase-type" "start" "stop"
                "temp-window" "update-contacts" "update-mail-and-index-real"
-               "update-mail-mode" "update-sentinel-func"))
+               "update-mail-mode" "update-sentinel-func" "view-gather-mime-parts"
+               "view-open-file" "view-mime-part-to-temp-file"))
       (defalias (intern (concat "mu4e--" transferable-suffix))
         (intern (concat "mu4e~" transferable-suffix))
         "Alias to provide the API of mu4e 1.8 (mu4e~ ⟶ mu4e--).")
@@ -119,6 +120,7 @@ is non-nil."
   ;; Better search symbols
   (letf! ((defun make-help-button (text help-echo)
             (with-temp-buffer
+              (insert " ")
               (insert-text-button text
                                   'help-echo help-echo
                                   'mouse-face nil)
@@ -127,13 +129,13 @@ is non-nil."
             (cons (make-help-button text1 help-echo)
                   (make-help-button text2 help-echo))))
     (setq mu4e-headers-threaded-label
-          (make-help-button-cons "T" (concat " " (all-the-icons-octicon "git-branch" :v-adjust 0.05))
+          (make-help-button-cons "T" (nerd-icons-octicon "nf-oct-git_branch" :v-adjust 0.05)
                                  "Thread view")
           mu4e-headers-related-label
-          (make-help-button-cons "R" (concat " " (all-the-icons-material "link" :v-adjust -0.1))
+          (make-help-button-cons "R" (nerd-icons-mdicon "nf-md-link" :v-adjust -0.1)
                                  "Showing related emails")
           mu4e-headers-full-label
-          (make-help-button-cons "F" (concat " " (all-the-icons-material "disc_full"))
+          (make-help-button-cons "F" (nerd-icons-mdicon "nf-md-disc")
                                  "Search is full!")))
 
   ;; set mail user agent
@@ -156,14 +158,14 @@ is non-nil."
   (add-to-list 'mu4e-bookmarks
                '("flag:flagged" "Flagged messages" ?f) t)
 
-  ;; TODO avoid assuming that all-the-icons is present
+  ;; TODO avoid assuming that nerd-icons is present
   (defvar +mu4e-header-colorized-faces
-    '(all-the-icons-green
-      all-the-icons-lblue
-      all-the-icons-purple-alt
-      all-the-icons-blue-alt
-      all-the-icons-purple
-      all-the-icons-yellow)
+    '(nerd-icons-green
+      nerd-icons-lblue
+      nerd-icons-purple-alt
+      nerd-icons-blue-alt
+      nerd-icons-purple
+      nerd-icons-yellow)
     "Faces to use when coloring folders and account stripes.")
 
   (defvar +mu4e-min-header-frame-width 120
@@ -220,6 +222,9 @@ is non-nil."
   ;; Wrap text in messages
   (setq-hook! 'mu4e-view-mode-hook truncate-lines nil)
 
+  ;; mu4e now uses `display-buffer-alist' so we need to add some rules of our own
+  (set-popup-rule! "^\\*mu4e-\\(main\\|headers\\)\\*" :ignore t)
+
   ;; Html mails might be better rendered in a browser
   (add-to-list 'mu4e-view-actions '("View in browser" . mu4e-action-view-in-browser))
   (when (fboundp 'make-xwidget)
@@ -272,7 +277,7 @@ Acts like a singular `mu4e-view-save-attachments', without the saving."
                                  (lambda (part)
                                    (when (assoc "attachment" (cdr part))
                                      part))
-                                 (mu4e~view-gather-mime-parts))))
+                                 (mu4e--view-gather-mime-parts))))
                (files (+mu4e-part-selectors parts)))
           (cdr (assoc (completing-read "Select attachment: " (mapcar #'car files)) files))
         (user-error (mu4e-format "No attached files found"))))
@@ -280,13 +285,13 @@ Acts like a singular `mu4e-view-save-attachments', without the saving."
     (defun +mu4e-view-open-attachment ()
       "Select an attachment, and open it."
       (interactive)
-      (mu4e~view-open-file
-       (mu4e~view-mime-part-to-temp-file (cdr (+mu4e-view-select-attachment)))))
+      (mu4e--view-open-file
+       (mu4e--view-mime-part-to-temp-file (cdr (+mu4e-view-select-attachment)))))
 
     (defun +mu4e-view-select-mime-part-action ()
       "Select a MIME part, and perform an action on it."
       (interactive)
-      (let ((labeledparts (+mu4e-part-selectors (mu4e~view-gather-mime-parts))))
+      (let ((labeledparts (+mu4e-part-selectors (mu4e--view-gather-mime-parts))))
         (if labeledparts
             (mu4e-view-mime-part-action
              (cadr (assoc (completing-read "Select part: " (mapcar #'car labeledparts))
@@ -321,8 +326,8 @@ Acts like a singular `mu4e-view-save-attachments', without the saving."
                   sizefmt (format "%%-%ds " maxsizelen))
             (dolist (pinfo partinfo)
               (push (cons (concat (propertize (format "%-2s " (plist-get pinfo :index)) 'face '(bold font-lock-type-face))
-                                  (when (featurep 'all-the-icons)
-                                    (all-the-icons-icon-for-file (or (plist-get pinfo :filename) "")))
+                                  (when (featurep 'nerd-icons)
+                                    (nerd-icons-icon-for-file (or (plist-get pinfo :filename) "")))
                                   (format fnamefmt (or (plist-get pinfo :filename)
                                                        (propertize (plist-get pinfo :type) 'face '(italic font-lock-doc-face))))
                                   (format sizefmt (propertize (plist-get pinfo :size) 'face 'font-lock-builtin-face))
@@ -358,17 +363,6 @@ This should already be the case yet it does not always seem to be."
     :before #'mu4e-compose-forward
     :before #'mu4e-compose-resend
     (read-only-mode -1))
-
-  (defvar +mu4e-main-bullet "⚫"
-    "Prefix to use instead of \"	*\" in the mu4e main view.
-This is enacted by `+mu4e~main-action-str-prettier-a' and
-`+mu4e~main-keyval-str-prettier-a'.")
-
-  (advice-add #'mu4e--key-val :filter-return #'+mu4e~main-keyval-str-prettier-a)
-  (advice-add #'mu4e--main-action-str :override #'+mu4e~main-action-str-prettier-a)
-  (when (modulep! :editor evil)
-    ;; As +mu4e~main-action-str-prettier replaces [k]ey with key q]uit should become quit
-    (setq evil-collection-mu4e-end-region-misc "quit"))
 
   ;; process lock control
   (when IS-WINDOWS

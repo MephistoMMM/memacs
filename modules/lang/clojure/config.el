@@ -16,6 +16,8 @@
 (use-package! clojure-mode
   :hook (clojure-mode . rainbow-delimiters-mode)
   :config
+  (set-formatter! 'cljfmt '("cljfmt" "fix" "-") :modes '(clojure-mode clojurec-mode clojurescript-mode))
+
   (when (modulep! +lsp)
     (add-hook! '(clojure-mode-local-vars-hook
                  clojurec-mode-local-vars-hook
@@ -36,7 +38,11 @@
                  clojurec-mode-local-vars-hook
                  clojurescript-mode-local-vars-hook)
                :append
-               #'tree-sitter!)))
+               #'tree-sitter!)
+    ;; TODO: PR this upstream
+    (after! tree-sitter-langs
+      (add-to-list 'tree-sitter-major-mode-language-alist '(clojurec-mode . clojure))
+      (add-to-list 'tree-sitter-major-mode-language-alist '(clojurescript-mode . clojure)))))
 
 
 ;; `cider-mode' is used instead of the typical `cider' package due to the main
@@ -130,7 +136,7 @@
       "Update repl icon on modeline with cider information."
       (setq cider-modeline-icon (concat
                                  " "
-                                 (+modeline-format-icon 'faicon "terminal" "" face label -0.0575)
+                                 (+modeline-format-icon 'faicon "nf-fa-terminal" "" face label -0.0575)
                                  " "))
       (add-to-list 'global-mode-string
                    '(t (:eval cider-modeline-icon))
@@ -267,6 +273,7 @@
 ;; clojure-lsp already uses clj-kondo under the hood
 (use-package! flycheck-clj-kondo
   :when (and (modulep! :checkers syntax)
+             (not (modulep! :checkers syntax +flymake))
              (not (modulep! +lsp)))
   :after flycheck)
 

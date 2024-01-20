@@ -42,7 +42,7 @@ This module adds [[https://www.javascript.com/][JavaScript]] and [[https://www.t
 
 ** TODO Hacks
 #+begin_quote
- 🔨 This module's hacks haven't been documented yet. [[doom-contrib-module:][Document them?]]
+ 󱌣 This module's hacks haven't been documented yet. [[doom-contrib-module:][Document them?]]
 #+end_quote
 
 ** TODO Changelog
@@ -58,9 +58,13 @@ This module requires [[https://nodejs.org/en/][NodeJS]] and one of [[https://www
 - Arch Linux: ~$ pacman --needed --noconfirm -S nodejs npm~
 - openSUSE: ~$ zypper install nodejs npm~
 
+** Formatter
+
+Formatting is handled using the [[doom-module::editor format]] module via [[https://prettier.io/docs/en/install.html][prettier]].
+
 * TODO Usage
 #+begin_quote
- 🔨 /This module's usage documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
+ 󱌣 /This module's usage documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
 #+end_quote
 
 ~rjsx-mode~ is used for all javascript buffers.
@@ -148,7 +152,7 @@ This module requires [[https://nodejs.org/en/][NodeJS]] and one of [[https://www
 
 * TODO Configuration
 #+begin_quote
- 🔨 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * Troubleshooting
@@ -159,5 +163,5 @@ This module requires [[https://nodejs.org/en/][NodeJS]] and one of [[https://www
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

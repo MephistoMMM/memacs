@@ -45,6 +45,7 @@ See `+emacs-lisp-non-package-mode' for details.")
                   :and "and"
                   :or "or"
                   :not "not")
+  (set-formatter! 'lisp-indent #'apheleia-indent-lisp-buffer :modes '(emacs-lisp-mode))
   (set-rotate-patterns! 'emacs-lisp-mode
     :symbols '(("t" "nil")
                ("let" "let*")
@@ -119,9 +120,6 @@ See `+emacs-lisp-non-package-mode' for details.")
            (when +emacs-lisp-enable-extra-fontification
              `((+emacs-lisp-highlight-vars-and-faces . +emacs-lisp--face)))))
  
-  ;; Recenter window after following definition
-  (advice-add #'elisp-def :after #'doom-recenter-a)
-
   (defadvice! +emacs-lisp-append-value-to-eldoc-a (fn sym)
     "Display variable value next to documentation in eldoc."
     :around #'elisp-get-var-docstring
@@ -197,7 +195,8 @@ See `+emacs-lisp-non-package-mode' for details.")
 
 
 (use-package! flycheck-cask
-  :when (modulep! :checkers syntax)
+  :when (and (modulep! :checkers syntax)
+             (not (modulep! :checkers syntax +flymake)))
   :defer t
   :init
   (add-hook! 'emacs-lisp-mode-hook
@@ -205,7 +204,8 @@ See `+emacs-lisp-non-package-mode' for details.")
 
 
 (use-package! flycheck-package
-  :when (modulep! :checkers syntax)
+  :when (and (modulep! :checkers syntax)
+             (not (modulep! :checkers syntax +flymake)))
   :after flycheck
   :config (flycheck-package-setup))
 

@@ -48,14 +48,21 @@ pacman -S mono
 ** LSP
 The language server is automatically installed by [[https://github.com/emacs-lsp/lsp-mode/blob/master/clients/lsp-fsharp.el][lsp-fsharp]].
 
+** Fantomas
+Fantomas is used for formatting via [[doom-module::editor format]] and can be installed as a [[https://dotnet.microsoft.com/en-us/download][dotnet]] tool. 
+
+#+begin_src shell
+dotnet tool install -g fantomas-tool
+#+end_src
+
 * TODO Usage
 #+begin_quote
- 🔨 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * TODO Configuration
 #+begin_quote
- 🔨 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * Troubleshooting
@@ -66,5 +73,5 @@ The language server is automatically installed by [[https://github.com/emacs-lsp
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

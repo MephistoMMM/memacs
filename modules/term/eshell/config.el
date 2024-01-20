@@ -69,7 +69,7 @@ You should use `set-eshell-alias!' to change this.")
         ;; TODO Use `eshell-input-filter-initial-space' when Emacs 25 support is dropped
         eshell-input-filter (lambda (input) (not (string-match-p "\\`\\s-+" input)))
         ;; em-prompt
-        eshell-prompt-regexp "^.* λ "
+        eshell-prompt-regexp "^[^#$\n]* [#$λ] "
         eshell-prompt-function #'+eshell-default-prompt-fn
         ;; em-glob
         eshell-glob-case-insensitive t
@@ -105,13 +105,17 @@ You should use `set-eshell-alias!' to change this.")
   ;; cursor comes close to the left/right edges of the window.
   (setq-hook! 'eshell-mode-hook hscroll-margin 0)
 
+  ;; Recognize prompts as Imenu entries.
+  (setq-hook! 'eshell-mode-hook
+    imenu-generic-expression
+    `((,(propertize "λ" 'face 'eshell-prompt)
+       ,(concat eshell-prompt-regexp "\\(.*\\)") 1)))
+
   ;; Don't auto-write our aliases! Let us manage our own `eshell-aliases-file'
   ;; or configure `+eshell-aliases' via elisp.
   (advice-add #'eshell-write-aliases-list :override #'ignore)
 
-  ;; REVIEW In Emacs 27 and newer, waiting for esh-module is unnecessary.
-  (after! esh-module
-    (add-to-list 'eshell-modules-list 'eshell-tramp))
+  (add-to-list 'eshell-modules-list 'eshell-tramp)
 
   ;; Visual commands require a proper terminal. Eshell can't handle that, so
   ;; it delegates these commands to a term buffer.
@@ -122,7 +126,51 @@ You should use `set-eshell-alias!' to change this.")
     (setq +eshell--default-aliases eshell-command-aliases-list
           eshell-command-aliases-list
           (append eshell-command-aliases-list
-                  +eshell-aliases))))
+                  +eshell-aliases)))
+
+  ;; HACK: Fixes #3817, where eshell completion after quotes is broken on Emacs
+  ;;   28 and older.
+  ;; CREDIT: Extracted from `cape''s cape-wrap-silent and cape-wrap-purify.
+  ;; REVIEW: Remove when Doom drops 28 support.
+  (when (< emacs-major-version 29)
+    (defadvice! +eshell--silent-a (capf)
+      "Call CAPF and silence it (no messages, no errors).
+This function can be used as an advice around an existing Capf."
+      :around #'pcomplete-completions-at-point
+      (letf! ((defmacro silent (&rest body) `(quiet! (ignore-errors ,@body)))
+              (defmacro wrapped-table (wrap body)
+                `(lambda (str pred action)
+                   (,@body
+                    (let ((result (complete-with-action action table str pred)))
+                      (when
+                          (and (eq action 'completion--unquote)
+                               (functionp (cadr result)))
+                        (cl-callf ,wrap (cadr result)))
+                      result))))
+              (defun* silent-table (table) (wrapped-table silent-table (silent))))
+        (pcase (silent (funcall capf))
+          (`(,beg ,end ,table . ,plist)
+           `(,beg ,end ,(silent-table table) ,@plist)))))
+
+    (defadvice! +eshell--purify-a (capf)
+      "Call CAPF and ensure that it does not illegally modify the buffer. This
+function can be used as an advice around an existing Capf. It has been
+introduced mainly to fix the broken `pcomplete-completions-at-point' function in
+Emacs versions < 29."
+      ;; bug#50470: Fix Capfs which illegally modify the buffer or which
+      ;; illegally call `completion-in-region'. The workaround here was proposed
+      ;; by @jakanakaevangeli and is used in his capf-autosuggest package.
+      :around #'pcomplete-completions-at-point
+      (catch 'illegal-completion-in-region
+        (condition-case nil
+            (let ((buffer-read-only t)
+                  (inhibit-read-only nil)
+                  (completion-in-region-function
+                   (lambda (beg end coll pred)
+                     (throw 'illegal-completion-in-region
+                            (list beg end coll :predicate pred)))))
+              (funcall capf))
+          (buffer-read-only nil))))))
 
 
 (after! esh-mode
@@ -188,7 +236,9 @@ You should use `set-eshell-alias!' to change this.")
 
 
 (use-package eshell-syntax-highlighting
-  :hook (eshell-mode . eshell-syntax-highlighting-mode))
+  :hook (eshell-mode . eshell-syntax-highlighting-mode)
+  :init
+  (add-hook 'eshell-syntax-highlighting-elisp-buffer-setup-hook #'highlight-quoted-mode))
 
 
 (use-package! fish-completion

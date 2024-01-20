@@ -38,7 +38,8 @@
 
 
 (use-package! flycheck-ledger
-  :when (modulep! :checkers syntax)
+  :when (and (modulep! :checkers syntax)
+             (not (modulep! :checkers syntax +flymake)))
   :after ledger-mode)
 
 
@@ -59,6 +60,10 @@
         (:map ledger-mode-map
          :m "]]" #'ledger-navigate-next-xact-or-directive
          :m "[[" #'ledger-navigate-prev-xact-or-directive)
+
+        (:localleader
+         :map ledger-report-mode-map
+         "r" #'ledger-report)
 
         (:localleader
          :map ledger-mode-map

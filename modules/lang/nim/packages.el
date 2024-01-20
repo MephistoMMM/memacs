@@ -3,7 +3,8 @@
 
 ;;; requires nim nimsuggest nimble
 
-(package! nim-mode :pin "744e076f0bea1c5ddc49f92397d9aa98ffa7eff8")
+(package! nim-mode :pin "1338e5b0d5e111ad932efb77d3cad680cc3b86c9")
 
-(when (modulep! :checkers syntax)
+(when (and (modulep! :checkers syntax)
+           (not (modulep! :checkers syntax +flymake)))
   (package! flycheck-nim :pin "ddfade51001571c2399f78bcc509e0aa8eb752a4"))

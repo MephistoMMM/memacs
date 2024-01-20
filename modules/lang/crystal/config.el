@@ -1,6 +1,8 @@
 ;;; lang/crystal/config.el -*- lexical-binding: t; -*-
 
 (after! crystal-mode
+  (set-formatter! 'crystal-mode '("crystal" "tool" "format" "-") :modes '(crystal-mode))
+
   (set-lookup-handlers! 'crystal-mode
     :definition #'crystal-def-jump
     :references #'crystal-tool-imp)
@@ -16,12 +18,14 @@
 
 
 (use-package! flycheck-crystal
-  :when (modulep! :checkers syntax)
+  :when (and (modulep! :checkers syntax)
+             (not (modulep! :checkers syntax +flymake)))
   :after crystal-mode)
 
 
 (use-package! flycheck-ameba
-  :when (modulep! :checkers syntax)
+  :when (and (modulep! :checkers syntax)
+             (not (modulep! :checkers syntax +flymake)))
   :after crystal-mode
   :config (flycheck-ameba-setup))
 

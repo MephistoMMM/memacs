@@ -11,14 +11,6 @@
     :references #'go-guru-referrers
     :documentation #'godoc-at-point)
 
-  ;; Redefines default formatter to *not* use goimports if reformatting a
-  ;; region; as it doesn't play well with partial code.
-  (set-formatter! 'gofmt
-    '(("%s" (if (or +format-region-p
-                    (not (executable-find "goimports")))
-                "gofmt"
-              "goimports"))))
-
   (set-ligatures! 'go-mode
     :null "nil"
     :def  "func"
@@ -88,5 +80,6 @@
   (setq company-go-show-annotation t))
 
 (use-package! flycheck-golangci-lint
-  :when (modulep! :checkers syntax)
+  :when (and (modulep! :checkers syntax)
+             (not (modulep! :checkers syntax +flymake)))
   :hook (go-mode . flycheck-golangci-lint-setup))

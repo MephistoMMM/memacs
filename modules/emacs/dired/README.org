@@ -16,7 +16,7 @@ This module provides reasonable defaults and augmentations for dired.
   Enables dired to be more like [[https://github.com/ranger/ranger][ranger]].
 
 ** Packages
-- [[doom-package:all-the-icons-dired]] if [[doom-module:+icons]]
+- [[doom-package:nerd-icons-dired]] if [[doom-module:+icons]]
 - [[doom-package:diff-hl]]
 - [[doom-package:diredfl]]
 - [[doom-package:dired-rsync]]
@@ -25,7 +25,7 @@ This module provides reasonable defaults and augmentations for dired.
 
 ** TODO Hacks
 #+begin_quote
- 🔨 This module's hacks haven't been documented yet. [[doom-contrib-module:][Document them?]]
+ 󱌣 This module's hacks haven't been documented yet. [[doom-contrib-module:][Document them?]]
 #+end_quote
 
 ** TODO Changelog
@@ -40,13 +40,13 @@ This module has no requirements *except on BSDs* like MacOS or FreeBSD, where
 
 * TODO Usage
 #+begin_quote
- 🔨 /This module's usage documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
+ 󱌣 /This module's usage documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
 #+end_quote
 
-| Keybind | Description                |
-|---------+----------------------------|
-| [[kbd:][SPC f d]] | Find directory with dired  |
-| [[kbd:][q]]       | Exit dired buffer          |
+| Keybind           | Description                                 |
+|-------------------+---------------------------------------------|
+| [[kbd:][SPC f d]] | Find directory with dired                   |
+| [[kbd:][q]]       | Exit dired buffer                           |
 | [[kbd:][C-c C-r]] | Run [[doom-package:dired-rsync]]            |
 | [[kbd:][C-c C-e]] | Rename entries with [[doom-package:wdired]] |
 
@@ -59,7 +59,7 @@ If [[doom-module:+ranger]] is enabled often a buffer will be opened in minimal r
 
 * TODO Configuration
 #+begin_quote
- 🔨 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * Troubleshooting
@@ -70,5 +70,5 @@ If [[doom-module:+ranger]] is enabled often a buffer will be opened in minimal r
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

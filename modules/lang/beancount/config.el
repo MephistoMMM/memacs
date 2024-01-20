@@ -4,12 +4,11 @@
   :mode ("\\.beancount\\'" . beancount-mode)
   :hook (beancount-mode . outline-minor-mode)
   :init
-  ;; REVIEW Remove once domtronn/all-the-icons.el#272 is merged
-  (after! all-the-icons
-    (add-to-list 'all-the-icons-icon-alist
-                 '("\\.beancount\\'" all-the-icons-material "attach_money" :face all-the-icons-lblue))
-    (add-to-list 'all-the-icons-mode-icon-alist
-                 '(beancount-mode all-the-icons-material "attach_money" :face all-the-icons-lblue)))
+  (after! nerd-icons
+    (add-to-list 'nerd-icons-extension-icon-alist
+                 '("beancount" nerd-icons-faicon "nf-fa-money" :face nerd-icons-lblue))
+    (add-to-list 'nerd-icons-mode-icon-alist
+                 '(beancount-mode nerd-icons-faicon "nf-fa-money" :face nerd-icons-lblue)))
 
   :config
   (setq beancount-electric-currency t)
@@ -26,6 +25,7 @@
         :localleader
         "b" #'+beancount/balance
         "c" #'beancount-check
+        "s" #'+beancount/occur
         "l" #'beancount-linked
         "q" #'beancount-query
         "x" #'beancount-context

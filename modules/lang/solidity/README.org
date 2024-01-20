@@ -55,14 +55,18 @@ can set it to your own =.soliumrc.json= with:
 (setq flycheck-solidity-solium-soliumrcfile "~/.soliumrc.json")
 #+end_src
 
+** Formatter
+
+Formatting is handled using the [[doom-module::editor format]] module via [[https://github.com/prettier-solidity/prettier-plugin-solidity#installation-and-usage][prettier]].
+
 * TODO Usage
 #+begin_quote
- 🔨 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * TODO Configuration
 #+begin_quote
- 🔨 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no configuration documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * Troubleshooting
@@ -73,5 +77,5 @@ can set it to your own =.soliumrc.json= with:
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

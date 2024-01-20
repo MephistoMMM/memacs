@@ -31,7 +31,7 @@ persist across Emacs sessions.
   - Undo-tree is too chatty about saving its history files. This has be
     "silenced". i.e. It's visible in \*Messages\*, but won't appear in your
     minibuffer.
-- unfo-fu only
+- undo-fu only
   - Doom defines ~undo-fu-mode~ to make it easier to add hooks/mode-local
     keybinds.
 
@@ -46,12 +46,12 @@ persist across Emacs sessions.
 
 * TODO Usage
 #+begin_quote
- 🔨 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * TODO Configuration
 #+begin_quote
- 🔨 /This module's configuration documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
+ 󱌣 /This module's configuration documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
 #+end_quote
 
 ** Disabling persistent undo history
@@ -80,5 +80,5 @@ persist across Emacs sessions.
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

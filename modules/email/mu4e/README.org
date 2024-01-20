@@ -6,7 +6,7 @@
 * Description :unfold:
 This module makes Emacs an email client, using [[https://www.djcbsoftware.nl/code/mu/mu4e.html][mu4e]].
 
-- Tidied mu4e headers view, with flags from [[doom-package:all-the-icons]].
+- Tidied mu4e headers view, with flags from [[doom-package:nerd-icons]].
 - Consistent coloring of reply depths (across compose and gnus modes).
 - Prettified =mu4e:main= view.
 - Cooperative locking of the =mu= process. Another Emacs instance may request
@@ -47,7 +47,7 @@ This module makes Emacs an email client, using [[https://www.djcbsoftware.nl/cod
 
 ** TODO Hacks
 #+begin_quote
- 🔨 This module's hacks haven't been documented yet. [[doom-contrib-module:][Document them?]]
+ 󱌣 This module's hacks haven't been documented yet. [[doom-contrib-module:][Document them?]]
 #+end_quote
 
 ** TODO Changelog
@@ -64,12 +64,12 @@ This module requires:
   (recommended, default) or [[http://www.offlineimap.org/][offlineimap]] but you can sync mail in other ways too.
 
 #+name: Install Matrix
-| Platform      | Install command            | Base packages           |
-|---------------+----------------------------+-------------------------|
-| MacOS         | ~$ brew install <pkgs>~    | =mu=                    |
+| Platform      | Install command          | Base packages       |
+|---------------+--------------------------+---------------------|
+| MacOS         | ~$ brew install <pkgs>~    | =mu=                  |
 | Arch          | ~$ pacman -S <pkgs>~       | (AUR, ~$ yay -S~) =mu=  |
 | openSUSE      | ~$ zypper install <pkgs>~  | =maildir-utils=, =mu4e= |
-| Fedora        | ~$ dnf install <pkgs>~     | =maildir-utils=         |
+| Fedora        | ~$ dnf install <pkgs>~     | =maildir-utils=       |
 | Debian/Ubuntu | ~$ apt-get install <pkgs>~ | =maildir-utils=, =mu4e= |
 
 Then install either the =isync= (=mbsync=) or =offlineimap= package.
@@ -103,12 +103,12 @@ environment.systemPackages = with pkgs; [
 
 * TODO Usage
 #+begin_quote
- 🔨 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
+ 󱌣 This module has no usage documentation yet. [[doom-contrib-module:][Write some?]]
 #+end_quote
 
 * TODO Configuration
 #+begin_quote
- 🔨 /This module's configuration documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
+ 󱌣 /This module's configuration documentation is incomplete./ [[doom-contrib-module:][Complete it?]]
 #+end_quote
 
 ** offlineimap
@@ -312,5 +312,5 @@ need to switch to the unstable build of =net-mail/mu= to see it.
 
 * TODO Appendix
 #+begin_quote
- 🔨 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
+ 󱌣 This module has no appendix yet. [[doom-contrib-module:][Write one?]]
 #+end_quote

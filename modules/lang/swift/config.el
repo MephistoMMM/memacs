@@ -2,7 +2,10 @@
 
 (after! swift-mode
   (set-repl-handler! 'swift-mode #'run-swift)
+  (set-eglot-client! 'swift-mode '("sourcekit-lsp"))
 
+  (when (modulep! +lsp)
+    (add-hook 'swift-mode-local-vars-hook #'lsp! 'append))
   (when (modulep! +tree-sitter)
     (add-hook 'swift-mode-local-vars-hook #'tree-sitter! 'append)))
 
@@ -23,10 +26,11 @@
 
 
 (use-package! lsp-sourcekit
-  :when (modulep! +lsp)
+  :when (and (modulep! +lsp) (not (modulep! :tools lsp +eglot)))
   :after swift-mode
   :init (add-hook 'swift-mode-local-vars-hook #'lsp! 'append)
   :config
+  (set-formatter! 'swiftformat '("swiftformat" "--output" "stdout"))
   (setq lsp-sourcekit-executable
         (cl-find-if #'executable-find
                     (list lsp-sourcekit-executable ; 'sourcekit-lsp' by default

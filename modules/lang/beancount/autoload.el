@@ -3,7 +3,7 @@
 ;;
 ;;; Helpers
 
-;; Lifted from ledger
+;; Lifted from ledger-mode
 (defconst +beancount--payee-any-status-regex
   "^[0-9]+[-/][-/.=0-9]+\\(\\s-+\\*\\)?\\(\\s-+(.*?)\\)?\\s-+\\(.+?\\)\\s-*\\(;\\|$\\)")
 
@@ -111,9 +111,9 @@ If REVERSE (the prefix arg) is non-nil, sort the transactions in reverst order."
         (let ((inhibit-field-text-motion t))
           (sort-subr
            reverse
-           '+beancount--navigate-next-xact
-           '+beancount--navigate-end-of-xact
-           '+beancount--sort-startkey))))
+           #'+beancount--navigate-next-xact
+           #'+beancount--navigate-end-of-xact
+           #'+beancount--sort-startkey))))
     (goto-char (point-min))
     (re-search-forward (regexp-quote target-xact))
     (goto-char (+ (match-beginning 0) point-delta))))
@@ -121,14 +121,16 @@ If REVERSE (the prefix arg) is non-nil, sort the transactions in reverst order."
 (defvar compilation-read-command)
 ;;;###autoload
 (defun +beancount/balance ()
-  "Run 'bean-report bal'."
+  "Display a balance report with bean-report (bean-report bal)."
   (interactive)
   (let (compilation-read-command)
     (beancount--run "bean-report" buffer-file-name "bal")))
 
 ;;;###autoload
 (defun +beancount/clone-transaction ()
-  "TODO"
+  "Clones a transaction from (and to the bottom of) the current ledger buffer.
+
+Updates the date to today."
   (interactive)
   (save-restriction
     (widen)
@@ -144,8 +146,9 @@ If REVERSE (the prefix arg) is non-nil, sort the transactions in reverst order."
 
 ;;;###autoload
 (defun +beancount/clone-this-transaction (&optional arg)
-  "Copy the current transaction to the bottom of the ledger.
-Updates the date to today"
+  "Clones the transaction at point to the bottom of the ledger.
+
+Updates the date to today."
   (interactive "P")
   (if (and (not arg) (looking-at-p "^$"))
       (call-interactively #'+beancount/clone-transaction)
@@ -166,15 +169,65 @@ Updates the date to today"
         (insert transaction)))))
 
 ;;;###autoload
+(defun +beancount/occur (account &optional disable?)
+  "Hide transactions that don't involve ACCOUNT.
+
+If DISABLE? (universal arg), reveal hidden accounts without prompting."
+  (interactive
+   (list (unless current-prefix-arg
+           ;; REVIEW: Could/should this be generalized to search for arbitrary
+           ;;   regexps, if desired?
+           (completing-read "Account: " #'beancount-account-completion-table))
+         current-prefix-arg))
+  (with-silent-modifications
+    (save-excursion
+      (setq header-line-format nil)
+      ;; TODO: Namespace these text-properties, in case of conflicts
+      (remove-text-properties (point-min) (point-max) '(invisible nil display nil))
+      (unless disable?
+        ;; TODO: Prettier header-line display
+        (setq header-line-format `("" "Filtering by account: " ,account))
+        (let ((start (point-min))
+              (placeholder (propertize "[...]\n" 'face 'shadow)))
+          (goto-char start)
+          (while (re-search-forward (concat "\\_<" (regexp-quote account) "\\_>") nil t)
+            (save-excursion
+              (seq-let (beg end) (beancount-find-transaction-extents (point))
+                ;; TODO: Highlight entry (ala org-occur)
+                (if (= beg end)
+                    (setq end (save-excursion (goto-char end) (1+ (eol)))))
+                (put-text-property start beg 'invisible t)
+                (put-text-property start beg 'display placeholder)
+                (setq start end))))
+          (put-text-property start (point-max) 'invisible t)
+          (put-text-property start (point-max) 'display placeholder))))))
+
+;;;###autoload
 (defun +beancount/next-transaction (&optional count)
   "Jump to the start of the next COUNT-th transaction."
   (interactive "p")
-  (dotimes (_ (or count 1))
-    (beancount-goto-next-transaction)))
+  (let ((beancount-transaction-regexp
+         ;; Don't skip over timestamped directives (like balance or event
+         ;; declarations).
+         (concat beancount-timestamped-directive-regexp
+                 "\\|" beancount-transaction-regexp)))
+    (dotimes (_ (or count 1))
+      (beancount-goto-next-transaction))))
 
 ;;;###autoload
 (defun +beancount/previous-transaction (&optional count)
-  "Jump to the start of current or previous COUNT-th transaction."
+  "Jump to the start of current or previous COUNT-th transaction.
+
+Return non-nil if successful."
   (interactive "p")
-  (re-search-backward
-   beancount-transaction-regexp nil t (or count 1)))
+  (let ((pos (point)))
+    (condition-case e
+        (progn
+          ;; Ensures "jump to top of current transaction" behavior that is
+          ;; common for jump-to-previous commands like this in other Emacs modes
+          ;; (like org-mode).
+          (or (bolp) (goto-char (eol)))
+          (re-search-backward
+           (concat beancount-timestamped-directive-regexp
+                   "\\|" beancount-transaction-regexp)))
+      ('search-failed (goto-char pos) nil))))
