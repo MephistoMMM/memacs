@@ -9,6 +9,16 @@
   (set-lookup-handlers! 'go-mode
     :documentation #'godoc-at-point)
 
+  (set-ligatures! 'go-mode
+    :null "nil"
+    :def  "func"
+    :true "true"
+    :false "false"
+    :bool  "bool"
+    :and "&&"
+    :or "||"
+    :not "!")
+
   (if (modulep! +lsp)
       (add-hook 'go-mode-local-vars-hook #'lsp! 'append)
     (add-hook 'go-mode-hook #'go-eldoc-setup))

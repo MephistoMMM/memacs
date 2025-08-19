@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: head of define
+# key: defhead
+# --
+#ifndef ${1:FILE_MAC}
+#define $1 1
+
+$0
+
+#endif

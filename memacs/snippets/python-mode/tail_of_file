@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: tail_of_file
+# key: t_file
+# --
+if __name__ == '__main__':
+    ${1:import doctest
+    doctest.testmod()}

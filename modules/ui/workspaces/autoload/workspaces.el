@@ -470,6 +470,7 @@ the next."
 ;;
 ;;; Tabs display in minibuffer
 
+;;;###autoload
 (defun +workspace--tabline (&optional names)
   (let ((names (or names (+workspace-list-names)))
         (current-name (+workspace-current-name)))
@@ -507,10 +508,7 @@ the next."
 
 ;;;###autoload
 (defun +workspace/display ()
-  "Display a list of workspaces (like tabs) in the echo area."
-  (interactive)
-  (let (message-log-max)
-    (message "%s" (+workspace--tabline))))
+  nil)
 
 
 ;;

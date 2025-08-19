@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: if_progn
+# key: ifprogn
+# --
+(if ${1:condition}
+  (progn ; t
+    ${2:t body}
+    )
+  (progn ; nil
+    ${3:nil body}
+    ))
+$0

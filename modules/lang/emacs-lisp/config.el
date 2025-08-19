@@ -39,7 +39,13 @@ See `+emacs-lisp-non-package-mode' for details.")
       :definition    #'+emacs-lisp-lookup-definition
       :documentation #'+emacs-lisp-lookup-documentation)
     (set-docsets! modes "Emacs Lisp")
-    (set-ligatures! modes :lambda "lambda")
+    (set-ligatures! modes :lambda "lambda"
+                  :true "t"
+                  :false "nil"
+                  :def "defun"
+                  :and "and"
+                  :or "or"
+                  :not "not")
     (set-formatter! 'lisp-indent #'apheleia-indent-lisp-buffer :modes modes)
     (set-rotate-patterns! modes
       :symbols '(("t" "nil")
@@ -86,7 +92,8 @@ See `+emacs-lisp-non-package-mode' for details.")
 
   (add-hook! '(emacs-lisp-mode-hook lisp-data-mode-local-vars-hook)
              ;; Allow folding of outlines in comments
-             #'outline-minor-mode
+             ;; its keymap override my avy commonds
+             ;; #'outline-minor-mode
              ;; Make parenthesis depth easier to distinguish at a glance
              #'rainbow-delimiters-mode
              ;; Make quoted symbols easier to distinguish from free variables

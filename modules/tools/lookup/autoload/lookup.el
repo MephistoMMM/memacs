@@ -178,6 +178,16 @@ This can be passed nil as its second argument to unset handlers for MODES. e.g.
           result)
       (set-marker origin nil))))
 
+(defun +lookup--jump-to-other-window (prop identifier &optional display-fn arg)
+  "Jump to definition around point in other window."
+  (let ((pos (point)))
+    ;; since `+lookup--jump-to' can be asynchronous we cannot use
+    ;; `save-excursion' here, so we have to bear with the jumpy behavior.
+    (switch-to-buffer-other-window (current-buffer))
+    (goto-char pos)
+    (+lookup--jump-to prop identifier display-fn arg))
+  )
+
 
 ;;
 ;;; Lookup backends
@@ -347,6 +357,17 @@ evil-mode is active."
   (cond ((null identifier) (user-error "Nothing under point"))
         ((+lookup--jump-to :definition identifier nil arg))
         ((user-error "Couldn't find the definition of %S" (substring-no-properties identifier)))))
+
+;;;###autoload
+(defun +lookup/definition-other-window (identifier &optional arg)
+  "Jump to the definition of IDENTIFIER (defaults to the symbol at point) in other window.
+
+Same as `+lookup/definition', but jump in other window."
+  (interactive (list (doom-thing-at-point-or-region)
+                     current-prefix-arg))
+  (cond ((null identifier) (user-error "Nothing under point"))
+        ((+lookup--jump-to-other-window :definition identifier nil arg))
+        ((error "Couldn't find the definition of %S" identifier))))
 
 ;;;###autoload
 (defun +lookup/implementations (identifier &optional arg)

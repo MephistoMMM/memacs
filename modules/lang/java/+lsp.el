@@ -1,16 +1,21 @@
 ;;; lang/java/+lsp.el -*- lexical-binding: t; -*-
 ;;;###if (and (modulep! +lsp) (modulep! :tools lsp -eglot))
 
+(defvar java-lombok-jar-path (expand-file-name "~/.local/share/lombok-1.18.10.jar")
+  "The path of lombok.jar")
+
 (use-package! lsp-java
   :defer t
   :preface
-  (setq lsp-java-workspace-dir (concat doom-data-dir "java-workspace"))
+  (setq lsp-java-server-install-dir (concat doom-user-dot-local-dir "share/eclipse.jdt.ls/server/")
+        lsp-java-workspace-dir (concat doom-etc-dir "java-workspace"))
   (add-hook 'java-mode-local-vars-hook #'lsp! 'append)
   :config
+  (when (file-exists-p java-lombok-jar-path)
+    (add-to-list 'lsp-java-vmargs (concat "-javaagent:" java-lombok-jar-path)))
   (when (modulep! :tools debugger +lsp)
     (setq lsp-jt-root (concat lsp-java-server-install-dir "java-test/server/")
           dap-java-test-runner (concat lsp-java-server-install-dir "test-runner/junit-platform-console-standalone.jar"))))
-
 
 (use-package! dap-java
   :when (modulep! :tools debugger +lsp)

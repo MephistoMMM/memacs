@@ -28,6 +28,7 @@ directives. By default, this only recognizes C directives.")
   :demand t
   :preface
   (setq evil-ex-search-vim-style-regexp t
+        evil-ex-substitute-global nil
         evil-ex-visual-char-range t  ; column range for ex commands
         evil-mode-line-format 'nil
         ;; more vim-like behavior
@@ -65,6 +66,9 @@ directives. By default, this only recognizes C directives.")
 
   :config
   (evil-select-search-module 'evil-search-module 'evil-search)
+
+  ;; unset repeat forward keybind
+  (define-key evil-motion-state-map "," nil)
 
   ;; PERF: Stop copying the selection to the clipboard each time the cursor
   ;; moves in visual mode. Why? Because on most non-X systems (and in terminals
@@ -189,33 +193,6 @@ directives. By default, this only recognizes C directives.")
 ;;
 ;;; Packages
 
-(use-package! evil-easymotion
-  :after-call doom-first-input-hook
-  :commands evilem-create evilem-default-keybindings
-  :config
-  ;; Use evil-search backend, instead of isearch
-  (evilem-make-motion evilem-motion-search-next #'evil-ex-search-next
-                      :bind ((evil-ex-search-highlight-all nil)))
-  (evilem-make-motion evilem-motion-search-previous #'evil-ex-search-previous
-                      :bind ((evil-ex-search-highlight-all nil)))
-  (evilem-make-motion evilem-motion-search-word-forward #'evil-ex-search-word-forward
-                      :bind ((evil-ex-search-highlight-all nil)))
-  (evilem-make-motion evilem-motion-search-word-backward #'evil-ex-search-word-backward
-                      :bind ((evil-ex-search-highlight-all nil)))
-
-  ;; Rebind scope of w/W/e/E/ge/gE evil-easymotion motions to the visible
-  ;; buffer, rather than just the current line.
-  (put 'visible 'bounds-of-thing-at-point (lambda () (cons (window-start) (window-end))))
-  (evilem-make-motion evilem-motion-forward-word-begin #'evil-forward-word-begin :scope 'visible)
-  (evilem-make-motion evilem-motion-forward-WORD-begin #'evil-forward-WORD-begin :scope 'visible)
-  (evilem-make-motion evilem-motion-forward-word-end #'evil-forward-word-end :scope 'visible)
-  (evilem-make-motion evilem-motion-forward-WORD-end #'evil-forward-WORD-end :scope 'visible)
-  (evilem-make-motion evilem-motion-backward-word-begin #'evil-backward-word-begin :scope 'visible)
-  (evilem-make-motion evilem-motion-backward-WORD-begin #'evil-backward-WORD-begin :scope 'visible)
-  (evilem-make-motion evilem-motion-backward-word-end #'evil-backward-word-end :scope 'visible)
-  (evilem-make-motion evilem-motion-backward-WORD-end #'evil-backward-WORD-end :scope 'visible))
-
-
 (use-package! evil-embrace
   :commands embrace-add-pair embrace-add-pair-regexp
   :hook (LaTeX-mode . embrace-LaTeX-mode-hook)
@@ -317,7 +294,15 @@ directives. By default, this only recognizes C directives.")
   (setq evil-snipe-smart-case t
         evil-snipe-scope 'line
         evil-snipe-repeat-scope 'visible
-        evil-snipe-char-fold t))
+        evil-snipe-enable-highlight t
+        evil-snipe-override-evil-repeat-keys nil
+        evil-snipe-enable-incremental-highlight t
+        evil-snipe-auto-disable-substitute t
+        evil-snipe-show-prompt nil
+        evil-snipe-char-fold t
+        evil-snipe-repeat-keys nil)
+  :config
+  (pushnew! evil-snipe-disabled-modes 'Info-mode 'calc-mode 'magit-mode 'ranger-mode 'git-rebase-mode 'treemacs-mode 'dired-mode))
 
 
 (use-package! evil-surround
@@ -445,13 +430,14 @@ directives. By default, this only recognizes C directives.")
       (:when (modulep! :tools lookup)
        :nv "K"   #'+lookup/documentation
        :nv "gd"  #'+lookup/definition
-       :nv "gD"  #'+lookup/references
+       :nv "gD"  #'+lookup/definition-other-window
+       :nv "gr"  #'+lookup/references
        :nv "gf"  #'+lookup/file
        :nv "gI"  #'+lookup/implementations)
       (:when (modulep! :tools eval)
-       :nv "gr"  #'+eval:region
-       :n  "gR"  #'+eval/buffer
-       :v  "gR"  #'+eval:replace-region
+       :nv "ge"  #'+eval:region
+       :n  "gE"  #'+eval/buffer
+       :v  "gE"  #'+eval:replace-region
        ;; Restore these keybinds, since the blacklisted/overwritten gr/gR will
        ;; undo them:
        (:after compile
@@ -525,27 +511,6 @@ directives. By default, this only recognizes C directives.")
       :textobj "q" #'+evil:inner-any-quote             #'+evil:outer-any-quote
       :textobj "u" #'+evil:inner-url-txtobj            #'+evil:outer-url-txtobj
       :textobj "x" #'evil-inner-xml-attr               #'evil-outer-xml-attr
-
-      ;; evil-easymotion
-      (:after evil-easymotion
-       :m "gs" evilem-map
-       ;; TODO: Use named functions
-       (:map evilem-map
-        "a" (evilem-create #'evil-forward-arg)
-        "A" (evilem-create #'evil-backward-arg)
-        "s" #'evil-avy-goto-char-2
-        "SPC" (cmd! (let ((current-prefix-arg t)) (evil-avy-goto-char-timer)))
-        "/" #'evil-avy-goto-char-timer))
-
-      ;; evil-snipe
-      (:after evil-snipe
-       :map evil-snipe-parent-transient-map
-       "C-;" (cmd! (require 'evil-easymotion)
-                   (call-interactively
-                    (evilem-create #'evil-snipe-repeat
-                                   :bind ((evil-snipe-scope 'whole-buffer)
-                                          (evil-snipe-enable-highlight)
-                                          (evil-snipe-enable-incremental-highlight))))))
 
       ;; evil-surround
       :v "S" #'evil-surround-region

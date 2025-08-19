@@ -54,3 +54,6 @@ flycheck_*.el
 /tramp
 /transient/
 /var/
+
+# extral
+.directory

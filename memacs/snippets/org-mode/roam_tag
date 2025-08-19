@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: roam tag
+# key: tagroam
+# --
+#+ROAM_TAGS: ${1:Tag1,Tag2}
+$0

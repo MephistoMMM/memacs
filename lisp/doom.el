@@ -245,17 +245,20 @@
 (defvar doom-modules-dir (expand-file-name "modules/" doom-emacs-dir)
   "The root directory for Doom's modules. Must end with a slash.")
 
+(defconst doom-default-user-dir "~/.emacs.d/memacs/"
+  "Where default doom-private-dir.")
+
 (defvar doom-user-dir
   (expand-file-name
    (if-let* ((doomdir (getenv-internal "DOOMDIR")))
        (file-name-as-directory doomdir)
      (or (let ((xdgdir
-                (file-name-concat
-                 (or (getenv-internal "XDG_CONFIG_HOME")
-                     "~/.config")
-                 "doom/")))
-           (if (file-directory-p xdgdir) xdgdir))
-         "~/.doom.d/")))
+               (file-name-concat
+                (or (getenv-internal "XDG_CONFIG_HOME")
+                   "~/.config")
+                "doom/")))
+          (if (file-directory-p xdgdir) xdgdir))
+        doom-default-user-dir)))
   "Where your private configuration is placed.
 
 Defaults to ~/.config/doom, ~/.doom.d or the value of the DOOMDIR envvar;
@@ -375,6 +378,9 @@ which is loaded at startup (if it exists). This is helpful if Emacs can't
 \(easily) be launched from the correct shell session (particularly for MacOS
 users).")
 
+;; HACK add user home dir
+(defconst memacs-user-home-dir (expand-file-name "~"))
+
 ;;; Module file variables
 (defvar doom-module-init-file "init.el"
   "The filename for module early initialization config files.
@@ -395,7 +401,6 @@ run before `doom-after-modules-config-hook' and after `doom-module-init-file'.")
 Package files are read whenever Doom's package manager wants a manifest of all
 desired packages. They are rarely read in interactive sessions (unless the user
 uses a straight or package.el command directly).")
-
 
 ;;
 ;;; Startup optimizations
@@ -583,7 +588,7 @@ uses a straight or package.el command directly).")
 
 ;; Allow the user to store custom.el-saved settings and themes in their Doom
 ;; config (e.g. ~/.doom.d/).
-(setq custom-file (file-name-concat doom-user-dir "custom.el"))
+(setq custom-file (concat doom-etc-dir "custom.el"))
 
 (define-advice en/disable-command (:around (fn &rest args) write-to-data-dir)
   "Save safe-local-variables to `custom-file' instead of `user-init-file'.

@@ -50,15 +50,6 @@
   (setq-hook! 'org-mode-hook pangu-spacing-real-insert-separtor t))
 
 
-(use-package! fcitx
-  :after evil
-  :config
-  (when (setq fcitx-remote-command
-              (or (executable-find "fcitx5-remote")
-                  (executable-find "fcitx-remote")))
-    (fcitx-evil-turn-on)))
-
-
 (use-package! ace-pinyin
   :after avy
   :init (setq ace-pinyin-use-avy t)

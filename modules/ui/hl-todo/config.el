@@ -21,6 +21,7 @@
           ;; Specifically, this means the code is deprecated, not necessarily
           ;; the feature it enables.
           ("DEPRECATED" font-lock-doc-face bold)
+          ("BASE"       font-lock-constant-face bold)
           ;; Extra keywords commonly found in the wild, whose meaning may vary
           ;; from project to project.
           ("NOTE" success bold)

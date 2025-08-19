@@ -39,6 +39,15 @@ Must be a `font-spec', a font object, an XFT font string, or an XLFD string. See
 
 An omitted font size means to inherit `doom-font''s size.")
 
+(defvar doom-chinese-font nil
+  "The font to use for chinese text.
+
+Expects either a `font-spec', font object, a XFT font string or XLFD string. See
+`doom-font' for examples.
+
+It is recommended you don't set specify a font-size, as to inherit `doom-font's
+size.")
+
 (defcustom doom-symbol-font nil
   "Fallback font for symbols.
 Must be a `font-spec', a font object, an XFT font string, or an XLFD string. See
@@ -477,6 +486,10 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 ;;
 ;;; Line numbers
 
+;; Display line numbers by default
+(defvar memacs-display-line-numbers-by-default nil
+  "By default, hide line numbers.")
+
 ;; Explicitly define a width to reduce the cost of on-the-fly computation
 (setq-default display-line-numbers-width 3)
 
@@ -487,8 +500,15 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 ;; Enable line numbers in most text-editing modes. We avoid
 ;; `global-display-line-numbers-mode' because there are many special and
 ;; temporary modes where we don't need/want them.
+
+(defun memacs-display-line-numbers ()
+  "If memacs-display-line-numbers-by-default is non-nil, start
+display-line-numbers-mode."
+  (when memacs-display-line-numbers-by-default
+    (display-line-numbers-mode)))
+
 (add-hook! '(prog-mode-hook text-mode-hook conf-mode-hook)
-           #'display-line-numbers-mode)
+           #'memacs-display-line-numbers)
 
 ;; Fix #2742: cursor is off by 4 characters in `artist-mode'
 ;; REVIEW Reported upstream https://debbugs.gnu.org/cgi/bugreport.cgi?bug=43811
@@ -652,6 +672,21 @@ them as such. Also intended as a helper for `doom--theme-is-colorscheme-p'."
                       ((not (invalid-p color))))
             (set-frame-parameter f param color)))))))
 
+(defun doom-init-extra-fonts-h (&optional frame)
+  "For chinese font."
+  (condition-case e
+      (with-selected-frame (or frame (selected-frame))
+        (when doom-chinese-font
+          (dolist (charset '(kana han symbol cjk-misc bopomofo))
+            (set-fontset-font (frame-parameter nil 'font)
+                              charset
+                              doom-chinese-font))))
+    ((debug error)
+     (if (string-prefix-p "Font not available: " (error-message-string e))
+         (lwarn 'doom-ui :warning
+                "Could not find the '%s' font on your system, falling back to system font"
+                (font-get (caddr e) :family))
+       (signal 'doom-error e)))))
 
 ;;
 ;;; Bootstrap
@@ -682,6 +717,8 @@ triggering hooks during startup."
               'after-init-hook)))
   (add-hook hook #'doom-init-fonts-h -100)
   (add-hook hook #'doom-init-theme-h -90))
+
+(add-hook 'doom-init-ui-hook #'doom-init-extra-fonts-h)
 
 ;; PERF: Init UI late, but not too late. Its impact on startup time seems to
 ;;   vary wildly depending on exact placement. `window-setup-hook' appears to be

@@ -50,6 +50,17 @@ generate `completing-read' candidates."
   (server-start))
 
 ;;;###autoload
+(defun +evil/avy ()
+  "Invoke and lazy-load `avy' without compromising which-key
+integration."
+  (interactive)
+  (require 'avy)
+  (require 'evil-integration)
+  (setq prefix-arg current-prefix-arg)
+  ;; TODO to use myself event, not easymotion's
+  (push '(t . easymotion) unread-command-events))
+
+;;;###autoload
 (defun +default/diagnostics (&rest arg)
   "List diagnostics for the current buffer/project.
 If the vertico and lsp modules are active, list lsp diagnostics for the

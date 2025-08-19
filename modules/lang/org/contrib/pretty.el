@@ -11,6 +11,13 @@
   (setq org-superstar-leading-bullet ?\s
         org-superstar-leading-fallback ?\s
         org-hide-leading-stars nil
+
+        ;; Don't do anything special for item bullets or TODOs by default; these slow
+        ;; down larger org buffers.
+        org-superstar-prettify-item-bullets nil
+        org-superstar-special-todo-items nil
+        ;; ...but configure it in case the user wants it later
+        org-superstar-headline-bullets-list '("✾" "✧" "❀" "✿" "❖")
         org-superstar-todo-bullet-alist
         '(("TODO" . 9744)
           ("[ ]"  . 9744)
@@ -19,16 +26,14 @@
 
 
 (use-package! org-fancy-priorities ; priority icons
-  :hook (org-mode . org-fancy-priorities-mode)
   :hook (org-agenda-mode . org-fancy-priorities-mode)
   :config
-  (setq org-fancy-priorities-list '("⚑" "⬆" "■"))
+  (setq org-fancy-priorities-list '("☢" "☕" "■"))
   ;; HACK: Prevent org-fancy-priorities from interfering with org exporters or
   ;;   other non-interactive Org crawlers/parsers (see #8280).
   (defadvice! +org--inhibit-org-fancy-in-non-real-buffers-a (&rest _)
     :before-until #'org-fancy-priorities-mode
     org-inhibit-startup))
-
 
 (use-package! org-appear ; better markup edit
   :hook (org-mode . org-appear-mode))

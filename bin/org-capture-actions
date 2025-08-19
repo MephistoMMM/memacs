@@ -1,0 +1,47 @@
+#!/usr/bin/env sh
+
+# Call org-capture via special arguments
+#
+# Usage: org-capture-actions TYPE URL TITLE MESSAGE
+# Examples:
+#   org-capture-actions Chrome "Org-mode Workflow" "https://blog.jethro.dev/posts/"
+
+if [ $# -lt 1 ]; then
+  echo "Usage: org-capture-actions TYPE ARGS"
+  echo "Examples:"
+  echo "  org-capture-actions Chrome 'Org-mode Workflow' 'https://blog.jethro.dev/posts/'"
+  exit 1
+fi
+
+DOOM_DIR="${DOOM_DIR:-$HOME/.emacs.d}"
+
+function urlUnescape() {
+  echo "$1" | ruby -ruri -pe '$_ = URI.unescape($_.split("/").reverse.join(" "))'
+}
+
+ACTION_TYPE=$1
+ACTION_URL=`urlUnescape $2`
+ACTION_TITLE=`urlUnescape $3`
+ACTION_MSG=`urlUnescape $4`
+
+current_date=`date "+%Y-%m-%d %a %H:%M"`
+
+case $ACTION_TYPE in
+    Emacs)
+        echo "Type: Emacs"
+        sh $DOOM_DIR/bin/org-capture
+        ;;
+    Chrome)
+        echo "Type: Chrome"
+        sh $DOOM_DIR/bin/org-capture -k l "[[$ACTION_URL][$ACTION_TITLE]] :Link:"
+        break
+        ;;
+    Safari)
+        echo "Type: Safari"
+        sh $DOOM_DIR/bin/org-capture -k l "[[$ACTION_URL][$ACTION_TITLE]] :Link:"
+        break
+        ;;
+    *)
+        echo "Sorry, I don't understand"
+        ;;
+esac

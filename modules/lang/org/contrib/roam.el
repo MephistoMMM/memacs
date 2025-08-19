@@ -94,3 +94,10 @@
 ;; detected), we can safely chain `org-roam-protocol' to it.
 (use-package! org-roam-protocol
   :after org-protocol)
+
+(use-package! company-org-roam
+  :when (modulep! :completion company)
+  :after org-roam
+  :config
+  (set-company-backend! 'org-mode '(company-yasnippet company-org-roam company-dabbrev)))
+

@@ -25,8 +25,20 @@ ob-shell.el when executed.")
 take one argument (the language specified in the src block, as a string). Stops
 at the first function to return non-nil.")
 
-(defvar +org-capture-todo-file "todo.org"
+(defvar +org-capture-proj-file "proj.org"
+  "Default target for project entries.
+
+Is relative to `org-directory', unless it is absolute. Is used in Doom's default
+`org-capture-templates'.")
+
+(defvar +org-capture-todo-file "inbox.org"
   "Default target for todo entries.
+
+Is relative to `org-directory', unless it is absolute. Is used in Doom's default
+`org-capture-templates'.")
+
+(defvar +org-capture-next-file "next.org"
+  "Default target for next entries.
 
 Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 `org-capture-templates'.")
@@ -55,6 +67,9 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 (defvar +org-capture-projects-file "projects.org"
   "Default, centralized target for org-capture templates.")
 
+(defvar +org-capture-work-directory "~/Desktop"
+  "Default, work directory for org-capture.")
+
 (defvar +org-habit-graph-padding 2
   "The padding added to the end of the consistency graph.")
 
@@ -80,7 +95,8 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
 
 (defun +org-init-agenda-h ()
   (unless org-agenda-files
-    (setq-default org-agenda-files (list org-directory)))
+    (setq-default org-agenda-files (list org-directory
+                                 +org-capture-work-directory)))
   (setq-default
    ;; Different colors for different priority levels
    org-agenda-deadline-faces
@@ -307,6 +323,7 @@ Also adds support for a `:sync' parameter to override `:async'."
           (when-let ((beg (org-babel-where-is-src-block-result))
                      (end (progn (goto-char beg) (forward-line) (org-babel-result-end))))
             (org-display-inline-images nil nil (min beg end) (max beg end)))))))
+  (add-hook! 'org-babel-after-execute-hook #'+org-babel-results-ansi-h)
 
   (after! python
     (unless org-babel-python-command
@@ -387,9 +404,23 @@ I like:
           ("n" "Personal notes" entry
            (file+headline +org-capture-notes-file "Inbox")
            "* %u %?\n%i\n%a" :prepend t)
-          ("j" "Journal" entry
-           (file+olp+datetree +org-capture-journal-file)
-           "* %U %?\n%i\n%a" :prepend t)
+
+          ("s" "Snippets" plain
+           (file memacs-org-capture-complete-snippets)
+           "#+title: %(memacs-org-capture-complete-snippets-title)
+#+filetags: :%(memacs-org-capture-complete-snippets-lang): \n\n%?")
+
+          ("l" "Links" entry
+           (file+headline +org-capture-todo-file "Inbox")
+           "* TODO [#B] %i\nSCHEDULED: %t\n%?\n%a" :prepend t)
+          ("w" "Work next" entry
+           (file +org-capture-work-next-file)
+           "* TODO [#%^{level|A|B}] %^{Task}\nSCHEDULED: %t\n%a"
+           :empty-lines 1)
+          ("i" "Work inbox" entry
+           (file +org-capture-work-todo-file)
+           "* TODO [#%^{level|A|B}] %^{Task}\n%a"
+           :empty-lines 1)
 
           ;; Will use {project-root}/{todo,notes,changelog}.org, unless a
           ;; {todo,notes,changelog}.org file is found in a parent directory.
@@ -397,8 +428,11 @@ I like:
           ;; `+org-capture-changelog-file' and `+org-capture-notes-file'.
           ("p" "Templates for projects")
           ("pt" "Project-local todo" entry  ; {project-root}/todo.org
-           (file+headline +org-capture-project-todo-file "Inbox")
-           "* TODO %?\n%i\n%a" :prepend t)
+           (file +org-capture-work-proj-file)
+            (function (lambda ()(if (boundp '+org-capture-work-project-todo-template)
+                +org-capture-work-project-todo-template
+              "* TODO [#%^{level|A|B}] %?\n%i\n%a")))
+           :empty-lines 1)
           ("pn" "Project-local notes" entry  ; {project-root}/notes.org
            (file+headline +org-capture-project-notes-file "Inbox")
            "* %U %?\n%i\n%a" :prepend t)
@@ -772,7 +806,18 @@ mutating hooks on exported output, like formatters."
         (let (persp-autokill-buffer-on-remove)
           (persp-remove-buffer org-agenda-new-buffers
                                (get-current-persp)
-                               nil)))))
+                               nil))))
+    (defun +org-save-all-agenda-files-h ()
+      "Save all buffers of agenda files that are
+currently open, base on `org-agenda-files'."
+      (let ((expand-org-agenda-files (org-agenda-files t)))
+        (save-current-buffer
+          (dolist (buffer (buffer-list t))
+            (set-buffer buffer)
+            (when (and (buffer-modified-p buffer)
+                     (member (buffer-file-name)
+                             expand-org-agenda-files))
+              (save-buffer)))))))
 
   (defadvice! +org--restart-mode-before-indirect-buffer-a (&optional buffer _)
     "Restart `org-mode' in buffers in which the mode has been deferred (see
@@ -875,7 +920,7 @@ between the two."
          "." #'consult-org-heading
          "/" #'consult-org-agenda)
         "A" #'org-archive-subtree-default
-        "e" #'org-export-dispatch
+        "e" #'+memacs-org-export-dispatch
         "f" #'org-footnote-action
         "h" #'org-toggle-heading
         "i" #'org-toggle-item
@@ -1014,7 +1059,14 @@ between the two."
         (:prefix ("p" . "priority")
          "d" #'org-priority-down
          "p" #'org-priority
-         "u" #'org-priority-up))
+         "u" #'org-priority-up)
+        (:prefix ("w" . "wrapper")
+         "r" #'+org/wrap-resume
+         "q" #'+org/wrap-quote
+         "l" #'+org/wrap-link
+         "o" #'+org/wrap-ordered-list
+         "u" #'+org/wrap-unordered-list
+         "s" #'+org/wrap-source-code))
 
   (map! :after org-agenda
         :map org-agenda-mode-map
@@ -1209,6 +1261,7 @@ between the two."
             :n CSleft     #'org-shiftleft
             :n CSup       #'org-shiftup
             :n CSdown     #'org-shiftdown
+            :nevmi "M-l"  #'evil-avy-goto-line
             ;; more intuitive RET keybinds
             :m [return]   #'+org/dwim-at-point
             :m "RET"      #'+org/dwim-at-point
@@ -1258,6 +1311,11 @@ between the two."
     (kbd doom-leader-key) nil))
 
 
+(use-package! org-mac-link
+  ;; https://orgmode.org/worg/org-contrib/org-mac-link.html
+  :when IS-MAC)
+
+
 ;;
 ;;; Bootstrap
 
@@ -1293,6 +1351,7 @@ between the two."
       ;; ol-mhe
       ;; ol-rmail
       ;; ol-eww
+      org-habit
       ))
 
   ;;; Custom org modules
@@ -1306,7 +1365,11 @@ between the two."
              ;; `org-indent-mode', so we turn off show-paren-mode altogether
              #'doom-disable-show-paren-mode-h
              ;; disable `show-trailing-whitespace'; shows a lot of false positives
-             #'doom-disable-show-trailing-whitespace-h)
+             #'doom-disable-show-trailing-whitespace-h
+             ;; #'+org-enable-auto-reformat-tables-h
+             ;; #'+org-enable-auto-update-cookies-h
+             #'+org-disable-truncate-lines-or-wrap-words-h
+             #'+org-make-last-point-visible-h)
 
   (add-hook! 'org-load-hook
              #'+org-init-org-directory-h

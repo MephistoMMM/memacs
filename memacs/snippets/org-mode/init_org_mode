@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: init_org_mode
+# key: i_org
+# --
+# -*- mode: Org; ${1:variable: value;} -*-
+$0

@@ -104,6 +104,8 @@
     :recipe (:host github :repo "org-roam/org-roam-v1")
     :pin "946a879a4a18756a0508afba1e0b0fe070c6a8b4"))
  ((modulep! +roam2)
+  (package! websocket :pin "fda4455333309545c0787a79d73c19ddbeb57980")
+  (package! org-roam-ui :pin "309fe3c58c7081de4e2c9c64f7b40ea291926048")
   (package! org-roam
     ;; FIXME A :recipe isn't strictly necessary, but without it, our package
     ;;       bumper fails to distinguish between org-roam v1 and v2.
@@ -112,6 +114,8 @@
   (when (< emacs-major-version 29)
     ;; HACK: Needed until org-roam/org-roam#2485 is resolved.
     (package! emacsql :pin "491105a01f58bf0b346cbc0254766c6800b229a2"))))
+(when IS-MAC
+  (package! org-mac-link :pin "0b18c1d070b9601cc65c40e902169e367e4348c9"))
 
 ;;; Babel
 (package! ob-async :pin "9aac486073f5c356ada20e716571be33a350a982")

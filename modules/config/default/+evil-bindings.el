@@ -30,8 +30,8 @@
     "C-j"    #'next-line
     "C-k"    #'previous-line)
   (define-key! read-expression-map
-    "C-j" #'next-line-or-history-element
-    "C-k" #'previous-line-or-history-element))
+    "C-n" #'next-line-or-history-element
+    "C-p" #'previous-line-or-history-element))
 
 
 ;;
@@ -60,6 +60,7 @@
                   (if (derived-mode-p 'eshell-mode 'comint-mode)
                       #'completion-at-point
                     #'indent-for-tab-command)))))))
+      :i "C-【" #'evil-force-normal-state
       :m [tab]
       `(menu-item "Evil motion smart tab" nil :filter
         (lambda (cmd)
@@ -117,6 +118,16 @@
       (:after geiser-doc :map geiser-doc-mode-map
        :n "o"    #'link-hint-open-link)
 
+      ;; HACK don't add :i to org-mode-map for "C-j", it is configed in
+      ;; org modules;
+      :nevim "C-j"     #'+evil/avy  ; lazy-load `avy'
+      :ei "C-'"      #'ar-leave-delimited-forward
+      (:after evil-org
+       :map evil-org-mode-map
+       :nevm "C-j"    #'+evil/avy
+       :ei "C-'"      #'ar-leave-delimited-forward
+       :prefix "<easymotion>"
+       "h" #'+org/goto-visible)
       (:unless (modulep! :input layout +bepo)
        (:after (evil-org evil-easymotion)
         :map evil-org-mode-map
@@ -168,8 +179,8 @@
          "C-w"     nil  ; don't interfere with `evil-delete-backward-word'
          "C-n"     #'company-select-next
          "C-p"     #'company-select-previous
-         "C-j"     #'company-select-next
-         "C-k"     #'company-select-previous
+         "C-j"     nil  ; don't interfere with avy-jump
+         "C-k"     #'company-abort
          "C-h"     #'company-show-doc-buffer
          "C-u"     #'company-previous-page
          "C-d"     #'company-next-page
@@ -229,6 +240,7 @@
         :map ivy-minibuffer-map
         "C-SPC" #'ivy-call-and-recenter  ; preview file
         "C-l"   #'ivy-alt-done
+        "M-l"   #'ivy-avy
         "C-v"   #'yank)
        (:after counsel
         :map counsel-ag-map
@@ -286,7 +298,7 @@
 
       (:when (modulep! :ui workspaces)
        :n "C-t"   #'+workspace/new
-       :n "C-S-t" #'+workspace/display
+       ;; :n "C-S-t" #'+workspace/display
        :g "M-1"   #'+workspace/switch-to-0
        :g "M-2"   #'+workspace/switch-to-1
        :g "M-3"   #'+workspace/switch-to-2
@@ -299,7 +311,7 @@
        :g "M-0"   #'+workspace/switch-to-final
        (:when (featurep :system 'macos)
         :g "s-t"   #'+workspace/new
-        :g "s-T"   #'+workspace/display
+        ;; :g "s-T"   #'+workspace/display
         :n "s-1"   #'+workspace/switch-to-0
         :n "s-2"   #'+workspace/switch-to-1
         :n "s-3"   #'+workspace/switch-to-2
@@ -346,14 +358,17 @@
 ;;
 ;;; <leader>
 
+;; HACK delete keybindings to evil-window-map
+;;      replace "l" to bind workspace(layout)
 (map! :leader
       :desc "Eval expression"       ";"    #'pp-eval-expression
       :desc "M-x"                   ":"    #'execute-extended-command
+      :desc "Org Capture"           "A"    #'org-agenda-list
       :desc "Pop up scratch buffer" "x"    #'doom/open-scratch-buffer
       :desc "Org Capture"           "X"    #'org-capture
       ;; C-u is used by evil
       :desc "Universal argument"    "u"    #'universal-argument
-      :desc "window"                "w"    evil-window-map
+      ;; :desc "window"                "w"    evil-window-map
       :desc "help"                  "h"    help-map
 
       (:when (modulep! :ui popup)
@@ -375,8 +390,9 @@
       :desc "Find file in project"  "SPC"  #'projectile-find-file
       :desc "Jump to bookmark"      "RET"  #'bookmark-jump
 
-      ;;; <leader> TAB --- workspace
+      ;;; <leader> l --- workspace (layout)
       (:when (modulep! :ui workspaces)
+        :desc "DOOM TS Workspaces" "l" #'doom-ts/workspace/body
        (:prefix-map ("TAB" . "workspace")
         :desc "Display tab bar"           "TAB" #'+workspace/display
         :desc "Switch workspace"          "."   #'+workspace/switch-to
@@ -417,6 +433,8 @@
        :desc "Clone buffer"                "c"   #'clone-indirect-buffer
        :desc "Clone buffer other window"   "C"   #'clone-indirect-buffer-other-window
        :desc "Kill buffer"                 "d"   #'kill-current-buffer
+        (:when (modulep! :ui doom-dashboard)
+        :desc "Dashbord"                    "h"   #'doom/switch-to-dashboard-or-scratch)
        :desc "ibuffer"                     "i"   #'ibuffer
        :desc "Kill buffer"                 "k"   #'kill-current-buffer
        :desc "Kill all buffers"            "K"   #'doom/kill-all-buffers
@@ -480,6 +498,30 @@
        :desc "Delete trailing whitespace"            "w"   #'delete-trailing-whitespace
        :desc "Delete trailing newlines"              "W"   #'doom/delete-trailing-newlines
        :desc "List errors"                           "x"   #'+default/diagnostics)
+
+
+      ;;; <leader> d --- diff
+      (:prefix-map ("d" . "diff")
+        :desc "Diff two buffers"       "b" #'ediff-buffers
+        :desc "Diff three buffers"     "B" #'ediff-buffers3
+        :desc "Diff two directories"   "d" #'ediff-directories
+        :desc "Diff three directories" "D" #'ediff-directories3
+        :desc "Diff two files"         "f" #'ediff
+        :desc "Diff three files"       "F" #'ediff3
+        :desc "Diff backup"            "." #'ediff-backup
+        :desc "Help documents"         "h" #'ediff-documentation
+        (:prefix ("p" . "patch")
+          "b" #'ediff-patch-buffer
+          "f" #'ediff-patch-file)
+        (:prefix ("r" . "regions")
+          "l"  #'ediff-regions-linewise
+          "w"  #'ediff-regions-wordwise)
+        (:prefix ("w" . "windows")
+          "l"  #'ediff-windows-linewise
+          "w"  #'ediff-windows-wordwise)
+        :desc "Show registry"          "s" #'ediff-show-registry
+        :desc "Revision"               "v" #'ediff-revision
+        :desc "Directory revision"     "V" #'ediff-directory-revisions)
 
       ;;; <leader> f --- file
       (:prefix-map ("f" . "file")
@@ -796,46 +838,6 @@
         :desc "Browse remote files"        "." #'ssh-deploy-browse-remote-handler
         :desc "Detect remote changes"      ">" #'ssh-deploy-remote-changes-handler))
 
-      ;;; <leader> s --- search
-      (:prefix-map ("s" . "search")
-       :desc "Search buffer"                "b"
-       (cond ((modulep! :completion vertico)   #'+default/search-buffer)
-             ((modulep! :completion ivy)       #'swiper)
-             ((modulep! :completion helm)      #'swiper))
-       :desc "Search all open buffers"      "B"
-       (cond ((modulep! :completion vertico)   (cmd!! #'consult-line-multi 'all-buffers))
-             ((modulep! :completion ivy)       #'swiper-all)
-             ((modulep! :completion helm)      #'swiper-all))
-       :desc "Search current directory"     "d" #'+default/search-cwd
-       :desc "Search other directory"       "D" #'+default/search-other-cwd
-       :desc "Search .emacs.d"              "e" #'+default/search-emacsd
-       :desc "Locate file"                  "f" #'locate
-       :desc "Jump to symbol"               "i" #'imenu
-       :desc "Jump to symbol in open buffers" "I"
-       (cond ((modulep! :completion vertico)   #'consult-imenu-multi)
-             ((modulep! :completion helm)      #'helm-imenu-in-all-buffers))
-       :desc "Jump to visible link"         "l" #'link-hint-open-link
-       :desc "Jump to link"                 "L" #'ffap-menu
-       :desc "Jump list"                    "j" #'evil-show-jumps
-       :desc "Jump to bookmark"             "m" #'bookmark-jump
-       :desc "Look up online"               "o" #'+lookup/online
-       :desc "Look up online (w/ prompt)"   "O" #'+lookup/online-select
-       :desc "Look up in local docsets"     "k" #'+lookup/in-docsets
-       :desc "Look up in all docsets"       "K" #'+lookup/in-all-docsets
-       :desc "Search project"               "p" #'+default/search-project
-       :desc "Search other project"         "P" #'+default/search-other-project
-       :desc "Jump to mark"                 "r" #'evil-show-marks
-       :desc "Search buffer"                "s" #'+default/search-buffer
-       :desc "Search buffer for thing at point" "S"
-       (cond ((modulep! :completion vertico)   #'+vertico/search-symbol-at-point)
-             ((modulep! :completion ivy)       #'swiper-isearch-thing-at-point)
-             ((modulep! :completion helm)      #'swiper-isearch-thing-at-point))
-       :desc "Dictionary"                   "t" #'+lookup/dictionary-definition
-       :desc "Thesaurus"                    "T" #'+lookup/synonyms
-       :desc "Undo history"                 "u"
-       (cond ((modulep! :emacs undo +tree)     #'undo-tree-visualize)
-             ((modulep! :emacs undo)           #'vundo)))
-
       ;;; <leader> t --- toggle
       (:prefix-map ("t" . "toggle")
        :desc "Big mode"                     "b" #'doom-big-font-mode
@@ -868,6 +870,56 @@
        (:when (modulep! :ui zen)
         :desc "Zen mode"                   "z" #'+zen/toggle
         :desc "Zen mode (fullscreen)"      "Z" #'+zen/toggle-fullscreen)))
+
+;;
+;;; Global & plugin keybinds
+
+;; HACK modify search map from "s" to "C-s"
+(map!
+  ;;; C-s --- search
+ (:prefix-map ("C-s" . "search")
+  :desc "Search buffer"                "b"
+  (cond ((modulep! :completion vertico)   #'+default/search-buffer)
+        ((modulep! :completion ivy)       #'swiper)
+        ((modulep! :completion helm)      #'swiper))
+  :desc "Search all open buffers"      "B"
+  (cond ((modulep! :completion vertico)   (cmd!! #'consult-line-multi 'all-buffers))
+        ((modulep! :completion ivy)       #'swiper-all)
+        ((modulep! :completion helm)      #'swiper-all))
+   :desc "Search current directory"     "d" #'+default/search-cwd
+   :desc "Search other directory"       "D" #'+default/search-other-cwd
+   :desc "Search .emacs.d"              "e" #'+default/search-emacsd
+   :desc "Locate file"                  "f" #'locate
+   :desc "Jump to symbol"               "i" #'imenu
+   :desc "Jump to symbol in open buffers" "I" #'consult-imenu-multi
+   :desc "Jump to visible link"         "l" #'link-hint-open-link
+   :desc "Jump to link"                 "L" #'ffap-menu
+   :desc "Jump list"                    "j" #'evil-show-jumps
+   :desc "Jump to bookmark"             "m" #'bookmark-jump
+   :desc "Look up online"               "o" #'+lookup/online
+   :desc "Look up online (w/ prompt)"   "O" #'+lookup/online-select
+   :desc "Look up in local docsets"     "k" #'+lookup/in-docsets
+   :desc "Look up in all docsets"       "K" #'+lookup/in-all-docsets
+   :desc "Search project"               "/" #'+default/search-project
+   :desc "Search project for thing at point" "?" #'+default/search-project-for-symbol-at-point
+   :desc "Search other project"         "P" #'+default/search-other-project
+   :desc "Jump to mark"                 "r" #'evil-show-marks
+   :desc "Search buffer"                "s" #'+default/search-buffer
+   :desc "Search buffer for thing at point" "S"
+   (cond ((modulep! :completion vertico)   #'+vertico/search-symbol-at-point)
+         ((modulep! :completion ivy)       #'swiper-isearch-thing-at-point)
+         ((modulep! :completion helm)      #'swiper-isearch-thing-at-point))
+   :desc "Dictionary"                   "t" #'+lookup/dictionary-definition
+   :desc "Thesaurus"                    "T" #'+lookup/synonyms
+   :desc "Undo history"                 "u"
+   (cond ((modulep! :emacs undo +tree)     #'undo-tree-visualize)
+         ((modulep! :emacs undo)           #'vundo)))
+
+ ;;; M-y --- yank
+ :nmei "M-y" #'counsel-yank-pop
+ ;;; M-e --- register
+ :nmei "M-e" #'counsel-evil-registers
+ )
 
 (after! which-key
   (let ((prefix-re (regexp-opt (list doom-leader-key doom-leader-alt-key))))

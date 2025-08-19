@@ -205,6 +205,10 @@ results buffer.")
   ;; of its own, on top of the defaults.
   (setq ivy-initial-inputs-alist nil)
 
+  (setq counsel-rg-base-command
+        (if (memq system-type '(ms-dos windows-nt))
+            "rg -M 240 --max-columns-preview --with-filename --no-heading --line-number --color never %s --path-separator / ."
+          "rg -M 240 --max-columns-preview --with-filename --no-heading --line-number --color never %s"))
   ;; REVIEW Counsel allows `counsel-rg-base-command' to be a string or list.
   ;;        This backwards compatibility complicates things for Doom. Simpler to
   ;;        just force it to always be a list.

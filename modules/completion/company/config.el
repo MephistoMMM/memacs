@@ -8,6 +8,7 @@
   :hook (doom-first-input . global-company-mode)
   :init
   (setq company-minimum-prefix-length 2
+        company-idle-delay 0.3
         company-tooltip-limit 14
         company-tooltip-align-annotations t
         company-require-match 'never
@@ -183,3 +184,4 @@
       (if (symbol-value mode)
           (add-to-list 'company-dict-minor-mode-list mode nil #'eq)
         (setq company-dict-minor-mode-list (delq mode company-dict-minor-mode-list))))))
+

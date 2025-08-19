@@ -32,6 +32,7 @@
                      ((executable-find "scrot") "scrot -s %s")
                      ((executable-find "gnome-screenshot") "gnome-screenshot -a -f %s"))))
 
+        org-download-image-html-width 600
         org-download-heading-lvl nil
         org-download-link-format "[[download:%s]]\n"
         org-download-annotate-function (lambda (_link) "")

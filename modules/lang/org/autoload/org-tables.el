@@ -76,6 +76,12 @@ re-align the table if necessary. (Necessary because org-mode has a
           (when noalign (setq org-table-may-need-update c)))
         t))))
 
+;;;###autoload
+(defun +org-disable-truncate-lines-or-wrap-words-h ()
+  "Disable truncate lines."
+  (setq-local word-wrap nil)
+  (setq-local truncate-lines nil))
+
 
 ;;
 ;;; Advice

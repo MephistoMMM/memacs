@@ -7,3 +7,6 @@
 (unless (modulep! :editor evil)
   (package! drag-stuff :pin "6d06d846cd37c052d79acd0f372c13006aa7e7c8")
   (package! expand-region :pin "351279272330cae6cecea941b0033a8dd8bcc4e8"))
+
+(package! leave-delimited
+  :recipe (:host github :repo "MephistoMMM/leave-delimited"))

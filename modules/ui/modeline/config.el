@@ -14,12 +14,10 @@
   (setq projectile-dynamic-mode-line nil)
   ;; Set these early so they don't trigger variable watchers
   (setq doom-modeline-bar-width 3
-        doom-modeline-github nil
         doom-modeline-mu4e nil
-        doom-modeline-persp-name nil
         doom-modeline-minor-modes nil
         doom-modeline-major-mode-icon nil
-        doom-modeline-buffer-file-name-style 'relative-from-project
+        doom-modeline-buffer-file-name-style 'buffer-name
         ;; Only show file encoding if it's non-UTF-8 and different line endings
         ;; than the current OSes preference
         doom-modeline-buffer-encoding 'nondefault
@@ -33,7 +31,7 @@
   (add-hook 'after-setting-font-hook #'+modeline-resize-for-font-h)
   (add-hook 'doom-load-theme-hook #'doom-modeline-refresh-bars)
 
-  (add-to-list 'doom-modeline-mode-alist '(+doom-dashboard-mode . dashboard))
+  ;; (add-to-list 'doom-modeline-mode-alist '(+doom-dashboard-mode . dashboard))
   (add-hook! 'magit-mode-hook
     (defun +modeline-hide-in-non-status-buffer-h ()
       "Show minimal modeline in magit-status buffer, no modeline elsewhere."
