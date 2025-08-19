@@ -1,7 +1,7 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; tools/ansible/packages.el
 
-(package! ansible :recipe (:nonrecursive t) :pin "4601ff31f56af19c71e86fcc7a2d52b7c17e8abd")
+(package! ansible :recipe (:nonrecursive t) :pin "7385222a4f209eca6d72d412c03da99097e2755f")
 (package! ansible-doc :pin "86083a7bb2ed0468ca64e52076b06441a2f8e9e0")
 (package! jinja2-mode :pin "03e5430a7efe1d163a16beaf3c82c5fd2c2caee1")
 (package! yaml-mode :pin "d91f878729312a6beed77e6637c60497c5786efa")

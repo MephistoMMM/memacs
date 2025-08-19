@@ -1,7 +1,7 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; lang/julia/packages.el
 
-(package! julia-mode :pin "0f4d74f9049df28e2f522733141bfc5b7a0f69a3")
+(package! julia-mode :pin "5c940c4ba357d8361534f11169f3d40b2d7833fc")
 (package! julia-repl :pin "317d56021889a336b4be241604ba71e46dc80581")
 
 (when (modulep! +lsp)
@@ -10,4 +10,4 @@
     (package! lsp-julia :pin "c869b2f6c05a97e5495ed3cc6710a33b4faf41a2")))
 
 (when (modulep! +snail)
-  (package! julia-snail :pin "24f79a067bfab177239833bb7d1d317b89d36741"))
+  (package! julia-snail :pin "cacf52e4c8db76706e6aa336d38746d15a2b6fe2"))

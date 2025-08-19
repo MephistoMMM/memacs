@@ -168,6 +168,9 @@ original state.")
 
 (defadvice! doom-straight--no-compute-prefixes-a (fn &rest args)
   :around #'straight--build-autoloads
+  (eval-when-compile
+    (or (require 'loaddefs-gen nil 'noerror)
+        (require 'autoload)))
   (let (autoload-compute-prefixes)
     (apply fn args)))
 
@@ -184,7 +187,7 @@ original state.")
     (let ((doom-straight--auto-options doom-straight--auto-options))
       ;; We can't intercept C-g, so no point displaying any options for this key
       ;; when C-c is the proper way to abort batch Emacs.
-      (delq! "C-g" actions 'assoc)
+      (cl-callf2 delq 'assoc actions)
       ;; HACK: Remove actions that don't work in noninteractive Emacs (like
       ;;   opening dired or magit).
       (setq actions

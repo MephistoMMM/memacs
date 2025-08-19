@@ -107,7 +107,7 @@ stored in `persp-save-dir'.")
   (add-to-list 'window-persistent-parameters '(winner-ring . t))
 
   (add-hook! 'persp-before-deactivate-functions
-    (defun +workspaces-save-winner-data-h (_)
+    (defun +workspaces-save-winner-data-h (&rest _)
       (when (and (bound-and-true-p winner-mode)
                  (get-current-persp))
         (set-persp-parameter
@@ -116,7 +116,7 @@ stored in `persp-save-dir'.")
                             winner-pending-undo-ring)))))
 
   (add-hook! 'persp-activated-functions
-    (defun +workspaces-load-winner-data-h (_)
+    (defun +workspaces-load-winner-data-h (&rest _)
       (when (bound-and-true-p winner-mode)
         (cl-destructuring-bind
             (currents alist pending-undo-ring)
@@ -178,7 +178,7 @@ stored in `persp-save-dir'.")
 
   ;; per-project workspaces, but reuse current workspace if empty
   ;; HACK?? needs review
-  (setq projectile-switch-project-action (lambda () (+workspaces-set-project-action-fn) (+workspaces-switch-to-project-h))
+  (setq projectile-switch-project-action #'+workspaces-switch-to-project-h
         counsel-projectile-switch-project-action
         '(1 ("o" +workspaces-switch-to-project-h "open project in new workspace")
             ("O" counsel-projectile-switch-project-action "jump to a project buffer or file")
@@ -212,7 +212,9 @@ stored in `persp-save-dir'.")
   (advice-add #'persp-asave-on-exit :around #'+workspaces-autosave-real-buffers-a)
 
   ;; Fix #1973: visual selection surviving workspace changes
-  (add-hook 'persp-before-deactivate-functions #'deactivate-mark)
+  (add-hook! 'persp-before-deactivate-functions
+    (defun +workspaces-disable-mark-after-switch-h (&rest _)
+      (deactivate-mark)))
 
   ;; Fix #1017: stop session persistence from restoring a broken posframe
   (after! posframe
@@ -250,30 +252,6 @@ stored in `persp-save-dir'.")
    :load-function (lambda (savelist &rest _)
                     (cl-destructuring-bind (buffer-name vars &rest _rest) (cdr savelist)
                       (magit-status (alist-get 'default-directory vars)))))
-  ;; Restore indirect buffers
-  (defvar +workspaces--indirect-buffers-to-restore nil)
-  (persp-def-buffer-save/load
-   :tag-symbol 'def-indirect-buffer
-   :predicate #'buffer-base-buffer
-   :save-function (lambda (buf tag vars)
-                    (list tag (buffer-name buf) vars
-                          (buffer-name (buffer-base-buffer buf))))
-   :load-function (lambda (savelist &rest _rest)
-                    (cl-destructuring-bind (buf-name _vars base-buf-name &rest _)
-                        (cdr savelist)
-                      (push (cons buf-name base-buf-name)
-                            +workspaces--indirect-buffers-to-restore)
-                      nil)))
-  (add-hook! 'persp-after-load-state-functions
-    (defun +workspaces-reload-indirect-buffers-h (&rest _)
-      (dolist (ibc +workspaces--indirect-buffers-to-restore)
-        (cl-destructuring-bind (buffer-name . base-buffer-name) ibc
-          (let ((base-buffer (get-buffer base-buffer-name)))
-            (when (buffer-live-p base-buffer)
-              (when (get-buffer buffer-name)
-                (setq buffer-name (generate-new-buffer-name buffer-name)))
-              (make-indirect-buffer base-buffer buffer-name t)))))
-      (setq +workspaces--indirect-buffers-to-restore nil)))
 
 ;;; tab-bar
   (add-hook! 'tab-bar-mode-hook

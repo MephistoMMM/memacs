@@ -113,24 +113,23 @@ MATCH is a string regexp. Only entries that match it will be included."
   (let (result)
     (dolist (file (mapcan (doom-rpartial #'doom-glob "*") (ensure-list paths)))
       (cond ((file-directory-p file)
-             (appendq!
-              result
-              (and (memq type '(t dirs))
-                   (string-match-p match file)
-                   (not (and filter (funcall filter file)))
-                   (not (and (file-symlink-p file)
-                             (not follow-symlinks)))
-                   (<= mindepth 0)
-                   (list (if relative-to
-                             (file-relative-name file relative-to)
-                           file)))
-              (and (>= depth 1)
-                   (apply #'doom-files-in file
-                          (append (list :mindepth (1- mindepth)
-                                        :depth (1- depth)
-                                        :relative-to relative-to
-                                        :map nil)
-                                  rest)))))
+             (cl-callf append result
+               (and (memq type '(t dirs))
+                    (string-match-p match file)
+                    (not (and filter (funcall filter file)))
+                    (not (and (file-symlink-p file)
+                              (not follow-symlinks)))
+                    (<= mindepth 0)
+                    (list (if relative-to
+                              (file-relative-name file relative-to)
+                            file)))
+               (and (>= depth 1)
+                    (apply #'doom-files-in file
+                           (append (list :mindepth (1- mindepth)
+                                         :depth (1- depth)
+                                         :relative-to relative-to
+                                         :map nil)
+                                   rest)))))
             ((and (memq type '(t files))
                   (string-match-p match file)
                   (not (and filter (funcall filter file)))
@@ -145,8 +144,7 @@ MATCH is a string regexp. Only entries that match it will be included."
 
 ;;;###autoload
 (defun doom-file-cookie (file &optional cookie null-value)
-  "Returns the evaluated result of FORM in a ;;;###COOKIE FORM at the top of
-FILE.
+  "Returns the quoted FORM in a ;;;###COOKIE FORM at the top of FILE.
 
 If COOKIE doesn't exist, or cookie isn't within the first 256 bytes of FILE,
 return NULL-VALUE."
@@ -156,10 +154,12 @@ return NULL-VALUE."
     (error "%S is unreadable" file))
   (with-temp-buffer
     (insert-file-contents file nil 0 256)
-    (if (re-search-forward (format "^;;;###%s " (regexp-quote (or cookie "if")))
-                           nil t)
-        (sexp-at-point)
-      null-value)))
+    (if (not (re-search-forward (format "^;;;###%s" (regexp-quote (or cookie "if")))
+                                nil t))
+        null-value
+      (skip-chars-forward " \t" (pos-eol))
+      (or (eolp)
+          (read (current-buffer))))))
 
 ;;;###autoload
 (defun doom-file-cookie-p (file &optional cookie null-value)
@@ -597,7 +597,7 @@ which case it will save it without prompting."
 
 ;; Introduced in Emacs 29.
 ;;;###autoload
-(eval-when! (not (fboundp 'find-sibling-file))
+(static-unless (fboundp 'find-sibling-file)
   (defvar find-sibling-rules nil)
 
   (defun find-sibling-file (file)

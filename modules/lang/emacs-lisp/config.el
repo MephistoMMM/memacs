@@ -29,7 +29,6 @@ See `+emacs-lisp-non-package-mode' for details.")
 ;;; Config
 
 (use-package! elisp-mode
-  :mode ("\\.Cask\\'" . emacs-lisp-mode)
   :interpreter ("doomscript" . emacs-lisp-mode)
   :config
   (let ((modes '(emacs-lisp-mode lisp-interaction-mode lisp-data-mode)))
@@ -87,8 +86,6 @@ See `+emacs-lisp-non-package-mode' for details.")
   (add-hook! '(emacs-lisp-mode-hook lisp-data-mode-local-vars-hook)
              ;; Allow folding of outlines in comments
              #'outline-minor-mode
-             ;; Make parenthesis depth easier to distinguish at a glance
-             #'rainbow-delimiters-mode
              ;; Make quoted symbols easier to distinguish from free variables
              #'highlight-quoted-mode
              ;; Extend imenu support to Doom constructs
@@ -138,6 +135,7 @@ See `+emacs-lisp-non-package-mode' for details.")
 
   (map! :localleader
         :map (emacs-lisp-mode-map lisp-interaction-mode-map)
+        :desc "Set working buffer" "b" #'+emacs-lisp/change-working-buffer
         :desc "Expand macro" "m" #'macrostep-expand
         (:prefix ("d" . "debug")
           "f" #'+emacs-lisp/edebug-instrument-defun-on
@@ -166,8 +164,6 @@ See `+emacs-lisp-non-package-mode' for details.")
         (append '(("\\(^\\*\\*\\*[^*]+\\*\\*\\*\\)\\(.*$\\)"
                    (1 font-lock-comment-face)
                    (2 font-lock-constant-face)))
-                (when (require 'highlight-numbers nil t)
-                  (highlight-numbers--get-regexp-for-mode 'emacs-lisp-mode))
                 (cl-loop for (matcher . match-highlights)
                          in (append lisp-el-font-lock-keywords-2
                                     lisp-cl-font-lock-keywords-2)
@@ -192,14 +188,6 @@ See `+emacs-lisp-non-package-mode' for details.")
 (autoload 'overseer-test "overseer" nil t)
 ;; Properly lazy load overseer by not loading it so early:
 (remove-hook 'emacs-lisp-mode-hook #'overseer-enable-mode)
-
-
-(use-package! flycheck-cask
-  :when (modulep! :checkers syntax -flymake)
-  :defer t
-  :init
-  (add-hook! 'emacs-lisp-mode-hook
-    (add-hook 'flycheck-mode-hook #'flycheck-cask-setup nil t)))
 
 
 (use-package! flycheck-package
@@ -326,9 +314,20 @@ current buffer."
   ;; Open help:* links with helpful-* instead of describe-*
   (advice-add #'org-link--open-help :around #'doom-use-helpful-a)
 
+  ;; Keep a record of buffers so our next/previous commands work.
+  (advice-add #'helpful--buffer :filter-return #'+emacs-lisp-record-new-buffers-a)
+
   (map! :map helpful-mode-map
         :ng "o"  #'link-hint-open-link
-        :n  "gr" #'helpful-update))
+        :n  "gr" #'helpful-update
+        :n "C-o" #'+emacs-lisp/helpful-previous
+        :n [C-i] #'+emacs-lisp/helpful-next
+        :n "<" #'+emacs-lisp/helpful-previous
+        :n ">" #'+emacs-lisp/helpful-next
+        "C-c C-b" #'+emacs-lisp/helpful-previous
+        "C-c C-f" #'+emacs-lisp/helpful-next
+        "l" #'+emacs-lisp/helpful-previous
+        "r" #'+emacs-lisp/helpful-next))
 
 
 ;;

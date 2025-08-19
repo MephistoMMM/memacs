@@ -1,9 +1,8 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; completion/ivy/packages.el
 
-(package! swiper :pin "abb9e1e5649bcd078a2a75bcb27abb42311b4f86")
+(package! swiper :pin "2257a9d0519e18f5ce7a7fafda8a1a8e5023628e")
 (package! ivy)
-(package! ivy-hydra)
 (package! ivy-avy)
 (package! counsel)
 
@@ -21,4 +20,4 @@
   (package! ivy-posframe :pin "660c773f559ac37f29ccf626af0103817c8d5e30"))
 
 (when (modulep! +icons)
-  (package! nerd-icons-ivy-rich :pin "86a896bb48fed543993f96e4b288047aa7e013c9"))
+  (package! nerd-icons-ivy-rich :pin "83c7b60595c8c387ce0f6b2436ce75bc263a98bf"))

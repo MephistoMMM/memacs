@@ -255,10 +255,10 @@ tell you about it. Very annoying. This prevents that."
 
 (use-package! autorevert
   ;; revert buffers when their files/state have changed
-  :hook (focus-in . doom-auto-revert-buffers-h)
   :hook (after-save . doom-auto-revert-buffers-h)
   :hook (doom-switch-buffer . doom-auto-revert-buffer-h)
   :hook (doom-switch-window . doom-auto-revert-buffer-h)
+  :hook (doom-switch-frame . doom-auto-revert-buffers-h)
   :config
   (setq auto-revert-verbose t ; let us know when it happens
         auto-revert-use-notify nil
@@ -282,7 +282,11 @@ tell you about it. Very annoying. This prevents that."
   ;;   single frame?).
   (defun doom-auto-revert-buffer-h ()
     "Auto revert current buffer, if necessary."
-    (unless (or auto-revert-mode (active-minibuffer-window))
+    (unless (or auto-revert-mode
+                (active-minibuffer-window)
+                (and buffer-file-name
+                     auto-revert-remote-files
+                     (file-remote-p buffer-file-name nil t)))
       (let ((auto-revert-mode t))
         (auto-revert-handler))))
 
@@ -307,30 +311,17 @@ tell you about it. Very annoying. This prevents that."
   (setq recentf-auto-cleanup nil     ; Don't. We'll auto-cleanup on shutdown
         recentf-max-saved-items 200) ; default is 20
 
-  (defun doom--recentf-file-truename-fn (file)
-    (if (or (not (file-remote-p file))
-            (equal "sudo" (file-remote-p file 'method)))
-        (abbreviate-file-name (file-truename (tramp-file-name-localname file)))
-      file))
-
-  ;; REVIEW: Use this in lieu of `doom--recentf-file-truename-fn' when we drop
-  ;;   28 support. See emacs-mirror/emacs@32906819addd.
-  ;; (setq recentf-show-abbreviated t)
-
   ;; Anything in runtime folders
   (add-to-list 'recentf-exclude
                (concat "^" (regexp-quote (or (getenv "XDG_RUNTIME_DIR")
                                              "/run"))))
 
-  ;; Resolve symlinks, strip out the /sudo:X@ prefix in local tramp paths, and
-  ;; abbreviate $HOME -> ~ in filepaths (more portable, more readable, & saves
-  ;; space)
-  (add-to-list 'recentf-filename-handlers #'doom--recentf-file-truename-fn)
-
-  ;; Text properties inflate the size of recentf's files, and there is
-  ;; no purpose in persisting them (Must be first in the list!)
+  ;; PERF: Text properties inflate the size of recentf's files, and there is no
+  ;;   reason to persist them (must be first in `recentf-filename-handlers'!)
   (add-to-list 'recentf-filename-handlers #'substring-no-properties)
 
+  ;; UX: Reorder the recent files list by frecency (i.e. every time you touch a
+  ;;   buffer, bump it to the top of the list).
   (add-hook! '(doom-switch-window-hook write-file-functions)
     (defun doom--recentf-touch-buffer-h ()
       "Bump file in recent file list when it is switched or written to."
@@ -338,7 +329,6 @@ tell you about it. Very annoying. This prevents that."
         (recentf-add-file buffer-file-name))
       ;; Return nil for `write-file-functions'
       nil))
-
   (add-hook! 'dired-mode-hook
     (defun doom--recentf-add-dired-directory-h ()
       "Add dired directories to recentf file list."
@@ -644,29 +634,28 @@ on."
   ;; read-only, in `so-long-minor-mode', so we can have a basic editing
   ;; experience in them, at least. It will remain off in `so-long-mode',
   ;; however, because long files have a far bigger impact on Emacs performance.
-  (delq! 'font-lock-mode so-long-minor-modes)
-  (delq! 'display-line-numbers-mode so-long-minor-modes)
-  (delq! 'buffer-read-only so-long-variable-overrides 'assq)
+  (cl-callf2 delq 'font-lock-mode so-long-minor-modes)
+  (cl-callf2 delq 'display-line-numbers-mode so-long-minor-modes)
+  (setf (alist-get 'buffer-read-only so-long-variable-overrides nil t) nil)
   ;; ...but at least reduce the level of syntax highlighting
   (add-to-list 'so-long-variable-overrides '(font-lock-maximum-decoration . 1))
   ;; ...and insist that save-place not operate in large/long files
   (add-to-list 'so-long-variable-overrides '(save-place-alist . nil))
   ;; But disable everything else that may be unnecessary/expensive for large or
   ;; wide buffers.
-  (appendq! so-long-minor-modes
-            '(spell-fu-mode
-              eldoc-mode
-              highlight-numbers-mode
-              better-jumper-local-mode
-              ws-butler-mode
-              auto-composition-mode
-              undo-tree-mode
-              highlight-indent-guides-mode
-              hl-fill-column-mode
-              ;; These are redundant on Emacs 29+
-              flycheck-mode
-              smartparens-mode
-              smartparens-strict-mode)))
+  (cl-callf append so-long-minor-modes
+    '(spell-fu-mode
+      eldoc-mode
+      better-jumper-local-mode
+      ws-butler-mode
+      auto-composition-mode
+      undo-tree-mode
+      highlight-indent-guides-mode
+      hl-fill-column-mode
+      ;; These are redundant on Emacs 29+
+      flycheck-mode
+      smartparens-mode
+      smartparens-strict-mode)))
 
 
 (use-package! ws-butler

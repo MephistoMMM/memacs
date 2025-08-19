@@ -41,7 +41,7 @@ TYPE should be a keyword of any of the known doom-*-error errors (e.g. :font,
 (defvar doom-log-level
   (if init-file-debug
       (if-let* ((level (getenv-internal "DEBUG"))
-                (level (string-to-number level))
+                (level (if (string-empty-p level) 1 (string-to-number level)))
                 ((not (zerop level))))
           level
         2)
@@ -246,7 +246,7 @@ unreadable. Returns the names of envvars that were changed."
 (defun doom-run-hook (hook)
   "Run HOOK (a hook function) with better error handling.
 Meant to be used with `run-hook-wrapped'."
-  (doom-log "hook:%s: run %s" (or doom--hook '*) hook)
+  (doom-log 2 "hook:%s: run %s" (or doom--hook '*) hook)
   (condition-case-unless-debug e
       (funcall hook)
     (error
@@ -313,7 +313,7 @@ TRIGGER-HOOK is a list of quoted hooks and/or sharp-quoted functions."
   (with-memoization (get 'doom-compile-function 'timer)
     (run-with-idle-timer
      1.5 t (fn! (when-let (fn (pop fns))
-                  (doom-log "compile-functions: %s" fn)
+                  (doom-log 3 "compile-functions: %s" fn)
                   (or (if (featurep 'native-compile)
                           (or (subr-native-elisp-p (indirect-function fn))
                               (ignore-errors (native-compile fn))))
@@ -486,22 +486,8 @@ echo-area, but not to *Messages*."
                (save-silently t))
            (prog1 ,@forms (message ""))))))
 
-(defmacro eval-if! (cond then &rest body)
-  "Expands to THEN if COND is non-nil, to BODY otherwise.
-COND is checked at compile/expansion time, allowing BODY to be omitted entirely
-when the elisp is byte-compiled. Use this for forms that contain expensive
-macros that could safely be removed at compile time."
-  (declare (indent 2))
-  (if (eval cond)
-      then
-    (macroexp-progn body)))
-
-(defmacro eval-when! (cond &rest body)
-  "Expands to BODY if CONDITION is non-nil at compile/expansion time.
-See `eval-if!' for details on this macro's purpose."
-  (declare (indent 1))
-  (when (eval cond)
-    (macroexp-progn body)))
+(define-obsolete-function-alias 'eval-if! 'static-if "3.0.0")
+(define-obsolete-function-alias 'eval-when! 'static-when "3.0.0")
 
 (defmacro versionp! (v1 comp v2 &rest comps)
   "Perform compound version checks.
@@ -708,8 +694,10 @@ See `general-key-dispatch' for what other arguments it accepts in BRANCHES."
 
 
 ;;; Mutation
+;; DEPRECATED: Remove in v3.0
 (defmacro appendq! (sym &rest lists)
   "Append LISTS to SYM in place."
+  (declare (obsolete "Use `cl-callf2' instead" "3.0.0"))
   `(setq ,sym (append ,sym ,@lists)))
 
 (defmacro setq! (&rest settings)
@@ -723,10 +711,12 @@ Unlike `setopt', this won't needlessly pull in dependencies."
             collect `(funcall (or (get ',var 'custom-set) #'set-default-toplevel-value)
                               ',var ,val))))
 
+;; DEPRECATED: Remove in v3.0
 (defmacro delq! (elt list &optional fetcher)
   "`delq' ELT from LIST in-place.
 
 If FETCHER is a function, ELT is used as the key in LIST (an alist)."
+  (declare (obsolete "Use `cl-callf2' or `alist-get' instead" "3.0.0"))
   `(setq ,list (delq ,(if fetcher
                           `(funcall ,fetcher ,elt ,list)
                         elt)
@@ -739,8 +729,10 @@ This is a variadic `cl-pushnew'."
     `(dolist (,var (list ,@values) (with-no-warnings ,place))
        (cl-pushnew ,var ,place :test #'equal))))
 
+;; DEPRECATED: Remove in v3.0
 (defmacro prependq! (sym &rest lists)
   "Prepend LISTS to SYM in place."
+  (declare (obsolete "Use `cl-callf2' instead" "3.0.0"))
   `(setq ,sym (append ,@lists ,sym)))
 
 
@@ -839,7 +831,7 @@ to reverse this and trigger `after!' blocks at a more reasonable time."
   (let ((advice-fn (intern (format "doom--defer-feature-%s-a" feature)))
         (fns (or fns (list feature))))
     `(progn
-       (delq! ',feature features)
+       (cl-callf2 delq ',feature features)
        (defadvice! ,advice-fn (&rest _)
          :before ',fns
          ;; Some plugins (like yasnippet) will invoke a fn early to parse
@@ -953,12 +945,7 @@ If N and M = 1, there's no benefit to using this macro over `remove-hook'.
   (declare (indent 1))
   (macroexp-progn
    (cl-loop for (var val hook fn) in (doom--setq-hook-fns hooks var-vals)
-            collect `(defun ,fn (&rest _)
-                       ,(format "%s = %s" var
-                                (let ((print-level nil)
-                                      (print-length nil))
-                                  (prin1-to-string val)))
-                       (setq-local ,var ,val))
+            collect `(defun ,fn (&rest _) (setq-local ,var ,val))
             collect `(add-hook ',hook #',fn -90))))
 
 (defmacro unsetq-hook! (hooks &rest vars)
@@ -998,8 +985,8 @@ DOCSTRING and BODY are as in `defun'.
 (defmacro undefadvice! (symbol _arglist &optional docstring &rest body)
   "Undefine an advice called SYMBOL.
 
-This has the same signature as `defadvice!' an exists as an easy undefiner when
-testing advice (when combined with `rotate-text').
+This has the same signature as `defadvice!' and exists as an easy undefiner when
+interactively testing (and toggling) advice.
 
 \(fn SYMBOL ARGLIST &optional DOCSTRING &rest [WHERE PLACES...] BODY\)"
   (declare (doc-string 3) (indent defun))
@@ -1085,7 +1072,7 @@ All valid contexts:
 (put 'doom-context 'risky-local-variable t)
 
 (defun doom-context-p (contexts)
-  "Return t if all CONTEXTS are active, nil otherwise.
+  "Return non-nil if all CONTEXTS are active.
 
 See `doom-context' for possible values for CONTEXT."
   (declare (side-effect-free t))
@@ -1097,12 +1084,12 @@ See `doom-context' for possible values for CONTEXT."
           (throw 'result nil))))))
 
 (defun doom-context-valid-p (context)
-  "Return non-nil if CONTEXT is a valid `doom-context'."
+  "Return non-nil if CONTEXT (a symbol) is a valid `doom-context'."
   (declare (pure t) (side-effect-free error-free))
   (memq context (get 'doom-context 'valid)))
 
 (defun doom-context-push (contexts)
-  "Add CONTEXTS to `doom-context', if not present.
+  "Add CONTEXTS (a symbol or list thereof) to `doom-context', if not present.
 
 Return list of successfully added contexts. Throws a `doom-context-error' if
 CONTEXTS contains invalid contexts."
@@ -1123,7 +1110,7 @@ CONTEXTS contains invalid contexts."
           added)))))
 
 (defun doom-context-pop (contexts)
-  "Remove CONTEXTS from `doom-context'.
+  "Remove CONTEXTS (a symbol or list thereof) from `doom-context'.
 
 Return list of removed contexts if successful. Throws `doom-context-error' if
 one of CONTEXTS isn't active."
@@ -1164,7 +1151,7 @@ Never set this variable directly, use `with-doom-module'.")
             (if key
                 (doom-module-context key)
               (make-doom-module-context)))))
-     (doom-log ":context:module: =%s" doom-module-context)
+     (doom-log 2 ":context:module: =%s" doom-module-context)
      ,@body))
 
 (defun doom-module-context (key)

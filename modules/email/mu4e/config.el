@@ -21,7 +21,7 @@
     (setq mu4e-maildir "~/.mail"
           mu4e-user-mail-address-list nil))
   :config
-  (add-to-list 'doom-debug-variables 'mu4e-debug)
+  (set-debug-variable! 'mu4e-debug)
   ;; mu4e now uses `display-buffer-alist' so we need to add some rules of our own
   (set-popup-rule! "^\\*mu4e-\\(main\\|headers\\)\\*" :ignore t)
   (set-popup-rule! "^\\*mu4e-log\\*" :select nil)
@@ -630,7 +630,6 @@ See `+mu4e-msg-gmail-p' and `mu4e-sent-messages-behavior'.")
 
     (defvar +mu4e--last-invalid-gmail-action 0)
 
-    (delq! 'delete mu4e-marks #'assq)
     (setf (alist-get 'delete mu4e-marks)
           (list
            :char '("D" . "✘")

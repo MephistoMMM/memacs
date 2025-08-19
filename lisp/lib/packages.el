@@ -125,8 +125,8 @@ package's name as a symbol, and whose CDR is the plist supplied to its
               (melpa              :type git :host github
                                   :repo "melpa/melpa"
                                   :build nil)
-              (nongnu-elpa        :type git
-                                  :repo "https://git.savannah.gnu.org/git/emacs/nongnu.git"
+              (nongnu-elpa        :type git :host github
+                                  :repo "emacsmirror/nongnu_elpa"
                                   :local-repo "nongnu-elpa"
                                   :build nil)
               (gnu-elpa-mirror    :type git :host github
@@ -199,7 +199,7 @@ processed."
                 (cl-pushnew name doom-disabled-packages)
               (when recipe
                 (straight-override-recipe (cons name recipe)))
-              (appendq! packages (cons name (straight--get-dependencies name)))))))
+              (cl-callf append packages (cons name (straight--get-dependencies name)))))))
       (dolist (package (cl-delete-duplicates packages :test #'equal))
         (straight-register-package package)
         (let ((name (symbol-name package)))
@@ -1283,7 +1283,8 @@ Must be run from a magit diff buffer."
 (defun doom-packages--purge-eln ()
   (if-let* ((dirs
              (cl-delete (expand-file-name comp-native-version-dir doom-packages--eln-output-path)
-                        (directory-files doom-packages--eln-output-path t "^[^.]" t)
+                        (when (file-directory-p doom-packages--eln-output-path)
+                          (directory-files doom-packages--eln-output-path t "^[^.]" t))
                         :test #'file-equal-p)))
       (progn
         (print! (start "Purging old native bytecode..."))

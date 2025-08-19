@@ -81,8 +81,11 @@ want to change your symbol font, use `doom-symbol-font'.")
   "List of hooks to run when the UI has been initialized.")
 
 (defcustom doom-load-theme-hook nil
-  "Hook run after the theme is loaded with `load-theme' or reloaded with
-`doom/reload-theme'.")
+  "Hook run after a color-scheme is loaded.
+
+Triggered by `load-theme', `enable-theme', or reloaded with `doom/reload-theme',
+but only for themes that declare themselves as a :kind color-scheme (which Doom
+treats as the default).")
 
 (defcustom doom-switch-buffer-hook nil
   "A list of hooks run after changing the current buffer.")
@@ -91,46 +94,63 @@ want to change your symbol font, use `doom-symbol-font'.")
   "A list of hooks run after changing the focused windows.")
 
 (defcustom doom-switch-frame-hook nil
-  "A list of hooks run after changing the focused frame.")
+  "A list of hooks run after changing the focused frame.
+
+This also serves as an analog for `focus-in-hook' or
+`after-focus-change-function', but also preforms debouncing (see
+`doom-switch-frame-hook-debounce-delay'). It's possible for this hook to be
+triggered multiple times (because there are edge cases where Emacs can have
+multiple frames focused at once).")
 
 (defun doom-run-switch-buffer-hooks-h (&optional _)
-  (let ((gc-cons-threshold most-positive-fixnum)
-        (inhibit-redisplay t))
+  "Trigger `doom-switch-buffer-hook' when selecting a new buffer."
+  (let ((gc-cons-threshold most-positive-fixnum))
     (run-hooks 'doom-switch-buffer-hook)))
 
-(defun doom-run-switch-window-or-frame-hooks-h (&optional _)
-  (let ((gc-cons-threshold most-positive-fixnum)
-        (inhibit-redisplay t))
-    (unless (equal (old-selected-frame) (selected-frame))
-      (run-hooks 'doom-switch-frame-hook))
-    (unless (or (minibufferp)
-                (equal (old-selected-window) (minibuffer-window)))
+(defun doom-run-switch-window-hooks-h (&optional _)
+  "Trigger `doom-switch-window-hook' when selecting a window in the same frame."
+  (unless (or (minibufferp)
+              (not (equal (old-selected-frame) (selected-frame)))
+              (equal (old-selected-window) (minibuffer-window)))
+    (let ((gc-cons-threshold most-positive-fixnum))
       (run-hooks 'doom-switch-window-hook))))
+
+(defvar doom-switch-frame-hook-debounce-delay 2.0
+  "The delay for which `doom-switch-frame-hook' won't trigger again.
+
+This exists to prevent switch-frame hooks getting triggered too aggressively due
+to misbehaving desktop environments, packages incorrectly frame switching in
+non-interactive code, or the user accidentally (and rapidly) un-and-refocusing
+the frame through some other means.")
+
+(defun doom--run-switch-frame-hooks-fn (_)
+  (remove-hook 'pre-redisplay-functions #'doom--run-switch-frame-hooks-fn)
+  (let ((gc-cons-threshold most-positive-fixnum))
+    (dolist (fr (visible-frame-list))
+      (let ((state (frame-focus-state fr)))
+        (when (and state (not (eq state 'unknown)))
+          (let ((last-update (frame-parameter fr '+last-focus)))
+            (when (or (null last-update)
+                      (> (float-time (time-subtract (current-time) last-update))
+                         doom-switch-frame-hook-debounce-delay))
+              (with-selected-frame fr
+                (unwind-protect
+                    (let ((inhibit-redisplay t))
+                      (run-hooks 'doom-switch-frame-hook))
+                  (set-frame-parameter fr '+last-focus (current-time)))))))))))
+
+(let (last-focus-state)
+  (defun doom-run-switch-frame-hooks-fn ()
+    "Trigger `doom-switch-frame-hook' once per frame focus change."
+    (or (equal last-focus-state
+               (setq last-focus-state
+                     (mapcar #'frame-focus-state (frame-list))))
+        ;; Defer until next redisplay
+        (add-hook 'pre-redisplay-functions #'doom--run-switch-frame-hooks-fn))))
 
 (defun doom-protect-fallback-buffer-h ()
   "Don't kill the scratch buffer. Meant for `kill-buffer-query-functions'."
   (not (eq (current-buffer) (doom-fallback-buffer))))
-
-(defun doom-highlight-non-default-indentation-h ()
-  "Highlight whitespace at odds with `indent-tabs-mode'.
-That is, highlight tabs if `indent-tabs-mode' is `nil', and highlight spaces at
-the beginnings of lines if `indent-tabs-mode' is `t'. The purpose is to make
-incorrect indentation in the current buffer obvious to you.
-
-Does nothing if `whitespace-mode' or `global-whitespace-mode' is already active
-or if the current buffer is read-only or not file-visiting."
-  (unless (or (eq major-mode 'fundamental-mode)
-              (bound-and-true-p global-whitespace-mode)
-              (null buffer-file-name))
-    (require 'whitespace)
-    (set (make-local-variable 'whitespace-style)
-         (cl-union (if indent-tabs-mode
-                       '(indentation)
-                     '(tabs tab-mark))
-                   (when whitespace-mode
-                     (remq 'face whitespace-active-style))))
-    (cl-pushnew 'face whitespace-style) ; must be first
-    (whitespace-mode +1)))
 
 
 ;;
@@ -270,9 +290,9 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 (setq window-resize-pixelwise nil)
 
 ;; UX: GUIs are inconsistent across systems, desktop environments, and themes,
-;;   and don't match the look of Emacs. They also impose inconsistent shortcut
-;;   key paradigms. I'd rather Emacs be responsible for prompting.
-(setq use-dialog-box nil)
+;;   but more annoying than that are the inconsistent shortcut keys tied to
+;;   them, so use Emacs instead of GUI popups.
+(setq use-dialog-box (featurep :system 'android)) ; Android dialogs are better UX
 (when (bound-and-true-p tooltip-mode)
   (tooltip-mode -1))
 
@@ -302,7 +322,8 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 
 ;; Expand the minibuffer to fit multi-line text displayed in the echo-area. This
 ;; doesn't look too great with direnv, however...
-(setq resize-mini-windows 'grow-only)
+(setq resize-mini-windows 'grow-only
+      tooltip-resize-echo-area t)
 
 ;; Typing yes/no is obnoxious when y/n will do
 (if (boundp 'use-short-answers)
@@ -327,8 +348,63 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 
 
 (after! comint
-  (setq comint-prompt-read-only t
-        comint-buffer-maximum-size 2048)) ; double the default
+  (setq-default comint-buffer-maximum-size 2048)  ; double the default
+
+  ;; UX: Temporarily disable undo history between command executions. Otherwise,
+  ;;   undo could destroy output while it's being printed or delete buffer
+  ;;   contents past the boundaries of the current prompt.
+  (add-hook 'comint-exec-hook #'buffer-disable-undo)
+  (defadvice! doom--comint-enable-undo-a (process _string)
+    :after #'comint-output-filter
+    (with-current-buffer (process-buffer process)
+      (when-let* ((start-marker comint-last-output-start))
+        (when (and (< start-marker
+                      (or (if process (process-mark process))
+                          (point-max-marker)))
+                   (eq (char-before start-marker) ?\n)) ;; Account for some of the IELM’s wilderness.
+          (buffer-enable-undo)
+          (setq buffer-undo-list nil)))))
+
+  ;; Protect prompts from accidental modifications.
+  (setq-default comint-prompt-read-only t)
+
+  ;; UX: Prior output in shell and comint shells (like ielm) should be
+  ;;   read-only. Otherwise, it's trivial to make edits in visual modes (like
+  ;;   evil's or term's term-line-mode) and leave the buffer in a half-broken
+  ;;   state (which you have to flush out with a couple RETs, which may execute
+  ;;   the broken text in the buffer),
+  (defadvice! doom--comint-protect-output-in-visual-modes-a (process _string)
+    :after #'comint-output-filter
+    ;; Adapted from https://github.com/michalrus/dotfiles/blob/c4421e361400c4184ea90a021254766372a1f301/.emacs.d/init.d/040-terminal.el.symlink#L33-L49
+    (with-current-buffer (process-buffer process)
+      (let ((start-marker comint-last-output-start)
+            (end-marker (process-mark process)))
+        (when (and start-marker (< start-marker end-marker)) ;; Account for some of the IELM’s wilderness.
+          (let ((inhibit-read-only t))
+            ;; Make all past output read-only (disallow buffer modifications)
+            (add-text-properties comint-last-input-start (1- end-marker) '(read-only t))
+            ;; Disallow interleaving.
+            (remove-text-properties start-marker (1- end-marker) '(rear-nonsticky))
+            ;; Make sure that at `max-point' you can always append. Important for
+            ;; bad REPLs that keep writing after giving us prompt (e.g. sbt).
+            (add-text-properties (1- end-marker) end-marker '(rear-nonsticky t))
+            ;; Protect fence (newline of input, just before output).
+            (when (eq (char-before start-marker) ?\n)
+              (remove-text-properties (1- start-marker) start-marker '(rear-nonsticky))
+              (add-text-properties (1- start-marker) start-marker '(read-only t))))))))
+
+  ;; UX: If the user is anywhere but the last prompt, typing should move them
+  ;;   there instead of unhelpfully spew read-only errors at them.
+  (defun doom--comint-move-cursor-to-prompt-h ()
+    (and (eq this-command 'self-insert-command)
+         comint-last-prompt
+         (> (cdr comint-last-prompt) (point))
+         (goto-char (cdr comint-last-prompt))))
+
+  (add-hook! 'comint-mode-hook
+    (defun doom--comint-init-move-cursor-to-prompt-h ()
+      (add-hook 'pre-command-hook #'doom--comint-move-cursor-to-prompt-h
+                nil t))))
 
 
 (after! compile
@@ -410,10 +486,10 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
   :preface (defvar winner-dont-bind-my-keys t) ; I'll bind keys myself
   :hook (doom-first-buffer . winner-mode)
   :config
-  (appendq! winner-boring-buffers
-            '("*Compile-Log*" "*inferior-lisp*" "*Fuzzy Completions*"
-              "*Apropos*" "*Help*" "*cvs*" "*Buffer List*" "*Ibuffer*"
-              "*esh command on file*")))
+  (cl-callf append winner-boring-buffers
+    '("*Compile-Log*" "*inferior-lisp*" "*Fuzzy Completions*"
+      "*Apropos*" "*Help*" "*cvs*" "*Buffer List*" "*Ibuffer*"
+      "*esh command on file*")))
 
 
 (use-package! paren
@@ -458,20 +534,8 @@ windows, switch to `doom-fallback-buffer'. Otherwise, delegate to original
 (add-hook! '(completion-list-mode-hook Man-mode-hook)
            #'hide-mode-line-mode)
 
-;; Many major modes do no highlighting of number literals, so we do it for them
-(use-package! highlight-numbers
-  :hook ((prog-mode conf-mode) . highlight-numbers-mode)
-  :config (setq highlight-numbers-generic-regexp "\\_<[[:digit:]]+\\(?:\\.[0-9]*\\)?\\_>"))
-
 ;;;###package image
 (setq image-animate-loop t)
-
-;;;###package rainbow-delimiters
-;; Helps us distinguish stacked delimiter pairs, especially in parentheses-drunk
-;; languages like Lisp. I reduce it from it's default of 9 to reduce the
-;; complexity of the font-lock keyword and hopefully buy us a few ms of
-;; performance.
-(setq rainbow-delimiters-max-face-count 4)
 
 
 ;;
@@ -664,14 +728,13 @@ triggering hooks during startup."
   (doom-run-hooks 'doom-init-ui-hook)
 
   (add-hook 'kill-buffer-query-functions #'doom-protect-fallback-buffer-h)
-  (add-hook 'after-change-major-mode-hook #'doom-highlight-non-default-indentation-h 'append)
 
   ;; Make `next-buffer', `other-buffer', etc. ignore unreal buffers.
   (push '(buffer-predicate . doom-buffer-frame-predicate) default-frame-alist)
 
-  ;; Initialize `doom-switch-window-hook' and `doom-switch-frame-hook'
-  (add-hook 'window-selection-change-functions #'doom-run-switch-window-or-frame-hooks-h)
-  ;; Initialize `doom-switch-buffer-hook'
+  ;; Initialize `doom-switch-*-hook' hooks.
+  (add-function :after after-focus-change-function #'doom-run-switch-frame-hooks-fn)
+  (add-hook 'window-selection-change-functions #'doom-run-switch-window-hooks-h)
   (add-hook 'window-buffer-change-functions #'doom-run-switch-buffer-hooks-h)
   ;; `window-buffer-change-functions' doesn't trigger for files visited via the server.
   (add-hook 'server-visit-hook #'doom-run-switch-buffer-hooks-h))
