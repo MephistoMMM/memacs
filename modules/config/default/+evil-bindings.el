@@ -56,7 +56,8 @@
                '(((bound-and-true-p company-mode)
                   #'company-indent-or-complete-common)))
            ,@(when (modulep! :completion corfu)
-               '(((bound-and-true-p corfu-mode)
+               '(((and (bound-and-true-p corfu-mode)
+                       corfu--candidates)
                   (if (derived-mode-p 'eshell-mode 'comint-mode)
                       #'completion-at-point
                     #'indent-for-tab-command)))))))
@@ -447,7 +448,7 @@
        :desc "Previous buffer"             "p"   #'previous-buffer
        :desc "Revert buffer"               "r"   #'revert-buffer
        :desc "Rename buffer"               "R"   #'rename-buffer
-       :desc "Save buffer"                 "s"   #'basic-save-buffer
+       :desc "Save buffer"                 "s"   #'save-buffer
        :desc "Save all buffers"            "S"   #'evil-write-all
        :desc "Save buffer as root"         "u"   #'doom/sudo-save-buffer
        :desc "Pop up scratch buffer"       "x"   #'doom/open-scratch-buffer
@@ -522,6 +523,33 @@
         :desc "Show registry"          "s" #'ediff-show-registry
         :desc "Revision"               "v" #'ediff-revision
         :desc "Directory revision"     "V" #'ediff-directory-revisions)
+      ;;; <leader> d --- debugger
+      (:when (modulep! :tools debugger)
+        (:prefix-map ("D" . "debugger")
+         "d" #'dape
+         "p" #'dape-pause
+         "c" #'dape-continue
+         "n" #'dape-next
+         "s" #'dape-step-in
+         "o" #'dape-step-out
+         "r" #'dape-restart
+         "i" #'dape-info
+         "R" #'dape-repl
+         "m" #'dape-memory
+         "M" #'dape-disassemble
+         "l" #'dape-breakpoint-log
+         "e" #'dape-breakpoint-expression
+         "h" #'dape-breakpoint-hits
+         "b" #'dape-breakpoint-toggle
+         "B" #'dape-breakpoint-remove-all
+         "t" #'dape-select-thread
+         "S" #'dape-select-stack
+         ">" #'dape-stack-select-down
+         "<" #'dape-stack-select-up
+         "x" #'dape-evaluate-expression
+         "w" #'dape-watch-dwim
+         "D" #'dape-disconnect-quit
+         "q" #'dape-quit))
 
       ;;; <leader> f --- file
       (:prefix-map ("f" . "file")
@@ -540,7 +568,7 @@
        :desc "Browse private config"       "P"   #'doom/open-private-config
        :desc "Recent files"                "r"   #'recentf-open-files
        :desc "Rename/move file"            "R"   #'doom/move-this-file
-       :desc "Save file"                   "s"   #'save-buffer
+       :desc "Save file"                   "s"   #'basic-save-buffer
        :desc "Save file as..."             "S"   #'write-file
        :desc "Sudo find file"              "u"   #'doom/sudo-find-file
        :desc "Sudo this file"              "U"   #'doom/sudo-this-file
@@ -570,8 +598,8 @@
         :desc "Magit clone"               "C"   #'magit-clone
         :desc "Magit fetch"               "F"   #'magit-fetch
         :desc "Magit buffer log"          "L"   #'magit-log-buffer-file
-        :desc "Git stage this file"       "S"   #'magit-stage-buffer-file
-        :desc "Git unstage this file"     "U"   #'magit-unstage-buffer-file
+        :desc "Git stage this file"       "S"   #'magit-file-stage
+        :desc "Git unstage this file"     "U"   #'magit-file-unstage
         (:prefix ("f" . "find")
          :desc "Find file"                 "f"   #'magit-find-file
          :desc "Find gitconfig file"       "g"   #'magit-find-git-config-file
@@ -728,7 +756,7 @@
         :desc "Tags search"    "m"  #'org-tags-view
         :desc "View search"    "v"  #'org-search-view)
        :desc "Default browser"    "b"  #'browse-url-of-file
-       :desc "Start debugger"     "d"  #'+debugger/start
+       :desc "Start a debugger"   "d"  #'+debugger/start
        :desc "New frame"          "f"  #'make-frame
        :desc "Select frame"       "F"  #'select-frame-by-name
        :desc "REPL"               "r"  #'+eval/open-repl-other-window
@@ -759,14 +787,26 @@
        (:when (modulep! :os macos)
         :desc "Reveal in Finder"           "o" #'+macos/reveal-in-finder
         :desc "Reveal project in Finder"   "O" #'+macos/reveal-project-in-finder
-        :desc "Send to Transmit"           "u" #'+macos/send-to-transmit
-        :desc "Send project to Transmit"   "U" #'+macos/send-project-to-transmit
-        :desc "Send to Launchbar"          "l" #'+macos/send-to-launchbar
-        :desc "Send project to Launchbar"  "L" #'+macos/send-project-to-launchbar
-        :desc "Open in iTerm"              "i" #'+macos/open-in-iterm
-        :desc "Open in new iTerm window"   "I" #'+macos/open-in-iterm-new-window)
+        (:prefix ("s" . "send to application")
+         :desc "Send to Transmit"           "t" #'+macos/send-to-transmit
+         :desc "Send project to Transmit"   "T" #'+macos/send-project-to-transmit
+         :desc "Send to Launchbar"          "l" #'+macos/send-to-launchbar
+         :desc "Send project to Launchbar"  "L" #'+macos/send-project-to-launchbar
+         :desc "Open in iTerm"              "i" #'+macos/open-in-iterm
+         :desc "Open in new iTerm window"   "I" #'+macos/open-in-iterm-new-window))
        (:when (modulep! :tools docker)
         :desc "Docker" "D" #'docker)
+       (:when (modulep! :tools llm)
+        (:prefix ("l" . "llm")
+         :desc "Add text to context"        "a" #'gptel-add
+         :desc "Explain"                    "e" #'gptel-quick
+         :desc "Add file to context"        "f" #'gptel-add-file
+         :desc "Open gptel"                 "l" #'gptel
+         :desc "Send to gptel"              "s" #'gptel-send
+         :desc "Open gptel menu"            "m" #'gptel-menu
+         :desc "Rewrite"                    "r" #'gptel-rewrite
+         :desc "Org: set topic"             "o" #'gptel-org-set-topic
+         :desc "Org: set properties"        "O" #'gptel-org-set-properties))
        (:when (modulep! :email mu4e)
         :desc "mu4e" "m" #'=mu4e)
        (:when (modulep! :email notmuch)
@@ -853,7 +893,7 @@
        :desc "Indent style"                 "I" #'doom/toggle-indent-style
        :desc "Line numbers"                 "l" #'doom/toggle-line-numbers
        (:when (modulep! :ui minimap)
-        :desc "Minimap"                      "m" #'minimap-mode)
+        :desc "Minimap"                      "m" #'demap-toggle)
        (:when (modulep! :lang org +present)
         :desc "org-tree-slide mode"        "p" #'org-tree-slide-mode)
        :desc "Read-only mode"               "r" #'read-only-mode

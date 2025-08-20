@@ -1,8 +1,8 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; ui/treemacs/packages.el
 
-(package! treemacs :pin "32bb3dd02ddfca85661614b3b227e770fab821e2")
-(package! treemacs-nerd-icons :pin "9876cb478145a0ec4e36f64ff6583f3de7126216")
+(package! treemacs :pin "5fa84199501fd43e5573b1277a2b1699c7473cc1")
+(package! treemacs-nerd-icons :pin "eac9fb5d92b8b29e7c4fcf9f3baddb2cb0b04575")
 ;; These packages have no :pin because they're in the same repo
 (when (modulep! :editor evil +everywhere)
   (package! treemacs-evil))
@@ -13,4 +13,4 @@
   (package! treemacs-persp))
 (when (and (modulep! +lsp)
            (modulep! :tools lsp -eglot))
-  (package! lsp-treemacs :pin "fb1a07ae0a3d781dea8ac78da2933e0173eb48a4"))
+  (package! lsp-treemacs :pin "3e5550f278db74f15ebe34add0138b138207ec08"))

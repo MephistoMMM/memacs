@@ -368,7 +368,7 @@ Requires `anzu', also `evil-anzu' if using `evil-mode' for compatibility with
              ;; In case the user saves the file to a new location
              after-save-hook
              ;; ...or makes external changes then returns to Emacs
-             focus-in-hook
+             doom-switch-frame-hook
              ;; ...or when we change the current project!
              projectile-after-switch-project-hook
              ;; ...when the visited file changes (e.g. it's renamed)
@@ -474,7 +474,7 @@ lines are selected, or the NxM dimensions of a block selection.")
 (defun +modeline-add-selection-segment-h ()
   (add-to-list '+modeline-format-left '+modeline-selection-info 'append))
 (defun +modeline-remove-selection-segment-h ()
-  (delq! '+modeline-selection-info +modeline-format-left))
+  (cl-callf2 delq '+modeline-selection-info +modeline-format-left))
 
 (if (featurep 'evil)
     (progn

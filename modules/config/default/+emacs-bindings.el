@@ -268,14 +268,26 @@
        (:when (modulep! :os macos)
         :desc "Reveal in Finder"           "o" #'+macos/reveal-in-finder
         :desc "Reveal project in Finder"   "O" #'+macos/reveal-project-in-finder
-        :desc "Send to Transmit"           "u" #'+macos/send-to-transmit
-        :desc "Send project to Transmit"   "U" #'+macos/send-project-to-transmit
-        :desc "Send to Launchbar"          "l" #'+macos/send-to-launchbar
-        :desc "Send project to Launchbar"  "L" #'+macos/send-project-to-launchbar
-        :desc "Open in iTerm"              "i" #'+macos/open-in-iterm
-        :desc "Open in new iTerm window"   "I" #'+macos/open-in-iterm-new-window)
+        (:prefix ("s" . "send to application")
+         :desc "Send to Transmit"           "t" #'+macos/send-to-transmit
+         :desc "Send project to Transmit"   "T" #'+macos/send-project-to-transmit
+         :desc "Send to Launchbar"          "l" #'+macos/send-to-launchbar
+         :desc "Send project to Launchbar"  "L" #'+macos/send-project-to-launchbar
+         :desc "Open in iTerm"              "i" #'+macos/open-in-iterm
+         :desc "Open in new iTerm window"   "I" #'+macos/open-in-iterm-new-window))
        (:when (modulep! :tools docker)
         :desc "Docker" "D" #'docker)
+       (:when (modulep! :tools llm)
+        (:prefix ("l" . "llm")
+         :desc "Add text to context"        "a" #'gptel-add
+         :desc "Explain"                    "e" #'gptel-quick
+         :desc "Add file to context"        "f" #'gptel-add-file
+         :desc "Open gptel"                 "l" #'gptel
+         :desc "Send to gptel"              "s" #'gptel-send
+         :desc "Open gptel menu"            "m" #'gptel-menu
+         :desc "Rewrite"                    "r" #'gptel-rewrite
+         :desc "Org: set topic"             "o" #'gptel-org-set-topic
+         :desc "Org: set properties"        "O" #'gptel-org-set-properties))
        (:when (modulep! :email mu4e)
         :desc "mu4e" "m" #'=mu4e)
        (:when (modulep! :email notmuch)
@@ -305,8 +317,8 @@
        :desc "Delete frame"                 "f" #'delete-frame
        :desc "Clear current frame"          "F" #'doom/kill-all-buffers
        :desc "Kill Emacs (and daemon)"      "K" #'save-buffers-kill-emacs
-       :desc "Quit Emacs"                   "q" #'kill-emacs
-       :desc "Save and quit Emacs"          "Q" #'save-buffers-kill-terminal
+       :desc "Quit Emacs"                   "q" #'save-buffers-kill-terminal
+       :desc "Quit Emacs without saving"    "Q" #'kill-emacs
        :desc "Quick save current session"   "s" #'doom/quicksave-session
        :desc "Restore last session"         "l" #'doom/quickload-session
        :desc "Save session to file"         "S" #'doom/save-session
@@ -340,7 +352,7 @@
        (:when (modulep! :ui indent-guides)
         :desc "Indent guides"              "i" #'indent-bars-mode)
        (:when (modulep! :ui minimap)
-        :desc "Minimap mode"               "m" #'minimap-mode)
+        :desc "Minimap mode"               "m" #'demap-toggle)
        (:when (modulep! :lang org +present)
         :desc "org-tree-slide mode"        "p" #'org-tree-slide-mode)
        :desc "Read-only mode"               "r" #'read-only-mode
@@ -533,11 +545,6 @@
         "C-n"        #'company-search-repeat-forward
         "C-p"        #'company-search-repeat-backward
         "C-s"        (cmd! (company-search-abort) (company-filter-candidates))))
-
-      ;;; ein notebooks
-      (:after ein:notebook-multilang
-        :map ein:notebook-multilang-mode-map
-        "C-c h" #'+ein/hydra/body)
 
       ;;; expand-region
       "C-="  #'er/expand-region
