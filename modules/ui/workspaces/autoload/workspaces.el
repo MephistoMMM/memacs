@@ -155,8 +155,7 @@ Otherwise return t on success, nil otherwise."
             (+popup--inhibit-transient t))
         (persp-delete-other-windows))
       (switch-to-buffer (doom-fallback-buffer))
-      (setf (persp-window-conf persp)
-            (funcall persp-window-state-get-function (selected-frame))))
+      (setf (persp-window-conf persp) (persp-window-state-get)))
     persp))
 
 ;;;###autoload
@@ -530,23 +529,16 @@ created."
 (defun +workspaces-associate-frame-fn (frame &optional _new-frame-p)
   "Create a blank, new perspective and associate it with FRAME."
   (when persp-mode
-    (if (not (persp-frame-list-without-daemon))
-        (+workspace-switch +workspaces-main t)
-      (with-selected-frame frame
-        (+workspace-switch (format "#%s" (+workspace--generate-id)) t)
-        (unless (doom-real-buffer-p (current-buffer))
-          (switch-to-buffer (doom-fallback-buffer)))
-        (set-frame-parameter frame 'workspace (+workspace-current-name))
-        ;; ensure every buffer has a buffer-predicate
-        (persp-set-frame-buffer-predicate frame))
-      (run-at-time 0.1 nil #'+workspace/display))))
-
-(defvar +workspaces--project-dir nil)
-;;;###autoload
-(defun +workspaces-set-project-action-fn ()
-  "A `projectile-switch-project-action' that sets the project directory for
-`+workspaces-switch-to-project-h'."
-  (setq +workspaces--project-dir default-directory))
+    (with-selected-frame frame
+      (if (not (cdr-safe (persp-frame-list-without-daemon)))
+          (+workspace-switch +workspaces-main t)
+        (+workspace-switch (format "#%s" (+workspace--generate-id)) t))
+      (unless (doom-real-buffer-p (current-buffer))
+        (switch-to-buffer (doom-fallback-buffer)))
+      (set-frame-parameter frame 'workspace (+workspace-current-name))
+      ;; ensure every buffer has a buffer-predicate
+      (persp-set-frame-buffer-predicate frame))
+    (run-at-time 0.1 nil #'+workspace/display)))
 
 ;;;###autoload
 (defun +workspaces-switch-to-project-h (&optional dir)
@@ -558,51 +550,60 @@ Afterwords, runs `+workspaces-switch-project-function'. By default, this prompts
 the user to open a file in the new project.
 
 This be hooked to `projectile-after-switch-project-hook'."
-  (when dir
-    (setq +workspaces--project-dir dir))
-  ;; HACK Clear projectile-project-root, otherwise cached roots may interfere
-  ;;      with project switch (see #3166)
-  (let (projectile-project-root)
-    (when (and persp-mode +workspaces--project-dir)
-      (when projectile-before-switch-project-hook
-        (with-temp-buffer
-          ;; Load the project dir-local variables into the switch buffer, so the
-          ;; action can make use of them
-          (setq default-directory +workspaces--project-dir)
-          (hack-dir-local-variables-non-file-buffer)
-          (run-hooks 'projectile-before-switch-project-hook)))
-      (unwind-protect
-          (if (and (not (null +workspaces-on-switch-project-behavior))
-                   (or (eq +workspaces-on-switch-project-behavior t)
-                       (+workspace--protected-p (safe-persp-name (get-current-persp)))
-                       (+workspace-buffer-list)))
-              (let* ((persp
-                      (let ((project-name (doom-project-name +workspaces--project-dir)))
-                        (or (+workspace-get project-name t)
-                            (+workspace-new project-name))))
-                     (new-name (persp-name persp)))
-                (+workspace-switch new-name)
-                (with-current-buffer (doom-fallback-buffer)
-                  (setq default-directory +workspaces--project-dir)
-                  (hack-dir-local-variables-non-file-buffer))
-                (unless current-prefix-arg
-                  (funcall +workspaces-switch-project-function +workspaces--project-dir))
-                (+workspace-message
-                 (format "Switched to '%s' in new workspace" new-name)
-                 'success))
+  (let* ((default-directory (or dir default-directory))
+         (pname (doom-project-name))
+         (proot (file-truename default-directory))
+         ;; HACK: Clear projectile-project-root or cached roots could interfere
+         ;;   with project switching (see #3166).
+         projectile-project-root)
+    (when persp-mode
+      (if (and (not (null +workspaces-on-switch-project-behavior))
+               (or (eq +workspaces-on-switch-project-behavior t)
+                   (+workspace--protected-p (safe-persp-name (get-current-persp)))
+                   (+workspace-buffer-list)))
+          (let* ((ws-param '+workspace-project)
+                 (ws (+workspace-get pname t))
+                 (ws (if (and ws
+                              (ignore-errors
+                                (file-equal-p (persp-parameter ws-param ws)
+                                              proot)))
+                         ws
+                       ;; Uniquify the project's name, so we don't clobber a
+                       ;; pre-existing workspace with the same name.
+                       (let* ((parts (nreverse (split-string proot "/" t)))
+                              (pre  (cdr parts))
+                              (post (list (car parts))))
+                         (while (and pre
+                                     (setq ws (+workspace-get (setq pname (string-join post "/")) t))
+                                     (not (ignore-errors
+                                            (file-equal-p (persp-parameter ws-param ws)
+                                                          proot))))
+                           (push (pop pre) post))
+                         (unless pre ws))))
+                 (ws (or ws
+                         (+workspace-get pname t)
+                         (+workspace-new pname))))
+            (set-persp-parameter ws-param proot ws)
+            (+workspace-switch pname)
             (with-current-buffer (doom-fallback-buffer)
-              (setq default-directory +workspaces--project-dir)
-              (hack-dir-local-variables-non-file-buffer)
-              (message "Switched to '%s'" (doom-project-name +workspaces--project-dir)))
-            (with-demoted-errors "Workspace error: %s"
-              (+workspace-rename (+workspace-current-name) (doom-project-name +workspaces--project-dir)))
+              (setq-local default-directory proot)
+              (hack-dir-local-variables-non-file-buffer))
             (unless current-prefix-arg
-              (funcall +workspaces-switch-project-function +workspaces--project-dir)))
-        (run-hooks 'projectile-after-switch-project-hook)
-        (setq +workspaces--project-dir nil)))))
+              (funcall +workspaces-switch-project-function proot))
+            (+workspace-message
+             (format "Switched to '%s' in new workspace" pname)
+             'success))
+        (with-current-buffer (doom-fallback-buffer)
+          (setq-local default-directory proot)
+          (hack-dir-local-variables-non-file-buffer)
+          (message "Switched to '%s'" pname))
+        (with-demoted-errors "Workspace error: %s"
+          (+workspace-rename (+workspace-current-name) pname))
+        (unless current-prefix-arg
+          (funcall +workspaces-switch-project-function proot))))))
 
 ;;;###autoload
-(defun +workspaces-save-tab-bar-data-h (_)
+(defun +workspaces-save-tab-bar-data-h (&rest _)
   "Save the current workspace's tab bar data."
   (when (get-current-persp)
     (set-persp-parameter
@@ -618,7 +619,7 @@ This be hooked to `projectile-after-switch-project-hook'."
                          (frameset-filter-tabs (tab-bar-tabs) nil nil t))))
 
 ;;;###autoload
-(defun +workspaces-load-tab-bar-data-h (_)
+(defun +workspaces-load-tab-bar-data-h (&rest _)
   "Restores the tab bar data of the workspace we have just switched to."
   (tab-bar-tabs-set (persp-parameter 'tab-bar-tabs))
   (setq tab-bar-closed-tabs (persp-parameter 'tab-bar-closed-tabs))

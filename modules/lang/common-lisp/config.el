@@ -14,7 +14,6 @@
 
 ;;;###package lisp-mode
 (defvar inferior-lisp-program "sbcl")
-(add-hook 'lisp-mode-hook #'rainbow-delimiters-mode)
 
 
 (use-package! sly
@@ -80,7 +79,9 @@
       "Attempt to auto-start sly when opening a lisp buffer."
       (cond ((or (doom-temp-buffer-p (current-buffer))
                  (sly-connected-p)))
-            ((executable-find (car (split-string inferior-lisp-program)))
+            ((executable-find (car (if (listp inferior-lisp-program)
+                                       inferior-lisp-program
+                                     (split-string inferior-lisp-program))))
              (let ((sly-auto-start 'always))
                (sly-auto-start)
                (add-hook 'kill-buffer-hook #'+common-lisp--cleanup-sly-maybe-h nil t)))

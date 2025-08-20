@@ -26,23 +26,11 @@ This is ignored by ccls.")
   ;; these only run in their respective major modes, and not derived modes.
   :hook ((c-mode-local-vars c++-mode-local-vars objc-mode-local-vars) . +cc-init-ffap-integration-h)
   ;;; Improve fontification in C/C++ (also see `modern-cpp-font-lock')
-  :hook (c-mode-common . rainbow-delimiters-mode)
   :hook ((c-mode c++-mode) . +cc-fontify-constants-h)
   :config
   (set-docsets! 'c-mode "C")
   (set-docsets! 'c++-mode "C++" "Boost")
   (set-electric! '(c-mode c++-mode objc-mode java-mode) :chars '(?\n ?\} ?\{))
-  (set-formatter!
-    'clang-format
-    '("clang-format"
-      "-assume-filename"
-      (or (buffer-file-name)
-          (cdr (assoc major-mode
-                      '((c-mode        . ".c")
-                        (c++-mode      . ".cpp")
-                        (cuda-mode     . ".cu")
-                        (protobuf-mode . ".proto"))))))
-    :modes '(c-mode c++-mode protobuf-mode cuda-mode))
   (set-rotate-patterns! 'c++-mode
     :symbols '(("public" "protected" "private")
                ("class" "struct")))
@@ -193,7 +181,7 @@ This is ignored by ccls.")
     (add-to-list 'project-vc-ignores "^\\.ccls-cache$"))
   ;; DEPRECATED: Remove when projectile is replaced with project.el
   (after! projectile
-    (add-to-list 'projectile-globally-ignored-directories "^.ccls-cache$")
+    (add-to-list 'projectile-globally-ignored-directories ".ccls-cache")
     (add-to-list 'projectile-project-root-files-bottom-up ".ccls-root")
     (add-to-list 'projectile-project-root-files-top-down-recurring "compile_commands.json"))
   :config

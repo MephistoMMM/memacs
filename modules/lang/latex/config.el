@@ -31,9 +31,7 @@ package to be installed.")
 (defvar +latex-viewers '(skim evince sumatrapdf zathura okular pdf-tools)
   "A list of enabled LaTeX viewers to use, in this order. If they don't exist,
 they will be ignored. Recognized viewers are skim, evince, sumatrapdf, zathura,
-okular and pdf-tools.
-
-If no viewer is found, `latex-preview-pane-mode' is used.")
+okular and pdf-tools.")
 
 ;;
 (defvar +latex--company-backends nil)
@@ -61,8 +59,6 @@ If no viewer is found, `latex-preview-pane-mode' is used.")
       TeX-source-correlate-method 'synctex
       ;; Don't start the Emacs server when correlating sources.
       TeX-source-correlate-start-server nil
-      ;; Automatically insert braces after sub/superscript in `LaTeX-math-mode'.
-      TeX-electric-sub-and-superscript t
       ;; Just save, don't ask before each compilation.
       TeX-save-query nil)
 
@@ -83,8 +79,6 @@ If no viewer is found, `latex-preview-pane-mode' is used.")
     fill-nobreak-predicate (cons #'texmathp fill-nobreak-predicate))
   ;; Enable word wrapping.
   (add-hook 'TeX-mode-hook #'visual-line-mode)
-  ;; Enable `rainbow-mode' after applying styles to the buffer.
-  (add-hook 'TeX-update-style-hook #'rainbow-delimiters-mode)
   ;; Display output of LaTeX commands in a popup.
   (set-popup-rules! '((" output\\*$" :size 15)
                       ("^\\*TeX \\(?:Help\\|errors\\)"
@@ -93,18 +87,25 @@ If no viewer is found, `latex-preview-pane-mode' is used.")
     ;; We have to use lower case modes here, because `smartparens-mode' uses
     ;; the same during configuration.
     (let ((modes '(tex-mode plain-tex-mode latex-mode LaTeX-mode)))
-      ;; All these excess pairs dramatically slow down typing in LaTeX buffers,
-      ;; so we remove them. Let snippets do their job.
-      (dolist (open '("\\left(" "\\left[" "\\left\\{" "\\left|"
-                      "\\bigl(" "\\biggl(" "\\Bigl(" "\\Biggl(" "\\bigl["
-                      "\\biggl[" "\\Bigl[" "\\Biggl[" "\\bigl\\{" "\\biggl\\{"
-                      "\\Bigl\\{" "\\Biggl\\{"
+      (dolist (open '(
+                      ;; All these pairs dramatically slow down typing in LaTeX
+                      ;; buffers, so remove them. Let snippets do their job.
+                      "\\left(" "\\left[" "\\left\\{" "\\left|"
+                      "\\bigl("   "\\biggl("   "\\Bigl("   "\\Biggl("
+                      "\\bigl["   "\\biggl["   "\\Bigl["   "\\Biggl["
+                      "\\bigl\\{" "\\biggl\\{" "\\Bigl\\{" "\\Biggl\\{"
                       "\\lfloor" "\\lceil" "\\langle"
-                      "\\lVert" "\\lvert" "`"))
-        (sp-local-pair modes open nil :actions :rem))
-      ;; And tweak these so that users can decide whether they want use LaTeX
-      ;; quotes or not, via `+latex-enable-plain-double-quotes'.
-      (sp-local-pair modes "``" nil :unless '(:add sp-in-math-p))))
+                      "\\lVert" "\\lvert"
+                      ;; Disable pairs that interfere with AucTeX,
+                      ;; see https://github.com/Fuco1/smartparens/pull/1151.
+                      "`" "``" "\""))
+        ;; Some of the above pairs are in smartparens' global list, which
+        ;; applies to all modes, so we need a local ":actions nil" override
+        ;; (instead of ":actions :rem", which removes from the local list).
+        ;; While this keeps the pairs in `sp-pairs', it has negligible
+        ;; performance impact because smartparens will omit the pairs when
+        ;; building the buffer-local `sp-local-pairs' used during operation.
+        (sp-local-pair modes open nil :actions nil))))
   ;; Hook LSP, if enabled.
   (when (modulep! +lsp)
     (add-hook! '(tex-mode-local-vars-hook
@@ -128,18 +129,7 @@ If no viewer is found, `latex-preview-pane-mode' is used.")
         :desc "View"          "v" #'TeX-view
         :desc "Compile"       "c" #'+latex/compile
         :desc "Run all"       "a" #'TeX-command-run-all
-        :desc "Run a command" "m" #'TeX-command-master)
-
-  ;; HACK: The standard LaTeXMk command uses `TeX-run-format', which doesn't
-  ;;   trigger `TeX-after-compilation-finished-functions', so swap it out for
-  ;;   `TeX-run-TeX', which does.
-  (defadvice! +latex--run-after-compilation-finished-functions-a (&rest args)
-    :after #'TeX-TeX-sentinel
-    (unless (TeX-error-report-has-errors-p)
-      (run-hook-with-args 'TeX-after-compilation-finished-functions
-                          (with-current-buffer TeX-command-buffer
-                            (expand-file-name
-                             (TeX-active-master (TeX-output-extension))))))))
+        :desc "Run a command" "m" #'TeX-command-master))
 
 
 (use-package! tex-fold
@@ -217,10 +207,10 @@ Math faces should stay fixed by the mixed-pitch blacklist, this is mostly for
   (defadvice! +latex--dont-indent-itemize-and-enumerate-and-description-a (fn &rest args)
     :around #'LaTeX-fill-region-as-paragraph
     (let ((LaTeX-indent-environment-list LaTeX-indent-environment-list))
-      (delq! "itemize" LaTeX-indent-environment-list 'assoc)
-      (delq! "enumerate" LaTeX-indent-environment-list 'assoc)
-      (delq! "description" LaTeX-indent-environment-list 'assoc)
-      (apply fn args))))
+      (dolist (item '("itemize" "enumerate" "description"))
+        (setf (alist-get item LaTeX-indent-environment-list nil t #'equal) nil))
+      (apply fn args)))
+  )
 
 
 (use-package! preview

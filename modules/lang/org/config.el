@@ -134,7 +134,7 @@ Is relative to `org-directory', unless it is absolute. Is used in Doom's default
         org-priority-faces
         '((?A . error)
           (?B . warning)
-          (?C . success))
+          (?C . shadow))
         org-startup-indented t
         org-tags-column 0
         org-use-sub-superscripts '{}
@@ -467,7 +467,10 @@ I like:
 
   ;; Fix #462: when refiling from org-capture, Emacs prompts to kill the
   ;; underlying, modified buffer. This fixes that.
-  (add-hook 'org-after-refile-insert-hook #'save-buffer)
+  (add-hook! 'org-after-refile-insert-hook
+    (defun +org-save-buffer-after-capture-h ()
+      (when (bound-and-true-p org-capture-is-refiling)
+        (save-buffer))))
 
   ;; HACK Doom doesn't support `customize'. Best not to advertise it as an
   ;;      option in `org-capture's menu.
@@ -662,29 +665,6 @@ relative to `org-directory', unless it is an absolute path."
                (find-file (doom-path doom-docs-dir "changelog.org"))
                (org-match-sparse-tree nil link))))
 
-  ;; TODO PR this upstream
-  (defadvice! +org--follow-search-string-a (fn link &optional arg)
-    "Support ::SEARCH syntax for id: links."
-    :around #'org-id-open
-    :around #'org-roam-id-open
-    (save-match-data
-      (cl-destructuring-bind (id &optional search)
-          (split-string link "::")
-        (prog1 (funcall fn id arg)
-          (cond ((null search))
-                ((string-match-p "\\`[0-9]+\\'" search)
-                 ;; Move N lines after the ID (in case it's a heading), instead
-                 ;; of the start of the buffer.
-                 (forward-line (string-to-number option)))
-                ((string-match "^/\\([^/]+\\)/$" search)
-                 (let ((match (match-string 1 search)))
-                   (save-excursion (org-link-search search))
-                   ;; `org-link-search' only reveals matches. Moving the point
-                   ;; to the first match after point is a sensible change.
-                   (when (re-search-forward match)
-                     (goto-char (match-beginning 0)))))
-                ((org-link-search search)))))))
-
   ;; Add "lookup" links for packages and keystrings; useful for Emacs
   ;; documentation -- especially Doom's!
 
@@ -794,7 +774,7 @@ mutating hooks on exported output, like formatters."
     "Restart `org-mode', but only once."
     (remove-hook 'doom-switch-buffer-hook #'+org--restart-mode-h 'local)
     (quiet! (org-mode-restart))
-    (delq! (current-buffer) org-agenda-new-buffers)
+    (cl-callf2 delq (current-buffer) org-agenda-new-buffers)
     (run-hooks 'find-file-hook))
 
   (add-hook! 'org-agenda-finalize-hook
@@ -1263,9 +1243,7 @@ between the two."
             :n CSdown     #'org-shiftdown
             :nevmi "M-l"  #'evil-avy-goto-line
             ;; more intuitive RET keybinds
-            :m [return]   #'+org/dwim-at-point
             :m "RET"      #'+org/dwim-at-point
-            :i [return]   #'+org/return
             :i "RET"      #'+org/return
             :i [S-return] #'+org/shift-return
             :i "S-RET"    #'+org/shift-return
@@ -1427,7 +1405,7 @@ between the two."
     (run-hooks 'org-load-hook))
 
   :config
-  (add-to-list 'doom-debug-variables 'org-export-async-debug)
+  (set-debug-variable! 'org-export-async-debug)
 
   (set-company-backend! 'org-mode 'company-capf)
   (set-eval-handler! 'org-mode #'+org-eval-handler)
@@ -1437,15 +1415,6 @@ between the two."
     :documentation #'+org-lookup-documentation-handler)
 
   (add-hook! 'org-mode-hook
-    ;; HACK: Somehow, users/packages still find a way to modify tab-width in
-    ;;   org-mode. Since org-mode treats a non-standerd tab-width as an error
-    ;;   state, I use this hook to makes it much harder to change by accident.
-    (add-hook! 'after-change-major-mode-hook :local
-      ;; The second check is necessary, in case of `org-edit-src-code' which
-      ;; clones a buffer and changes its major-mode.
-      (when (derived-mode-p 'org-mode)
-        (setq tab-width 8)))
-
     ;; HACK: `save-place' can position the cursor in an invisible region. This
     ;;   makes it visible unless `org-inhibit-startup' or
     ;;   `org-inhibit-startup-visibility-stuff' is non-nil.

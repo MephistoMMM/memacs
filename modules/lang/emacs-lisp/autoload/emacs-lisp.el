@@ -1,31 +1,40 @@
-;;; lang/emacs-lisp/autoload.el -*- lexical-binding: t; -*-
+;;; lang/emacs-lisp/autoload/emacs-lisp.el -*- lexical-binding: t; -*-
 
 ;;
 ;;; Library
 
+(defvar +emacs-lisp-eval-working-buffer nil)
+
 ;;;###autoload
 (defun +emacs-lisp-eval (beg end)
   "Evaluate a region and print it to the echo area (if one line long), otherwise
-to a pop up buffer."
+to a pop up buffer.
+
+Meant as an eval handler for Doom's :tools eval module."
   (+eval-display-results
    (string-trim-right
     (let ((buffer (generate-new-buffer " *+eval-output*"))
+          (working-buffer (or +emacs-lisp-eval-working-buffer (current-buffer)))
           (debug-on-error t))
-      (unwind-protect
-          (condition-case-unless-debug e
-              (with-doom-module
-                  (doom-module-from-path
-                   (or (buffer-file-name (buffer-base-buffer))
-                       default-directory))
-                (with-doom-context 'eval
-                  (eval-region beg end buffer load-read-function))
-                (with-current-buffer buffer
-                  (let ((pp-max-width nil))
-                    (require 'pp)
-                    (pp-buffer)
-                    (replace-regexp-in-string "\\\\n" "\n" (string-trim-left (buffer-string))))))
-            (error (format "ERROR: %s" e)))
-        (kill-buffer buffer))))
+      (unless (buffer-live-p working-buffer)
+        (setq +emacs-lisp-eval-working-buffer nil
+              working-buffer (current-buffer)))
+      (with-current-buffer working-buffer
+        (unwind-protect
+            (condition-case-unless-debug e
+                (with-doom-module
+                    (doom-module-from-path
+                     (or (buffer-file-name (buffer-base-buffer))
+                         default-directory))
+                  (with-doom-context 'eval
+                    (eval-region beg end buffer load-read-function))
+                  (with-current-buffer buffer
+                    (let ((pp-max-width nil))
+                      (require 'pp)
+                      (pp-buffer)
+                      (replace-regexp-in-string "\\\\n" "\n" (string-trim-left (buffer-string))))))
+              (error (format "ERROR: %s" e)))
+          (kill-buffer buffer)))))
    (current-buffer)))
 
 ;;;###autoload
@@ -143,69 +152,39 @@ if it's callable, `apropos' otherwise."
 (unless (fboundp 'lisp--local-defform-body-p)
   (fset 'lisp--local-defform-body-p #'ignore))
 
-;;;###autoload
-(defun +emacs-lisp-indent-function (indent-point state)
-  "A replacement for `lisp-indent-function'.
-
-Indents plists more sensibly. Adapted from
-https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
-  (let ((normal-indent (current-column))
-        (orig-point (point))
-        ;; TODO Refactor `target' usage (ew!)
-        target)
-    (goto-char (1+ (elt state 1)))
-    (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t)
-    (cond ((and (elt state 2)
-                (or (eq (char-after) ?:)
-                    (not (looking-at-p "\\sw\\|\\s_"))))
-           (if (lisp--local-defform-body-p state)
-               (lisp-indent-defform state indent-point)
-             (unless (> (save-excursion (forward-line 1) (point))
-                        calculate-lisp-indent-last-sexp)
-               (goto-char calculate-lisp-indent-last-sexp)
-               (beginning-of-line)
-               (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t))
-             (backward-prefix-chars)
-             (current-column)))
-          ((and (save-excursion
-                  (goto-char indent-point)
-                  (skip-syntax-forward " ")
-                  (not (eq (char-after) ?:)))
-                (save-excursion
-                  (goto-char orig-point)
-                  (and (eq (char-after) ?:)
-                       (eq (char-before) ?\()
-                       (setq target (current-column)))))
-           (save-excursion
-             (move-to-column target t)
-             target))
-          ((let* ((function (buffer-substring (point) (progn (forward-sexp 1) (point))))
-                  (method (or (function-get (intern-soft function) 'lisp-indent-function)
-                              (get (intern-soft function) 'lisp-indent-hook))))
-             (cond ((or (eq method 'defun)
-                        (and (null method)
-                             (> (length function) 3)
-                             (string-match-p "\\`def" function)))
-                    (lisp-indent-defform state indent-point))
-                   ((integerp method)
-                    (lisp-indent-specform method state indent-point normal-indent))
-                   (method
-                    (funcall method indent-point state))))))))
-
 
 ;;
 ;;; Commands
 
 ;;;###autoload
+(defun +emacs-lisp/change-working-buffer (buffer &optional clear?)
+  "Change what buffer to run `+emacs-lisp-eval' in.
+
+If given the prefix arg (CLEAR?), clears the current working buffer."
+  (interactive
+   (list (read-buffer "Set working buffer to: ")
+         current-prefix-arg))
+  (let ((buffer (get-buffer buffer)))
+    (if (and buffer (buffer-live-p buffer))
+        (setq +emacs-lisp-eval-working-buffer buffer)
+      (user-error "No such buffer: %S" buf))))
+
+;;;###autoload
 (defun +emacs-lisp/open-repl ()
-  "Open the Emacs Lisp REPL (`ielm')."
+  "Open the Emacs Lisp REPL (`ielm').
+
+If the repl isn't already open, sets ielm's working buffer to the buffer
+selected before this command was invoked."
   (interactive)
   (pop-to-buffer
    (or (get-buffer "*ielm*")
-       (progn (ielm)
-              (let ((buf (get-buffer "*ielm*")))
-                (bury-buffer buf)
-                buf)))))
+       (let ((original-buffer (current-buffer)))
+         (ielm)
+         (when (buffer-live-p original-buffer)
+           (ielm-change-working-buffer original-buffer))
+         (let ((buf (get-buffer "*ielm*")))
+           (bury-buffer buf)
+           buf)))))
 
 ;;;###autoload
 (defun +emacs-lisp/buttercup-run-file ()
@@ -281,6 +260,7 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
   (let* ((file-path (buffer-file-name (buffer-base-buffer)))
          (file-base (if file-path (file-name-base file-path))))
     (and (derived-mode-p 'emacs-lisp-mode)
+         (not (bound-and-true-p org-src-mode))
          (or (null file-base)
              (locate-file file-base (custom-theme--load-path) '(".elc" ".el"))
              (save-excursion

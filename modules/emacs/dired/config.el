@@ -75,11 +75,11 @@ Fixes #3939: unsortable dired entries on Windows."
   :init
   (setq dirvish-cache-dir (file-name-concat doom-cache-dir "dirvish/"))
   ;; HACK: ...
-  (advice-add #'dired-find-file :override #'dirvish-find-entry-a)
+  (advice-add #'dired--find-file :override #'dirvish--find-entry)
   (advice-add #'dired-noselect :around #'dirvish-dired-noselect-a)
   :config
   (dirvish-override-dired-mode)
-  (set-popup-rule! "^ ?\\*Dirvish.*" :ignore t)
+  (set-popup-rule! "^ ?\\*\\(?:[Dd]irvish\\|SIDE :: \\).*" :ignore t)
 
   ;; Fixes #8038. This setting is for folks who expect to be able to switch back
   ;; to dired buffers where the file is opened from.  In other cases, don't
@@ -115,7 +115,7 @@ Fixes #3939: unsortable dired entries on Windows."
 
   (when (modulep! +icons)
     (setq dirvish-subtree-always-show-state t)
-    (appendq! dirvish-attributes '(nerd-icons subtree-state)))
+    (cl-callf append dirvish-attributes '(nerd-icons subtree-state)))
 
   (setq dirvish-hide-details '(dirvish dirvish-side)
         dirvish-hide-cursor '(dirvish dirvish-side))

@@ -56,8 +56,8 @@ Buffers that are considered unreal (see `doom-real-buffer-p') are dimmed with
             (prin1-to-string val))
            ((stringp val)
             (propertize (format "%S" val) 'face 'font-lock-string-face))
-           ((numberp val)
-            (propertize (format "%s" val) 'face 'highlight-numbers-number))
+           ((and (numberp val) (facep 'font-lock-number-face)) ; introduced in 29.1+
+            (propertize (format "%s" val) 'face 'font-lock-number-face))
            ((format "%s" val)))
      t)))
 
@@ -351,7 +351,7 @@ If ARG (universal argument), include all files, even hidden or compressed ones."
                   :require-match t
                   :action (lambda (cand)
                             (let ((mark (cdr cand)))
-                              (delq! (marker-buffer mark) buffers)
+                              (cl-callf2 delq (marker-buffer mark) buffers)
                               (mapc #'kill-buffer buffers)
                               (setq buffers nil)
                               (with-current-buffer (switch-to-buffer (marker-buffer mark))

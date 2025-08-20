@@ -206,7 +206,8 @@ and enables `+popup-buffer-mode'."
         (when-let (popup (cl-loop for func in actions
                                   if (funcall func buffer alist)
                                   return it))
-          (+popup--init popup alist)
+          (with-current-buffer buffer
+            (+popup--init popup alist))
           (+popup--maybe-select-window popup origin)
           popup))))
 
@@ -256,14 +257,15 @@ Uses `shrink-window-if-larger-than-buffer'."
 (defun +popup-adjust-fringes-h ()
   "Hides the fringe in popup windows, restoring them if `+popup-buffer-mode' is
 disabled."
-  (let ((f (if (bound-and-true-p +popup-buffer-mode) 0)))
-    (set-window-fringes nil f f fringes-outside-margins)))
+  (when (+popup-window-p)
+    (let ((f (if (bound-and-true-p +popup-buffer-mode) 0)))
+      (set-window-fringes nil f f fringes-outside-margins))))
 
 ;;;###autoload
 (defun +popup-adjust-margins-h ()
   "Creates padding for the popup window determined by `+popup-margin-width',
 restoring it if `+popup-buffer-mode' is disabled."
-  (when +popup-margin-width
+  (when (and +popup-margin-width (+popup-window-p))
     (unless (memq (window-parameter nil 'window-side) '(left right))
       (let ((m (if (bound-and-true-p +popup-buffer-mode) +popup-margin-width)))
         (set-window-margins nil m m)))))
@@ -428,15 +430,34 @@ If no popups are available, display the *Messages* buffer in a popup window."
 
 ;;;###autoload
 (defun +popup/raise (window &optional arg)
-  "Raise the current popup window into a regular window and
-return it. If prefix ARG, raise the current popup into a new
-window and return that window."
+  "Raise a popup WINDOW into a regular window, then select it.
+
+When called interactively, the selected popup window will be raised. If the
+selected window isn't a popup, any sole, visible popup window in the active
+frame will be raised. If there are multiple visible popups, then the user will
+be prompted to select one.
+
+If prefix ARG, the popup is raised into `other-window' instead."
   (interactive
-   (list (selected-window) current-prefix-arg))
+   (list
+    (let ((win (selected-window)))
+      (if (+popup-window-p win)
+          win
+        (if-let* ((popups
+                   (cl-loop for w in (+popup-windows)
+                            collect (cons (buffer-name (window-buffer w)) w))))
+            (if (cdr popups)
+                (or (cdr (assoc (completing-read
+                                 "Select window: " (mapcar #'car popups))
+                                popups))
+                    (user-error "Aborted"))
+              (cdar popups))
+          (user-error "No popup windows to raise"))))
+    current-prefix-arg))
   (cl-check-type window window)
   (unless (+popup-window-p window)
     (user-error "Cannot raise a non-popup window"))
-  (let ((buffer (current-buffer))
+  (let ((buffer (window-buffer window))
         (+popup--inhibit-transient t)
         +popup--remember-last)
     (+popup/close window 'force)

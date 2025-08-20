@@ -132,6 +132,13 @@
 (defconst doom--system-macos-p   (eq 'macos   (car doom-system)))
 (defconst doom--system-linux-p   (eq 'linux   (car doom-system)))
 
+;; Announce WSL if it is detected.
+(when (and doom--system-linux-p
+           (if (boundp 'operating-system-release) ; is deprecated since 28.x
+               (string-match-p "-[Mm]icrosoft" operating-system-release)
+             (getenv-internal "WSLENV")))
+  (add-to-list 'doom-system 'wsl 'append))
+
 ;; `system-type' is esoteric, so I create a pseudo feature as a stable and
 ;; consistent alternative, for use with `featurep'.
 (push :system features)
@@ -200,8 +207,7 @@
 
 ;;; Load Doom's stdlib
 (add-to-list 'load-path (file-name-directory load-file-name))
-(when (< emacs-major-version 30)
-  (require 'doom-compat)) ; backport niceties from later versions of Emacs
+(require 'doom-compat) ; backport niceties from later versions of Emacs
 (require 'doom-lib)
 
 
@@ -217,7 +223,7 @@
   "Current version of Doom Emacs core.")
 
 ;; DEPRECATED: Remove these when the modules are moved out of core.
-(defconst doom-modules-version "25.03.0-pre"
+(defconst doom-modules-version "25.09.0-pre"
   "Current version of Doom Emacs.")
 
 (defvar doom-init-time nil
@@ -663,6 +669,12 @@ to `doom-profile-cache-dir' instead, so it can be safely cleaned up as part of
 ;; still aliases them fine regardless.
 (setq warning-suppress-types '((defvaralias) (lexical-binding)))
 
+;; As some point in 31+, Emacs began spamming the user with warnings about
+;; missing `lexical-binding' cookies in elisp files that you are unlikely to
+;; have any direct control over (e.g. package files, data lisp files, and elisp
+;; shell scripts). This shuts it up.
+(setq warning-inhibit-types '((files missing-lexbind-cookie)))
+
 ;; Reduce debug output unless we've asked for it.
 (setq debug-on-error init-file-debug
       jka-compr-verbose init-file-debug)
@@ -706,11 +718,12 @@ to `doom-profile-cache-dir' instead, so it can be safely cleaned up as part of
   (setq package-user-dir (file-name-concat doom-local-dir "elpa/")
         package-gnupghome-dir (expand-file-name "gpg" package-user-dir))
   (let ((s (if gnutls-verify-error "s" "")))
-    (prependq! package-archives
-               ;; I omit Marmalade because its packages are manually submitted
-               ;; rather than pulled, and so often out of date.
-               `(("melpa" . ,(format "http%s://melpa.org/packages/" s))
-                 ("org"   . ,(format "http%s://orgmode.org/elpa/"   s)))))
+    (cl-callf2 append
+        ;; I omit Marmalade because its packages are manually submitted rather
+        ;; than pulled, and so often out of date.
+        `(("melpa" . ,(format "http%s://melpa.org/packages/" s))
+          ("org"   . ,(format "http%s://orgmode.org/elpa/"   s)))
+        package-archives))
 
   ;; Refresh package.el the first time you call `package-install', so it's still
   ;; trivially usable. Remember to run 'doom sync' to purge them; they can
@@ -876,12 +889,6 @@ appropriately against `noninteractive' or the `cli' context."
     ;; A last ditch opportunity to undo hacks or do extra configuration before
     ;; the session is complicated by user config and packages.
     (doom-run-hooks 'doom-before-init-hook)
-
-    ;; HACK: Later versions of Emacs 30 emit warnings about missing
-    ;;   lexical-bindings directives at the top of loaded files. This is a good
-    ;;   thing, but it inundates users with unactionable warnings (from old
-    ;;   packages or internal subdirs.el files), which aren't useful.
-    (cl-callf2 assq-delete-all 'lexical-binding delayed-warnings-list)
 
     ;; HACK: Ensure OS checks are as fast as possible (given their ubiquity).
     (setq features (cons :system (delq :system features)))
