@@ -7,6 +7,7 @@
 (package! paredit
   :recipe (:host github :repo "emacsmirror/paredit")
   :pin "af075775af91f2dbc63b915d762b4aec092946c4")
+(package! paren-face)
 
 ;; HACK Forward declare these clj-refactor/cider deps so that their deps are
 ;;      byte-compiled first.

@@ -45,6 +45,13 @@ Used in org file template")
          ;;        (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline 'scheduled))))
          nil)))
 
+(setq org-modern-fold-stars
+      '(("◉" . "✾") ("◈" . "✧") ("✿" . "❀") ("◇" . "❖") ("▸" . "▾"))
+      org-modern-priority
+      '((?A . "☢")
+        (?B . "☕")
+        (?C . "■")))
+
 (setq org-agenda-custom-commands nil)
 (add-to-list 'org-agenda-custom-commands `,memacs-org-agenda-todo-view)
 

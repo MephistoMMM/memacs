@@ -1291,7 +1291,7 @@ between the two."
 
 (use-package! org-mac-link
   ;; https://orgmode.org/worg/org-contrib/org-mac-link.html
-  :when IS-MAC)
+  :when (featurep :system 'macos))
 
 
 ;;

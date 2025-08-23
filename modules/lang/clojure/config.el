@@ -316,3 +316,8 @@
   (map! :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
         :localleader
         "j" #'jet))
+
+(use-package! paren-face
+  :hook (clojure-mode . paren-face-mode)
+  :config
+  (setq paren-face-regexp "\\([( ]\\.-\\|[( ]\\.+\\|[][(){}#/]\\)"))
