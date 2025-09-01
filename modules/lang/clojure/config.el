@@ -32,7 +32,8 @@
                    clojurec-mode
                    clojurescript-mode
                    clojurex-mode))
-        (add-to-list 'lsp-language-id-configuration (cons m "clojure")))))
+        (add-to-list 'lsp-language-id-configuration (cons m "clojure")))
+      (setq lsp-clojure-custom-server-command '("clojure-lsp"))))
 
   (when (modulep! +tree-sitter)
     (add-hook! '(clojure-mode-local-vars-hook
@@ -201,6 +202,7 @@
 
   (map! (:localleader
           (:map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
+            "."  #'hydra-cljr-help-menu/body
             "'"  #'cider-jack-in-clj
             "\"" #'cider-jack-in-cljs
             "c"  #'cider-connect-clj
@@ -253,6 +255,15 @@
               "c" #'cider-find-and-clear-repl-output
               "l" #'cider-load-buffer
               "L" #'cider-load-buffer-and-switch-to-repl-buffer)
+            (:prefix ("s" . "sexp")
+              "f" #'sp-forward-slurp-sexp
+              "b" #'sp-backward-slurp-sexp
+              "F" #'sp-forward-barf-sexp
+              "B" #'sp-backward-barf-sexp
+              "s" #'sp-transpose-sexp
+              "k" #'sp-kill-sexp
+              "K" #'sp-backward-kill-sexp
+              "h" #'sp-kill-hybrid-sexp)
             (:prefix ("t" . "test")
               "a" #'cider-test-rerun-test
               "l" #'cider-test-run-loaded-tests
@@ -316,8 +327,3 @@
   (map! :map (clojure-mode-map clojurescript-mode-map clojurec-mode-map)
         :localleader
         "j" #'jet))
-
-(use-package! paren-face
-  :hook (clojure-mode . paren-face-mode)
-  :config
-  (setq paren-face-regexp "\\([( ]\\.-\\|[( ]\\.+\\|[][(){}#/]\\)"))
