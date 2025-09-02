@@ -81,7 +81,7 @@
   (when (< emacs-major-version 27)
     (user-error
      (concat
-      "Detected Emacs " emacs-version ", but Doom requires 27.1 or newer (30.1 is\n\n"
+      "Detected Emacs " emacs-version ", but Doom requires 27.1 or newer (30.2 is\n\n"
       "recommended). The current Emacs executable in use is:\n\n  " (car command-line-args)
       "\n\nA guide for installing a newer version of Emacs can be found at:\n\n  "
       (format "https://docs.doomemacs.org/-/install/%s"
@@ -223,7 +223,7 @@
   "Current version of Doom Emacs core.")
 
 ;; DEPRECATED: Remove these when the modules are moved out of core.
-(defconst doom-modules-version "25.09.0-pre"
+(defconst doom-modules-version "25.10.0-pre"
   "Current version of Doom Emacs.")
 
 (defvar doom-init-time nil
