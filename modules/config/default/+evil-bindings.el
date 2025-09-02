@@ -500,7 +500,6 @@
        :desc "Delete trailing newlines"              "W"   #'doom/delete-trailing-newlines
        :desc "List errors"                           "x"   #'+default/diagnostics)
 
-
       ;;; <leader> d --- diff
       (:prefix-map ("d" . "diff")
         :desc "Diff two buffers"       "b" #'ediff-buffers
@@ -523,7 +522,8 @@
         :desc "Show registry"          "s" #'ediff-show-registry
         :desc "Revision"               "v" #'ediff-revision
         :desc "Directory revision"     "V" #'ediff-directory-revisions)
-      ;;; <leader> d --- debugger
+
+      ;;; <leader> D --- debugger
       (:when (modulep! :tools debugger)
         (:prefix-map ("D" . "debugger")
          "d" #'dape

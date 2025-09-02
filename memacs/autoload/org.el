@@ -325,10 +325,10 @@ It is meant to be added to `org-export-before-parsing-hook'."
     (width . 100)
     (height . 25)
     (transient . t)
-    ,@(when IS-LINUX
+    ,@(when (featurep :system 'linux)
         `((window-system . ,(if (boundp 'pgtk-initialized) 'pgtk 'x))
           (display . ,(or (getenv "DISPLAY") ":0"))))
-    ,(if IS-MAC '(menu-bar-lines . 1))))
+    ,(if (featurep :system 'macos) '(menu-bar-lines . 1))))
 
 ;;;###autoload
 (defun +memacs/open-convenient-frame (&optional initial-input)

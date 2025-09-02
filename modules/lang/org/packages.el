@@ -113,7 +113,7 @@
   (when (< emacs-major-version 29)
     ;; HACK: Needed until org-roam/org-roam#2485 is resolved.
     (package! emacsql :pin "491105a01f58bf0b346cbc0254766c6800b229a2"))))
-(when IS-MAC
+(when (featurep :system 'macos)
   (package! org-mac-link :pin "0b18c1d070b9601cc65c40e902169e367e4348c9"))
 
 ;;; Babel

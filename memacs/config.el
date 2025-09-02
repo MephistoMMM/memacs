@@ -53,7 +53,7 @@
 ;; You can also try 'gd' (or 'C-c g d') to jump to their definition and see how
 ;; they are implemented.
 
-(when (and IS-MAC (fboundp 'mac-auto-operator-composition-mode))
+(when (and (featurep :system 'macos) (fboundp 'mac-auto-operator-composition-mode))
   (setq +ligatures-extra-symbols
         '(;; org
           :name          "»"

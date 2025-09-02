@@ -93,8 +93,6 @@ See `+emacs-lisp-non-package-mode' for details.")
              ;; Allow folding of outlines in comments
              ;; its keymap override my avy commonds
              ;; #'outline-minor-mode
-             ;; Make parenthesis depth easier to distinguish at a glance
-             #'rainbow-delimiters-mode
              ;; Make quoted symbols easier to distinguish from free variables
              #'highlight-quoted-mode
              ;; Extend imenu support to Doom constructs
