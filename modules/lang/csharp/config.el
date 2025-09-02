@@ -2,14 +2,20 @@
 
 (use-package! csharp-mode
   :defer t
+  :init
+  (when (modulep! +tree-sitter)
+    (set-tree-sitter! 'csharp-mode 'csharp-ts-mode
+      `((c-sharp :url "https://github.com/tree-sitter/tree-sitter-c-sharp"
+                 :rev ,(if (< emacs-major-version 30) "v0.20.0" "v0.23.1")
+                 :commit "3431444351c871dffb32654f1299a00019280f2f"))))
   :config
   (set-formatter! 'csharpier '("csharpier" "format" "--write-stdout")
-    :modes '(csharp-mode))
-  (set-electric! 'csharp-mode :chars '(?\n ?\}))
-  (set-rotate-patterns! 'csharp-mode
+    :modes '(csharp-mode csharp-ts-mode))
+  (set-electric! '(csharp-mode csharp-ts-mode) :chars '(?\n ?\}))
+  (set-rotate-patterns! '(csharp-mode csharp-ts-mode)
     :symbols '(("public" "protected" "private")
                ("class" "struct")))
-  (set-ligatures! 'csharp-mode
+  (set-ligatures! '(csharp-mode csharp-ts-mode)
     ;; Functional
     :lambda        "() =>"
     ;; Types
@@ -30,12 +36,13 @@
     :return        "return"
     :yield         "yield")
 
-  (sp-local-pair 'csharp-mode "<" ">"
+  (sp-local-pair '(csharp-mode csharp-ts-mode) "<" ">"
                  :when '(+csharp-sp-point-in-type-p)
                  :post-handlers '(("| " "SPC")))
 
   (when (modulep! +lsp)
-    (add-hook 'csharp-mode-local-vars-hook #'lsp! 'append))
+    (add-hook 'csharp-mode-local-vars-hook #'lsp! 'append)
+    (add-hook 'csharp-ts-mode-local-vars-hook #'lsp! 'append))
 
   (defadvice! +csharp-disable-clear-string-fences-a (fn &rest args)
     "This turns off `c-clear-string-fences' for `csharp-mode'. When
@@ -46,24 +53,13 @@ or terminating simple string."
       (apply fn args))))
 
 
-(use-package! csharp-tree-sitter
-  :when (modulep! +tree-sitter)
-  :defer t
-  :init
-  (add-hook 'csharp-mode-local-vars-hook #'tree-sitter! 'append)
-  (when (fboundp #'csharp-tree-sitter-mode)
-    (add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-tree-sitter-mode))
-    (when (modulep! +lsp)
-      (add-hook 'csharp-tree-sitter-mode-local-vars-hook #'lsp! 'append))))
-
-
 ;; Unity shaders
 (use-package! shader-mode
   :when (modulep! +unity)
   :mode "\\.shader\\'"
   :config
   (def-project-mode! +csharp-unity-mode
-    :modes '(csharp-mode shader-mode)
+    :modes '(csharp-mode csharp-ts-mode shader-mode)
     :files (and "Assets" "Library/MonoManager.asset" "Library/ScriptMapper")))
 
 
