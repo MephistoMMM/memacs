@@ -45,13 +45,7 @@
       (sp-local-pair "<?"    "?>" :post-handlers '(("| " "SPC" "=") ("||\n[i]" "RET") ("[d2]" "p")))
       (sp-local-pair "<?php" "?>" :post-handlers '(("| " "SPC") ("||\n[i]" "RET"))))
 
-    (if (modulep! -lsp)
-        ;; `+php-company-backend' uses `php-extras-company' or
-        ;; `company-dabbrev-code', in that order.
-        (when +php--company-backends
-          (set-company-backend! mode
-            (cons :separate +php--company-backends)
-            'company-dabbrev-code))
+    (when (modulep! +lsp)
       (when (executable-find "php-language-server.php")
         (setq lsp-clients-php-server-command "php-language-server.php"))
       (add-hook mode-vars-hook #'lsp! 'append))
@@ -78,7 +72,7 @@
   :when (modulep! +tree-sitter)
   :defer t
   :init
-  (set-tree-sitter! 'php-mode 'php-ts-mode
+  (set-tree-sitter! '(php-mode php-mode-maybe) 'php-ts-mode
     '((php :url "https://github.com/tree-sitter/tree-sitter-php"
            :rev "v0.23.11"
            :commit "f7cf7348737d8cff1b13407a0bfedce02ee7b046"
