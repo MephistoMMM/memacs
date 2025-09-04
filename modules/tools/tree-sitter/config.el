@@ -60,9 +60,14 @@
                             ;; `treesit-ready-p' calls in Emacs <=30.1. We'll
                             ;; log it to *Messages* instead.
                             (warning-suppress-types
-                             (cons '(treesit) warning-suppress-types)))
+                             (if doom-debug-mode
+                                 warning-suppress-types
+                               (cons '(treesit) warning-suppress-types))))
                         (or (not (autoloadp fn))
-                            (autoload-do-load fn mode)))
+                            ;; ts-modes usually change these alists at autoload
+                            ;; *and* load time.
+                            (let (auto-mode-alist interpreter-mode-alist)
+                              (autoload-do-load fn mode))))
                       ;; Only prompt once, and log other times.
                       (or (null (cdr ts))  ; no grammars, no problem!
                           ;; If the base/fallback mode doesn't exist, let's
@@ -70,10 +75,22 @@
                           ;; and push forward anyway, even if a missing grammar
                           ;; results in a broken state.
                           (not (fboundp fallback-mode))
-                          (cl-every (if (get mode '+tree-sitter-ensured)
-                                        (doom-rpartial #'treesit-ready-p 'message)
-                                      #'treesit-ensure-installed)
-                                    (cdr ts))))
+                          ;; Ensure grammars are present (and prompt to install
+                          ;; them if needed).
+                          (if-let* ((grammars
+                                     (cl-remove-if (doom-rpartial #'treesit-ready-p 'message)
+                                                   (cdr ts))))
+                              (if (or (eq treesit-auto-install-grammar 'always)
+                                      (if (eq treesit-auto-install-grammar 'ask)
+                                          (y-or-n-p
+                                           (format "Missing tree-sitter grammars: %s\nInstall now?"
+                                                   (mapconcat #'symbol-name grammars ", ")))))
+                                  (mapc #'treesit-install-language-grammar grammars)
+                                (message "Treesit grammars missing (%s), falling back to `%s'..."
+                                         (mapconcat #'symbol-name grammars ", ")
+                                         fallback-mode)
+                                nil)
+                            t)))
                  (put mode '+tree-sitter-ensured t)
                  mode)
                 (fallback-mode))

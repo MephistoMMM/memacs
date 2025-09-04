@@ -30,9 +30,11 @@ This is ignored by ccls.")
   :init
   (when (modulep! +tree-sitter)
     (set-tree-sitter! 'c-mode 'c-ts-mode
-      '((c :url "https://github.com/tree-sitter/tree-sitter-c")))
+      `((c :url "https://github.com/tree-sitter/tree-sitter-c"
+           :rev ,(if (< (treesit-library-abi-version) 15) "v0.23.6" "v0.24.1"))))
     (set-tree-sitter! 'c++-mode 'c++-ts-mode
-      '((cpp :url "https://github.com/tree-sitter/tree-sitter-cpp"))))
+      '((cpp :url "https://github.com/tree-sitter/tree-sitter-cpp"
+             :rev "v0.23.4"))))
   :config
   (set-docsets! '(c-mode c-ts-mode) "C")
   (set-docsets! '(c++-mode c++-ts-mode) "C++" "Boost")
@@ -145,9 +147,9 @@ This is ignored by ccls.")
 (use-package! cuda-mode
   :defer t
   :config
+  (set-eglot-client! 'cuda-mode '("clangd"))
   (when (modulep! +lsp)
-    (add-hook 'cuda-mode-local-vars-hook #'lsp! 'append))
-  )
+    (add-hook 'cuda-mode-local-vars-hook #'lsp! 'append)))
 
 
 (use-package! cuda-ts-mode
@@ -157,6 +159,7 @@ This is ignored by ccls.")
   (set-tree-sitter! 'cuda-mode 'cuda-ts-mode
     '((cuda :url "https://github.com/tree-sitter-grammars/tree-sitter-cuda")))
   :config
+  (set-eglot-client! 'cuda-ts-mode '("clangd"))
   (when (modulep! +lsp)
     (add-hook 'cuda-ts-mode-local-vars-hook #'lsp! 'append)))
 
@@ -182,7 +185,6 @@ This is ignored by ccls.")
         ;; and grinding your system to a halt.
         (cl-pushnew (format "-j=%d" (max 1 (/ (doom-system-cpus) 2)))
                     lsp-clients-clangd-args))
-    (set-eglot-client! 'cuda-mode '("clangd"))
 
     ;; Map eglot specific helper
     (map! :localleader
