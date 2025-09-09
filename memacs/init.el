@@ -56,7 +56,7 @@
        ;;tabs              ; a tab bar for Emacs
        ;;treemacs          ; a project drawer, like neotree but cooler
        unicode           ; extended unicode support for various languages
-       vc-gutter         ; vcs diff in the fringe
+       ;;vc-gutter         ; vcs diff in the fringe
        vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        window-select     ; visually switch windows
        workspaces        ; tab emulation, persistence & separate workspaces
@@ -66,7 +66,8 @@
        (evil +everywhere); come to the dark side, we have cookies
        file-templates    ; auto-snippets for empty files
        fold              ; (nigh) universal code folding
-       ;;(format +onsave)  ; automated prettiness
+       (format +onsave
+               +lsp)  ; automated prettiness
        ;;god               ; run Emacs commands without modifier keys
        ;;lispy             ; vim for lisp, for people who don't like vim
        ;;multiple-cursors  ; editing in many places at once
@@ -167,12 +168,12 @@
        ;;nix               ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org              ; organize your plain life in plain text
-        +jupyter
+        ;;+jupyter
         +pretty
         +dragndrop       ; drag & drop files/images into org buffers
         ;;+hugo            ; use Emacs for hugo blogging
         +pandoc          ; export-with-pandoc support
-        +pomodoro        ; be fruitful with the tomato technique
+        ;;+pomodoro        ; be fruitful with the tomato technique
         +present         ; using org-mode for presentations
         +roam2)           ; using roam
        ;;php               ; perl's insecure younger brother
@@ -215,9 +216,6 @@
        (lib +spacemacs)    ; BASE module
        ;;literate
        (default +bindings +smartparens))
-
-;(add-load-path! (concat (expand-file-name "~") "/.emacs.d/.local/straight/repos/doom-modeline") )
-;(use-package! doom-modeline :after all-the-icons)
 
 (defvar doom-user-dot-local-dir (expand-file-name "~/.local/")
   "Directory for .local of user")
