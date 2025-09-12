@@ -1,8 +1,5 @@
 ;;; lang/php/config.el -*- lexical-binding: t; -*-
 
-(defvar +php--company-backends nil
-  "List of company backends to use in `php-mode'.")
-
 (defvar +php-default-docker-container "php-fpm"
   "The default docker container to run commands in.")
 
@@ -20,17 +17,11 @@
 ;;
 ;;; Packages
 
-(use-package! php-mode
-  :mode "\\.inc\\'"
-  :config
-  ;; Disable HTML compatibility in php-mode. `web-mode' has superior support for
-  ;; php+html. Use the .phtml extension instead.
-  (setq php-mode-template-compatibility nil)
-
-  (set-docsets! 'php-mode "PHP" "PHPUnit" "Laravel" "CakePHP" "CodeIgniter" "Doctrine_ORM")
-  (set-repl-handler! 'php-mode #'+php/open-repl)
-  (set-lookup-handlers! 'php-mode :documentation #'php-search-documentation)
-  (set-ligatures! 'php-mode
+(defun +php-common-config (mode)
+  (set-docsets! mode "PHP" "PHPUnit" "Laravel" "CakePHP" "CodeIgniter" "Doctrine_ORM")
+  (set-repl-handler! mode #'+php/open-repl)
+  (set-lookup-handlers! mode :documentation #'php-search-documentation)
+  (set-ligatures! mode
     ;; Functional
     :lambda "function()" :lambda "fn"
     :def "function"
@@ -48,37 +39,55 @@
     :return "return"
     :yield "use")
 
-  (if (modulep! -lsp)
-      ;; `+php-company-backend' uses `php-extras-company' or
-      ;; `company-dabbrev-code', in that order.
-      (when +php--company-backends
-        (set-company-backend! 'php-mode
-          (cons :separate +php--company-backends)
-          'company-dabbrev-code))
-    (when (executable-find "php-language-server.php")
-      (setq lsp-clients-php-server-command "php-language-server.php"))
-    (add-hook 'php-mode-local-vars-hook #'lsp! 'append))
+  (let ((mode-vars-hook (intern (format "%s-local-vars-hook" mode)))
+        (mode-map (intern (format "%s-map" mode))))
+    (sp-with-modes (ensure-list mode)
+      (sp-local-pair "<?"    "?>" :post-handlers '(("| " "SPC" "=") ("||\n[i]" "RET") ("[d2]" "p")))
+      (sp-local-pair "<?php" "?>" :post-handlers '(("| " "SPC") ("||\n[i]" "RET"))))
 
-  (when (modulep! +tree-sitter)
-    (add-hook 'php-mode-local-vars-hook #'tree-sitter! 'append))
+    (when (modulep! +lsp)
+      (when (executable-find "php-language-server.php")
+        (setq lsp-clients-php-server-command "php-language-server.php"))
+      (add-hook mode-vars-hook #'lsp! 'append))
 
-  ;; Use the smallest `sp-max-pair-length' for optimum `smartparens' performance
-  (setq-hook! 'php-mode-hook sp-max-pair-length 5)
+    (map! :localleader
+          :map ,mode-map
+          :prefix ("t" . "test")
+          "r" #'phpunit-current-project
+          "a" #'phpunit-current-class
+          "s" #'phpunit-current-test)))
 
-  (sp-with-modes '(php-mode)
-    (sp-local-pair "<?"    "?>" :post-handlers '(("| " "SPC" "=") ("||\n[i]" "RET") ("[d2]" "p")))
-    (sp-local-pair "<?php" "?>" :post-handlers '(("| " "SPC") ("||\n[i]" "RET"))))
 
-  (map! :localleader
-        :map php-mode-map
-        :prefix ("t" . "test")
-        "r" #'phpunit-current-project
-        "a" #'phpunit-current-class
-        "s" #'phpunit-current-test))
+(use-package! php-mode
+  :defer t
+  :config
+  (+php-common-config 'php-mode)
+
+  ;; Disable HTML compatibility in php-mode. `web-mode' has superior support for
+  ;; php+html. Use the .phtml extension instead.
+  (setq php-mode-template-compatibility nil))
+
+
+(use-package! php-ts-mode
+  :when (modulep! +tree-sitter)
+  :defer t
+  :init
+  (set-tree-sitter! '(php-mode php-mode-maybe) 'php-ts-mode
+    '((php :url "https://github.com/tree-sitter/tree-sitter-php"
+           :rev "v0.23.11"
+           :commit "f7cf7348737d8cff1b13407a0bfedce02ee7b046"
+           :source-dir "php/src")
+      (phpdoc :url "https://github.com/claytonrcarter/tree-sitter-phpdoc"
+              :commit "03bb10330704b0b371b044e937d5cc7cd40b4999")
+      html css            ; requires :lang (web +tree-sitter)
+      javascript jsdoc))  ; requires :lang (javascript +tree-sitter)
+  :config
+  (+php-common-config 'php-ts-mode))
 
 
 (use-package! php-refactor-mode
   :hook php-mode
+  :hook php-ts-mode
   :config
   (map! :localleader
         :map php-refactor-mode-map
@@ -89,32 +98,6 @@
         "rv" #'php-refactor--rename-local-variable))
 
 
-(use-package! php-extras
-  :after php-mode
-  :preface
-  (setq php-extras-eldoc-functions-file
-        (concat doom-profile-cache-dir "php-extras-eldoc-functions"))
-  ;; We'll set up company support ourselves
-  (advice-add #'php-extras-company-setup :override #'ignore)
-  (add-to-list '+php--company-backends #'php-extras-company)
-  :config
-  ;; Silence warning if `php-extras-eldoc-functions-file' hasn't finished
-  ;; generating yet.
-  (defun php-extras-load-eldoc ()
-    (require 'php-extras-eldoc-functions php-extras-eldoc-functions-file t))
-  ;; Make expensive php-extras generation async
-  (unless (file-exists-p (concat php-extras-eldoc-functions-file ".el"))
-    (message "Generating PHP eldoc files...")
-    (require 'async)
-    (async-start `(lambda ()
-                    ,(async-inject-variables "\\`\\(load-path\\|php-extras-eldoc-functions-file\\)$")
-                    (require 'php-extras-gen-eldoc)
-                    (php-extras-generate-eldoc-1 t))
-                 (lambda (_)
-                   (load (concat php-extras-eldoc-functions-file ".el"))
-                   (message "PHP eldoc updated!")))))
-
-
 (use-package! hack-mode
   :when (modulep! +hack)
   :mode "\\.hh\\'")
@@ -123,10 +106,9 @@
 (use-package! composer
   :defer t
   :init
-  (map! :after php-mode
-        :localleader
-        :map php-mode-map
-        :prefix ("c" . "composer")
+  (setq composer-directory-to-managed-file (file-name-concat doom-etc-dir "composer/"))
+  (defvar +php-common-mode-map (make-sparse-keymap))
+  (map! :map +php-common-mode-map
         "c" #'composer
         "i" #'composer-install
         "r" #'composer-require
@@ -135,23 +117,31 @@
         "s" #'composer-run-script
         "v" #'composer-run-vendor-bin-command
         "o" #'composer-find-json-file
-        "l" #'composer-view-lock-file))
+        "l" #'composer-view-lock-file)
+  (map! :after php-mode
+        :localleader
+        :map php-mode-map
+        :desc "composer" "c" +php-common-mode-map)
+  (map! :after php-ts-mode
+        :localleader
+        :map php-ts-mode-map
+        :desc "composer" "c" +php-common-mode-map))
 
 
 ;;
 ;; Projects
 
 (def-project-mode! +php-laravel-mode
-  :modes '(php-mode yaml-mode web-mode nxml-mode js2-mode scss-mode)
+  :modes '(php-mode php-ts-mode yaml-mode yaml-ts-mode web-mode nxml-mode js-mode js-ts-mode scss-mode)
   :files (and "artisan" "server.php"))
 
 (def-project-mode! +php-composer-mode
-  :modes '(web-mode php-mode)
+  :modes '(web-mode php-mode php-ts-mode)
   :files ("composer.json"))
 
 (def-project-mode! +phpunit-docker-compose-mode
   :when +php-run-tests-in-docker
-  :modes '(php-mode docker-compose-mode)
+  :modes '(php-mode php-ts-mode docker-compose-mode)
   :files (and "phpunit.xml" (or +php-default-docker-compose  "docker-compose.yml"))
   :on-enter
   (setq phpunit-args `("exec" ,+php-default-docker-container "php" "vendor/bin/phpunit")

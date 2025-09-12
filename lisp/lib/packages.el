@@ -997,11 +997,10 @@ Must be run from a magit diff buffer."
                      (condition-case-unless-debug e
                          (let ((straight-vc-git-post-clone-hook
                                 (cons (lambda! (&key commit)
-                                        (print-group!
-                                          (if-let* ((pin (cdr (assoc package pinned))))
-                                              (print! (item "Pinned to %s") pin)
-                                            (when commit
-                                              (print! (item "Checked out %s") commit)))))
+                                        (if-let* ((pin (cdr (assoc package pinned))))
+                                            (print! (item "%s: pinned to %s") package pin)
+                                          (when commit
+                                            (print! (item "%s: checked out %s") package commit))))
                                       straight-vc-git-post-clone-hook)))
                            (straight-use-package (intern package))
                            (when (file-in-directory-p repo-dir straight-base-dir)
@@ -1011,7 +1010,8 @@ Must be run from a magit diff buffer."
                              ;;   indicates a successful clone (causing load
                              ;;   errors later).
                              (let ((try 0))
-                               (while (not (file-directory-p (doom-path repo-dir ".git")))
+                               (while (not (or (file-directory-p (doom-path repo-dir ".git"))
+                                               (file-exists-p (doom-path repo-dir ".straight-commit"))))
                                  (when (= try 3)
                                    (error "Failed to clone package"))
                                  (print! (warn "Failed to clone %S, trying again (attempt #%d)...") package (1+ try))
@@ -1077,7 +1077,8 @@ Must be run from a magit diff buffer."
            (print! (warn "(%d/%d) Skipping %s because it is out-of-tree...") i total package)
            (cl-return))
          (when (eq type 'git)
-           (unless (file-exists-p ".git")
+           (unless (or (file-directory-p ".git")
+                       (file-exists-p ".straight-commit"))
              (error "%S is not a valid repository" package)))
          (when (and pinned-only-p (not (assoc local-repo pinned)))
            (cl-return))
@@ -1103,6 +1104,12 @@ Must be run from a magit diff buffer."
                     ((doom-packages--same-commit-p target-ref ref)
                      (print! (item "\r(%d/%d) %s is up-to-date...%s") i total package esc)
                      (cl-return))
+
+                    ((file-exists-p ".straight-commit")
+                     (print! (start "\r(%d/%d) Downloading %s...%s") i total package esc)
+                     (delete-directory default-directory t)
+                     (straight-vc-git-clone recipe target-ref)
+                     (doom-packages--same-commit-p target-ref (straight-vc-get-commit type local-repo)))
 
                     ((if (straight-vc-commit-present-p recipe target-ref)
                          (print! (start "\r(%d/%d) Checking out %s (%s)...%s")
@@ -1161,7 +1168,7 @@ Must be run from a magit diff buffer."
                          (if (> n 0)
                              (format " (w/ %d dependents)" n)
                            "")))
-               (unless (string-empty-p output)
+               (when (and (stringp output) (not (string-empty-p output)))
                  (let ((lines (split-string output "\n")))
                    (setq output
                          (if (> (length lines) 20)
@@ -1205,28 +1212,29 @@ Must be run from a magit diff buffer."
      (length
       (delq nil (mapcar #'doom-packages--purge-build builds))))))
 
-(cl-defun doom-packages--regraft-repo (repo)
+(defun doom-packages--regraft-repo (repo)
   (unless repo
     (error "No repo specified for regrafting"))
   (let ((default-directory (straight--repos-dir repo)))
-    (unless (file-directory-p ".git")
-      (print! (warn "\rrepos/%s is not a git repo, skipping" repo))
-      (cl-return))
-    (unless (file-in-directory-p default-directory straight-base-dir)
-      (print! (warn "\rSkipping repos/%s because it is local" repo))
-      (cl-return))
-    (let ((before-size (doom-directory-size default-directory)))
-      (doom-call-process "git" "reset" "--hard")
-      (doom-call-process "git" "clean" "-ffd")
-      (if (not (zerop (car (doom-call-process "git" "replace" "--graft" "HEAD"))))
-          (print! (item "\rrepos/%s is already compact\033[1A" repo))
-        (doom-call-process "git" "reflog" "expire" "--expire=all" "--all")
-        (doom-call-process "git" "gc" "--prune=now")
-        (let ((after-size (doom-directory-size default-directory)))
-          (if (equal after-size before-size)
-              (print! (success "\rrepos/%s cannot be compacted further" repo))
-            (print! (success "\rRegrafted repos/%s (from %0.1fKB to %0.1fKB)")
-                    repo before-size after-size)))))
+    (catch 'skip
+      (unless (file-directory-p ".git")
+        (print! (warn "\rrepos/%s is not a git repo, skipping" repo))
+        (throw 'skip t))
+      (unless (file-in-directory-p default-directory straight-base-dir)
+        (print! (warn "\rSkipping repos/%s because it is local" repo))
+        (throw 'skip t))
+      (let ((before-size (doom-directory-size default-directory)))
+        (doom-call-process "git" "reset" "--hard")
+        (doom-call-process "git" "clean" "-ffd")
+        (if (not (zerop (car (doom-call-process "git" "replace" "--graft" "HEAD"))))
+            (print! (item "\rrepos/%s is already compact\033[1A" repo))
+          (doom-call-process "git" "reflog" "expire" "--expire=all" "--all")
+          (doom-call-process "git" "gc" "--prune=now")
+          (let ((after-size (doom-directory-size default-directory)))
+            (if (equal after-size before-size)
+                (print! (success "\rrepos/%s cannot be compacted further" repo))
+              (print! (success "\rRegrafted repos/%s (from %0.1fKB to %0.1fKB)")
+                      repo before-size after-size))))))
     t))
 
 (defun doom-packages--regraft-repos (repos)

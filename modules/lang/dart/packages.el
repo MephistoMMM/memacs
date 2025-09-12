@@ -1,7 +1,13 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; lang/dart/packages.el
 
-(package! dart-mode :pin "f82ff052309125b93d19bdd3f619266f908f43ce")
+(package! dart-mode :pin "edb45cb7095b1e4f62eaae33e56fe9af5b010213")
+
+(when (and (modulep! +tree-sitter) (treesit-available-p))
+  (package! dart-ts-mode
+    :recipe (:host github
+             :repo "50ways2sayhard/dart-ts-mode")
+    :pin "ab87873f25f7e0cc8d22daa2501aae141dbe98ad"))
 
 (when (and (modulep! +lsp)
            (modulep! :tools lsp -eglot))

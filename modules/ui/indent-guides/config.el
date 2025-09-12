@@ -21,7 +21,8 @@ be enabled. If any function returns non-nil, the mode will not be activated."
     (unless (run-hook-with-args-until-success '+indent-guides-inhibit-functions)
       (indent-bars-mode +1)))
   :config
-  (setq indent-bars-prefer-character
+  (setq indent-bars-treesit-support (modulep! :tools tree-sitter)
+        indent-bars-prefer-character
         (or
          ;; Bitmaps are far slower on MacOS, inexplicably, but this needs more
          ;; testing to see if it's specific to ns or emacs-mac builds, or is
@@ -42,9 +43,6 @@ be enabled. If any function returns non-nil, the mode will not be activated."
         ;; unnecessary overhead for little benefit.
         indent-bars-highlight-current-depth nil)
 
-  ;; TODO: Uncomment once we support treesit
-  ;; (setq indent-bars-treesit-support (modulep! :tools tree-sitter))
-
   ;; indent-bars adds this to `enable-theme-functions', which was introduced in
   ;; 29.1, which will be redundant with `doom-load-theme-hook'.
   (unless (boundp 'enable-theme-functions)
@@ -63,7 +61,13 @@ be enabled. If any function returns non-nil, the mode will not be activated."
     ;; used for completion or eldoc popups).
     ;; REVIEW: Swap with `frame-parent' when 27 support is dropped
     (defun +indent-guides-in-childframe-p ()
-      (frame-parameter nil 'parent-frame)))
+      (frame-parameter nil 'parent-frame))
+    ;; indent-guides in src blocks can cause syntax highlighting to fail
+    ;; abruptly for some major modes (particularly *-ts-modes or rustic-mode).
+    ;; Since it's already working on the super org buffer, it's redundant to let
+    ;; it work on the contents of each babel block.
+    (defun +indent-guides-in-org-src-block-p ()
+      (string-prefix-p " *org-src-fontification:" (buffer-name))))
 
   ;; HACK: The way `indent-bars-display-on-blank-lines' functions, it places
   ;;   text properties with a display property containing a newline, which
@@ -82,7 +86,7 @@ be enabled. If any function returns non-nil, the mode will not be activated."
         (goto-char nlp)
       (apply fn col args)))
 
-  ;; HACK: `indent-bars-mode' interactions with some packages poorly, often
+  ;; HACK: `indent-bars-mode' interacts with some packages poorly, often
   ;;   flooding whole sections of the buffer with indent guides. This section is
   ;;   dedicated to fixing interop with those packages.
   (when (modulep! :tools magit)
@@ -105,21 +109,4 @@ be enabled. If any function returns non-nil, the mode will not be activated."
     (defadvice! +indent-guides--restore-after-lsp-ui-peek-a (&rest _)
       :after #'lsp-ui-peek--peek-hide
       (unless indent-bars-prefer-character
-        (indent-bars-setup))))
-
-  ;; HACK: Both indent-bars and tree-sitter-hl-mode use the jit-font-lock
-  ;;   mechanism, and so they don't play well together. For those particular
-  ;;   cases, we'll use `highlight-indent-guides', at least until the
-  ;;   tree-sitter module adopts treesit.
-  (defvar-local +indent-guides-p nil)
-  (add-hook! 'tree-sitter-mode-hook :append
-    (defun +indent-guides--toggle-on-tree-sitter-h ()
-      (if tree-sitter-mode
-          (when (bound-and-true-p indent-bars-mode)
-            (with-memoization (get 'indent-bars-mode 'disabled-in-tree-sitter)
-              (doom-log "Disabled `indent-bars-mode' because it's not supported in `tree-sitter-mode'")
-              t)
-            (indent-bars-mode -1)
-            (setq +indent-guides-p t))
-        (when +indent-guides-p
-          (indent-bars-mode +1))))))
+        (indent-bars-setup)))))

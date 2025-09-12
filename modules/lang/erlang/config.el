@@ -5,9 +5,15 @@
   :mode ("/rebar\\.config\\(?:\\.script\\)?\\'" . erlang-mode)
   :mode ("/\\(?:app\\|sys\\)\\.config\\'" . erlang-mode)
   :config
-  (set-formatter! 'erlfmt '("rebar3" "fmt" "-") :modes '(erlang-mode))
+  (set-formatter! 'erlfmt '("rebar3" "fmt" "-")
+    :modes '(erlang-mode erlang-ts-mode))
   (when (modulep! +lsp)
-    (add-hook 'erlang-mode-local-vars-hook #'lsp! 'append))
+    (add-hook 'erlang-mode-local-vars-hook #'lsp! 'append)))
 
-  (when (modulep! +tree-sitter)
-    (add-hook 'erlang-mode-local-vars-hook #'tree-sitter! 'append)))
+
+(use-package! erlang-ts
+  :when (modulep! +tree-sitter)
+  :defer t
+  :init
+  (set-tree-sitter! 'erlang-mode 'erlang-ts-mode
+    '((erlang :url "https://github.com/WhatsApp/tree-sitter-erlang"))))
