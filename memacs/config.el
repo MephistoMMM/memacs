@@ -37,6 +37,14 @@
 ;;   MAJOR-MODE  Any major mode symbol"
 (setq doom-scratch-initial-major-mode t)
 
+(setq +format-on-save-disabled-modes
+      '(sql-mode           ; sqlformat is currently broken
+        tex-mode           ; latexindent is broken
+        latex-mode
+        LaTeX-mode
+        org-msg-edit-mode
+        emacs-lisp-mode))
+
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
 ;; - `load!' for loading external *.el files relative to this one
@@ -104,7 +112,7 @@
   ;;  ((text-mode prog-mode) . smart-input-source-inline-english-mode))
   :config
   (sis-ism-lazyman-config
-  
+
    ;; English input source may be: "ABC", "US" or another one.
    ;; "com.apple.keylayout.US"
    "com.apple.keylayout.ABC"
@@ -113,7 +121,7 @@
    ;; "im.rime.inputmethod.Squirrel.Rime"
    "com.apple.inputmethod.SCIM.ITABC")
 
-    ;; enable the /cursor color/ mode
+  ;; enable the /cursor color/ mode
   (sis-global-cursor-color-mode t)
   ;; enable the /respect/ mode
   (sis-global-respect-mode t)
@@ -127,7 +135,7 @@
 
 (use-package! image
   :custom
-    ;; Enable converting external formats (ie. webp) to internal ones.
+  ;; Enable converting external formats (ie. webp) to internal ones.
   (image-use-external-converter t))
 
 ;; add memacs keybinds group
