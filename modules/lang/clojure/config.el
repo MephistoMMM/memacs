@@ -23,6 +23,12 @@
   :config
   (set-formatter! 'cljfmt '("cljfmt" "fix" "-") :modes '(clojure-mode clojurec-mode clojurescript-mode))
 
+  (when (modulep! :editor evil )
+    (add-hook! '(clojure-mode-local-vars-hook
+                 clojurec-mode-local-vars-hook
+                 clojurescript-mode-local-vars-hook)
+      (modify-syntax-entry ?- "w")))
+
   (when (modulep! +lsp)
     (add-hook! '(clojure-mode-local-vars-hook
                  clojurec-mode-local-vars-hook
