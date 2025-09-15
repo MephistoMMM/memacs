@@ -22,8 +22,7 @@
   (when (modulep! +tree-sitter)
     (set-tree-sitter! 'python-mode 'python-ts-mode
       `((python :url "https://github.com/tree-sitter/tree-sitter-python"
-                :rev ,(if (< (treesit-library-abi-version) 15) "v0.23.6")
-                :commit "bffb65a8cfe4e46290331dfef0dbf0ef3679de11"))))
+                :rev ,(if (< (treesit-library-abi-version) 15) "v0.23.6" "v0.25.0")))))
 
   :config
   ;; HACK: `python-base-mode' (and `python-ts-mode') don't exist on pre-29
@@ -35,9 +34,19 @@
   (when (modulep! +lsp)
     (add-hook 'python-mode-local-vars-hook #'lsp! 'append)
     (add-hook 'python-ts-mode-local-vars-hook #'lsp! 'append)
-    ;; Use "mspyls" in eglot if in PATH
-    (when (executable-find "Microsoft.Python.LanguageServer")
-      (set-eglot-client! '(python-mode python-ts-mode) '("Microsoft.Python.LanguageServer"))))
+
+    ;; REVIEW: PR this upstream, which assumes the wrong names for the
+    ;;   (based)pyright executables.
+    (set-eglot-client! '(python-mode python-ts-mode)
+                       "pylsp" "pyls"
+                       '("basedpyright" "--stdio")
+                       '("basedpyright-langserver" "--stdio")
+                       '("pyright" "--stdio")
+                       '("pyright-langserver" "--stdio")
+                       '("pyrefly" "lsp")
+                       "jedi-language-server"
+                       '("ruff" "server")
+                       "ruff-lsp"))
 
   (set-repl-handler! '(python-mode python-ts-mode) #'+python/open-repl
     :persist t
