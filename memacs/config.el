@@ -7,7 +7,7 @@
 ;; These are used for a number of things, particularly for GPG configuration,
 ;; some email clients, file templates and snippets.
 (setq user-full-name "Mephis Pheies"
-      user-mail-address "mephistommm@gmail.com")
+      user-mail-address "mephispheies@qq.com")
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
@@ -18,7 +18,7 @@
 ;;
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
-(setq doom-font (font-spec :family "monofur for Powerline" :size 18))
+(setq doom-font (font-spec :family "Fira Code" :size 16))
 (setq doom-chinese-font (font-spec :family "Kaiti SC"))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and

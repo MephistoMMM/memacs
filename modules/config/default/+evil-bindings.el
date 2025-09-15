@@ -299,7 +299,7 @@
 
       (:when (modulep! :ui workspaces)
        :n "C-t"   #'+workspace/new
-       ;; :n "C-S-t" #'+workspace/display
+       :n "C-S-t" #'+workspace/display
        :g "M-1"   #'+workspace/switch-to-0
        :g "M-2"   #'+workspace/switch-to-1
        :g "M-3"   #'+workspace/switch-to-2
@@ -309,20 +309,7 @@
        :g "M-7"   #'+workspace/switch-to-6
        :g "M-8"   #'+workspace/switch-to-7
        :g "M-9"   #'+workspace/switch-to-8
-       :g "M-0"   #'+workspace/switch-to-final
-       (:when (featurep :system 'macos)
-        :g "s-t"   #'+workspace/new
-        ;; :g "s-T"   #'+workspace/display
-        :n "s-1"   #'+workspace/switch-to-0
-        :n "s-2"   #'+workspace/switch-to-1
-        :n "s-3"   #'+workspace/switch-to-2
-        :n "s-4"   #'+workspace/switch-to-3
-        :n "s-5"   #'+workspace/switch-to-4
-        :n "s-6"   #'+workspace/switch-to-5
-        :n "s-7"   #'+workspace/switch-to-6
-        :n "s-8"   #'+workspace/switch-to-7
-        :n "s-9"   #'+workspace/switch-to-8
-        :n "s-0"   #'+workspace/switch-to-final)))
+       :g "M-0"   #'+workspace/switch-to-final))
 
 ;;; :editor
 (map! (:when (modulep! :editor format)
@@ -931,7 +918,9 @@
    :desc "Search .emacs.d"              "e" #'+default/search-emacsd
    :desc "Locate file"                  "f" #'locate
    :desc "Jump to symbol"               "i" #'imenu
-   :desc "Jump to symbol in open buffers" "I" #'consult-imenu-multi
+       :desc "Jump to symbol in open buffers" "I"
+       (cond ((modulep! :completion vertico)   #'consult-imenu-multi)
+             ((modulep! :completion helm)      #'helm-imenu-in-all-buffers))
    :desc "Jump to visible link"         "l" #'link-hint-open-link
    :desc "Jump to link"                 "L" #'ffap-menu
    :desc "Jump list"                    "j" #'evil-show-jumps
@@ -941,8 +930,7 @@
    :desc "Look up in local docsets"     "k" #'+lookup/in-docsets
    :desc "Look up in all docsets"       "K" #'+lookup/in-all-docsets
    :desc "Search project"               "/" #'+default/search-project
-   :desc "Search project for thing at point" "?" #'+default/search-project-for-symbol-at-point
-   :desc "Search other project"         "P" #'+default/search-other-project
+       :desc "Search other project"         "P" #'+default/search-other-project
    :desc "Jump to mark"                 "r" #'evil-show-marks
    :desc "Search buffer"                "s" #'+default/search-buffer
    :desc "Search buffer for thing at point" "S"
@@ -954,11 +942,6 @@
    :desc "Undo history"                 "u"
    (cond ((modulep! :emacs undo +tree)     #'undo-tree-visualize)
          ((modulep! :emacs undo)           #'vundo)))
-
- ;;; M-y --- yank
- :nmei "M-y" #'counsel-yank-pop
- ;;; M-e --- register
- :nmei "M-e" #'counsel-evil-registers
  )
 
 (after! which-key

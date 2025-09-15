@@ -58,7 +58,17 @@
                  clojurec-mode-local-vars-hook
                  clojurescript-mode-local-vars-hook)
       (modify-syntax-entry ?- "w")))
-  (setq lsp-clojure-custom-server-command '("clojure-lsp")))
+  (setq lsp-clojure-custom-server-command '("clojure-lsp"))
+  (set-ligatures! 'clojure-mode
+    :null "nil"
+    :def  "defn"
+    :true "true"
+    :false "false"
+    :and "and"
+    :or "or"
+    :not "!"
+    :lambda "fn"
+    :lambda "fn_"))
 
 
 (use-package! clojure-ts-mode

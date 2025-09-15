@@ -24,7 +24,7 @@ fi
 
 echo "Start install Fira Code Memacs Symbol fonts..."
 # https://github.com/tonsky/FiraCode/wiki/Installing
-brew tap homebrew/cask-fonts && brew cask install font-fira-code
+brew install font-fira-code
 if [ $? -eq 0 ]; then
     echo "Finish installing Fira Code Memacs Symbol fonts."
 else
