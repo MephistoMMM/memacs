@@ -66,9 +66,15 @@
     :false "false"
     :and "and"
     :or "or"
-    :not "!"
+    :not "not"
     :lambda "fn"
-    :lambda "fn_"))
+    :lambda "fn_"
+    :empty-set "#{}"
+    :some "some"
+    :local "let"
+    :do "do"
+    :promise "promise"
+    :atom "atom"))
 
 
 (use-package! clojure-ts-mode

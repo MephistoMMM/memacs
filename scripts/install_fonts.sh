@@ -7,19 +7,12 @@
 #
 ROOTPATH=${PWD%/scripts}
 
-echo "Start install powerline fonts..."
-export FONTS_PATH=/tmp/memacs_`date "+%Y%m%d"`/install_fonts
-
-if [ ! -d $FONTS_PATH ]; then
-    mkdir -p $FONTS_PATH
-fi
-
-git clone https://github.com/powerline/fonts.git $FONTS_PATH/powerlinefonts \
-        && $FONTS_PATH/powerlinefonts/install.sh
+echo "Start install Nerd Icons fonts ..."
+brew install font-hack-nerd-font
 if [ $? -eq 0 ]; then
-    echo "Finish installing powerline fonts."
+    echo "Finish installing Nerd Icons fonts."
 else
-    echo "Failed to install powerline fonts!"
+    echo "Failed to install Nerd Icons fonts!"
 fi
 
 echo "Start install Fira Code Memacs Symbol fonts..."

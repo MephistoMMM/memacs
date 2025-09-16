@@ -124,7 +124,8 @@ Doesn't work in terminal Emacs."
   "Reload your fonts, if they're set.
 See `doom-init-fonts-h'."
   (interactive)
-  (doom-init-fonts-h 'reload))
+  (doom-init-fonts-h 'reload)
+  (doom-init-extra-fonts-h))
 
 ;;;###autoload
 (defun doom/increase-font-size (count &optional increment)
