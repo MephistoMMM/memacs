@@ -142,6 +142,8 @@ isn't disabled in `+ligatures-extras-in-modes'."
  ;; so use that instead if this module is enabled.
  ((if (featurep :system 'macos)
       (fboundp 'mac-auto-operator-composition-mode))
+  ;; HACK fix org bullet star view
+  (setq mac-auto-operator-composition-characters "!\"#$%&'()+,-./:;<=>?@[\\]^_`{|}~")
   (add-hook 'doom-init-ui-hook #'mac-auto-operator-composition-mode 'append))
 
  ;; This module does not support Emacs 27 and less, but if we still try to
