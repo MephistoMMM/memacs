@@ -7,6 +7,15 @@
 ;;
 ;;; Code:
 
+;; These two functions don't exist in terminal Emacs, but some Emacs packages
+;; (internal and external) use it anyway, leading to void-function errors. I
+;; define a no-op substitute to suppress them.
+(unless (fboundp 'define-fringe-bitmap)
+  (fset 'define-fringe-bitmap #'ignore))
+(unless (fboundp 'set-fontset-font)
+  (fset 'set-fontset-font #'ignore))
+
+
 ;;; From Emacs >= 28
 ;; `format-spec' wasn't autoloaded until 28.1
 (unless (fboundp 'format-spec)
@@ -131,6 +140,25 @@ The functions in the hook are called with one parameter -- the
     (when (custom-theme-enabled-p theme)
       (funcall fn theme)
       (run-hook-with-args 'enable-theme-functions theme))))
+
+;; Introduced in 29.1
+;; In case of Emacs builds where treesit isn't built in (to avoid void-function
+;; errors and verbose, redundant checks everywhere).
+;;;###autodef
+(unless (fboundp 'treesit-available-p)
+  (defun treesit-available-p ()
+    "Return non-nil if tree-sitter support is built-in and available."
+    nil))
+
+;;;###autoload
+(unless (fboundp 'treesit-library-abi-version)
+  (defun treesit-library-abi-version (&optional _min-compatible)
+    0))
+
+;;;###autoload
+(unless (fboundp 'treesit-language-abi-version)
+  (defun treesit-language-abi-version (&optional _lang)
+    nil))
 
 
 ;;; From Emacs >= 30
