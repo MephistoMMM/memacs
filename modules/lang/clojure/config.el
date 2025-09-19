@@ -73,6 +73,7 @@
     :some "some"
     :local "let"
     :do "do"
+    :clj-macro "defmacro"
     :promise "promise"
     :atom "atom"))
 

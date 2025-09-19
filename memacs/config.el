@@ -120,6 +120,7 @@
           :return        "⮑"
           :yield         "⟻"
           ;; Other
+          :clj-macro     ""
           :atom          "◉"
           :promise       "ℙ"
           :local         "⚲"
