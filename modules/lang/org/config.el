@@ -284,23 +284,7 @@ Also adds support for a `:sync' parameter to override `:async'."
         (save-excursion
           (when-let ((beg (org-babel-where-is-src-block-result))
                      (end (progn (goto-char beg) (forward-line) (org-babel-result-end))))
-            (org-display-inline-images nil nil (min beg end) (max beg end)))))))
-
-  (after! python
-    (unless org-babel-python-command
-      (setq org-babel-python-command
-            (string-trim
-             (concat python-shell-interpreter " "
-                     (if (string-match-p "\\<i?python[23]?$" python-shell-interpreter)
-                         (replace-regexp-in-string
-                          "\\(^\\| \\)-i\\( \\|$\\)" " " python-shell-interpreter-args)
-                       python-shell-interpreter-args))))))
-
-  (after! ob-ditaa
-    ;; TODO Should be fixed upstream
-    (let ((default-directory (org-find-library-dir "org-contribdir")))
-      (setq org-ditaa-jar-path     (expand-file-name "scripts/ditaa.jar")
-            org-ditaa-eps-jar-path (expand-file-name "scripts/DitaaEps.jar")))))
+            (org-display-inline-images nil nil (min beg end) (max beg end))))))))
 
 
 (defun +org-init-babel-lazy-loader-h ()
