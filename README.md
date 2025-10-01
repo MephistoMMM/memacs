@@ -1,261 +1,285 @@
 <div align="center">
 
+本项目为本人 Doom 配置维护方式的实际案例。
+
 # Doom Emacs
 
 [Install](#install) • [Documentation] • [FAQ] • [Screenshots] • [Contribute](#contribute)
 
-![Made with Doom Emacs](https://img.shields.io/github/tag/doomemacs/doomemacs.svg?style=flat-square&label=release&color=58839b)
-![Supports Emacs 27.1–30.2](https://img.shields.io/badge/Supports-Emacs_27.1–30.2-blueviolet.svg?style=flat-square&logo=GNU%20Emacs&logoColor=white)
-![Latest commit](https://img.shields.io/github/last-commit/doomemacs/doomemacs?style=flat-square)
-<!-- ![Build status: master](https://img.shields.io/github/workflow/status/doomemacs/doomemacs/CI/master?style=flat-square) -->
-[![Discord Server](https://img.shields.io/discord/406534637242810369?color=738adb&label=Discord&logo=discord&logoColor=white&style=flat-square)][discord]
-[![Discussions board](https://img.shields.io/github/discussions/doomemacs/community?label=Discussions&logo=github&style=flat-square)][discuss]
+# 说明
 
-![Doom Emacs Screenshot](https://raw.githubusercontent.com/doomemacs/doomemacs/screenshots/main.png)
+[Doom](https://github.com/doomemacs/doomemacs) 是非常强大的、可配置性极高的 Emacs 配置框架，
+用户使用时只需要 clone 它源码到 `~/.config/emacs` 目录，再将自己的配置写到 `~/.doom.d` 即可。按标准使用
+方式，用户只维护 `~/.doom.d` 目录下自己的配置。但是，随着用户逐渐深度地使用 Emacs ，Doom 提供的
+可配置空间将愈发不足。因此需要一种方式，既能方便地同步 Doom 原项目的更新，又可以随意修改 Doom 任意配置。
 
-</div>
+本人曾采用 clone 原项目到本地并添加两个远程库（一个为 Doom ，另一个为本人自己的github 仓库）的方式，使用
+过程中发现分支提交数量过多，除少量本人提交之外，绝大多数都是原库各位贡献者大佬的提交。在该方式下，大量提交是
+一种负担，然而用户仅想区分自身提交与官方改动。为改进此问题，本人设计了一种新的同步方式，以供所需者参考。
 
----
+# 方案
 
-### Table of Contents
-- [Introduction](#introduction)
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Install](#install)
-- [Roadmap](#roadmap)
-- [Getting help](#getting-help)
-- [Contribute](#contribute)
+## 核心设计
 
+1. 识别出 Doom 中比用户项目已同步提交更新的所有提交；
+   - 如，Doom主分支提交为 `A..G` ，用户项目主分支已同步提交为 `A..C` ，此状态下用户需要同步的更新提交
+     为 `E..G` 。
+   - 注，案例中用户项目主分支为用户主要维护分支，已同步提交为用户与 Doom 主分支的同步状态，用户主分支中
+     不含有 `A..C` 提交。
+2. 将更新的提交压缩为一个汇总提交，所有提交信息也压缩为汇总提交的提交信息；
+   - 即，将 `E..G` 压缩为 `U1` 
+3. 将汇总提交合并至用户项目主要维护的分支；
+   - 即，将压缩后的 `U1` 合并至用户项目主分支
 
-# Introduction
-<a href="http://ultravioletbat.deviantart.com/art/Yay-Evil-111710573">
-  <img src="https://raw.githubusercontent.com/doomemacs/doomemacs/screenshots/cacochan.png" align="right" />
-</a>
+## 实现
 
-> It is a story as old as time. A stubborn, shell-dwelling, and melodramatic
-> vimmer—envious of the features of modern text editors—spirals into
-> despair before he succumbs to the [dark side][evil-mode]. This is his config.
+本节指导如何在已定期同步 Doom 官方提交的用户项目上作调整，从0开始的项目可参考简化。
 
-Doom is a configuration framework for [GNU Emacs] tailored for Emacs bankruptcy
-veterans who want less framework in their frameworks, a modicum of stability
-(and reproducibility) from their package manager, and the performance of a hand
-rolled config (or better). It can be a foundation for your own config or a
-resource for Emacs enthusiasts to learn more about our favorite operating
-system.
+**0.重新克隆 Doom 项目**
 
-Its design is guided by these mantras:
-
-+ **Gotta go fast.** Startup and run-time performance are priorities. Doom goes
-  beyond by modifying packages to be snappier and load lazier.
-+ **Close to metal.** There's less between you and vanilla Emacs by design.
-  That's less to grok and less to work around when you tinker. Internals ought
-  to be written as if reading them were part of Doom's UX, and it is!
-+ **Opinionated, but not stubborn.** Doom is about reasonable defaults and
-  curated opinions, but use as little or as much of it as you like.
-+ **Your system, your rules.** You know better. At least, Doom hopes so! It
-  won't *automatically* install system dependencies (and will force plugins not
-  to either). Rely on `doom doctor` to tell you what's missing.
-+ **Nix/Guix is a great idea!** The Emacs ecosystem is temperamental. Things
-  break and they break often. Disaster recovery should be a priority! Doom's
-  package management should be declarative and your private config reproducible,
-  and comes with a means to roll back releases and updates (still a WIP).
-  
-Check out [the FAQ][FAQ] for answers to common questions about the project.
-
-
-# Features
-- Minimalistic good looks inspired by modern editors.
-- Curated and sane defaults for many packages, (major) OSes, and Emacs itself.
-- A modular organizational structure for separating concerns in your config.
-- A standard library designed to simplify your elisp bike shedding.
-- A declarative [package management system][package-management] (powered by
-  [straight.el]) with a command line interface. Install packages from anywhere,
-  not just (M)ELPA, and pin them to any commit.
-- Optional vim emulation powered by [evil-mode], including ports of popular vim
-  plugins like [vim-sneak], [vim-easymotion], [vim-unimpaired] and
-  [more][ported-vim-plugins]!
-- Opt-in LSP integration for many languages, using [lsp-mode] or [eglot]
-- Support for *many* programming languages. Includes syntax highlighting,
-  linters/checker integration, inline code evaluation, code completion (where
-  possible), REPLs, documentation lookups, snippets, and more!
-- Support for *many* tools, like docker, pass, ansible, terraform, and more.
-- A Spacemacs-esque [keybinding scheme][bindings], centered around leader
-  and localleader prefix keys (<kbd>SPC</kbd> and <kbd>SPC</kbd><kbd>m</kbd> for
-  evil users, <kbd>C-c</kbd> and <kbd>C-c l</kbd> for vanilla users).
-- A rule-based [popup manager][popup-system] to control how temporary buffers
-  are displayed (and disposed of).
-- Per-file indentation style detection and [editorconfig] integration. Let
-  someone else argue about tabs vs **_spaces_**.
-- Project-management tools and framework-specific minor modes with their own
-  snippets libraries.
-- Project search (and replace) utilities, powered by [ripgrep] and [ivy] or
-  [helm].
-- Isolated and persistent workspaces (also substitutes for vim tabs).
-- Support for Chinese and Japanese input systems.
-- Save a snapshot of your shell environment to a file for Emacs to load at
-  startup. No more struggling to get Emacs to inherit your `PATH`, among other
-  things.
-
-
-# Prerequisites
-- **Required:**
-  - GNU Emacs 27.1–30.2
-    - 30.2 is recommended (fastest and most stable)
-    - Doom's modules require >=28.1
-      - Tree-sitter support requires >= 29.1
-      - JS(X)/TS(X) support is far better on >= 30.1 (w/ tree-sitter)
-    - Doom's core requires >=27.1
-  - Git >= 2.23
-  - [ripgrep] >= 11.0
-- **Optional, but recommended:**
-  - [fd] 7.3.0+ (used to improve file indexing performance)
-  - GNU variants of `find`, `ls`, and `tar` (on MacOS and BSD *nix)
-  - Symbola font (Emacs' fallback font for glyphs it can't display)
-
-> [!WARNING]
-> Unstable and pre-release builds of Emacs -- which end in `.50`, `.60`, or
-> `.9X` (e.g. `28.1.91`) -- **are not officially supported**. There *is* some
-> effort to support Emacs HEAD, however. [Follow this Discourse
-> post](https://discourse.doomemacs.org/t/3241) for details.
- 
-> [!IMPORTANT]
-> Doom is comprised of [~150 optional modules][Modules], some of which may have
-> additional dependencies. [Visit their documentation][Modules] or run `bin/doom
-> doctor` to check for any that you may have missed.
-
-
-# Install
 ``` sh
-git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
-~/.config/emacs/bin/doom install
+$ git clone --single-branch https://github.com/hlissner/doom-emacs NEW_PROJECT
 ```
 
-Then [read our Getting Started guide][getting-started] to be walked through
-installing, configuring and maintaining Doom Emacs.
+**1.识别 Doom 中本地项目当前已合并的最新提交并回退**
 
-It's a good idea to add `~/.config/emacs/bin` to your `PATH`! Other `bin/doom`
-commands you should know about:
+此步骤需人为识别，通过 `git log` 命令在用户项目中筛选出 Doom 的最新提交，获取提交id，如 `8846d151814ebbf7fb90d9d5dd16cd737257408e` 。
 
-+ `doom sync` to synchronize your private config with Doom by installing missing
-  packages, removing orphaned packages, and regenerating caches. Run this
-  whenever you modify your private `init.el` or `packages.el`, or install/remove
-  an Emacs package through your OS package manager (e.g. mu4e or agda).
-+ `doom upgrade` to update Doom to the latest release & all installed packages.
-+ `doom doctor` to diagnose common issues with your system and config.
-+ `doom env` to dump a snapshot of your shell environment to a file that Doom
-  will load at startup. This allows Emacs to inherit your `PATH`, among other
-  things.
+在 NEW_PROJECT 中执行回退：
 
+``` sh
+$ cd NEW_PROJECT
+$ git reset --hard 8846d151814ebbf7fb90d9d5dd16cd737257408e
+```
 
-# Roadmap
-Doom is an active and ongoing project. To make that development more
-transparent, its roadmap (and other concerns) are published across three github
-project boards and a newsletter:
+**2.重建项目git仓库**
 
-- [Development Roadmap](https://doomemacs.org/roadmap)
-- [Packages under review](https://doomemacs.org/packages-under-review):
-  lists plugins we are watching and considering for inclusion, and what their
-  status for inclusion is. Please consult this list before requesting new
-  packages/features.
-+ [Upstream bugs](https://github.com/orgs/doomemacs/projects/7): lists
-  issues that originate from elsewhere, and whether or not we have local
-  workarounds or temporary fixes for them.
-+ ~~Doom's newsletter~~ (not finished) will contain changelogs in between
-  releases.
-  
+在 NEW_PROJECT 中清理原git仓库信息，将当前目录中文件内容作为重建后仓库的第一个提交。
 
-# Getting help
-Emacs is no journey of a mere thousand miles. You _will_ run into problems and
-mysterious errors. When you do, here are some places you can look for help:
+``` sh
+$ cd NEW_PROJECT
+$ rm -rf .git
+$ git init
+$ git add --all
+$ git commit -am "init: squash to 8846d151814ebbf7fb90d9d5dd16cd737257408e"
+```
 
-+ [Our documentation][documentation] covers many use cases.
-  + [The Configuration section][configuration] covers how to configure Doom and
-    its packages.
-  + [The Package Management section][package-management] covers how to install
-    and disable packages.
-  + [This section][bin/doom] explains the `bin/doom` script's most important
-    commands.
-  + [This section][common-mistakes] lists some common configuration mistakes new
-    users make, when migrating a config from another distro or their own.
-  + [This answer][change-theme] shows you how to add your own themes to your
-    private config.
-  + [This answer][change-font] shows you how to change the default font.
-  + Your issue may be documented in the [FAQ].
-+ With Emacs built-in help system documentation is a keystroke away:
-  + For functions: <kbd>SPC h f</kbd> or <kbd>C-h f</kbd>
-  + For variables: <kbd>SPC h v</kbd> or <kbd>C-h v</kbd>
-  + For a keybind: <kbd>SPC h k</kbd> or <kbd>C-h k</kbd>
-  + To search available keybinds: <kbd>SPC h b b</kbd> or <kbd>C-h b b</kbd>
-+ Run `bin/doom doctor` to detect common issues with your development
-  environment and private config.
-+ Check out the [FAQ] or [Community FAQs][community-faq], in case your question
-  has already been answered.
-+ Search [Doom's issue tracker](https://github.com/doomemacs/doomemacs/issues)
-  in case your issue was already reported.
-+ Hop on [our Discord server][discord]; it's active and friendly! Keep an eye on
-  the #announcements channel, where I announce breaking updates and releases.
+**3.拷贝原用户项目文件覆盖至新项目中并提交**
 
+删除 NEW_PROJECT 中除 `.git/` 以外的所有文件与文件夹。
 
-# Contribute
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
-[![Elisp styleguide](https://img.shields.io/badge/elisp-style%20guide-purple?style=flat-square)](https://github.com/bbatsov/emacs-lisp-style-guide)
-[![Donate on liberapay](https://img.shields.io/badge/liberapay-donate-1.svg?style=flat-square&logo=liberapay&color=blue)][liberapay]
-[![Donate on paypal](https://img.shields.io/badge/paypal-donate-1?style=flat-square&logo=paypal&color=blue)][paypal]
+``` sh
+$ cd NEW_PROJECT
+$ rm -rf .d* .github .gitignore bin docs early-init.el LICENSE lisp modules profiles README.md shell.nix static
+```
 
-Doom is a labor of love and incurable madness, but I'm only one guy. Doom
-wouldn't be where it is today without your help. I welcome contributions of any
-kind!
+拷贝用户原项目 OLD_PROJECT 中除 `.git/` 以外的所有文件与文件夹。此处建议通过手工拖拽形式等形式将非隐藏文件复制到 NEW_PROJECT 文件夹，隐藏文件通过命令拷贝：
 
-+ I :heart: pull requests and bug reports (see the [Contributing
-  Guidelines][contribute])!
-+ Don't hesitate to [tell me my Elisp-fu
-  sucks](https://github.com/doomemacs/doomemacs/issues/new/choose), but please
-  tell me why.
-+ Hop on [our Discord server][discord] and say hi! Help others, hang out or talk
-  to me about Emacs, gamedev, programming, physics, pixel art, anime, gaming --
-  anything you like. Nourish this lonely soul.
-+ If you'd like to support my work financially, buy me a drink through
-  [liberapay] or [paypal]. My work contends with studies, adventures in indie
-  gamedev and freelance work. Donations help me allocate more time to my Emacs
-  and OSS capers.
+``` sh
+$ cp -R ../OLD_PROJECT/.clj-kondo ../OLD_PROJECT/.d* ../OLD_PROJECT/.gitignore ../OLD_PROJECT/.lsp/ .
+```
 
+提交第一个用户改动，该改动压缩了用户历史所有提交。
 
-[contribute]: docs/contributing.org
-[discord]: https://doomemacs.org/discord
-[discuss]: https://doomemacs.org/discuss
-[community-faq]: https://github.com/doomemacs/community?tab=readme-ov-file#frequently-asked-questions
-[documentation]: docs/index.org
-[faq]: https://github.com/hlissner/doom-emacs/blob/master/docs/faq.org
-[getting-started]: docs/getting_started.org
-[install]: docs/getting_started.org#install
-[backtrace]: docs/getting_started.org#how-to-extract-a-backtrace-from-an-error
-[configuration]: docs/getting_started.org#configuring-doom
-[package-management]: docs/getting_started.org#package-management
-[bin/doom]: docs/getting_started.org#the-bindoom-utility
-[common-mistakes]: docs/getting_started.org#common-mistakes-when-configuring-doom-emacs
-[change-theme]: docs/faq.org#how-do-i-change-the-theme
-[change-font]: docs/faq.org#how-do-i-change-the-fonts
-[modules]: docs/modules.org
-[popup-system]: modules/ui/popup/README.org
-[screenshots]: https://github.com/doomemacs/doomemacs/tree/screenshots#emacsd-screenshots
+``` sh
+$ git add --all
+$ git commit -am"migrate: squash until 2025.3.31"
+```
 
-[bindings]: modules/config/default/+evil-bindings.el
-[editorconfig]: http://editorconfig.org/
-[evil-mode]: https://github.com/emacs-evil/evil
-[fd]: https://github.com/sharkdp/fd
-[gnu emacs]: https://www.gnu.org/software/emacs/
-[helm]: https://github.com/emacs-helm/helm
-[ivy]: https://github.com/abo-abo/swiper
-[lsp-mode]: https://github.com/emacs-lsp/lsp-mode
-[eglot]: https://github.com/joaotavora/eglot
-[nix]: https://nixos.org
-[ported-vim-plugins]: modules/editor/evil/README.org#ported-vim-plugins
-[ripgrep]: https://github.com/BurntSushi/ripgrep
-[straight.el]: https://github.com/radian-software/straight.el
-[vim-easymotion]: https://github.com/easymotion/vim-easymotion
-[vim-lion]: https://github.com/tommcdo/vim-lion
-[vim-sneak]: https://github.com/justinmk/vim-sneak
-[vim-unimpaired]: https://github.com/tpope/vim-unimpaired
+**4.新建同步分支并回退至用户项目当前已合并的最新提交**
 
-[liberapay]: https://liberapay.com/hlissner/donate
-[paypal]: https://paypal.me/hlissner/10
+新建同步分支，该分支用于压缩提交。
+
+``` sh
+$ cd NEW_PROJECT
+$ git checkout -b doom-squash
+$ git reset --hard HEAD^
+$ git remote add doom https://github.com/hlissner/doom-emacs
+```
+
+**5.创建同步状态文件**
+
+同步状态文件用于同步脚本识别已同步提交状态，内容为已同步最新提交的提交id。
+
+``` sh
+$ cd NEW_PROJECT
+$ mkdir -p .local/doom-branch-sync
+$ echo -n "8846d151814ebbf7fb90d9d5dd16cd737257408e" > .local/doom-branch-sync/head
+```
+
+**6.创建同步脚本并执行同步**
+
+在 NEW_PROJECT 目录外创建同步脚本 `auto_merge.sh` ，复制下文同步脚本中的内容，并通过 `chmod a+x auto_merge.sh` 添加执行权限。
+
+执行同步：
+
+``` sh
+$ ./auto_merge.sh ./NEW_PROJECT
+```
+
+## 同步脚本
+
+``` sh
+#!/bin/bash
+#
+# 同步doom项目更新代码到用户项目的master分支。doom项目的新提交将被压缩成一个提交。
+#
+# USAGE:
+#   sh auto_merge.sh DIR
+#      DIR 为本地 doom emacs 项目所在目录。
+#
+#
+
+MEMACS_DIR=$1
+if [ -z "$MEMACS_DIR" ]; then
+    echo "USAGE:"
+    echo "  sh auth_merge.sh DIR"
+    echo "      DIR 为本地 memacs 项目所在目录。"
+    exit 1
+fi
+
+if [ ! -d $MEMACS_DIR ] || [ ! -d  $MEMACS_DIR/.git ]; then
+    echo "Error: $MEMACS_DIR 不是一个合法 memacs 项目目录。"
+    exit 1
+fi
+
+# 主项目分支
+BRANCH_MASTER=master
+# 同步中间分支
+BRANCH_SQUASH=doom-squash
+# doom远程名
+REMOTE_DOOM=doom
+
+LOCAL_DIR=.local/doom-branch-sync
+
+# 获取远程doom的master分支最新提交
+function am_get_remote_doom_head_commit() {
+    git fetch $REMOTE_DOOM > /dev/null 2>&1 
+    git log --pretty=oneline --remotes=$REMOTE_DOOM | head -n 1 | awk '{ print $1 }'
+    return $?
+}
+
+# 将提交压入历史栈并返回上一次栈顶提交
+function am_push_doom_squash_sync_commit() {
+    now=$1
+    if [ -z "$now" ]; then
+        return 1
+    fi
+    mkdir -p $LOCAL_DIR
+    if [ ! -f $LOCAL_DIR/head ]; then
+        return 1
+    fi
+
+    prev=`cat $LOCAL_DIR/head`
+    if [ "$prev" == "$now" ]; then
+        # 前后版本相同，无需执行更新
+        return 2
+    fi
+    echo -n "$prev" > $LOCAL_DIR/prev
+    echo -n "$now"  > $LOCAL_DIR/head
+    echo "$prev"
+}
+
+# 安全切换分支
+function am_checkout_branch_safely() {
+    target_branch=$1
+    if [ -z "$target_branch" ]; then
+        exit 1
+    fi
+    git checkout $1
+    return $?
+}
+
+# 获取远程doom中两个提交之间所有的改动并应用
+function am_diff_commits_and_apply_change() {
+    prev=$1
+    head=$2
+    if [ -z "$prev" ]; then
+        return 1
+    fi
+    if [ -z "$head" ]; then
+        return 1
+    fi
+    git diff $prev..$head | git apply --3way
+    return $?
+}
+
+# 获取远程doom中两个提交之间所有日志并提交当前改动
+function am_log_commits_and_commit() {
+    prev=$1
+    head=$2
+    if [ -z "$prev" ]; then
+        return 1
+    fi
+    if [ -z "$head" ]; then
+        return 1
+    fi
+
+    git log --pretty=oneline --no-decorate --remotes=$REMOTE_DOOM $prev..$head \
+        | awk '{$1=""}1' > $LOCAL_DIR/message
+    if [ $? -ne 0 ]; then
+        return 1
+    fi
+
+    git commit -am"squash:$prev..$head
+$(cat $LOCAL_DIR/message )"
+    return $?
+}
+
+# 合并分支
+function am_merge() {
+    target_branch=$1
+    if [ -z "$target_branch" ]; then
+        exit 1
+    fi
+    git merge $target_branch
+    return $?
+}
+
+cd $MEMACS_DIR
+latest_commit=`am_get_remote_doom_head_commit`
+if [ $? -ne 0 ]; then
+    echo "Error: 未获取到远程doom的master分支最新提交。"
+    exit 1
+fi
+
+previous_commit=`am_push_doom_squash_sync_commit $latest_commit`
+re=$?
+if [ $re -ne 0 ]; then
+    if [ $re -eq 2 ]; then
+        echo "Info: doom未更新，无需同步。"
+        exit 0
+    fi
+    echo "Error: 将提交压入历史栈并返回上一次栈顶提交错误。"
+    exit 1
+fi
+
+am_checkout_branch_safely $BRANCH_SQUASH
+if [ $? -ne 0 ]; then
+    echo "Error: 无法切换分支至$BRANCH_SQUASH。"
+    exit 1
+fi
+
+echo "获取远程doom中 $prev 与 $head 之间所有的改动并应用"
+am_diff_commits_and_apply_change $previous_commit $latest_commit
+if [ $? -ne 0 ]; then
+    echo "Error: 无法获取远程doom中两个提交之间所有的改动并应用。"
+    exit 1
+fi
+
+am_log_commits_and_commit $previous_commit $latest_commit
+if [ $? -ne 0 ]; then
+    echo "Error: 无法获取远程doom中两个提交之间所有日志并提交当前改动。"
+    exit 1
+fi
+
+am_checkout_branch_safely $BRANCH_MASTER
+if [ $? -ne 0 ]; then
+    echo "Error: 无法切换分支至$BRANCH_MASTER。"
+    exit 1
+fi
+
+echo "合并 $BRANCH_SQUASH 的改动提交到 $BRANCH_MASTER "
+am_merge $BRANCH_SQUASH
+```
+
