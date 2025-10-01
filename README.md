@@ -1,5 +1,3 @@
-<div align="center">
-
 本项目为本人 Doom 配置维护方式的实际案例。
 
 # Doom Emacs
