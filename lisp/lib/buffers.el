@@ -276,6 +276,16 @@ See `doom-real-buffer-p' for an explanation for real buffers."
 ;; Interactive commands
 
 ;;;###autoload
+(defun doom/switch-to-dashboard-or-scratch (&optional arg)
+  "Switch to dashboard buffer. If dashboard doesn't exist, switch
+to scratch."
+  (interactive "P")
+  (if (and (boundp '+doom-dashboard-name)
+         (get-buffer +doom-dashboard-name))
+      (switch-to-buffer +doom-dashboard-name)
+    (switch-to-buffer (doom-fallback-buffer))))
+
+;;;###autoload
 (defun doom/save-and-kill-buffer ()
   "Save the current buffer to file, then kill it."
   (interactive)
